@@ -120,7 +120,7 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
 	 */
     public boolean isEditable() {
         ObjectPropertyStatementAccessObject aops = new ObjectPropertyStatementAccessObject(vreq.getJenaOntModel(), individual.getURI(), SOME_PREDICATE, SOME_URI);
-        SimpleAuthorizationRequest addSomeObjectProperty = new SimpleAuthorizationRequest(aops, AccessOperation.ADD);
+        SimpleAuthorizationRequest addSomeObjectProperty = new SimpleAuthorizationRequest(aops, AccessOperation.EDIT);
         return PolicyHelper.isAuthorizedForActions(vreq, addSomeObjectProperty);
     }
 

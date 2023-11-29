@@ -105,7 +105,7 @@ public class PolicyTest {
         AttributeValueSetRegistry.getInstance().clear();
     }
 
-    protected void countRulesAndAttributes(DynamicPolicy policy, int ruleCount, Set<Integer> attrCount) {
+    protected void countRulesAndAttributes(DynamicPolicy policy, int ruleCount, Set<Integer> checksCount) {
         assertTrue(policy != null);
         Set<AccessRule> rules = policy.getRules();
         Map<String, AccessRule> ruleMap = rules.stream().collect(Collectors.toMap(r -> r.getRuleUri(), r -> r));
@@ -117,14 +117,14 @@ public class PolicyTest {
         }
         assertEquals(ruleCount, ruleMap.size());
         for (AccessRule ar : ruleMap.values()) {
-            if (!attrCount.contains(ar.getChecks().size())) {
-                log.error(String.format("Attribute count %s doesn't match for policy %s", ar.getChecks().size(),
+            if (!checksCount.contains(ar.getChecks().size())) {
+                log.error(String.format("Checks count %s doesn't match for policy %s", ar.getChecks().size(),
                         policy.getUri()));
-                for (String att : ar.getCheckUris()) {
-                    log.error(String.format("Attribute uri %s", att));
+                for (String checkUri : ar.getCheckUris()) {
+                    log.error(String.format("Checks uri %s", checkUri));
                 }
             }
-            assertTrue(attrCount.contains(ar.getChecks().size()));
+            assertTrue(checksCount.contains(ar.getChecks().size()));
             for (Check att : ar.getChecks()) {
                 assertTrue(!att.getValues().isEmpty());
             }

@@ -1,0 +1,71 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/edit-individual-pages/> .
+
+:PolicyTemplate a access:PolicyTemplate ;
+    access:hasDataSet :AdminRoleDataSet ;
+    access:hasDataSet :CuratorRoleDataSet ;
+    access:hasDataSet :EditorRoleDataSet ;
+    access:hasDataSetTemplate :RoleDataSetTemplate ;
+    access:hasRule :AllowEditIndividualPagesRule .
+
+:AdminRoleDataSet a access:DataSet ;
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet .
+
+:CuratorRoleDataSet a access:DataSet ;
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet .
+
+:EditorRoleDataSet a access:DataSet ;
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet .
+
+:RoleDataSetTemplate a access:DataSetTemplate ;
+    access:hasDataSetTemplateKey :RoleEditPagesDataSetTemplateKey ;
+    access:dataSetValueTemplate :RoleEditPagesValueSetTemplate .
+
+:RoleEditPagesValueSetTemplate a access:ValueSetTemplate ;
+    access:relatedCheck :SubjectRoleCheck;
+    access:containsElementsOfType access-individual:SubjectRole .
+
+:RoleEditPagesDataSetTemplateKey a access:DataSetTemplateKey ;
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
+
+:AllowEditIndividualPagesRule a access:Rule;
+    access:requiresCheck :SubjectRoleCheck ;
+    access:requiresCheck :IsEditOperation ;
+    access:requiresCheck :IsObjectPropertyStatement ;
+    access:requiresCheck :ObjectUriIsSomeUri ;
+    access:requiresCheck :PredicateIsSomePredicate .
+
+:SubjectRoleCheck a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:attribute access-individual:SubjectRole ;
+    access:values access-individual:AdminRoleValueSet ;
+    access:values access-individual:CuratorRoleValueSet ;
+    access:values access-individual:EditorRoleValueSet .
+
+:IsEditOperation a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:attribute access-individual:Operation ;
+    access:value access-individual:EditOperation .
+
+:PredicateIsSomePredicate a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:attribute access-individual:StatementPredicateUri ;
+    access:value :SomeUri .
+
+:ObjectUriIsSomeUri a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:attribute access-individual:StatementObjectUri ;
+    access:value :SomeUri .
+
+:IsObjectPropertyStatement a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:attribute access-individual:AccessObjectType ;
+    access:value access-individual:ObjectPropertyStatement .
+
+:SomeUri a access:AttributeUriValue ;
+    access:id "?SOME_URI" .
+
