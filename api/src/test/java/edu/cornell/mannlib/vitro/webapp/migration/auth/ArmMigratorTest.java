@@ -124,8 +124,9 @@ public class ArmMigratorTest extends AuthMigratorTest {
         armMigrator.collectAdditions(entityTypeMap);
         String stringResult = armMigrator.additions.toString();
         assertFalse(stringResult.isEmpty());
-        assertEquals(33, getCount("\n", stringResult));
-        assertEquals(33, getCount(value, stringResult));
+        assertEquals(59, getCount("\n", stringResult));
+        assertEquals(59, getCount(value, stringResult));
+        assertEquals(26, getCount(VitroVocabulary.LABEL, stringResult));
         assertEquals(6, getCount(OBJECT_PROPERTY_URI, stringResult));
         assertEquals(3, getCount(CLASS_URI, stringResult));
         assertEquals(5, getCount(DATA_PROPERTY_URI, stringResult));
