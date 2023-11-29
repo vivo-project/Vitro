@@ -1,7 +1,7 @@
 # $This file is distributed under the terms of the license in LICENSE$
 
-@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/related-allowed-property/> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/access-allowed-property/> .
 @prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
-:SelfEditorPublishObjectPropertyValueSet access:value
+:CuratorEditDataPropertyValueSet access:value
     <http://www.w3.org/2000/01/rdf-schema#label> .
