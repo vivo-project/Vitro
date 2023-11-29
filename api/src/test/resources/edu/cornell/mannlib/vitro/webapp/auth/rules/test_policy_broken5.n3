@@ -18,12 +18,12 @@ access-individual:BrokenRule rdf:type access:Rule ;
 
 access-individual:BrokenAttribute1 rdf:type access:Check ;
     access:useOperator access-individual:Equals ;
-    access:attribute access-individual:ObjectUri ;
+    access:hasTypeToCheck access-individual:ObjectUri ;
     access:setValue access-individual:valueSet1 .
 
 access-individual:BrokenAttribute2 rdf:type access:Check ;
     access:useOperator access-individual:Equals ;
-    access:attribute access-individual:ObjectUri ;
+    access:hasTypeToCheck access-individual:ObjectUri ;
     access:setValue access-individual:valueSet2 .
 
 access-individual:testDataSet1 rdf:type access:DataSet ;

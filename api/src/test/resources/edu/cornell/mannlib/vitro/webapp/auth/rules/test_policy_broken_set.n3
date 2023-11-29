@@ -19,13 +19,13 @@ access-individual:BrokenRule rdf:type access:Rule ;
     
 access-individual:BrokenSetAttribute1 rdf:type access:Check ;
     access:useOperator access-individual:NotOneOf ;
-    access:attribute access-individual:ObjectUri ;
+    access:hasTypeToCheck access-individual:ObjectUri ;
     access:values access-individual:valueSet1 ;
     .
     
 access-individual:BrokenSetAttribute2 rdf:type access:Check ;
     access:useOperator access-individual:NotOneOf ;
-    access:attribute access-individual:ObjectUri ;
+    access:hasTypeToCheck access-individual:ObjectUri ;
     access:values access-individual:valueSet2 ;
     .
 
