@@ -149,7 +149,8 @@
     rdfs:domain :Check ;
     rdfs:range :Operator .
 
-:attribute a owl:ObjectProperty ;
+:hasTypeToCheck a owl:ObjectProperty ,
+    owl:FunctionalProperty ;
     rdfs:comment "Set attribute that should be checked";
     rdfs:label "attribute"@en-US ;
     rdfs:domain :Check ;

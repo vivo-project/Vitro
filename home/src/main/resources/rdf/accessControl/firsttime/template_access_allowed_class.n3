@@ -315,13 +315,13 @@
 
 :AccessObjectTypeCheck a access:Check ;
     access:useOperator access-individual:Equals ;
-    access:attribute access-individual:AccessObjectType ;
+    access:hasTypeToCheck access-individual:AccessObjectType ;
     access:values access-individual:ClassValueSet ;
     .
 
 :OperationCheck a access:Check ;
     access:useOperator access-individual:Equals ;
-    access:attribute access-individual:Operation ;
+    access:hasTypeToCheck access-individual:Operation ;
     access:values access-individual:DisplayOperationValueSet ;
     access:values access-individual:PublishOperationValueSet ;
     access:values access-individual:UpdateOperationValueSet ;
@@ -329,7 +329,7 @@
 
 :SubjectRoleCheck a access:Check ;
     access:useOperator access-individual:Equals ;
-    access:attribute access-individual:SubjectRole ;
+    access:hasTypeToCheck access-individual:SubjectRole ;
     access:values access-individual:PublicRoleValueSet ;
     access:values access-individual:SelfEditorRoleValueSet ;
     access:values access-individual:EditorRoleValueSet ;
@@ -338,7 +338,7 @@
 
 :AccessObjectUriCheck a access:Check ;
     access:useOperator access-individual:OneOf ;
-    access:attribute access-individual:AccessObjectUri ;
+    access:hasTypeToCheck access-individual:AccessObjectUri ;
     access:values :AdminPublishClassValueSet ;
     access:values :AdminDisplayClassValueSet ;
     access:values :AdminUpdateClassValueSet ;

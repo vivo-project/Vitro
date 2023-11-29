@@ -18,32 +18,32 @@
 
 :SubjectRoleIsSelfEditor a access:Check ;
     access:useOperator access-individual:Equals ;
-    access:attribute access-individual:SubjectRole ;
+    access:hasTypeToCheck access-individual:SubjectRole ;
     access:value access-individual:SelfEditorRoleUri .
 
 :IsEditOperation a access:Check ;
     access:useOperator access-individual:Equals ;
-    access:attribute access-individual:Operation ;
+    access:hasTypeToCheck access-individual:Operation ;
     access:value access-individual:EditOperation .
 
 :PredicateIsSomePredicate a access:Check ;
     access:useOperator access-individual:Equals ;
-    access:attribute access-individual:StatementPredicateUri ;
+    access:hasTypeToCheck access-individual:StatementPredicateUri ;
     access:value :SomeUri .
 
 :ObjectUriIsSomeUri a access:Check ;
     access:useOperator access-individual:Equals ;
-    access:attribute access-individual:StatementObjectUri ;
+    access:hasTypeToCheck access-individual:StatementObjectUri ;
     access:value :SomeUri .
 
 :SubjectUriIsProfileRelatedResource a access:Check ;
     access:useOperator access-individual:SparqlSelectQueryContains ;
-    access:attribute access-individual:StatementSubjectUri ;
+    access:hasTypeToCheck access-individual:StatementSubjectUri ;
     access:value access-individual:PersonProfileProximityToResourceUri .
 
 :IsObjectPropertyStatement a access:Check ;
     access:useOperator access-individual:Equals ;
-    access:attribute access-individual:AccessObjectType ;
+    access:hasTypeToCheck access-individual:AccessObjectType ;
     access:value access-individual:ObjectPropertyStatement .
 
 :SomeUri a access:AttributeUriValue ;

@@ -13,6 +13,6 @@
 
 :IsRootUserCheck a access:Check ;
     access:useOperator access-individual:Equals ;
-    access:attribute access-individual:SubjectType ;
+    access:hasTypeToCheck access-individual:SubjectType ;
     access:value access-individual:RootUserSubject .
 

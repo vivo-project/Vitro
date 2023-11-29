@@ -102,12 +102,12 @@
 
 :IsExecuteOperation a access:Check ;
     access:useOperator access-individual:Equals ;
-    access:attribute access-individual:Operation ;
+    access:hasTypeToCheck access-individual:Operation ;
     access:value access-individual:ExecuteOperation .
 
 :PermissionNameAllowed a access:Check ;
     access:useOperator access-individual:OneOf ;
-    access:attribute access-individual:AccessObjectUri ;
+    access:hasTypeToCheck access-individual:AccessObjectUri ;
     access:values :PublicSimplePermissionValueSet ;
     access:values :SelfEditorSimplePermissionValueSet ;
     access:values :EditorSimplePermissionValueSet ;
@@ -116,7 +116,7 @@
 
 :IsSimplePermission a access:Check ;
     access:useOperator access-individual:Equals ;
-    access:attribute access-individual:AccessObjectType ;
+    access:hasTypeToCheck access-individual:AccessObjectType ;
     access:value access-individual:NamedObject .
 
 :PublicSimplePermissionValueSet a access:ValueSet ;
@@ -132,7 +132,7 @@
 
 :SubjectRoleEqualsDataSetRole a access:Check ;
     access:useOperator access-individual:Equals ;
-    access:attribute access-individual:SubjectRole ;
+    access:hasTypeToCheck access-individual:SubjectRole ;
     access:values access-individual:PublicRoleValueSet ;
     access:values access-individual:SelfEditorRoleValueSet ;
     access:values access-individual:EditorRoleValueSet ;
