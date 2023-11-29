@@ -36,6 +36,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessing
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -325,21 +327,22 @@ public class ContactMailController extends FreemarkerHttpServlet {
 
     private String validateInput(String webusername, String webuseremail,
                                  String comments, String captchaInput, String challengeId, VitroRequest vreq) {
+        I18nBundle i18nBundle = I18n.bundle(vreq);
 
         if (webusername.isEmpty()) {
-            return "Please enter a value in the Full name field.";
+            return i18nBundle.text("full_name_empty");
         }
 
         if (webuseremail.isEmpty()) {
-            return "Please enter a valid email address.";
+            return i18nBundle.text("email_address_empty");
         }
 
         if (comments.isEmpty()) {
-            return "Please enter your comments or questions in the space provided.";
+            return i18nBundle.text("comments_empty");
         }
 
         if (captchaInput.isEmpty()) {
-            return "Please enter the contents of the gray box in the security field provided.";
+            return i18nBundle.text("captcha_user_sol_empty");
         }
 
         switch(captchaImpl) {
@@ -356,7 +359,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
         }
 
 
-        return "The value you entered in the security field did not match the letters displayed in the gray box.";
+        return i18nBundle.text("captcha_user_sol_invalid");
     }
 
     /**
