@@ -14,6 +14,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.attributes.OperationGroup;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.EntityPolicyController;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyLoader;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyTemplateController;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
@@ -217,6 +218,12 @@ public class ArmMigrator {
             for (String entity : intersectionEntities) {
                 Set<String> faux = getFauxByBase(entity);
                 addFauxDP.addAll(faux);
+            }
+            // Workaround for missing rdfs:label in ARM
+            //Allow any role to display/update/publish rdfs:label
+            //with exception to public role and update/publish operations groups
+            if (!(ARM_PUBLIC.equals(role) && !OperationGroup.DISPLAY_GROUP.equals(og))) {
+                intersectionEntities.add(VitroVocabulary.LABEL);
             }
         }
         if (AccessObjectType.FAUX_OBJECT_PROPERTY.equals(type)) {
