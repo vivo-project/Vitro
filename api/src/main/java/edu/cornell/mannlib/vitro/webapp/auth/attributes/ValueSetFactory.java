@@ -8,7 +8,7 @@ public class ValueSetFactory {
 
     public static AttributeValueSet create(String value, QuerySolution qs, AttributeValueKey dataSetKey) {
         Optional<String> type = getSetElementsType(qs);
-        if (!type.isPresent() || dataSetKey == null) {
+        if (!type.isPresent() || dataSetKey == null || dataSetKey.isEmpty()) {
             return new MutableAttributeValueSet(value);
         } else {
             AttributeValueKey avcKey = getAttributeValueSetKey(dataSetKey, type.get());

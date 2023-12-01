@@ -56,6 +56,10 @@ public class AttributeValueKey {
         return new AttributeValueKey(ao, aot, role, type);
     }
 
+    public boolean isEmpty() {
+        return ao == null && aot == null && role == null && type == null;
+    }
+
     @Override
     public boolean equals(Object object) {
         if (!(object instanceof AttributeValueKey)) {
