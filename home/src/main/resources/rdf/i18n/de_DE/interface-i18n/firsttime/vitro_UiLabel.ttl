@@ -6273,7 +6273,7 @@ uil-data:no_individual_associated_with_id.Vitro
 uil-data:full_name_empty.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Bitte geben Sie einen Wert im Feld Vollständiger Name ein."@de-DE ;
+        rdfs:label       "Bitte geben Sie ihren vollständigen Namen an."@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "full_name_empty" ;
         uil:hasPackage  "Vitro-languages" .
