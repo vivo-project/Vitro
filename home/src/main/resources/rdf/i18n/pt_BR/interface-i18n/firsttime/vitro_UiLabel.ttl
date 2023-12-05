@@ -6305,7 +6305,7 @@ uil-data:captcha_user_sol_empty.Vitro
 uil-data:captcha_user_sol_invalid.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Solução CAPTCHA inválida, por favor, tente novamente."@pt-BR ;
+        rdfs:label       "A solução do CAPTCHA informada está inválida, por favor, tente novamente."@pt-BR ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "captcha_user_sol_invalid" ;
         uil:hasPackage  "Vitro-languages" .
