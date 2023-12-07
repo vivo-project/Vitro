@@ -137,7 +137,6 @@ $(document).ready(function(){
                 if ( $('li.nav-link').first().attr("groupName") != groupName ) {
                     // deselect the default first tab
 
-
                     if ( groupName == "viewAll" ) {
                         console.log("View all")
                         showAllTabs();
@@ -147,9 +146,6 @@ $(document).ready(function(){
                         let tab = new bootstrap.Tab(tabSelect);
                         tab.show();
                     }
-
-                    // show the selected tab section
-                    $('section#' + groupName).show();
                 }
             }
         }
