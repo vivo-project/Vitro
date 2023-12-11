@@ -6305,7 +6305,7 @@ uil-data:captcha_user_sol_empty.Vitro
 uil-data:captcha_user_sol_invalid.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Недопустимое решение CAPTCHA, пожалуйста, попробуйте снова."@ru-RU ;
+        rdfs:label       "Недопустимое решение теста Тьюринга для различения компьютеров и людей. Пожалуйста, попробуйте снова."@ru-RU ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "captcha_user_sol_invalid" ;
         uil:hasPackage  "Vitro-languages" .
