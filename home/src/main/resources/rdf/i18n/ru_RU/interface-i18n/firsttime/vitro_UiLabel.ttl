@@ -6297,7 +6297,7 @@ uil-data:comments_empty.Vitro
 uil-data:captcha_user_sol_empty.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Пожалуйста, решите задачу CAPTCHA в предоставленном поле безопасности."@ru-RU ;
+        rdfs:label       "Пожалуйста, выполните полностью автоматизированный тест Тьюринга для различения компьютеров и людей."@ru-RU ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "captcha_user_sol_empty" ;
         uil:hasPackage  "Vitro-languages" .
