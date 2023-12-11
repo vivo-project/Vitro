@@ -26,8 +26,8 @@ import net.logicsquad.nanocaptcha.image.noise.StraightLineNoiseProducer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
@@ -64,11 +64,10 @@ public class CaptchaServiceBean {
         String verificationUrl =
             "https://www.google.com/recaptcha/api/siteverify?secret=" + secretKey + "&response=" + recaptchaResponse;
 
-        try {
-            HttpClient httpClient = HttpClients.createDefault();
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet verificationRequest = new HttpGet(verificationUrl);
-
             HttpResponse verificationResponse = httpClient.execute(verificationRequest);
+
             String responseBody = EntityUtils.toString(verificationResponse.getEntity());
             ObjectMapper objectMapper = new ObjectMapper();
             ReCaptchaResponse response = objectMapper.readValue(responseBody, ReCaptchaResponse.class);

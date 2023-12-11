@@ -63,14 +63,14 @@ public class ContactFormController extends FreemarkerHttpServlet {
 
         else {
             String captchaImpl =
-                ConfigurationProperties.getBean(vreq).getProperty("captcha.implementation");
+                ConfigurationProperties.getInstance().getProperty("captcha.implementation");
             if (captchaImpl == null) {
                 captchaImpl = "";
             }
 
             if (captchaImpl.equals("RECAPTCHA")) {
                 body.put("siteKey",
-                    Objects.requireNonNull(ConfigurationProperties.getBean(vreq).getProperty("recaptcha.siteKey"),
+                    Objects.requireNonNull(ConfigurationProperties.getInstance().getProperty("recaptcha.siteKey"),
                         "You have to provide a site key through configuration file."));
             } else {
                 CaptchaBundle captchaChallenge = CaptchaServiceBean.generateChallenge();

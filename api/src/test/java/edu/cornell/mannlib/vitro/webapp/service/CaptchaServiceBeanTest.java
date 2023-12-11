@@ -14,7 +14,7 @@ import com.google.common.cache.Cache;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.CaptchaBundle;
 import edu.cornell.mannlib.vitro.webapp.beans.CaptchaServiceBean;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import org.junit.Before;
 import org.junit.Test;
 import stubs.edu.cornell.mannlib.vitro.webapp.config.ConfigurationPropertiesStub;
@@ -33,7 +33,7 @@ public class CaptchaServiceBeanTest extends AbstractTestClass {
         props.setProperty("recaptcha.secretKey", "secretKey");
 
         ServletContextStub ctx = new ServletContextStub();
-        props.setBean(ctx);
+        ConfigurationProperties.setInstance(props);
 
         HttpSessionStub session = new HttpSessionStub();
         session.setServletContext(ctx);

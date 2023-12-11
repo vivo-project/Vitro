@@ -81,7 +81,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
             return errorNoRecipients();
         }
 
-        captchaImpl = ConfigurationProperties.getBean(vreq).getProperty("captcha.implementation");
+        captchaImpl = ConfigurationProperties.getInstance().getProperty("captcha.implementation");
         if (captchaImpl == null) {
             captchaImpl = "";
         }
@@ -107,7 +107,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
 
         if (errorMsg != null) {
             String siteKey =
-                Objects.requireNonNull(ConfigurationProperties.getBean(vreq).getProperty("recaptcha.siteKey"),
+                Objects.requireNonNull(ConfigurationProperties.getInstance().getProperty("recaptcha.siteKey"),
                     "You have to provide a site key through configuration file.");
             return errorParametersNotValid(errorMsg, webusername, webuseremail, comments, vreq.getContextPath(),
                 siteKey);
@@ -352,7 +352,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
         switch (captchaImpl) {
             case "RECAPTCHA":
                 String secretKey =
-                    Objects.requireNonNull(ConfigurationProperties.getBean(vreq).getProperty("recaptcha.secretKey"),
+                    Objects.requireNonNull(ConfigurationProperties.getInstance().getProperty("recaptcha.secretKey"),
                         "You have to provide a secret key through configuration file.");
                 if (CaptchaServiceBean.validateReCaptcha(captchaInput, secretKey)) {
                     return null;
