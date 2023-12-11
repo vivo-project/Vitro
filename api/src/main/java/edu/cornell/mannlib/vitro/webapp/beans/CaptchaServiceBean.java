@@ -1,3 +1,5 @@
+/* $This file is distributed under the terms of the license in LICENSE$ */
+
 package edu.cornell.mannlib.vitro.webapp.beans;
 
 import java.awt.Color;
@@ -6,7 +8,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.Base64;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -16,8 +17,6 @@ import javax.imageio.ImageIO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import net.logicsquad.nanocaptcha.image.ImageCaptcha;
 import net.logicsquad.nanocaptcha.image.backgrounds.GradiatedBackgroundProducer;
 import net.logicsquad.nanocaptcha.image.filter.FishEyeImageFilter;
@@ -58,13 +57,10 @@ public class CaptchaServiceBean {
      * Validates a reCAPTCHA response using Google's reCAPTCHA API.
      *
      * @param recaptchaResponse The reCAPTCHA response to validate.
-     * @param vreq              The VitroRequest associated with the validation.
+     * @param secretKey         The secret key used for Google ReCaptcha validation.
      * @return True if the reCAPTCHA response is valid, false otherwise.
      */
-    public static boolean validateReCaptcha(String recaptchaResponse, VitroRequest vreq) {
-        String secretKey =
-            Objects.requireNonNull(ConfigurationProperties.getBean(vreq).getProperty("recaptcha.secretKey"),
-                "You have to provide a secret key through configuration file.");
+    public static boolean validateReCaptcha(String recaptchaResponse, String secretKey) {
         String verificationUrl =
             "https://www.google.com/recaptcha/api/siteverify?secret=" + secretKey + "&response=" + recaptchaResponse;
 

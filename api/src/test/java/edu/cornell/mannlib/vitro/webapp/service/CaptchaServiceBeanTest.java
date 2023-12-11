@@ -1,3 +1,5 @@
+/* $This file is distributed under the terms of the license in LICENSE$ */
+
 package edu.cornell.mannlib.vitro.webapp.service;
 
 import static org.junit.Assert.assertEquals;
@@ -43,10 +45,10 @@ public class CaptchaServiceBeanTest extends AbstractTestClass {
     @Test
     public void validateReCaptcha_InvalidResponse_ReturnsFalse() throws IOException {
         // Given
-        VitroRequest vitroRequest = new VitroRequest(httpServletRequest);
+        String secretKey = "WRONG_SECRET_KEY";
 
         // When
-        boolean result = CaptchaServiceBean.validateReCaptcha("invalidResponse", vitroRequest);
+        boolean result = CaptchaServiceBean.validateReCaptcha("invalidResponse", secretKey);
 
         // Then
         assertFalse(result);

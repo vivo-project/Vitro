@@ -93,7 +93,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
 
         String captchaInput;
         String captchaId = "";
-        switch(captchaImpl) {
+        switch (captchaImpl) {
             case "RECAPTCHA":
                 captchaInput = nonNullAndTrim(vreq, "g-recaptcha-response");
                 break;
@@ -106,7 +106,11 @@ public class ContactMailController extends FreemarkerHttpServlet {
         String errorMsg = validateInput(webusername, webuseremail, comments, captchaInput, captchaId, vreq);
 
         if (errorMsg != null) {
-            return errorParametersNotValid(errorMsg, webusername, webuseremail, comments, vreq);
+            String siteKey =
+                Objects.requireNonNull(ConfigurationProperties.getBean(vreq).getProperty("recaptcha.siteKey"),
+                    "You have to provide a site key through configuration file.");
+            return errorParametersNotValid(errorMsg, webusername, webuseremail, comments, vreq.getContextPath(),
+                siteKey);
         }
 
         String spamReason = checkForSpam(comments, formType);
@@ -345,9 +349,12 @@ public class ContactMailController extends FreemarkerHttpServlet {
             return i18nBundle.text("captcha_user_sol_empty");
         }
 
-        switch(captchaImpl) {
+        switch (captchaImpl) {
             case "RECAPTCHA":
-                if (CaptchaServiceBean.validateReCaptcha(captchaInput, vreq)){
+                String secretKey =
+                    Objects.requireNonNull(ConfigurationProperties.getBean(vreq).getProperty("recaptcha.secretKey"),
+                        "You have to provide a secret key through configuration file.");
+                if (CaptchaServiceBean.validateReCaptcha(captchaInput, secretKey)) {
                     return null;
                 }
             case "DEFAULT":
@@ -416,7 +423,8 @@ public class ContactMailController extends FreemarkerHttpServlet {
     }
 
     private ResponseValues errorParametersNotValid(String errorMsg, String webusername, String webuseremail,
-                                                   String comments, VitroRequest vreq) throws IOException {
+                                                   String comments, String contextPath, String siteKey)
+        throws IOException {
         Map<String, Object> body = new HashMap<String, Object>();
         body.put("errorMessage", errorMsg);
         body.put("formAction", "submitFeedback");
@@ -424,7 +432,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
         body.put("webuseremail", webuseremail);
         body.put("comments", comments);
         body.put("captchaToUse", captchaImpl);
-        body.put("contextPath", vreq.getContextPath());
+        body.put("contextPath", contextPath);
 
         if (!captchaImpl.equals("RECAPTCHA")) {
             CaptchaBundle captchaChallenge = CaptchaServiceBean.generateChallenge();
@@ -432,9 +440,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
             body.put("challenge", captchaChallenge.getB64Image());
             body.put("challengeId", captchaChallenge.getCaptchaId());
         } else {
-            body.put("siteKey",
-                Objects.requireNonNull(ConfigurationProperties.getBean(vreq).getProperty("recaptcha.siteKey"),
-                    "You have to provide a site key through configuration file."));
+            body.put("siteKey", siteKey);
         }
 
         return new TemplateResponseValues(TEMPLATE_FORM, body);
