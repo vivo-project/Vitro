@@ -14,20 +14,26 @@
     <p>${i18n().interest_thanks(siteName)}</p>
 
     <form name="contact_form" id="contact_form" class="customForm" action="${formAction!}" method="post" onSubmit="return ValidateForm('contact_form');" role="contact form">
-        <input type="hidden" name="RequiredFields" value="webusername,webuseremail,s34gfd88p9x1" />
-        <input type="hidden" name="RequiredFieldsNames" value="Name,Email address,Comments" />
-        <input type="hidden" name="EmailFields" value="webuseremail" />
-        <input type="hidden" name="EmailFieldsNames" value="emailaddress" />
-        <input type="hidden" name="DeliveryType" value="contact" />
+        <div>
+          <input type="hidden" name="RequiredFields" value="webusername,webuseremail,s34gfd88p9x1" />
+          <input type="hidden" name="RequiredFieldsNames" value="Name,Email address,Comments" />
+          <input type="hidden" name="EmailFields" value="webuseremail" />
+          <input type="hidden" name="EmailFieldsNames" value="emailaddress" />
+          <input type="hidden" name="DeliveryType" value="contact" />
 
-        <label for="webusername">${i18n().full_name} <span class="requiredHint"> *</span></label>
-        <input type="text" name="webusername" value="${webusername!}"/>
+          <label for="webusername">${i18n().full_name} <span class="requiredHint"> *</span></label><br/>
+          <input type="text" name="webusername" value="${webusername!}"/>
+        </div>
 
-        <label for="webuseremail">${i18n().email_address} <span class="requiredHint"> *</span></label>
-        <input type="text" name="webuseremail"  value="${webuseremail!}"/>
+        <div>
+          <label for="webuseremail">${i18n().email_address} <span class="requiredHint"> *</span></label><br/>
+          <input type="text" name="webuseremail"  value="${webuseremail!}"/>
+        </div>
 
-        <label>${i18n().comments_questions} <span class="requiredHint"> *</span></label>
-        <textarea name="s34gfd88p9x1" rows="10" cols="90">${comments!}</textarea>
+        <div>
+          <label>${i18n().comments_questions} <span class="requiredHint"> *</span></label><br/>
+          <textarea name="s34gfd88p9x1" rows="10" cols="90">${comments!}</textarea>
+        </div>
 
 
         <#if captchaToUse == "RECAPTCHA">
