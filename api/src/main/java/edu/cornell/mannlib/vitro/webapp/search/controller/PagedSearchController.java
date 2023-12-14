@@ -462,11 +462,28 @@ public class PagedSearchController extends FreemarkerHttpServlet {
 
     private void addSortRules(VitroRequest vreq, SearchQuery query, Map<String, SortConfiguration> sortOptions) {
         String sortType = getSortType(vreq);
+        if (sortOptions.isEmpty()) {
+            return;
+        }
         if (!StringUtils.isBlank(sortType) && sortOptions.containsKey(sortType)) {
             SortConfiguration conf = sortOptions.get(sortType);
-            query.addSortField(conf.getField(vreq.getLocale()), conf.getSortOrder());
+            String field = conf.getField(vreq.getLocale());
+            if (!StringUtils.isBlank(field)) {
+                query.addSortField(field, conf.getSortOrder());
+            }
             conf.setSelected(true);
+            return;
         }
+        boolean textQueryIsEmpty = StringUtils.isBlank(getQueryText(vreq));
+        // If text field is empty, apply the first sort option
+        if (textQueryIsEmpty) {
+            SortConfiguration conf = sortOptions.entrySet().iterator().next().getValue();
+            String field = conf.getField(vreq.getLocale());
+            if (!StringUtils.isBlank(field)) {
+                query.addSortField(field, conf.getSortOrder());
+            }
+        }
+        // If text field is not empty, sort by relevance (no need to add sort field)
     }
 
     private String getSortType(VitroRequest vreq) {
