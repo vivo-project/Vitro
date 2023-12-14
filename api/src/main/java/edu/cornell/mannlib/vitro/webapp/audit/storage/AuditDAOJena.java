@@ -2,6 +2,16 @@
 
 package edu.cornell.mannlib.vitro.webapp.audit.storage;
 
+import static edu.cornell.mannlib.vitro.webapp.audit.storage.AuditVocabulary.PROP_DATE;
+import static edu.cornell.mannlib.vitro.webapp.audit.storage.AuditVocabulary.PROP_GRAPH;
+import static edu.cornell.mannlib.vitro.webapp.audit.storage.AuditVocabulary.PROP_GRAPH_ADDED;
+import static edu.cornell.mannlib.vitro.webapp.audit.storage.AuditVocabulary.PROP_GRAPH_REMOVED;
+import static edu.cornell.mannlib.vitro.webapp.audit.storage.AuditVocabulary.PROP_HASGRAPH;
+import static edu.cornell.mannlib.vitro.webapp.audit.storage.AuditVocabulary.PROP_USER;
+import static edu.cornell.mannlib.vitro.webapp.audit.storage.AuditVocabulary.PROP_UUID;
+import static edu.cornell.mannlib.vitro.webapp.audit.storage.AuditVocabulary.TYPE_CHANGESET;
+import static edu.cornell.mannlib.vitro.webapp.audit.storage.AuditVocabulary.TYPE_CHANGESETGRAPH;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
@@ -13,6 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.audit.AuditChangeSet;
 import edu.cornell.mannlib.vitro.webapp.audit.AuditResults;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Dataset;
+import org.apache.jena.query.ParameterizedSparqlString;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -72,18 +83,18 @@ public abstract class AuditDAOJena implements AuditDAO {
             Resource changeResource = auditModel.createResource(changeUri);
 
             // Define the type of this resource
-            changeResource.addProperty(RDF.type, auditModel.createResource(AuditVocabulary.TYPE_CHANGESET));
+            changeResource.addProperty(RDF.type, auditModel.createResource(TYPE_CHANGESET));
 
             // Add the UUID
-            changeResource.addProperty(auditModel.createProperty(AuditVocabulary.PROP_UUID),
+            changeResource.addProperty(auditModel.createProperty(PROP_UUID),
                     changes.getUUID().toString());
 
             // Add the user information
-            changeResource.addProperty(auditModel.createProperty(AuditVocabulary.PROP_USER),
+            changeResource.addProperty(auditModel.createProperty(PROP_USER),
                     auditModel.createResource(changes.getUserId()));
 
             // Add the time of the change
-            changeResource.addProperty(auditModel.createProperty(AuditVocabulary.PROP_DATE),
+            changeResource.addProperty(auditModel.createProperty(PROP_DATE),
                     Long.toString(changes.getRequestTime().getTime(), 10));
 
             // Get the names of modified graphs
@@ -105,15 +116,15 @@ public abstract class AuditDAOJena implements AuditDAO {
                     Resource graphResource = auditModel.createResource(graphUri);
 
                     // Record the URI in the overall metadata
-                    changeResource.addProperty(auditModel.createProperty(AuditVocabulary.PROP_HASGRAPH), graphResource);
+                    changeResource.addProperty(auditModel.createProperty(PROP_HASGRAPH), graphResource);
 
                     // Define the type of this resource
-                    graphResource.addProperty(RDF.type, auditModel.createResource(AuditVocabulary.TYPE_CHANGESETGRAPH));
+                    graphResource.addProperty(RDF.type, auditModel.createResource(TYPE_CHANGESETGRAPH));
 
                     // If we are recording changes for a named (rather than default) graph, record the graph that the
                     // changes apply to
                     if (!StringUtils.isEmpty(graphName)) {
-                        graphResource.addProperty(auditModel.createProperty(AuditVocabulary.PROP_GRAPH),
+                        graphResource.addProperty(auditModel.createProperty(PROP_GRAPH),
                                 auditModel.createResource(graphName));
                     }
 
@@ -123,7 +134,7 @@ public abstract class AuditDAOJena implements AuditDAO {
                         Model addedAuditModel = auditStore.getNamedModel(addedName);
                         if (addedAuditModel != null) {
                             addedAuditModel.add(addedModel);
-                            graphResource.addProperty(auditModel.createProperty(AuditVocabulary.PROP_GRAPH_ADDED),
+                            graphResource.addProperty(auditModel.createProperty(PROP_GRAPH_ADDED),
                                     auditModel.createResource(addedName));
                         }
                     }
@@ -134,7 +145,7 @@ public abstract class AuditDAOJena implements AuditDAO {
                         Model removedAuditModel = auditStore.getNamedModel(removedName);
                         if (removedAuditModel != null) {
                             removedAuditModel.add(removedModel);
-                            graphResource.addProperty(auditModel.createProperty(AuditVocabulary.PROP_GRAPH_REMOVED),
+                            graphResource.addProperty(auditModel.createProperty(PROP_GRAPH_REMOVED),
                                     auditModel.createResource(removedName));
                         }
                     }
@@ -162,52 +173,19 @@ public abstract class AuditDAOJena implements AuditDAO {
         if (auditStore == null) {
             return null;
         }
-
         // Indicate that we are reading from the audit store
         auditStore.begin(ReadWrite.READ);
         try {
-            StringBuilder queryString;
             Query query;
             QueryExecution qexec;
-
+            ParameterizedSparqlString pss;
             // SPARQL query to retrieve overall change sets, in reverse chronological order, with pagination
-            queryString = new StringBuilder();
-            queryString.append("SELECT ?dataset");
-            queryString.append(" WHERE {");
-            queryString.append("   ?dataset a <").append(AuditVocabulary.TYPE_CHANGESET).append("> . ");
-            queryString.append("   ?dataset <").append(AuditVocabulary.PROP_DATE).append("> ?date . ");
-            if (!StringUtils.isBlank(userUri)) {
-                queryString.append("   ?dataset <").append(AuditVocabulary.PROP_USER).append("> <").append(userUri)
-                        .append("> . ");
-            }
-            if (!StringUtils.isBlank(graphUri)) {
-                queryString.append("   ?dataset <").append(AuditVocabulary.PROP_HASGRAPH).append("> ?graph . ");
-                queryString.append("   ?graph <").append(AuditVocabulary.PROP_GRAPH).append("> <").append(graphUri)
-                        .append("> . ");
-            }
-            if (startDate > 0) {
-                queryString.append("   FILTER ( ?date >= \"" + Long.toString(startDate) + "\" ) ");
-            }
-            if (endDate > 0) {
-                queryString.append("   FILTER ( ?date <= \"" + Long.toString(endDate) + "\" ) ");
-            }
-            queryString.append(" } ");
-            if (order) {
-                queryString.append(" ORDER BY ASC(?date) ");
-            } else {
-                queryString.append(" ORDER BY DESC(?date) ");
-            }
-
-            queryString.append(" LIMIT ").append(limit);
-            queryString.append(" OFFSET ").append(offset);
-
-            query = QueryFactory.create(queryString.toString());
+            pss = createChangeSetsQuery(offset, limit, startDate, endDate, userUri, graphUri, order);
+            query = QueryFactory.create(pss.toString());
             qexec = QueryExecutionFactory.create(query, auditStore.getNamedModel(auditGraph));
 
             try {
                 ResultSet rs = qexec.execSelect();
-
-                // For each result
                 while (rs.hasNext()) {
                     QuerySolution qs = rs.next();
                     String uri = qs.getResource("dataset").getURI();
@@ -218,33 +196,10 @@ public abstract class AuditDAOJena implements AuditDAO {
                 qexec.close();
                 query.clone();
             }
-
             // SPARQL Query to obtain a count of all change sets
-            queryString = new StringBuilder();
-            queryString.append("SELECT (COUNT(?dataset) AS ?datasetCount) ");
-            queryString.append(" WHERE {");
-            queryString.append("   ?dataset a <").append(AuditVocabulary.TYPE_CHANGESET).append("> . ");
-            queryString.append("   ?dataset <").append(AuditVocabulary.PROP_DATE).append("> ?date . ");
-            if (!StringUtils.isBlank(userUri)) {
-                queryString.append("   ?dataset <").append(AuditVocabulary.PROP_USER).append("> <").append(userUri)
-                        .append("> . ");
-            }
-            if (!StringUtils.isBlank(graphUri)) {
-                queryString.append("   ?dataset <").append(AuditVocabulary.PROP_HASGRAPH).append("> ?graph . ");
-                queryString.append("   ?graph <").append(AuditVocabulary.PROP_GRAPH).append("> <").append(graphUri)
-                        .append("> . ");
-            }
-            if (startDate > 0) {
-                queryString.append("   FILTER ( ?date >= \"" + Long.toString(startDate) + "\" ) ");
-            }
-            if (endDate > 0) {
-                queryString.append("   FILTER ( ?date <= \"" + Long.toString(endDate) + "\" ) ");
-            }
-            queryString.append(" } ");
-
-            query = QueryFactory.create(queryString.toString());
+            pss = createChangeSetCountQuery(startDate, endDate, userUri, graphUri);
+            query = QueryFactory.create(pss.toString());
             qexec = QueryExecutionFactory.create(query, auditStore.getNamedModel(auditGraph));
-
             try {
                 ResultSet rs = qexec.execSelect();
                 while (rs.hasNext()) {
@@ -259,9 +214,94 @@ public abstract class AuditDAOJena implements AuditDAO {
         } finally {
             auditStore.end();
         }
-
         // Create a new results object
         return new AuditResults(total, offset, limit, datasets);
+    }
+
+    private ParameterizedSparqlString createChangeSetCountQuery(long startDate, long endDate, String userUri,
+            String graphUri) {
+        ParameterizedSparqlString pss;
+        pss = new ParameterizedSparqlString();
+        pss.append("SELECT (COUNT(?dataset) AS ?datasetCount)\n");
+        startWhere(pss);
+        addType(pss);
+        addDate(pss);
+        addUserUri(userUri, pss);
+        addGraphUri(graphUri, pss);
+        addStartDate(startDate, pss);
+        addEndDate(endDate, pss);
+        endWhere(pss);
+        return pss;
+    }
+
+    private ParameterizedSparqlString createChangeSetsQuery(long offset, int limit, long startDate, long endDate,
+            String userUri, String graphUri, boolean order) {
+        ParameterizedSparqlString pss = new ParameterizedSparqlString();
+        pss.append("SELECT ?dataset\n");
+        startWhere(pss);
+        addType(pss);
+        addDate(pss);
+        addUserUri(userUri, pss);
+        addGraphUri(graphUri, pss);
+        addStartDate(startDate, pss);
+        addEndDate(endDate, pss);
+        endWhere(pss);
+        addOrder(order, pss);
+        pss.append("LIMIT " + limit + " OFFSET " + offset);
+        return pss;
+    }
+
+    private void addDate(ParameterizedSparqlString pss) {
+        pss.append("  ?dataset <" + PROP_DATE + "> ?date .\n");
+    }
+
+    private void addType(ParameterizedSparqlString pss) {
+        pss.append("  ?dataset a <" + TYPE_CHANGESET + "> .\n");
+    }
+
+    private void startWhere(ParameterizedSparqlString pss) {
+        pss.append("WHERE {\n");
+    }
+
+    private void endWhere(ParameterizedSparqlString pss) {
+        pss.append(" }");
+    }
+
+    private void addOrder(boolean order, ParameterizedSparqlString pss) {
+        if (order) {
+            pss.append("ORDER BY ASC(?date)\n");
+        } else {
+            pss.append("ORDER BY DESC(?date)\n");
+        }
+    }
+
+    private void addEndDate(long endDate, ParameterizedSparqlString pss) {
+        if (endDate > 0) {
+            pss.append("  FILTER ( ?date <= ?endDate )\n");
+            pss.setLiteral("endDate", Long.toString(endDate));
+        }
+    }
+
+    private void addStartDate(long startDate, ParameterizedSparqlString pss) {
+        if (startDate > 0) {
+            pss.append("  FILTER ( ?date >= ?startDate )\n");
+            pss.setLiteral("startDate", Long.toString(startDate));
+        }
+    }
+
+    private void addGraphUri(String graphUri, ParameterizedSparqlString pss) {
+        if (!StringUtils.isBlank(graphUri)) {
+            pss.append("  ?dataset <" + PROP_HASGRAPH + "> ?graph .\n");
+            pss.append("  ?graph <" + PROP_GRAPH + "> ?graphUri .\n");
+            pss.setIri("graphUri", graphUri);
+        }
+    }
+
+    private void addUserUri(String userUri, ParameterizedSparqlString pss) {
+        if (!StringUtils.isBlank(userUri)) {
+            pss.append("  ?dataset <" + PROP_USER + "> ?userUri .\n");
+            pss.setIri("userUri", userUri);
+        }
     }
 
     @Override
@@ -283,8 +323,8 @@ public abstract class AuditDAOJena implements AuditDAO {
             queryString = new StringBuilder();
             queryString.append("SELECT DISTINCT ?userUri ");
             queryString.append(" WHERE {");
-            // queryString.append(" ?dataset a <").append(AuditVocabulary.TYPE_CHANGESET).append("> . ");
-            queryString.append("   ?dataset <").append(AuditVocabulary.PROP_USER).append("> ?userUri . ");
+            // queryString.append(" ?dataset a <").append(TYPE_CHANGESET).append("> . ");
+            queryString.append("   ?dataset <").append(PROP_USER).append("> ?userUri . ");
             queryString.append(" } ");
 
             query = QueryFactory.create(queryString.toString());
@@ -332,7 +372,7 @@ public abstract class AuditDAOJena implements AuditDAO {
             queryString = new StringBuilder();
             queryString.append("SELECT DISTINCT ?graphUri ");
             queryString.append(" WHERE {");
-            queryString.append("   ?dataset <").append(AuditVocabulary.PROP_GRAPH).append("> ?graphUri . ");
+            queryString.append("   ?dataset <").append(PROP_GRAPH).append("> ?graphUri . ");
             queryString.append(" } ");
 
             query = QueryFactory.create(queryString.toString());
@@ -399,18 +439,18 @@ public abstract class AuditDAOJena implements AuditDAO {
                 while (iter.hasNext()) {
                     Statement stmt = iter.next();
                     switch (stmt.getPredicate().getURI()) {
-                        case AuditVocabulary.PROP_UUID:
+                        case PROP_UUID:
                             id = UUID.fromString(stmt.getObject().asLiteral().toString());
                             break;
 
-                        case AuditVocabulary.PROP_DATE:
+                        case PROP_DATE:
                             time = new Date(stmt.getObject().asLiteral().getLong());
                             break;
 
-                        case AuditVocabulary.PROP_HASGRAPH:
+                        case PROP_HASGRAPH:
                             graphUris.add(stmt.getObject().asResource().getURI());
                             break;
-                        case AuditVocabulary.PROP_USER:
+                        case PROP_USER:
                             userId = stmt.getObject().asResource().getURI();
                             break;
                     }
@@ -438,17 +478,17 @@ public abstract class AuditDAOJena implements AuditDAO {
                     Statement stmt = iter.next();
                     switch (stmt.getPredicate().getURI()) {
                         // Get the graph name (e.g. the graph in the content store) that was affected by this change
-                        case AuditVocabulary.PROP_GRAPH:
+                        case PROP_GRAPH:
                             graphName = stmt.getObject().asResource().getURI();
                             break;
 
                         // Get the URI of the graph that contains the statements that were added
-                        case AuditVocabulary.PROP_GRAPH_ADDED:
+                        case PROP_GRAPH_ADDED:
                             addedGraph = stmt.getObject().asResource().getURI();
                             break;
 
                         // Get the URI of the graph that contains the statements that were removed
-                        case AuditVocabulary.PROP_GRAPH_REMOVED:
+                        case PROP_GRAPH_REMOVED:
                             removedGraph = stmt.getObject().asResource().getURI();
                             break;
                     }
