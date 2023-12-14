@@ -73,7 +73,7 @@ public class PageController extends FreemarkerHttpServlet{
             if (StringUtils.isBlank(uri)) {
                 continue;
             }
-            NamedAccessObject ao = new NamedAccessObject(uri, AccessObjectType.NAMED_OBJECT);
+            NamedAccessObject ao = new NamedAccessObject(uri);
             auth = auth.and( new SimpleAuthorizationRequest(ao, AccessOperation.EXECUTE));
         }
         return auth;
