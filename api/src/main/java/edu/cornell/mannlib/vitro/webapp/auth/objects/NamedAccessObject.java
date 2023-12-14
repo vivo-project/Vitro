@@ -11,21 +11,13 @@ import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
  */
 public class NamedAccessObject extends AccessObject {
     private final String uri;
-    private AccessObjectType type;
 
     public NamedAccessObject() {
         this.uri = "";
-        this.type = AccessObjectType.NAMED_OBJECT;
-    }
-
-    public NamedAccessObject(String uri, AccessObjectType type) {
-        this.uri = uri;
-        this.type = type;
     }
 
     public NamedAccessObject(String uri) {
         this.uri = uri;
-        this.type = AccessObjectType.NAMED_OBJECT;
     }
 
     @Override
@@ -61,7 +53,7 @@ public class NamedAccessObject extends AccessObject {
 
     @Override
     public AccessObjectType getType() {
-        return type;
+        return AccessObjectType.NAMED_OBJECT;
     }
 
     private static String getShortName(String entityUri) {

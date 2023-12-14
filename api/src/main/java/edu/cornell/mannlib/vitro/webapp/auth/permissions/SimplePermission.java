@@ -75,7 +75,7 @@ public class SimplePermission {
 
     private SimplePermission(String uri) {
         this.uri = SimplePermission.NS + uri;
-        NamedAccessObject ao = new NamedAccessObject(this.uri, AccessObjectType.NAMED_OBJECT);
+        NamedAccessObject ao = new NamedAccessObject(this.uri);
         this.ACTION = new SimpleAuthorizationRequest(ao, AccessOperation.EXECUTE);
     }
 }
