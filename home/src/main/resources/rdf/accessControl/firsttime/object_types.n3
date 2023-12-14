@@ -33,6 +33,9 @@ access-individual:Class a access:ObjectType ;
 access-individual:NamedObject a access:ObjectType ;
     access:id "NAMED_OBJECT" .
 
+access-individual:IndividualAccessObject a access:ObjectType ;
+    access:id "INDIVIDUAL" .
+
 #Object type value containers
 
 access-individual:ObjectPropertyValueSet a access:ValueSet ;
