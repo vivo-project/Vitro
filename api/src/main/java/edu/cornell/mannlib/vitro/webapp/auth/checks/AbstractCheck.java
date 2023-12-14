@@ -85,7 +85,10 @@ public abstract class AbstractCheck implements Check {
             case STARTS_WITH:
                 computationalCost += 1000;
                 return;
-            case SPARQL_SELECT_QUERY_CONTAINS:
+            case SPARQL_SELECT_QUERY_RESULTS_CONTAIN:
+                computationalCost += 10000;
+                return;
+            case SPARQL_SELECT_QUERY_RESULTS_NOT_CONTAIN:
                 computationalCost += 10000;
                 return;
             default:

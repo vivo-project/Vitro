@@ -29,8 +29,10 @@ public class AttributeValueChecker {
                 return !contains(attr, values);
             case STARTS_WITH:
                 return startsWith(attr, values);
-            case SPARQL_SELECT_QUERY_CONTAINS:
+            case SPARQL_SELECT_QUERY_RESULTS_CONTAIN:
                 return sparqlQueryContains(attr, ar, values);
+            case SPARQL_SELECT_QUERY_RESULTS_NOT_CONTAIN:
+                return !sparqlQueryContains(attr, ar, values);
             default:
                 return false;
         }
@@ -65,7 +67,7 @@ public class AttributeValueChecker {
         List<String> resourceUris = Arrays.asList(ao.getResourceUris());
         return ProximityChecker.isAnyRelated(m, resourceUris, personUris, queryTemplate);
     }
-
+    
     private static boolean contains(Check attr, String... inputValues) {
         AttributeValueSet values = attr.getValues();
         for (String inputValue : inputValues) {
