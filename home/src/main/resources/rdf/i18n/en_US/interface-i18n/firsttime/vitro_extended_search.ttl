@@ -6,14 +6,6 @@
 @prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 
-uil-data:search_results_relevance.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:PropertyKey ;
-        rdfs:label       "Relevance"@en-US ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "search_results_relevance" ;
-        uil:hasPackage  "Vitro-languages" .
-
 uil-data:search_results_sort_by.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:PropertyKey ;

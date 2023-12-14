@@ -6,6 +6,7 @@
 :filter_category rdfs:label "Category"@en-US .
 :sort_title_desc rdfs:label "Title Z-A"@en-US .
 :sort_title_asc rdfs:label "Title A-Z"@en-US .
+:sort_by_relevance rdfs:label "Relevance"@en-US .
 :field_label_sort rdfs:label "Label sort field"@en-US .
 :field_category rdfs:label "ClassGroup"@en-US .
 :field_type rdfs:label "Type"@en-US .

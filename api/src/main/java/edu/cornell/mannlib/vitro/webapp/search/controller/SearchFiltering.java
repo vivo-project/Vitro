@@ -125,12 +125,16 @@ public class SearchFiltering {
             + "WHERE {\n"
             + "    ?sort rdf:type search:Sort . \n"
             + "    ?sort rdfs:label ?sort_label .\n"
-            + "    ?sort search:sortField ?field .\n"
-            + "    ?sort search:id ?id .\n"
-            + "    ?field search:indexField ?searchField  .\n"
             + "    OPTIONAL {\n"
-            + "        ?field search:isLanguageSpecific ?f_multilingual  .\n"
-            + "        BIND(?f_multilingual as ?bind_multilingual) .\n"
+            + "        ?sort search:sortField ?field .\n"
+            + "        ?field search:indexField ?searchField  .\n"
+            + "        OPTIONAL {\n"
+            + "            ?field search:isLanguageSpecific ?f_multilingual  .\n"
+            + "            BIND(?f_multilingual as ?bind_multilingual) .\n"
+            + "        }\n"
+            + "    }\n"
+            + "    OPTIONAL {\n"
+            + "        ?sort search:id ?id .\n"
             + "    }\n"
             + "    OPTIONAL {\n"
             + "        ?sort search:isAscending ?f_ord  .\n"
@@ -340,12 +344,13 @@ public class SearchFiltering {
             ResultSet results = qexec.execSelect();
             while (results.hasNext()) {
                 QuerySolution solution = results.nextSolution();
-                if (solution.get("label") == null || solution.get("id") == null
-                        || solution.get("searchField") == null) {
+                RDFNode searchFieldNode = solution.get("searchField");
+                RDFNode idNode = solution.get("id");
+                if (solution.get("label") == null) {
                     continue;
                 }
-                String field = solution.get("searchField").toString();
-                String id = solution.get("id").toString();
+                String field = searchFieldNode == null ? "" : searchFieldNode.toString();
+                String id = idNode == null ? "" : idNode.toString();
                 String label = solution.get("label").toString();
 
                 SortConfiguration config = null;
