@@ -94,7 +94,7 @@ public class CaptchaServiceBean {
      */
     public static CaptchaBundle generateChallenge() throws IOException {
         String difficulty = getCaptchaDifficulty();
-        ImageCaptcha.Builder imageCaptchaBuilder = new ImageCaptcha.Builder(200, 75)
+        ImageCaptcha.Builder imageCaptchaBuilder = new ImageCaptcha.Builder(220, 85)
             .addContent(random.nextInt(2) + 5)
             .addBackground(new GradiatedBackgroundProducer())
             .addNoise(new StraightLineNoiseProducer(getRandomColor(), 2))
