@@ -12,7 +12,7 @@ public class FilterValue {
 
     private boolean selected = false;
 
-    private boolean defaultPublic;
+    private boolean isDefaultValue;
 
     private boolean publiclyAvailable = true;
 
@@ -32,8 +32,8 @@ public class FilterValue {
         this.id = id;
     }
 
-    public boolean isDefaultPublic() {
-        return defaultPublic;
+    public boolean isDefault() {
+        return isDefaultValue;
     }
 
     public String getName() {
@@ -80,7 +80,7 @@ public class FilterValue {
         return selected;
     }
 
-    public void setDefaultPublic(boolean b) {
-        defaultPublic = b;
+    public void setDefault(boolean b) {
+        isDefaultValue = b;
     }
 }
