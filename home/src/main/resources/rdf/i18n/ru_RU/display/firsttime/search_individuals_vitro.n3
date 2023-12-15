@@ -1,0 +1,14 @@
+@prefix : <https://vivoweb.org/ontology/vitro-search-individual/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+:filter_group_search_filters rdfs:label "Фильтры"@ru-RU .
+:filter_type rdfs:label "Тип"@ru-RU .
+:filter_category rdfs:label "Категория"@ru-RU .
+:sort_title_desc rdfs:label "названию Я-А"@ru-RU .
+:sort_title_asc rdfs:label "названию А-Я"@ru-RU .
+:sort_by_relevance rdfs:label "релевантности"@ru-RU .
+:field_label_sort rdfs:label "Поле сортировки по названию"@ru-RU .
+:field_category rdfs:label "Поле категория"@ru-RU .
+:field_type rdfs:label "Поле тип"@ru-RU .
+:filter_querytext rdfs:label "Текст"@ru-RU .
+:field_querytext rdfs:label "Поле фильтра по умолчанию"@ru-RU .

@@ -9,7 +9,7 @@
 uil-data:search_results_sort_by.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:PropertyKey ;
-        rdfs:label       "Sort by {0}"@en-US ;
+        rdfs:label       "Trier par {0}"@fr-CA ;
         uil:hasApp       "Vitro" ;
         uil:hasKey       "search_results_sort_by" ;
         uil:hasPackage   "Vitro-languages" .
@@ -17,7 +17,7 @@ uil-data:search_results_sort_by.Vitro
 uil-data:search_results_per_page.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:PropertyKey ;
-        rdfs:label       "{0} Results per page"@en-US ;
+        rdfs:label       "{0} résultats par page"@fr-CA ;
         uil:hasApp       "Vitro" ;
         uil:hasKey       "search_results_per_page" ;
         uil:hasPackage   "Vitro-languages" .
@@ -25,7 +25,7 @@ uil-data:search_results_per_page.Vitro
 uil-data:search_field_placeholder.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:PropertyKey ;
-        rdfs:label       "Enter search term"@en-US ;
+        rdfs:label       "Entrez le terme de recherche"@fr-CA ;
         uil:hasApp       "Vitro" ;
         uil:hasKey       "search_field_placeholder" ;
         uil:hasPackage   "Vitro-languages" .
@@ -33,7 +33,7 @@ uil-data:search_field_placeholder.Vitro
 uil-data:results_found.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:PropertyKey ;
-        rdfs:label       "{0} results found"@en-US ;
+        rdfs:label       "{0} résultats trouvés"@fr-CA ;
         uil:hasApp       "Vitro" ;
         uil:hasKey       "results_found" ;
         uil:hasPackage   "Vitro-languages" .
