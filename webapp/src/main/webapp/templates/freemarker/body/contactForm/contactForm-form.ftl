@@ -39,7 +39,7 @@
         <#if captchaToUse == "RECAPTCHA">
             <div class="g-recaptcha" data-sitekey="${siteKey!}"></div>
             <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response" />
-        <#else>
+        <#elseif captchaToUse == "NANOCAPTCHA">
             <!-- Your custom captcha implementation -->
             <p>
                 <label class="realpersonLabel">${i18n().enter_in_security_field}:<span class="requiredHint"> *</span></label>
@@ -81,7 +81,7 @@ ${scripts.add('<script type="text/javascript" src="${urls.base}/js/commentForm.j
             document.getElementById('g-recaptcha-response').value = recaptchaResponse;
         });
     </script>
-<#else>
+<#elseif captchaToUse == "NANOCAPTCHA">
     <script>
         $(document).ready(function () {
             $('#refresh').click(function () {

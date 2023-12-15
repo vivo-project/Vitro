@@ -81,10 +81,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
             return errorNoRecipients();
         }
 
-        captchaImpl = ConfigurationProperties.getInstance().getProperty("captcha.implementation");
-        if (captchaImpl == null) {
-            captchaImpl = "";
-        }
+        captchaImpl = CaptchaServiceBean.getCaptchaImpl();
 
         String webusername = nonNullAndTrim(vreq, WEB_USERNAME_PARAM);
         String webuseremail = nonNullAndTrim(vreq, WEB_USEREMAIL_PARAM);
@@ -97,7 +94,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
             case "RECAPTCHA":
                 captchaInput = nonNullAndTrim(vreq, "g-recaptcha-response");
                 break;
-            case "DEFAULT":
+            case "NANOCAPTCHA":
             default:
                 captchaInput = nonNullAndTrim(vreq, "userSolution");
                 captchaId = nonNullAndTrim(vreq, "challengeId");
@@ -106,11 +103,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
         String errorMsg = validateInput(webusername, webuseremail, comments, captchaInput, captchaId, vreq);
 
         if (errorMsg != null) {
-            String siteKey =
-                Objects.requireNonNull(ConfigurationProperties.getInstance().getProperty("recaptcha.siteKey"),
-                    "You have to provide a site key through configuration file.");
-            return errorParametersNotValid(errorMsg, webusername, webuseremail, comments, vreq.getContextPath(),
-                siteKey);
+            return errorParametersNotValid(errorMsg, webusername, webuseremail, comments, vreq.getContextPath());
         }
 
         String spamReason = checkForSpam(comments, formType);
@@ -345,26 +338,13 @@ public class ContactMailController extends FreemarkerHttpServlet {
             return i18nBundle.text("comments_empty");
         }
 
-        if (captchaInput.isEmpty()) {
+        if (!captchaImpl.equals("NONE") && captchaInput.isEmpty()) {
             return i18nBundle.text("captcha_user_sol_empty");
         }
 
-        switch (captchaImpl) {
-            case "RECAPTCHA":
-                String secretKey =
-                    Objects.requireNonNull(ConfigurationProperties.getInstance().getProperty("recaptcha.secretKey"),
-                        "You have to provide a secret key through configuration file.");
-                if (CaptchaServiceBean.validateReCaptcha(captchaInput, secretKey)) {
-                    return null;
-                }
-            case "DEFAULT":
-            default:
-                Optional<CaptchaBundle> optionalChallenge = CaptchaServiceBean.getChallenge(challengeId);
-                if (optionalChallenge.isPresent() && optionalChallenge.get().getCode().equals(captchaInput)) {
-                    return null;
-                }
+        if (CaptchaServiceBean.validateCaptcha(captchaInput, challengeId)) {
+            return null;
         }
-
 
         return i18nBundle.text("captcha_user_sol_invalid");
     }
@@ -423,9 +403,9 @@ public class ContactMailController extends FreemarkerHttpServlet {
     }
 
     private ResponseValues errorParametersNotValid(String errorMsg, String webusername, String webuseremail,
-                                                   String comments, String contextPath, String siteKey)
+                                                   String comments, String contextPath)
         throws IOException {
-        Map<String, Object> body = new HashMap<String, Object>();
+        Map<String, Object> body = new HashMap<>();
         body.put("errorMessage", errorMsg);
         body.put("formAction", "submitFeedback");
         body.put("webusername", webusername);
@@ -434,14 +414,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
         body.put("captchaToUse", captchaImpl);
         body.put("contextPath", contextPath);
 
-        if (!captchaImpl.equals("RECAPTCHA")) {
-            CaptchaBundle captchaChallenge = CaptchaServiceBean.generateChallenge();
-            CaptchaServiceBean.getCaptchaChallenges().put(captchaChallenge.getCaptchaId(), captchaChallenge);
-            body.put("challenge", captchaChallenge.getB64Image());
-            body.put("challengeId", captchaChallenge.getCaptchaId());
-        } else {
-            body.put("siteKey", siteKey);
-        }
+        CaptchaServiceBean.addCaptchaRelatedFieldsToPageContext(body);
 
         return new TemplateResponseValues(TEMPLATE_FORM, body);
     }

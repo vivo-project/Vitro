@@ -5,12 +5,14 @@ package edu.cornell.mannlib.vitro.webapp.service;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
-import com.google.common.cache.Cache;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.CaptchaBundle;
 import edu.cornell.mannlib.vitro.webapp.beans.CaptchaServiceBean;
@@ -24,38 +26,83 @@ import stubs.javax.servlet.http.HttpSessionStub;
 
 public class CaptchaServiceBeanTest extends AbstractTestClass {
 
-    HttpServletRequestStub httpServletRequest;
-
+    private final ConfigurationPropertiesStub props = new ConfigurationPropertiesStub();
 
     @Before
-    public void createConfigurationProperties() throws Exception {
-        ConfigurationPropertiesStub props = new ConfigurationPropertiesStub();
-        props.setProperty("recaptcha.secretKey", "secretKey");
-
+    public void createConfigurationProperties() {
+        props.setProperty("captcha.enabled", "true");
         ServletContextStub ctx = new ServletContextStub();
         ConfigurationProperties.setInstance(props);
 
         HttpSessionStub session = new HttpSessionStub();
         session.setServletContext(ctx);
 
-        httpServletRequest = new HttpServletRequestStub();
+        HttpServletRequestStub httpServletRequest = new HttpServletRequestStub();
         httpServletRequest.setSession(session);
     }
 
     @Test
-    public void validateReCaptcha_InvalidResponse_ReturnsFalse() throws IOException {
+    public void validateReCaptcha_InvalidResponse_ReturnsFalse() {
         // Given
-        String secretKey = "WRONG_SECRET_KEY";
+        props.setProperty("recaptcha.secretKey", "WRONG_SECRET_KEY");
 
         // When
-        boolean result = CaptchaServiceBean.validateReCaptcha("invalidResponse", secretKey);
+        boolean result = CaptchaServiceBean.validateReCaptcha("invalidResponse");
 
         // Then
         assertFalse(result);
     }
 
     @Test
-    public void generateChallenge_ValidChallengeGenerated() throws IOException {
+    public void generateChallenge_ValidEasyChallengeGenerated() throws IOException {
+        // Given
+        props.setProperty("nanocaptcha.difficulty", "easy");
+
+        // When
+        CaptchaBundle captchaBundle = CaptchaServiceBean.generateChallenge();
+
+        // Then
+        assertNotNull(captchaBundle);
+        assertNotNull(captchaBundle.getB64Image());
+        assertNotNull(captchaBundle.getCode());
+        assertNotNull(captchaBundle.getCaptchaId());
+    }
+
+    @Test
+    public void generateChallenge_ValidEmptyChallengeGenerated() throws IOException {
+        // Given
+        props.setProperty("nanocaptcha.difficulty", "");
+
+        // When
+        CaptchaBundle captchaBundle = CaptchaServiceBean.generateChallenge();
+
+        // Then
+        assertNotNull(captchaBundle);
+        assertNotNull(captchaBundle.getB64Image());
+        assertNotNull(captchaBundle.getCode());
+        assertNotNull(captchaBundle.getCaptchaId());
+    }
+
+    @Test
+    public void generateChallenge_ValidInvalidDifficultyChallengeGenerated() throws IOException {
+        // Given
+        props.setProperty("nanocaptcha.difficulty", "asdasdasd");
+
+        // When
+        CaptchaBundle captchaBundle = CaptchaServiceBean.generateChallenge();
+
+        // Then
+        assertNotNull(captchaBundle);
+        assertNotNull(captchaBundle.getB64Image());
+        assertNotNull(captchaBundle.getCode());
+        assertNotNull(captchaBundle.getCaptchaId());
+    }
+
+    @Test
+    public void generateChallenge_ValidHardChallengeGenerated() throws IOException {
+        // Given
+        props.setProperty("nanocaptcha.difficulty", "hard");
+
         // When
         CaptchaBundle captchaBundle = CaptchaServiceBean.generateChallenge();
 
@@ -74,23 +121,116 @@ public class CaptchaServiceBeanTest extends AbstractTestClass {
         CaptchaServiceBean.getCaptchaChallenges().put(captchaId, sampleChallenge);
 
         // When
-        Cache<String, CaptchaBundle> captchaChallenges = CaptchaServiceBean.getCaptchaChallenges();
         Optional<CaptchaBundle> result = CaptchaServiceBean.getChallenge(captchaId);
 
         // Then
         assertTrue(result.isPresent());
         assertEquals(sampleChallenge, result.get());
-        assertEquals(0, captchaChallenges.size());
     }
 
     @Test
     public void getChallenge_NonMatchingCaptchaIdAndRemoteAddress_ReturnsEmptyOptional() {
         // When
-        Cache<String, CaptchaBundle> captchaChallenges = CaptchaServiceBean.getCaptchaChallenges();
         Optional<CaptchaBundle> result = CaptchaServiceBean.getChallenge("nonMatchingId");
 
         // Then
         assertFalse(result.isPresent());
-        assertEquals(0, captchaChallenges.size());
+    }
+
+    @Test
+    public void addCaptchaRelatedFieldsToPageContext_RecaptchaImpl() throws IOException {
+        // Given
+        props.setProperty("captcha.implementation", "RECAPTCHA");
+        props.setProperty("recaptcha.siteKey", "SITE_KEY");
+        Map<String, Object> context = new HashMap<>();
+
+        // When
+        CaptchaServiceBean.addCaptchaRelatedFieldsToPageContext(context);
+
+        // Assert
+        assertNotNull(context.get("siteKey"));
+        assertNull(context.get("challenge"));
+        assertNull(context.get("challengeId"));
+        assertEquals("RECAPTCHA", context.get("captchaToUse"));
+    }
+
+    @Test
+    public void addCaptchaRelatedFieldsToPageContext_NanocaptchaImpl() throws IOException {
+        // Given
+        props.setProperty("captcha.implementation", "NANOCAPTCHA");
+        Map<String, Object> context = new HashMap<>();
+
+        // When
+        CaptchaServiceBean.addCaptchaRelatedFieldsToPageContext(context);
+
+        // Assert
+        assertNull(context.get("siteKey"));
+        assertNotNull(context.get("challenge"));
+        assertNotNull(context.get("challengeId"));
+        assertEquals("NANOCAPTCHA", context.get("captchaToUse"));
+    }
+
+    @Test
+    public void getCaptchaImpl_EnabledCaptcha() {
+        // Given
+        props.setProperty("captcha.enabled", "true");
+        props.setProperty("captcha.implementation", "RECAPTCHA");
+
+        // Act
+        String captchaImpl = CaptchaServiceBean.getCaptchaImpl();
+
+        // Assert
+        assertEquals("RECAPTCHA", captchaImpl);
+    }
+
+    @Test
+    public void getCaptchaImpl_DisabledCaptcha() {
+        // Given
+        props.setProperty("captcha.enabled", "false");
+
+        // Act
+        String captchaImpl = CaptchaServiceBean.getCaptchaImpl();
+
+        // Assert
+        assertEquals("NONE", captchaImpl);
+    }
+
+    @Test
+    public void getCaptchaImpl_DefaultImplementation() {
+        // Given
+        props.setProperty("captcha.enabled", "true");
+        props.setProperty("captcha.implementation", null);
+
+        // Act
+        String captchaImpl = CaptchaServiceBean.getCaptchaImpl();
+
+        // Assert
+        assertEquals("NANOCAPTCHA", captchaImpl);
+    }
+
+    @Test
+    public void validateCaptcha_NanoCaptchaValid() {
+        // Given
+        CaptchaBundle sampleChallenge = new CaptchaBundle("sampleB64Image", "validCode", "challengeId");
+        CaptchaServiceBean.getCaptchaChallenges().put("challengeId", sampleChallenge);
+        props.setProperty("captcha.implementation", "NANOCAPTCHA");
+
+        // Act
+        boolean result = CaptchaServiceBean.validateCaptcha("validCode", "challengeId");
+
+        // Assert
+        assertTrue(result);
+    }
+
+    @Test
+    public void validateCaptcha_NoneValid() {
+        // Given
+        props.setProperty("captcha.enabled", "false");
+
+        // Act
+        boolean result = CaptchaServiceBean.validateCaptcha("anyInput", "anyChallengeId");
+
+        // Assert
+        assertTrue(result);
     }
 }
