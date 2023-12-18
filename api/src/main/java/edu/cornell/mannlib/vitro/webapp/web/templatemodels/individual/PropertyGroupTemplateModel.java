@@ -102,20 +102,11 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
 	 */
 	private boolean allowedToDisplay(VitroRequest vreq, DataProperty dp, Individual subject) {
         AccessObject ao;
-        if (dp instanceof FauxDataPropertyWrapper) {
-            ao = new FauxDataPropertyAccessObject(dp);
-        } else {
-            ao = new DataPropertyAccessObject(dp);    
-        }
-		if (PolicyHelper.isAuthorizedForActions(vreq, ao, AccessOperation.DISPLAY)) {
-			return true;
-		}
-        //TODO: Model should be here to correctly check authorization
 		if (dp instanceof FauxDataPropertyWrapper) {
 		    final FauxProperty fauxProperty = ((FauxDataPropertyWrapper) dp).getFauxProperty();
-			ao = new FauxDataPropertyStatementAccessObject(null, subject.getURI(), fauxProperty, SOME_LITERAL);
+			ao = new FauxDataPropertyStatementAccessObject(vreq.getJenaOntModel(), subject.getURI(), fauxProperty, SOME_LITERAL);
 		} else {
-			ao = new DataPropertyStatementAccessObject(null, subject.getURI(), dp, SOME_LITERAL);
+			ao = new DataPropertyStatementAccessObject(vreq.getJenaOntModel(), subject.getURI(), dp, SOME_LITERAL);
 		}
         return PolicyHelper.isAuthorizedForActions(vreq, ao, AccessOperation.DISPLAY);	
     }
