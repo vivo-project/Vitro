@@ -28,9 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
-import edu.cornell.mannlib.vitro.webapp.beans.CaptchaBundle;
+import edu.cornell.mannlib.vitro.webapp.beans.CaptchaImplementation;
 import edu.cornell.mannlib.vitro.webapp.beans.CaptchaServiceBean;
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -62,7 +61,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
     private static final String EMAIL_JOURNAL_FILE_DIR = "emailJournal";
     private static final String EMAIL_JOURNAL_FILE_NAME = "contactFormEmails.html";
 
-    private String captchaImpl;
+    private CaptchaImplementation captchaImpl;
 
     @Override
     protected String getTitle(String siteName, VitroRequest vreq) {
@@ -91,10 +90,10 @@ public class ContactMailController extends FreemarkerHttpServlet {
         String captchaInput;
         String captchaId = "";
         switch (captchaImpl) {
-            case "RECAPTCHA":
+            case RECAPTCHAv2:
                 captchaInput = nonNullAndTrim(vreq, "g-recaptcha-response");
                 break;
-            case "NANOCAPTCHA":
+            case NANOCAPTCHA:
             default:
                 captchaInput = nonNullAndTrim(vreq, "userSolution");
                 captchaId = nonNullAndTrim(vreq, "challengeId");
@@ -338,7 +337,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
             return i18nBundle.text("comments_empty");
         }
 
-        if (!captchaImpl.equals("NONE") && captchaInput.isEmpty()) {
+        if (!captchaImpl.equals(CaptchaImplementation.NONE) && captchaInput.isEmpty()) {
             return i18nBundle.text("captcha_user_sol_empty");
         }
 

@@ -15,6 +15,7 @@ import java.util.Optional;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.CaptchaBundle;
+import edu.cornell.mannlib.vitro.webapp.beans.CaptchaImplementation;
 import edu.cornell.mannlib.vitro.webapp.beans.CaptchaServiceBean;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import org.junit.Before;
@@ -140,7 +141,7 @@ public class CaptchaServiceBeanTest extends AbstractTestClass {
     @Test
     public void addCaptchaRelatedFieldsToPageContext_RecaptchaImpl() throws IOException {
         // Given
-        props.setProperty("captcha.implementation", "RECAPTCHA");
+        props.setProperty("captcha.implementation", "RECAPTCHAv2");
         props.setProperty("recaptcha.siteKey", "SITE_KEY");
         Map<String, Object> context = new HashMap<>();
 
@@ -151,7 +152,7 @@ public class CaptchaServiceBeanTest extends AbstractTestClass {
         assertNotNull(context.get("siteKey"));
         assertNull(context.get("challenge"));
         assertNull(context.get("challengeId"));
-        assertEquals("RECAPTCHA", context.get("captchaToUse"));
+        assertEquals("RECAPTCHAv2", context.get("captchaToUse"));
     }
 
     @Test
@@ -174,13 +175,13 @@ public class CaptchaServiceBeanTest extends AbstractTestClass {
     public void getCaptchaImpl_EnabledCaptcha() {
         // Given
         props.setProperty("captcha.enabled", "true");
-        props.setProperty("captcha.implementation", "RECAPTCHA");
+        props.setProperty("captcha.implementation", "RECAPTCHAv2");
 
-        // Act
-        String captchaImpl = CaptchaServiceBean.getCaptchaImpl();
+        // When
+        CaptchaImplementation captchaImpl = CaptchaServiceBean.getCaptchaImpl();
 
-        // Assert
-        assertEquals("RECAPTCHA", captchaImpl);
+        // Then
+        assertEquals(CaptchaImplementation.RECAPTCHAv2, captchaImpl);
     }
 
     @Test
@@ -188,11 +189,11 @@ public class CaptchaServiceBeanTest extends AbstractTestClass {
         // Given
         props.setProperty("captcha.enabled", "false");
 
-        // Act
-        String captchaImpl = CaptchaServiceBean.getCaptchaImpl();
+        // When
+        CaptchaImplementation captchaImpl = CaptchaServiceBean.getCaptchaImpl();
 
-        // Assert
-        assertEquals("NONE", captchaImpl);
+        // Then
+        assertEquals(CaptchaImplementation.NONE, captchaImpl);
     }
 
     @Test
@@ -201,11 +202,11 @@ public class CaptchaServiceBeanTest extends AbstractTestClass {
         props.setProperty("captcha.enabled", "true");
         props.setProperty("captcha.implementation", null);
 
-        // Act
-        String captchaImpl = CaptchaServiceBean.getCaptchaImpl();
+        // When
+        CaptchaImplementation captchaImpl = CaptchaServiceBean.getCaptchaImpl();
 
-        // Assert
-        assertEquals("NANOCAPTCHA", captchaImpl);
+        // Then
+        assertEquals(CaptchaImplementation.NANOCAPTCHA, captchaImpl);
     }
 
     @Test

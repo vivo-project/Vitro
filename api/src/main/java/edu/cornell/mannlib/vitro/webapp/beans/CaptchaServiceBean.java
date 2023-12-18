@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
@@ -93,7 +94,7 @@ public class CaptchaServiceBean {
      * @throws IOException If an error occurs during image conversion.
      */
     public static CaptchaBundle generateChallenge() throws IOException {
-        String difficulty = getCaptchaDifficulty();
+        CaptchaDifficulty difficulty = getCaptchaDifficulty();
         ImageCaptcha.Builder imageCaptchaBuilder = new ImageCaptcha.Builder(220, 85)
             .addContent(random.nextInt(2) + 5)
             .addBackground(new GradiatedBackgroundProducer())
@@ -101,7 +102,7 @@ public class CaptchaServiceBean {
             .addFilter(new StretchImageFilter())
             .addBorder();
 
-        if (difficulty.equals("hard")) {
+        if (difficulty.equals(CaptchaDifficulty.HARD)) {
             imageCaptchaBuilder
                 .addNoise(new CurvedLineNoiseProducer(getRandomColor(), 2f))
                 .addFilter(new StretchImageFilter())
@@ -159,29 +160,31 @@ public class CaptchaServiceBean {
 
     /**
      * Retrieves the configured captcha implementation based on the application's configuration properties.
-     * If captcha functionality is disabled, returns "NONE." If the captcha implementation is not specified,
-     * defaults to "NANOCAPTCHA."
+     * If captcha functionality is disabled, returns NONE. If the captcha implementation is not specified,
+     * defaults to NANOCAPTCHA.
      *
-     * @return The selected captcha implementation ("NANOCAPTCHA," "RECAPTCHA," or "NONE").
+     * @return The selected captcha implementation (NANOCAPTCHA, RECAPTCHAv2, or NONE).
      */
-    public static String getCaptchaImpl() {
-        if (!Boolean.parseBoolean(ConfigurationProperties.getInstance().getProperty("captcha.enabled"))) {
-            return "NONE";
+    public static CaptchaImplementation getCaptchaImpl() {
+        String captchaEnabledSetting = ConfigurationProperties.getInstance().getProperty("captcha.enabled");
+
+        if (Objects.nonNull(captchaEnabledSetting) && !Boolean.parseBoolean(captchaEnabledSetting)) {
+            return CaptchaImplementation.NONE;
         }
 
-        String captchaImpl =
+        String captchaImplSetting =
             ConfigurationProperties.getInstance().getProperty("captcha.implementation");
-        if (captchaImpl == null) {
-            captchaImpl = "NANOCAPTCHA";
+        if (Strings.isNullOrEmpty(captchaImplSetting)) {
+            captchaImplSetting = "NANOCAPTCHA";
         }
 
-        return captchaImpl;
+        return CaptchaImplementation.valueOf(captchaImplSetting);
     }
 
     /**
      * Adds captcha-related fields to the given page context map. The specific fields added depend on the
      * configured captcha implementation.
-     *
+     * <p>
      * If the captcha implementation is "RECAPTCHA," the "siteKey" field is added to the context. If the
      * implementation is "NANOCAPTCHA" or "NONE," a captcha challenge is generated, and "challenge" and
      * "challengeId" fields are added to the context. Additionally, the "captchaToUse" field is added
@@ -191,9 +194,9 @@ public class CaptchaServiceBean {
      * @throws IOException If there is an IO error during captcha challenge generation.
      */
     public static void addCaptchaRelatedFieldsToPageContext(Map<String, Object> context) throws IOException {
-        String captchaImpl = getCaptchaImpl();
+        CaptchaImplementation captchaImpl = getCaptchaImpl();
 
-        if (captchaImpl.equals("RECAPTCHA")) {
+        if (captchaImpl.equals(CaptchaImplementation.RECAPTCHAv2)) {
             context.put("siteKey",
                 Objects.requireNonNull(ConfigurationProperties.getInstance().getProperty("recaptcha.siteKey"),
                     "You have to provide a site key through configuration file."));
@@ -205,7 +208,7 @@ public class CaptchaServiceBean {
             context.put("challengeId", captchaChallenge.getCaptchaId());
         }
 
-        context.put("captchaToUse", captchaImpl);
+        context.put("captchaToUse", captchaImpl.name());
     }
 
     /**
@@ -216,21 +219,21 @@ public class CaptchaServiceBean {
      * @return {@code true} if the captcha input is valid, {@code false} otherwise.
      */
     public static boolean validateCaptcha(String captchaInput, String challengeId) {
-        String captchaImpl = getCaptchaImpl();
+        CaptchaImplementation captchaImpl = getCaptchaImpl();
 
         switch (captchaImpl) {
-            case "RECAPTCHA":
+            case RECAPTCHAv2:
                 if (CaptchaServiceBean.validateReCaptcha(captchaInput)) {
                     return true;
                 }
                 break;
-            case "NANOCAPTCHA":
+            case NANOCAPTCHA:
                 Optional<CaptchaBundle> optionalChallenge = CaptchaServiceBean.getChallenge(challengeId);
                 if (optionalChallenge.isPresent() && optionalChallenge.get().getCode().equals(captchaInput)) {
                     return true;
                 }
                 break;
-            case "NONE":
+            case NONE:
                 return true;
         }
 
@@ -251,15 +254,16 @@ public class CaptchaServiceBean {
 
     /**
      * Retrieves the configured difficulty level for generating captchas.
-     * If the difficulty level is not specified or is not "hard", the default difficulty is set to "easy".
+     * If the difficulty level is not specified or is not HARD, the default difficulty is set to EASY.
      *
-     * @return The difficulty level for captcha generation ("easy" or "hard").
+     * @return The difficulty level for captcha generation (EASY or HARD).
      */
-    private static String getCaptchaDifficulty() {
+    private static CaptchaDifficulty getCaptchaDifficulty() {
         String difficulty = ConfigurationProperties.getInstance().getProperty("nanocaptcha.difficulty");
-        if (difficulty == null || !difficulty.equals("hard")) {
-            difficulty = "easy";
+        try {
+            return CaptchaDifficulty.valueOf(difficulty.toUpperCase());
+        } catch (NullPointerException | IllegalArgumentException e) {
+            return CaptchaDifficulty.EASY;
         }
-        return difficulty;
     }
 }
