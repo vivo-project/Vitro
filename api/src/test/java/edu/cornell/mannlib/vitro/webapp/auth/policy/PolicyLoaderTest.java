@@ -6,10 +6,13 @@ import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.AUTH_INDIVIDU
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueKey;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -53,7 +56,7 @@ public class PolicyLoaderTest extends PolicyTest {
     @Test
     public void getDataSetUriByKeyTest() {
         load(DATA_SET);
-        String uri = PolicyLoader.getInstance().getDataSetUriByKey(new String[] {  },
+        String uri = PolicyLoader.getInstance().getDataSetUriByKey(new String[] {},
                 new String[] { NAMED_OBJECT.toString(), EXECUTE.toString(), PUBLIC });
         assertEquals(PREFIX + "PublicDataSet", uri);
     }
@@ -75,7 +78,6 @@ public class PolicyLoaderTest extends PolicyTest {
         expectedKey.setObjectType(NAMED_OBJECT);
         AttributeValueKey compositeKey = PolicyLoader.getInstance().getDataSetKey(PREFIX + "PublicDataSet");
         assertEquals(expectedKey, compositeKey);
-
     }
 
     @Test
@@ -91,4 +93,17 @@ public class PolicyLoaderTest extends PolicyTest {
         assertTrue(!patterns.isEmpty());
         assertEquals(1, patterns.size());
     }
+
+    @Test
+    public void testLoadPolicyWithValues() {
+        load(RESOURCES_RULES_PREFIX + "policy_values.n3");
+        String policyUri = VitroVocabulary.AUTH_INDIVIDUAL_PREFIX + "policy-values-test/Policy";
+        Set<DynamicPolicy> policies = loader.loadPolicies(policyUri);
+        assertEquals(1, policies.size());
+        DynamicPolicy policy = policies.iterator().next();
+        assertTrue(policy != null);
+        assertEquals(100, policy.getPriority());
+        countRulesAndAttributes(policy, 1, Collections.singleton(1));
+    }
+
 }
