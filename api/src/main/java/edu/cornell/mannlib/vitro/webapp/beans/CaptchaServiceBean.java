@@ -178,7 +178,7 @@ public class CaptchaServiceBean {
             captchaImplSetting = "NANOCAPTCHA";
         }
 
-        return CaptchaImplementation.valueOf(captchaImplSetting);
+        return CaptchaImplementation.valueOf(captchaImplSetting.toUpperCase());
     }
 
     /**
@@ -196,7 +196,7 @@ public class CaptchaServiceBean {
     public static void addCaptchaRelatedFieldsToPageContext(Map<String, Object> context) throws IOException {
         CaptchaImplementation captchaImpl = getCaptchaImpl();
 
-        if (captchaImpl.equals(CaptchaImplementation.RECAPTCHAv2)) {
+        if (captchaImpl.equals(CaptchaImplementation.RECAPTCHAV2)) {
             context.put("siteKey",
                 Objects.requireNonNull(ConfigurationProperties.getInstance().getProperty("recaptcha.siteKey"),
                     "You have to provide a site key through configuration file."));
@@ -222,7 +222,7 @@ public class CaptchaServiceBean {
         CaptchaImplementation captchaImpl = getCaptchaImpl();
 
         switch (captchaImpl) {
-            case RECAPTCHAv2:
+            case RECAPTCHAV2:
                 if (CaptchaServiceBean.validateReCaptcha(captchaInput)) {
                     return true;
                 }

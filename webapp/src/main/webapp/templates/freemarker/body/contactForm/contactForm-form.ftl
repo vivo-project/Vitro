@@ -36,7 +36,7 @@
         </div>
 
 
-        <#if captchaToUse == "RECAPTCHAv2">
+        <#if captchaToUse == "RECAPTCHAV2">
             <div class="g-recaptcha" data-sitekey="${siteKey!}"></div>
             <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response" />
         <#elseif captchaToUse == "NANOCAPTCHA">
@@ -72,7 +72,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/templates/freemarke
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/commentForm.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.12.1.min.js"></script>')}
 
-<#if captchaToUse == "RECAPTCHAv2">
+<#if captchaToUse == "RECAPTCHAV2">
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script>
         document.getElementById('contact_form').addEventListener('submit', function() {

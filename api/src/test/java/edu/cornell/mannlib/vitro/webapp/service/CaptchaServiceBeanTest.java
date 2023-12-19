@@ -152,7 +152,7 @@ public class CaptchaServiceBeanTest extends AbstractTestClass {
         assertNotNull(context.get("siteKey"));
         assertNull(context.get("challenge"));
         assertNull(context.get("challengeId"));
-        assertEquals("RECAPTCHAv2", context.get("captchaToUse"));
+        assertEquals("RECAPTCHAV2", context.get("captchaToUse"));
     }
 
     @Test
@@ -181,7 +181,7 @@ public class CaptchaServiceBeanTest extends AbstractTestClass {
         CaptchaImplementation captchaImpl = CaptchaServiceBean.getCaptchaImpl();
 
         // Then
-        assertEquals(CaptchaImplementation.RECAPTCHAv2, captchaImpl);
+        assertEquals(CaptchaImplementation.RECAPTCHAV2, captchaImpl);
     }
 
     @Test

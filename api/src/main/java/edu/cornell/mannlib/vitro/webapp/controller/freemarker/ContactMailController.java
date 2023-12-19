@@ -90,7 +90,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
         String captchaInput;
         String captchaId = "";
         switch (captchaImpl) {
-            case RECAPTCHAv2:
+            case RECAPTCHAV2:
                 captchaInput = nonNullAndTrim(vreq, "g-recaptcha-response");
                 break;
             case NANOCAPTCHA:
