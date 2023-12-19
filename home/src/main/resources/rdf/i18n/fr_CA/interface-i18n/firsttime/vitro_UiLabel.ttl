@@ -257,7 +257,7 @@ uil-data:reset_password_note.Vitro
 uil-data:password_reset_email_sent.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Un courriel de récupération de mot de passe est envoyé à {0}, s'il est lié à un compte existant."@fr-CA ;
+        rdfs:label       "Un courriel de récupération du mot de passe est envoyé à {0}, s'il est lié à un compte existant."@fr-CA ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "password_reset_email_sent" ;
         uil:hasPackage  "Vitro-languages" .
@@ -313,7 +313,7 @@ uil-data:password_reset_button.Vitro
 uil-data:password_reset_manual.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Pour réinitialiser votre mot de passe, veuillez entrer votre adresse e-mail ci-dessous:"@fr-CA ;
+        rdfs:label       "Pour réinitialiser votre mot de passe, veuillez entrer votre adresse courriel ci-dessous:"@fr-CA ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "password_reset_manual" ;
         uil:hasPackage  "Vitro-languages" .
@@ -321,7 +321,7 @@ uil-data:password_reset_manual.Vitro
 uil-data:password_reset_forgot_email.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Si vous ne vous souvenez pas de votre adresse e-mail, veuillez"@fr-CA ;
+        rdfs:label       "Si vous ne vous souvenez pas de votre adresse courriel, veuillez"@fr-CA ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "password_reset_forgot_email" ;
         uil:hasPackage  "Vitro-languages" .
