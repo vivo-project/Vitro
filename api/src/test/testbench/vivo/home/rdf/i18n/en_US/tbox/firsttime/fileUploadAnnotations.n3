@@ -1,0 +1,4 @@
+@prefix vitro-public:  <http://vitro.mannlib.cornell.edu/ns/vitro/public#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+
+vitro-public:storedFile rdfs:label "stored file"@en-US .

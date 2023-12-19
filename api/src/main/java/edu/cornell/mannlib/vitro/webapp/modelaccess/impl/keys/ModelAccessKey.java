@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.IndividualsTreatmentOption;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.LanguageOption;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.ModelAccessOption;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.PolicyOption;
@@ -66,6 +67,19 @@ public abstract class ModelAccessKey {
 				PolicyOption.class);
 	}
 
+    protected static IndividualsTreatmentOption findIndividualsTreatmentOption(ModelAccessOption[] options) {
+        return findIndividualsTreatmentOption(Arrays.asList(options));
+    }
+
+    protected static IndividualsTreatmentOption findIndividualsTreatmentOption(
+            Iterable<ModelAccessOption> options) {
+        return findOption(options, IndividualsTreatmentOption.REMOTE_TREATMENT, IndividualsTreatmentOption.class);
+    }
+	
+	
+	
+	
+	
 	/**
 	 * Search through the options for values from the specified class. If none
 	 * are found, use the default value.
@@ -118,6 +132,10 @@ public abstract class ModelAccessKey {
 	protected LanguageOption getLanguageOption() {
 		return findLanguageOption(keyComponents);
 	}
+
+    protected IndividualsTreatmentOption getIndividualsTreatmentOption() {
+        return findIndividualsTreatmentOption(keyComponents);
+    }
 
 	protected WhichService getWhichService() {
 		return findWhichService(keyComponents);

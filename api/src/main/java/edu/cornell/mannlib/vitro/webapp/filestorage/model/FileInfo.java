@@ -62,9 +62,9 @@ public class FileInfo {
 				.getObjectPropertyStatements(opStmt);
 
 		if (stmts.size() > 1) {
-			StringBuilder uris = new StringBuilder();
+			String uris = "";
 			for (ObjectPropertyStatement stmt : stmts) {
-				uris.append("'").append(stmt.getSubjectURI()).append("' ");
+				uris += "'" + stmt.getSubjectURI() + "' ";
 			}
 			log.warn("Found " + stmts.size() + " Individuals that claim '"
 					+ entity.getURI() + "' as its bytestream:" + uris);

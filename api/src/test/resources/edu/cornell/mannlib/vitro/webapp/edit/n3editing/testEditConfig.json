@@ -2,7 +2,7 @@
     "formUrl" : "${formUrl}",
     "editKey" : "${editKey}",
 
-    "subject"   : ["series",    "${subjectUriJson}", ],
+    "subject"   : ["series",    "${subjectUriJson}" ],
     "predicate" : ["predicate", "${predicateUriJson}" ],
     "object"    : ["talk", "${objectUriJson}", "URI" ],
 

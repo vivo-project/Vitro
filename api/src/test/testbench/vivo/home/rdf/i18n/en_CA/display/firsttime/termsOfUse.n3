@@ -1,0 +1,20 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix default: <http://vitro.mannlib.cornell.edu/ns/default/pages#> .
+
+default:terms_of_use_dg
+    a   <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.FixedHTMLDataGetter> ;
+    <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#htmlValue>
+        """
+	    <p>Terms of use should be here</p>		
+        """@en-CA ;
+        <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#saveToVar>
+                "termsOfUse" .
+default:terms_of_use
+    a   <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#Page> ;
+    <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#hasDataGetter>
+        default:terms_of_use_dg ;
+    <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#title>
+        "Terms of use"@en-CA ;
+    <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#urlMapping>
+        "/termsOfUse" .

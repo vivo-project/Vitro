@@ -1,0 +1,164 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix action: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#> .
+
+# These are the reqired action objects from the SimplePermission.java.
+
+action:AccessSpecialDataModels
+    a display:RequiredAction ;
+    rdfs:label "ACCESS_SPECIAL_DATA_MODELS" .
+
+
+action:DoBackEndEditing
+    a display:RequiredAction ;
+    rdfs:label "DO_BACK_END_EDITING" .
+
+
+action:DoFrontEndEditing
+    a display:RequiredAction ;
+    rdfs:label "DO_FRONT_END_EDITING" .
+
+
+action:EditOntology
+    a display:RequiredAction ;
+    rdfs:label "EDIT_ONTOLOGY" .
+
+
+action:EditOwnAccount
+    a display:RequiredAction ;
+    rdfs:label "EDIT_OWN_ACCOUNT" .
+
+
+action:EditSiteInformation
+    a display:RequiredAction ;
+    rdfs:label "EDIT_SITE_INFORMATION" .
+
+
+action:LoginDuringMaintenance
+    a display:RequiredAction ;
+    rdfs:label "LOGIN_DURING_MAINTENANCE" .
+
+
+action:ManageMenus
+    a display:RequiredAction ;
+    rdfs:label "MANAGE_MENUS" .
+
+
+action:ManageOwnProxies
+    a display:RequiredAction ;
+    rdfs:label "MANAGE_OWN_PROXIES" .
+
+
+action:ManageProxies
+    a display:RequiredAction ;
+    rdfs:label "MANAGE_PROXIES" .
+
+
+action:ManageSearchIndex
+    a display:RequiredAction ;
+    rdfs:label "MANAGE_SEARCH_INDEX" .
+
+
+action:ManageUserAccounts
+    a display:RequiredAction ;
+    rdfs:label "MANAGE_USER_ACCOUNTS" .
+
+
+action:QueryFullModel
+    a display:RequiredAction ;
+    rdfs:label "QUERY_FULL_MODEL" .
+
+
+action:QueryUserAccountsModel
+    a display:RequiredAction ;
+    rdfs:label "QUERY_USER_ACCOUNTS_MODEL" .
+
+
+action:RefreshVisualizationCache
+    a display:RequiredAction ;
+    rdfs:label "REFRESH_VISUALIZATION_CACHE" .
+
+
+action:SeeIndividualEditingPanel
+    a display:RequiredAction ;
+    rdfs:label "SEE_INDVIDUAL_EDITING_PANEL" .
+
+
+action:SeeRevisionInfo
+    a display:RequiredAction ;
+    rdfs:label "SEE_REVISION_INFO" .
+
+
+action:SeeSiteAdminPage
+    a display:RequiredAction ;
+    rdfs:label "SEE_SITE_ADMIN_PAGE" .
+
+
+action:SeeStartupStatus
+    a display:RequiredAction ;
+    rdfs:label "SEE_STARTUP_STATUS" .
+
+
+action:SeeVerbosePropertyInformation
+    a display:RequiredAction ;
+    rdfs:label "SEE_VERBOSE_PROPERTY_INFORMATION" .
+
+
+action:UseAdvancedDataToolsPages
+    a display:RequiredAction ;
+    rdfs:label "USE_ADVANCED_DATA_TOOLS_PAGES" .
+
+
+action:UseSparqlQueryPage
+    a display:RequiredAction ;
+    rdfs:label "USE_SPARQL_QUERY_PAGE" .
+
+
+action:UseBasicAjaxControllers
+    a display:RequiredAction ;
+    rdfs:label "USE_BASIC_AJAX_CONTROLLERS" .
+
+
+action:UseMiscellaneousAdminPages
+    a display:RequiredAction ;
+    rdfs:label "USE_MISCELLANEOUS_ADMIN_PAGES" .
+
+
+action:UseMiscellaneousCuratorPages
+    a display:RequiredAction ;
+    rdfs:label "USE_MISCELLANEOUS_CURATOR_PAGES" .
+
+
+action:UseIndividualControlPanel
+    a display:RequiredAction ;
+    rdfs:label "USE_INDIVIDUAL_CONTROL_PANEL" .
+
+
+action:UseMiscellaneousPages
+    a display:RequiredAction ;
+    rdfs:label "USE_MISCELLANEOUS_PAGES" .
+
+##Page specific permissions
+action:PageViewableAdmin
+	a display:RequiredAction ;
+    rdfs:label "PAGE_VIEWABLE_ADMIN" .
+
+action:PageViewableCurator
+	a display:RequiredAction ;
+	rdfs:label "PAGE_VIEWABLE_CURATOR" .
+
+action:PageViewableEditor
+	a display:RequiredAction ;
+	rdfs:label "PAGE_VIEWABLE_EDITOR" .
+
+action:PageViewableLoggedIn
+	a display:RequiredAction ;
+	rdfs:label "PAGE_VIEWABLE_LOGGEDIN" .
+
+action:PageViewablePublic
+	a display:RequiredAction ;
+	rdfs:label "PAGE_VIEWABLE_PUBLIC" .

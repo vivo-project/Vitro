@@ -1,0 +1,39 @@
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix prop-data: <http://vivoweb.org/ontology/core/properties/individual#> .
+@prefix prop:  <http://vivoweb.org/ontology/core/properties/vocabulary#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+prop:hasPackage  rdf:type  owl:DatatypeProperty ;
+        rdfs:domain  prop:PropertyKey ;
+        rdfs:label   "has package" ;
+        rdfs:range   xsd:string .
+
+prop:hasKey  rdf:type  owl:DatatypeProperty ;
+        rdfs:comment  "Value of the key" ;
+        rdfs:domain   prop:PropertyKey ;
+        rdfs:label    "Propertie file url " ;
+        rdfs:range    xsd:string .
+
+prop:hasTheme  rdf:type  owl:DatatypeProperty ;
+        rdfs:domain  prop:PropertyKey ;
+        rdfs:label   "has theme" ;
+        rdfs:range   xsd:string .
+
+prop:PropertyKey  rdf:type  owl:Class ;
+        rdfs:label       skos:Concept ;
+        rdfs:subClassOf  owl:Thing ;
+        rdfs:subClassOf  skos:Concept .
+
+prop:ftlUrl  rdf:type  owl:DatatypeProperty ;
+        rdfs:comment  "Points to the FTL file containing the key" ;
+        rdfs:domain   prop:PropertyKey ;
+        rdfs:label    "ftl file url" ;
+        rdfs:range    xsd:anyURI .
+
+prop:hasApp  rdf:type  owl:DatatypeProperty ;
+        rdfs:domain  prop:PropertyKey ;
+        rdfs:label   "has application" ;
+        rdfs:range   xsd:string .

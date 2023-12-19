@@ -11,7 +11,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -329,11 +331,67 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
        }
    }
 
+   public String toString_() {
+       ObjectMapper mapper = new ObjectMapper();
+       String jsonString = "";
+       try {
+           jsonString = (name != null                     ? "{ name = "+ mapper.writeValueAsString(name) + " },": "")
+                   + (rdfsLabel != null                   ? "{ rdfsLabel = "+ mapper.writeValueAsString(rdfsLabel)  + " },": "")
+                   + (vClassURI != null                   ? "{ vClassURI = "+ mapper.writeValueAsString(vClassURI)  + " },": "")
+                   + (vClass != null                      ? "{ vClass = "+ mapper.writeValueAsString(vClass)  + " },": "")
+                   + (directVClasses != null              ? "{ directVClasses = "+ mapper.writeValueAsString(directVClasses)  + " },": "")
+                   + (allVClasses != null                 ? "{ allVClasses = "+ mapper.writeValueAsString(allVClasses)  + " },": "")
+                   + (modTime != null                     ? "{ modTime = "+ mapper.writeValueAsString(modTime)  + " },": "")
+                   + (propertyList != null                ? "{ propertyList = "+ mapper.writeValueAsString(propertyList)  + " }," : "")
+                   + (populatedObjectPropertyList != null ? "{ populatedObjectPropertyList = "+ mapper.writeValueAsString(populatedObjectPropertyList)  + " },": "")
+                   + (objectPropertyMap != null           ? "{ objectPropertyMap = "+ mapper.writeValueAsString(objectPropertyMap)  + " },": "")
+                   + (datatypePropertyList != null        ? "{ datatypePropertyList = "+ mapper.writeValueAsString(datatypePropertyList)  + " },": "")
+                   + (populatedDataPropertyList != null   ? "{ populatedDataPropertyList = "+ mapper.writeValueAsString(populatedDataPropertyList)  + " },": "")
+                   + (dataPropertyMap != null             ? "{ dataPropertyMap = "+ mapper.writeValueAsString(dataPropertyMap)  + " },": "")
+                   + (dataPropertyStatements != null      ? "{ dataPropertyStatements = "+ mapper.writeValueAsString(dataPropertyStatements)  + " },": "")
+                   + (objectPropertyStatements != null    ? "{ objectPropertyStatements = "+ mapper.writeValueAsString(objectPropertyStatements)  + " },": "")
+                   + (rangeEnts2Ents != null              ? "{ rangeEnts2Ents = "+ mapper.writeValueAsString(rangeEnts2Ents)  + " },": "")
+                   + (externalIds != null                 ? "{ externalIds = "+ mapper.writeValueAsString(externalIds)  + " },": "")
+                   + (mainImageUri != null                ? "{ mainImageUri = "+ mapper.writeValueAsString(mainImageUri)  + " },": "")
+                   + (imageInfo != null                   ? "{ imageInfo = "+ mapper.writeValueAsString(imageInfo)  + " }": "");
+       } catch (JsonProcessingException e) {
+           // TODO Auto-generated catch block
+           e.printStackTrace();
+       }
+       return jsonString;
+   }
+   
+   
    public String toString(){
        if( getURI() == null ){
            return "uninitialized, null URI";
-       }else{
-           return getURI() + " " + getName();
+       } else {
+           return "IndividualImpl [\n" + 
+                   (name != null ? "name=" + name + ", \n" : "")
+                   + (rdfsLabel != null ? "rdfsLabel=" + rdfsLabel + ", \n" : "")
+                   + (vClassURI != null ? "vClassURI=" + vClassURI + ", \n" : "")
+                   + (vClass != null ? "vClass=" + vClass + ", \n" : "")
+                   + (directVClasses != null ? "directVClasses=" + directVClasses + ", \n" : "")
+                   + (allVClasses != null ? "allVClasses=" + allVClasses + ", \n" : "")
+                   + (modTime != null ? "modTime=" + modTime + ", " : "")
+                   + (propertyList != null ? "propertyList=" + propertyList + ", \n" : "")
+                   + (populatedObjectPropertyList != null
+                           ? "populatedObjectPropertyList=" + populatedObjectPropertyList + ", \n"
+                           : "")
+                   + (objectPropertyMap != null ? "objectPropertyMap=" + objectPropertyMap + ", \n" : "")
+                   + (datatypePropertyList != null ? "datatypePropertyList=" + datatypePropertyList + ", \n" : "")
+                   + (populatedDataPropertyList != null ? "populatedDataPropertyList=" + populatedDataPropertyList + ", \n"
+                           : "")
+                   + (dataPropertyMap != null ? "dataPropertyMap=" + dataPropertyMap + ", \n" : "")
+                   + (dataPropertyStatements != null ? "dataPropertyStatements=" + dataPropertyStatements + ", \n" : "")
+                   + (objectPropertyStatements != null ? "objectPropertyStatements=" + objectPropertyStatements + ", \n"
+                           : "")
+                   + (rangeEnts2Ents != null ? "rangeEnts2Ents=" + rangeEnts2Ents + ", \n" : "")
+                   + (externalIds != null ? "externalIds=" + externalIds + ", \n" : "")
+                   + (mainImageUri != null ? "mainImageUri=" + mainImageUri + ", \n" : "")
+                   + (imageInfo != null ? "imageInfo=" + imageInfo + ", \n" : "")
+                   + "]";
+//           return getURI() + " " + getName();
        }
    }
 
@@ -341,7 +399,7 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
         return getThumbUrl() != null && ! getThumbUrl().isEmpty();
     }
 
-	@Override
+    @Override
 	public void resolveAsFauxPropertyStatements(List<ObjectPropertyStatement> list) {
 		// No webappDaoFactory, so nothing to do.
 	}

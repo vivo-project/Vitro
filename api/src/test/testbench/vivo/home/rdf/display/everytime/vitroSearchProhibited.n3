@@ -1,0 +1,25 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+# All instances of a class can be excluded from the search index by adding a
+# vitroDisplay:excludeClass property between vitroDisplay:SearchIndex and the
+# URI of the class that you would like to exclude.
+
+# .n3 or .rdf files can be created in this directory to configure the search
+# exclusions.  Each file must be a valid file in the format specified by its
+# extension. Each file will be loaded individually and must be a complete
+# stand alone example of its format.  Each file must contain all the necessary
+# prefixes, namespaces and preambles required by the format specified by its
+# extension.
+
+# If you would like to add classes to the exclusions, add a file to this
+# directory ending in .n3 with N3 statements similar to this example.
+
+#
+# @prefix owl: <http://www.w3.org/2002/07/owl#> .
+# @prefix vitroDisplay: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> .
+# @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+# @prefix example: <http://example/ns/> .
+#
+# vitroDisplay:SearchIndex
+#    rdf:type owl:Thing ;
+#    vitroDisplay:excludeClass example:classToExclude ;

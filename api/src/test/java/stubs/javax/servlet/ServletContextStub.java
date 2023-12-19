@@ -4,6 +4,7 @@ package stubs.javax.servlet;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -25,16 +26,36 @@ import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.descriptor.JspConfigDescriptor;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean;
+import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean.LevelRevisionInfo;
 
 /**
  * A simple stand-in for the {@link ServletContext}, for use in unit tests.
  */
 public class ServletContextStub implements ServletContext {
 	private static final Log log = LogFactory.getLog(ServletContextStub.class);
-
-	// ----------------------------------------------------------------------
+	public ServletContextStub() {
+        String benchAbsPath = (new File("src/test/testbench/webapp")).getAbsolutePath();
+	    mockResources.put("/WEB-INF/resources/startup_listeners.txt", 
+	            benchAbsPath +"/WEB-INF/resources/startup_listeners.txt");
+        mockResources.put("/WEB-INF/resources/shortview_config.n3", 
+                benchAbsPath+"/WEB-INF/resources/shortview_config.n3");
+        mockResources.put("/WEB-INF/resources/revisionInfo.txt", 
+                benchAbsPath+"/WEB-INF/resources/revisionInfo.txt");
+        setRealPath("/templates/freemarker", benchAbsPath+"/templates/freemarker");
+        setRealPath("/themes", benchAbsPath+"/themes");
+        setRealPath("/i18n/", benchAbsPath+"/i18n/");
+        setRealPath("/local/i18n/", benchAbsPath+"/local/i18n/");
+        setRealPath("/themes/", benchAbsPath+"/themes/");
+        
+        this.setAttribute("edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean", "");
+        // TODO Auto-generated constructor stub
+    }
+    // ----------------------------------------------------------------------
 	// Stub infrastructure
 	// ----------------------------------------------------------------------
 
@@ -118,11 +139,20 @@ public class ServletContextStub implements ServletContext {
 		}
 	}
 
-	@Override
 	public InputStream getResourceAsStream(String path) {
 		if (mockResources.containsKey(path)) {
-			return new ByteArrayInputStream(mockResources.get(path).getBytes());
+		    String realPath = mockResources.get(path);
+		    File file= new File(realPath);
+		    byte[] fileContent = null;
+            try {
+                fileContent = FileUtils.readFileToByteArray(file);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+			return new ByteArrayInputStream(fileContent);
 		} else {
+		    log.info("No mock resource for key="+path);
 			return null;
 		}
 	}
