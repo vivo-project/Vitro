@@ -229,7 +229,7 @@
     .
 
 :RelationCheck a access:Check ;
-    access:useOperator access-individual:SparqlSelectQueryContains ;
+    access:useOperator access-individual:SparqlSelectQueryResultContain ;
     access:hasTypeToCheck access-individual:StatementSubjectUri ;
     access:value access-individual:PersonProfileProximityToResourceUri .
 
