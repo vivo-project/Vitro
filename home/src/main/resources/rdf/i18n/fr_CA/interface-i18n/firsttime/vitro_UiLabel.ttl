@@ -6281,7 +6281,7 @@ uil-data:full_name_empty.Vitro
 uil-data:email_address_empty.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Veuillez entrer une adresse e-mail valide."@fr-CA ;
+        rdfs:label       "Veuillez entrer une adresse courriel valide."@fr-CA ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "email_address_empty" ;
         uil:hasPackage  "Vitro-languages" .
