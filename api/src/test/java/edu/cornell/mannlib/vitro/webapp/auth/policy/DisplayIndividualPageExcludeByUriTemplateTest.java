@@ -50,7 +50,6 @@ public class DisplayIndividualPageExcludeByUriTemplateTest extends PolicyTest {
     @Test
     public void testLoadPolicy() {
         load(POLICY_PATH);
-        load(RESOURCES_RULES_PREFIX + "display_individual_page_exclude_uri.n3");
 
         if (roleUri.equals(CUSTOM)) {
             PolicyTemplateController.createRoleDataSets(CUSTOM);

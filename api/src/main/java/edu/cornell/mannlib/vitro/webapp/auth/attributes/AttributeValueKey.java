@@ -94,15 +94,23 @@ public class AttributeValueKey {
         }
         AttributeValueKey compared = (AttributeValueKey) object;
 
-        return new EqualsBuilder().append(getAccessOperation(), compared.getAccessOperation())
-                .append(getObjectType(), compared.getObjectType()).append(getRole(), compared.getRole())
-                .append(getType(), compared.getType()).append(getNamedKeyComponents(), compared.getNamedKeyComponents())
+        return new EqualsBuilder()
+                .append(getAccessOperation(), compared.getAccessOperation())
+                .append(getObjectType(), compared.getObjectType())
+                .append(getRole(), compared.getRole())
+                .append(getType(), compared.getType())
+                .append(getNamedKeyComponents(), compared.getNamedKeyComponents())
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(151, 1017).append(getAccessOperation()).append(getObjectType()).append(getRole())
-                .append(getType()).append(getNamedKeyComponents()).toHashCode();
+        return new HashCodeBuilder(151, 1017)
+                .append(getAccessOperation())
+                .append(getObjectType())
+                .append(getRole())
+                .append(getType())
+                .append(getNamedKeyComponents())
+                .toHashCode();
     }
 }

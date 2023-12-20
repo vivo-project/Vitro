@@ -15,6 +15,7 @@ public abstract class AccessObject {
     public static String SOME_URI = "?SOME_URI";
     public static Property SOME_PREDICATE = new Property(SOME_URI);
     public static String SOME_LITERAL = "?SOME_LITERAL";
+    private Model model = null;
 
     protected AccessObjectStatement statement;
     private DataProperty dataProperty;
@@ -50,16 +51,12 @@ public abstract class AccessObject {
         }
     }
 
-    public void setStatementOntModel(Model ontModel) {
-        initializeStatement();
-        statement.setModel(ontModel);
+    public void setModel(Model ontModel) {
+        model = ontModel;
     }
 
-    public Model getStatementOntModel() {
-        if (statement != null) {
-            return statement.getModel();
-        }
-        return null;
+    public Model getModel() {
+        return model;
     }
 
     public void setStatementSubject(String subject) {
