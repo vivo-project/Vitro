@@ -58,6 +58,11 @@
     rdfs:comment "Represents attribute uri value";
     rdfs:label "Attribute uri value"@en-US .
 
+:NamedKeyComponent a owl:Class ;
+    rdfs:subClassOf :AttributeValuePattern ;
+    rdfs:comment "Represents named key component";
+    rdfs:label "Named key component"@en-US .
+
 :SubjectRoleUri a owl:Class ;
     rdfs:subClassOf :AttributeUriValue ;
     rdfs:comment "Represents role uri";
