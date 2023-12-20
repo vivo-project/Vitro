@@ -1,0 +1,10 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+
+access-individual:UriExclusion a access:NamedKeyComponent ;
+    access:id "URI_EXCLUSION" .
+
+access-individual:ClassExclusion a access:NamedKeyComponent ;
+    access:id "CLASS_EXCLUSION" .

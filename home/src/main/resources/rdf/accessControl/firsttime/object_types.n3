@@ -64,3 +64,6 @@ access-individual:FauxDataPropertyStatementValueSet a access:ValueSet ;
 
 access-individual:ClassValueSet a access:ValueSet ;
     access:value access-individual:Class .
+
+access-individual:IndividualValueSet a access:ValueSet ;
+    access:value access-individual:IndividualAccessObject .

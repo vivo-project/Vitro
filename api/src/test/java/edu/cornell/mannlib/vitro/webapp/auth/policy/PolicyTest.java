@@ -43,6 +43,7 @@ public class PolicyTest {
     public static final String OBJECT_TYPES = USER_ACCOUNTS_HOME_FIRSTTIME + "object_types.n3";
     public static final String ATTRIBUTES_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "attributes.n3";
     public static final String OPERATORS_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "operators.n3";
+    public static final String NAMED_KEY_COMPONENTS_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "named_key_components.n3";
     public static final String PROFILE_PROXIMITY_QUERY = USER_ACCOUNTS_HOME_FIRSTTIME + "profile_proximity_query.n3";
     public static final String TEST_DECISIONS = USER_ACCOUNTS_HOME_FIRSTTIME + "decisions.n3";
     public static final String ROLES = USER_ACCOUNTS_HOME_FIRSTTIME + "roles.n3";
@@ -92,6 +93,7 @@ public class PolicyTest {
         load(OPERATORS_PATH);
         load(PROFILE_PROXIMITY_QUERY);
         load(TEST_DECISIONS);
+        load(NAMED_KEY_COMPONENTS_PATH);
         RDFServiceModel rdfService = new RDFServiceModel(configurationDataSet);
         AttributeValueSetRegistry.getInstance().clear();
         PolicyLoader.initialize(rdfService);

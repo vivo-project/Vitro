@@ -52,8 +52,9 @@ public class EntityPolicyController {
         return AttributeValueSetRegistry.getInstance();
     }
 
-    public static void revokeAccess(String entityUri, AccessObjectType aot, AccessOperation ao, String role) {
-        AttributeValueKey key = new AttributeValueKey(ao, aot, role, aot.toString());
+    public static void revokeAccess(String entityUri, AccessObjectType aot, AccessOperation ao, String role,
+            String... namedKeyComponents) {
+        AttributeValueKey key = new AttributeValueKey(ao, aot, role, aot.toString(), namedKeyComponents);
         AttributeValueSet set = getRegistry().get(key);
         if (set != null) {
             if (set.contains(entityUri)) {
@@ -77,8 +78,9 @@ public class EntityPolicyController {
         getLoader().updateAccessControlModel(removals.toString(), false);
     }
 
-    public static void grantAccess(String entityUri, AccessObjectType aot, AccessOperation ao, String role) {
-        AttributeValueKey key = new AttributeValueKey(ao, aot, role, aot.toString());
+    public static void grantAccess(String entityUri, AccessObjectType aot, AccessOperation ao, String role,
+            String... namedKeyComponents) {
+        AttributeValueKey key = new AttributeValueKey(ao, aot, role, aot.toString(), namedKeyComponents);
         AttributeValueSet set = getRegistry().get(key);
         if (set != null) {
             if (!set.contains(entityUri)) {
@@ -87,14 +89,13 @@ public class EntityPolicyController {
                 getLoader().updateAccessControlModel(toAdd, true);
             }
         } else {
-            extendInactiveValueSet(entityUri, aot, ao, role);
+            extendInactiveValueSet(entityUri, aot, ao, role, namedKeyComponents);
             loadPolicy(aot, ao, role);
         }
     }
 
     private static void loadPolicy(AccessObjectType aot, AccessOperation ao, String role) {
-        String dataSetUri =
-                getLoader().getDataSetUriByKey(new String[] { }, new String[] { ao.toString(), aot.toString(), role });
+        String dataSetUri = getLoader().getDataSetUriByKey(ao.toString(), aot.toString(), role);
         if (dataSetUri != null) {
             DynamicPolicy policy = getLoader().loadPolicyFromTemplateDataSet(dataSetUri);
             if (policy != null) {
@@ -104,18 +105,19 @@ public class EntityPolicyController {
     }
 
     private static void extendInactiveValueSet(String entityUri, AccessObjectType aot, AccessOperation ao,
-            String role) {
+            String role, String... namedKeyComponents) {
         StringBuilder additions = new StringBuilder();
-        getDataValueStatements(entityUri, aot, ao, Collections.singleton(role), additions);
+        getDataValueStatements(entityUri, aot, ao, Collections.singleton(role), additions, namedKeyComponents);
         getLoader().updateAccessControlModel(additions.toString(), true);
     }
 
-    public static boolean isGranted(String entityUri, AccessObjectType aot, AccessOperation ao, String role) {
+    public static boolean isGranted(String entityUri, AccessObjectType aot, AccessOperation ao, String role,
+            String... namedKeyComponents) {
         if (StringUtils.isBlank(entityUri)) {
             return false;
         }
         AttributeValueSetRegistry registry = getRegistry();
-        AttributeValueKey key = new AttributeValueKey(ao, aot, role, aot.toString());
+        AttributeValueKey key = new AttributeValueKey(ao, aot, role, aot.toString(), namedKeyComponents);
         AttributeValueSet set = registry.get(key);
         if (set == null) {
             return false;
@@ -138,12 +140,12 @@ public class EntityPolicyController {
     }
 
     public static void getDataValueStatements(String entityUri, AccessObjectType aot, AccessOperation ao,
-            Set<String> selectedRoles, StringBuilder sb) {
+            Set<String> selectedRoles, StringBuilder sb, String... namedKeyComponents) {
         if (StringUtils.isBlank(entityUri)) {
             return;
         }
         for (String role : selectedRoles) {
-            String valueSetUri = getValueSetUri(aot, ao, role);
+            String valueSetUri = getValueSetUri(aot, ao, role, namedKeyComponents);
             if (valueSetUri == null) {
                 log.debug(String.format("Policy value set wasn't found by key:\n%s\n%s\n%s", ao, aot, role));
                 continue;
@@ -175,12 +177,13 @@ public class EntityPolicyController {
         return values.contains(entityUri);
     }
 
-    private static String getValueSetUri(AccessObjectType aot, AccessOperation ao, String role) {
+    private static String getValueSetUri(AccessObjectType aot, AccessOperation ao, String role,
+            String... namedKeyComponents) {
         String key = aot.toString() + "." + ao.toString() + "." + role;
         if (policyKeyToDataValueMap.containsKey(key)) {
             return policyKeyToDataValueMap.get(key);
         }
-        String uri = getLoader().getEntityValueSetUri(ao, aot, role);
+        String uri = getLoader().getEntityValueSetUri(ao, aot, role, namedKeyComponents);
         policyKeyToDataValueMap.put(key, uri);
         return uri;
     }

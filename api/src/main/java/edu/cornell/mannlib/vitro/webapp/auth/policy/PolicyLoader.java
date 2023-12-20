@@ -270,6 +270,10 @@ public class PolicyLoader {
             + "      ?keyComponent a access:SubjectRoleUri .\n"
             + "      BIND('SUBJECT_ROLE_URI' as ?type)\n"
             + "    }\n"
+            + "    OPTIONAL {\n"
+            + "      ?keyComponent a access:NamedKeyComponent .\n"
+            + "      BIND('NAMED_KEY_COMPONENT' as ?type)\n"
+            + "    }\n"
             + "  }\n"
             + "}\n";
 
@@ -451,8 +455,7 @@ public class PolicyLoader {
     public Set<String> getDataSetValues(AccessOperation ao, AccessObjectType aot, String role) {
         Set<String> values = new HashSet<>();
         long expectedSize = 3;
-        String queryText = getDataSetByKeyQuery(new String[] {},
-                new String[] { ao.toString(), aot.toString(), role });
+        String queryText = getDataSetByKeyQuery(ao.toString(), aot.toString(), role);
         ParameterizedSparqlString pss = new ParameterizedSparqlString(queryText);
         pss.setLiteral("setElementsId", aot.toString());
         queryText = pss.toString();
@@ -486,9 +489,10 @@ public class PolicyLoader {
         return values;
     }
 
-    public String getEntityValueSetUri(AccessOperation ao, AccessObjectType aot, String role) {
-        long expectedSize = 3;
-        String queryText = getDataSetByKeyQuery(new String[] { }, new String[] { ao.toString(), aot.toString(), role });
+    public String getEntityValueSetUri(AccessOperation ao, AccessObjectType aot, String role,
+            String... namedKeyComponents) {
+        long expectedSize = 3 + namedKeyComponents.length;
+        String queryText = getDataSetByKeyQuery(ao.toString(), aot.toString(), role);
         ParameterizedSparqlString pss = new ParameterizedSparqlString(queryText);
         pss.setLiteral("setElementsId", aot.toString());
         queryText = pss.toString();
@@ -587,11 +591,8 @@ public class PolicyLoader {
         return query.toString();
     }
 
-    private static String getDataSetByKeyQuery(String[] uris, String[] ids) {
+    private static String getDataSetByKeyQuery(String... ids) {
         StringBuilder query = new StringBuilder(policyKeyTemplatePrefix);
-        for (String uri : uris) {
-            query.append(String.format("  ?dataSetKeyUri access:hasKeyComponent <%s> . \n", uri));
-        }
         int i = 0;
         for (String id : ids) {
             query.append(String.format(
@@ -809,9 +810,9 @@ public class PolicyLoader {
         return cs;
     }
 
-    public String getDataSetUriByKey(String[] uris, String[] ids) {
-        long expectedSize = uris.length + ids.length;
-        final String queryText = getDataSetByKeyQuery(uris, ids);
+    public String getDataSetUriByKey(String... ids) {
+        long expectedSize = ids.length;
+        final String queryText = getDataSetByKeyQuery(ids);
         debug("SPARQL Query to get policy data set values:\n %s", queryText);
         String[] uri = new String[1];
         try {
@@ -858,6 +859,9 @@ public class PolicyLoader {
                             }
                             if (Attribute.SUBJECT_ROLE_URI.toString().equals(type)) {
                                 compositeKey.setRole(id);
+                            }
+                            if ("NAMED_KEY_COMPONENT".equals(type)) {
+                                compositeKey.addNamedKey(id);
                             }
                         }
                     } else {
