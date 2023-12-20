@@ -1,0 +1,188 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/display-individual-page-exclude-by-type/> .
+
+:PolicyTemplate a access:PolicyTemplate ;
+    access:priority 1500 ;
+    access:hasRule :ExcludeMatchingUri ;
+    access:hasDataSet :PublicDisplayExclusionDataSet ;
+    access:hasDataSet :SelfEditorDisplayExclusionDataSet ;
+    access:hasDataSet :EditorDisplayExclusionDataSet ;
+    access:hasDataSet :CuratorDisplayExclusionDataSet ;
+    access:hasDataSet :AdminDisplayExclusionDataSet ;
+    access:hasDataSetTemplate :RoleDisplayExclusionDataSetTemplate ;
+    .
+
+#Role Display data set template
+
+:RoleDisplayExclusionDataSetTemplate a access:DataSetTemplate ;
+    access:hasDataSetTemplateKey :RoleDisplayExclusionDataSetTemplateKey ;
+    access:hasDataSetKeyTemplate :RoleDisplayExclusionDataSetKeyTemplate ;
+    access:hasRelatedValueSet access-individual:IndividualValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:dataSetValueTemplate :RoleDisplayRoleValueSetTemplate ;
+    access:dataSetValueTemplate :RoleDisplayValueSetTemplate .  
+
+:RoleDisplayExclusionDataSetTemplateKey a access:DataSetTemplateKey ;
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
+
+:RoleDisplayExclusionDataSetKeyTemplate a access:DataSetKeyTemplate ;
+    access:hasKeyComponent access-individual:IndividualAccessObject ;
+    access:hasKeyComponent access-individual:DisplayOperation ;
+    access:hasKeyComponent access-individual:TypeExclusion ;
+    access:hasKeyComponentTemplate access-individual:SubjectRole .
+
+:RoleDisplayRoleValueSetTemplate a access:ValueSetTemplate ;
+    access:relatedCheck :SubjectRoleCheck;
+    access:containsElementsOfType access-individual:SubjectRole .
+
+:RoleDisplayValueSetTemplate a access:ValueSetTemplate ;
+    access:relatedCheck :AccessObjectClassCheck ;
+#    access:value access-individual:defaultUri ;
+    access:containsElementsOfType access-individual:IndividualAccessObject .
+
+### Public display uri data sets
+
+:PublicDisplayExclusionDataSet a access:DataSet ;
+    access:hasDataSetKey :PublicDisplayExclusionDataSetKey ;
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet access-individual:IndividualValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :PublicDisplayValueSet .
+
+:PublicDisplayExclusionDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:IndividualAccessObject ;
+    access:hasKeyComponent access-individual:PublicRoleUri ;
+    access:hasKeyComponent access-individual:TypeExclusion ;
+    access:hasKeyComponent access-individual:DisplayOperation .
+
+### SelfEditor display uri data sets
+
+:SelfEditorDisplayExclusionDataSet a access:DataSet ;
+    access:hasDataSetKey :SelfEditorDisplayExclusionDataSetKey ;
+    access:hasRelatedValueSet access-individual:SelfEditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:IndividualValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :SelfEditorDisplayValueSet .
+
+:SelfEditorDisplayExclusionDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:IndividualAccessObject ;
+    access:hasKeyComponent access-individual:SelfEditorRoleUri ;
+    access:hasKeyComponent access-individual:TypeExclusion ;
+    access:hasKeyComponent access-individual:DisplayOperation .
+
+### Editor display uri data sets
+
+:EditorDisplayExclusionDataSet a access:DataSet ;
+    access:hasDataSetKey :EditorDisplayExclusionDataSetKey ;
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:IndividualValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :EditorDisplayValueSet .
+
+:EditorDisplayExclusionDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:IndividualAccessObject ;
+    access:hasKeyComponent access-individual:EditorRoleUri ;
+    access:hasKeyComponent access-individual:TypeExclusion ;
+    access:hasKeyComponent access-individual:DisplayOperation .
+
+### Curator display uri data sets
+
+:CuratorDisplayExclusionDataSet a access:DataSet ;
+    access:hasDataSetKey :CuratorDisplayExclusionDataSetKey ;
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:IndividualValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :CuratorDisplayValueSet .
+
+:CuratorDisplayExclusionDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:IndividualAccessObject ;
+    access:hasKeyComponent access-individual:CuratorRoleUri ;
+    access:hasKeyComponent access-individual:TypeExclusion ;
+    access:hasKeyComponent access-individual:DisplayOperation .
+
+### Admin display uri data sets
+
+:AdminDisplayExclusionDataSet a access:DataSet ;
+    access:hasDataSetKey :AdminDisplayExclusionDataSetKey ;
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet access-individual:IndividualValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :AdminDisplayValueSet .
+
+:AdminDisplayExclusionDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:IndividualAccessObject ;
+    access:hasKeyComponent access-individual:AdminRoleUri ;
+    access:hasKeyComponent access-individual:TypeExclusion ;
+    access:hasKeyComponent access-individual:DisplayOperation .
+
+### Rule
+
+:ExcludeMatchingUri a access:Rule;
+    access:hasDecision access-individual:Deny ;
+    access:requiresCheck :SubjectRoleCheck ;
+    access:requiresCheck :OperationCheck ;
+    access:requiresCheck :AccessObjectTypeCheck ;
+    access:requiresCheck :AccessObjectClassCheck .
+
+### Checks
+
+:AccessObjectTypeCheck a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:AccessObjectType ;
+    access:values access-individual:IndividualValueSet ;
+    .
+
+:OperationCheck a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:Operation ;
+    access:values access-individual:DisplayOperationValueSet ;
+    .
+
+:SubjectRoleCheck a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:SubjectRole ;
+    access:values access-individual:PublicRoleValueSet ;
+    access:values access-individual:SelfEditorRoleValueSet ;
+    access:values access-individual:EditorRoleValueSet ;
+    access:values access-individual:CuratorRoleValueSet ;
+    access:values access-individual:AdminRoleValueSet .
+
+:AccessObjectClassCheck a access:Check ;
+    access:useOperator access-individual:SparqlSelectQueryContains ;
+    access:useConfiguration :IndividualTypeQuery ;
+    access:hasTypeToCheck access-individual:AccessObjectUri ;
+    access:values :AdminDisplayValueSet ;
+    access:values :CuratorDisplayValueSet ;
+    access:values :EditorDisplayValueSet ;
+    access:values :PublicDisplayValueSet ;
+    access:values :SelfEditorDisplayValueSet ;
+    .
+
+:IndividualTypeQuery a access:SparqlSelectValuesQuery ;
+    access:id """
+		SELECT ?type WHERE {
+		    ?objectUri <http://www.w3.org/2000/01/rdf-schema#type> ?type .
+		}
+    """ .
+
+###Value sets
+
+:AdminDisplayValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:IndividualAccessObject .
+
+:CuratorDisplayValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:IndividualAccessObject .
+
+:EditorDisplayValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:IndividualAccessObject .
+
+:SelfEditorDisplayValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:IndividualAccessObject .
+
+:PublicDisplayValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:IndividualAccessObject .
+

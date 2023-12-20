@@ -6,5 +6,5 @@
 access-individual:UriExclusion a access:NamedKeyComponent ;
     access:id "URI_EXCLUSION" .
 
-access-individual:ClassExclusion a access:NamedKeyComponent ;
-    access:id "CLASS_EXCLUSION" .
+access-individual:TypeExclusion a access:NamedKeyComponent ;
+    access:id "TYPE_EXCLUSION" .
