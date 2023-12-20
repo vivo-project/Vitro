@@ -11,6 +11,7 @@ public abstract class AbstractCheck implements Check {
     private AttributeValueSet values;
     private String uri;
     private long computationalCost;
+    private String configuration;
 
     private CheckType testType = CheckType.EQUALS;
 
@@ -36,12 +37,18 @@ public abstract class AbstractCheck implements Check {
         adjustComputationCost(testType);
     }
 
-    @Override
+    public String getConfiguration() {
+        return configuration;
+    }
+
+    public void setConfiguration(String configuration) {
+        this.configuration = configuration;
+    }
+
     public void addValue(String value) {
         values.add(value);
     }
 
-    @Override
     public AttributeValueSet getValues() {
         return values;
     }

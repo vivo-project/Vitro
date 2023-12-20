@@ -55,6 +55,10 @@ public class MutableAttributeValueSet implements AttributeValueSet {
         return "";
     }
 
+    public Set<String> getValues() {
+        return values;
+    }
+
     @Override
     public boolean isEmpty() {
         return values.isEmpty();

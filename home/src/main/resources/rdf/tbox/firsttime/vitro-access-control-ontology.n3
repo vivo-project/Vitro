@@ -154,6 +154,12 @@
     rdfs:domain :Check ;
     rdfs:range :Operator .
 
+:useConfiguration a owl:ObjectProperty ;
+    rdfs:comment "Use configuration in case :Check needs additional configuration";
+    rdfs:label "use configuration"@en-US ;
+    rdfs:domain :Check ;
+    rdfs:range :AttributeValuePattern .
+
 :hasTypeToCheck a owl:ObjectProperty ,
     owl:FunctionalProperty ;
     rdfs:comment "Set attribute type that should be checked";

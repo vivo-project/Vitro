@@ -20,9 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import edu.cornell.mannlib.vitro.webapp.auth.checks.ProximityChecker;
 import edu.cornell.mannlib.vitro.webapp.auth.checks.QueryResultsMapCache;
-import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
@@ -101,7 +99,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
         VitroRequest vreq = new VitroRequest(request);
         ResponseValues responseValues = null;
 
-    	try(QueryResultsMapCache personResourceCache = new QueryResultsMapCache()) {
+    	try(QueryResultsMapCache sparqlQueryCache = new QueryResultsMapCache()) {
 
             // This method does a redirect if the required authorizations are not met, so just return.
             if (!isAuthorizedToDisplayPage(request, response, requiredActions(vreq))) {

@@ -95,7 +95,8 @@ public class PolicyLoader {
     private static final String NO_DATASET_RULES_QUERY = ""
             + "prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#>\n"
             + "prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
-            + "SELECT DISTINCT ?policyUri ?rule ?check ?testId ?typeId ?value ?lit_value ?decision_id \n"
+            + "SELECT DISTINCT ?policyUri ?rule ?check ?config ?attributeValue "
+            + "?testId ?typeId ?value ?lit_value ?decision_id \n"
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
             + "    ?policy a access:Policy .\n"
@@ -112,6 +113,10 @@ public class PolicyLoader {
             + "      OPTIONAL {\n"
             + "        ?checkType access:id ?typeId . \n"
             + "      }\n"
+            + "    }\n"
+            + "    OPTIONAL {\n"
+            + "      ?check access:useConfiguration ?configUri . \n"
+            + "      ?configUri access:id ?config . \n"
             + "    }\n"
             + "    OPTIONAL {\n"
             + "      ?rule access:hasDecision ?decision . \n"
@@ -134,7 +139,7 @@ public class PolicyLoader {
     private static final String DATASET_RULES_QUERY = ""
             + "prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#>\n"
             + "prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
-            + "SELECT DISTINCT ?policyUri ?rule ?check ?testId ?typeId ?value ?lit_value ?decision_id "
+            + "SELECT DISTINCT ?policyUri ?rule ?check ?config ?testId ?typeId ?value ?lit_value ?decision_id "
             + " ?dataSetUri ?attributeValue ?setElementsType \n"
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
@@ -154,6 +159,10 @@ public class PolicyLoader {
             + "      OPTIONAL {\n"
             + "        ?checkType access:id ?typeId .\n"
             + "      }\n"
+            + "    }\n"
+            + "    OPTIONAL {\n"
+            + "      ?check access:useConfiguration ?configUri . \n"
+            + "      ?configUri access:id ?config . \n"
             + "    }\n"
             + "    OPTIONAL {\n"
             + "      ?rule access:hasDecision ?decision .\n"
@@ -635,9 +644,7 @@ public class PolicyLoader {
                 @Override
                 protected void processQuerySolution(QuerySolution qs) {
                     try {
-                        if (isInvalidPolicySolution(qs)) {
-                            throw new Exception();
-                        }
+                        isInvalidPolicySolution(qs);
                         if (isRuleContinues(rules, qs)) {
                             String ruleUri = qs.getResource("rule").getURI();
                             populateRule(rules.get(ruleUri), qs, null);
@@ -675,9 +682,7 @@ public class PolicyLoader {
                 @Override
                 protected void processQuerySolution(QuerySolution qs) {
                     try {
-                        if (isInvalidPolicySolution(qs)) {
-                            throw new Exception();
-                        }
+                        isInvalidPolicySolution(qs);
                         if (isRuleContinues(rules, qs)) {
                             String ruleUri = qs.getResource("rule").getURI();
                             populateRule(rules.get(ruleUri), qs, dataSetKey);
@@ -757,36 +762,33 @@ public class PolicyLoader {
         }
     }
 
-    private static boolean isInvalidPolicySolution(QuerySolution qs) {
+    private static void isInvalidPolicySolution(QuerySolution qs) {
         if (!qs.contains("policyUri") || !qs.get("policyUri").isResource()) {
-            log.debug("Query solution doesn't contain policy uri");
-            return true;
+            throw new InvalidSolutionException("Query solution doesn't contain policy uri");
         }
         String policy = qs.get("policyUri").asResource().getURI();
         if (!qs.contains("rule") || !qs.get("rule").isResource()) {
-            log.debug(String.format("Query solution for policy <%s> doesn't contain rule uri", policy));
-            return true;
+            throw new InvalidSolutionException(
+                    String.format("Query solution for policy <%s> doesn't contain rule uri", policy));
         }
         String rule = qs.get("rule").asResource().getLocalName();
         if (!qs.contains("check") || !qs.get("check").isResource()) {
-            log.debug(String.format("Query solution for policy <%s> doesn't contain check uri", policy));
-            return true;
+            throw new InvalidSolutionException(
+                    String.format("Query solution for policy <%s> doesn't contain check uri", policy));
         }
         String check = qs.get("check").asResource().getLocalName();
         if (!qs.contains("value")) {
-            log.debug(String.format("Query solution for policy <%s> rule %s check %s doesn't contain value", policy,
-                    rule, check));
-            return true;
+            throw new InvalidSolutionException(String.format(
+                    "Query solution for policy <%s> rule %s check %s doesn't contain value", policy, rule, check));
         }
         if (!qs.contains("typeId") || !qs.get("typeId").isLiteral()) {
-            log.debug(String.format("Query solution for policy <%s> doesn't contain check type id", policy));
-            return true;
+            throw new InvalidSolutionException(
+                    String.format("Query solution for policy <%s> doesn't contain check type id", policy));
         }
         if (!qs.contains("testId") || !qs.get("testId").isLiteral()) {
-            log.debug(String.format("Query solution for policy <%s> doesn't contain check test id", policy));
-            return true;
+            throw new InvalidSolutionException(
+                    String.format("Query solution for policy <%s> doesn't contain check test id", policy));
         }
-        return false;
     }
 
     private static void debug(String template, Object... objects) {

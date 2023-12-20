@@ -4,22 +4,12 @@ package edu.cornell.mannlib.vitro.webapp.auth.objects;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
-import org.apache.jena.rdf.model.Model;
 
 public class AccessObjectStatement {
 
-    private Model model = null;
     private String subject = null;
     private Property predicate = null;
     private String object = null;
-
-    public Model getModel() {
-        return model;
-    }
-
-    public void setModel(Model model) {
-        this.model = model;
-    }
 
     public String getSubject() {
         return subject;

@@ -4,6 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
 import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.AUTH_VOCABULARY_PREFIX;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -90,12 +92,17 @@ public class EntityPolicyController {
             }
         } else {
             extendInactiveValueSet(entityUri, aot, ao, role, namedKeyComponents);
-            loadPolicy(aot, ao, role);
+            loadPolicy(aot, ao, role, namedKeyComponents);
         }
     }
 
-    private static void loadPolicy(AccessObjectType aot, AccessOperation ao, String role) {
-        String dataSetUri = getLoader().getDataSetUriByKey(ao.toString(), aot.toString(), role);
+    private static void loadPolicy(AccessObjectType aot, AccessOperation ao, String role,
+            String... namedKeyComponents) {
+        String[] ids = Arrays.copyOf(namedKeyComponents, namedKeyComponents.length + 3);
+        ids[ids.length - 1] = ao.toString();
+        ids[ids.length - 2] = aot.toString();
+        ids[ids.length - 3] = role;
+        String dataSetUri = getLoader().getDataSetUriByKey(ids);
         if (dataSetUri != null) {
             DynamicPolicy policy = getLoader().loadPolicyFromTemplateDataSet(dataSetUri);
             if (policy != null) {
@@ -179,12 +186,23 @@ public class EntityPolicyController {
 
     private static String getValueSetUri(AccessObjectType aot, AccessOperation ao, String role,
             String... namedKeyComponents) {
-        String key = aot.toString() + "." + ao.toString() + "." + role;
+        String key = generateKey(aot, ao, role, namedKeyComponents);
         if (policyKeyToDataValueMap.containsKey(key)) {
             return policyKeyToDataValueMap.get(key);
         }
         String uri = getLoader().getEntityValueSetUri(ao, aot, role, namedKeyComponents);
         policyKeyToDataValueMap.put(key, uri);
         return uri;
+    }
+
+    private static String generateKey(AccessObjectType aot, AccessOperation ao, String role,
+            String[] namedKeyComponents) {
+        String key = aot.toString() + "." + ao.toString() + "." + role;
+        if (namedKeyComponents.length > 0) {
+            List<String> namedKeys = new ArrayList<>(Arrays.asList(namedKeyComponents));
+            Collections.sort(namedKeys);
+            key = key + String.join(".", namedKeys);
+        }
+        return key;
     }
 }
