@@ -205,8 +205,7 @@ public class AuditController extends FreemarkerHttpServlet {
         String start = vreq.getParameter(PARAM_START_DATE);
         try {
             if (!StringUtils.isBlank(start)) {
-                Date startDate = sdf.parse(start);
-                return startDate;
+                return sdf.parse(start);
             }
         } catch (Exception e) {
             log.error(e, e);
