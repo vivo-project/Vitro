@@ -118,9 +118,9 @@ public class FastFailAccessRule implements AccessRule {
             @Override
             public int compare(Check latt, Check ratt) {
                 if (latt.getComputationalCost() > ratt.getComputationalCost()) {
-                    return -1;
-                } else if (latt.getComputationalCost() < ratt.getComputationalCost()) {
                     return 1;
+                } else if (latt.getComputationalCost() < ratt.getComputationalCost()) {
+                    return -1;
                 }
                 return latt.getUri().compareTo(latt.getUri());
             }

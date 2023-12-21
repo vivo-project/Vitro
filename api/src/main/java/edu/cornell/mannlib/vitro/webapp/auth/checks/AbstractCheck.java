@@ -76,20 +76,26 @@ public abstract class AbstractCheck implements Check {
 
     private void adjustComputationCost(CheckType testType) {
         switch (testType) {
+            case EQUALS:
+                computationalCost = 1;
+                return;
+            case NOT_EQUALS:
+                computationalCost = 2;
+                return;
             case ONE_OF:
-                computationalCost += 100;
+                computationalCost = 100;
                 return;
             case NOT_ONE_OF:
-                computationalCost += 100;
+                computationalCost = 101;
                 return;
             case STARTS_WITH:
-                computationalCost += 1000;
+                computationalCost = 1000;
                 return;
             case SPARQL_SELECT_QUERY_RESULTS_CONTAIN:
-                computationalCost += 10000;
+                computationalCost = 10000;
                 return;
             case SPARQL_SELECT_QUERY_RESULTS_NOT_CONTAIN:
-                computationalCost += 10000;
+                computationalCost = 10001;
                 return;
             default:
                 return;

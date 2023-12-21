@@ -1,8 +1,11 @@
 package edu.cornell.mannlib.vitro.webapp.auth.rules;
 
 import static edu.cornell.mannlib.vitro.webapp.auth.checks.CheckType.EQUALS;
+import static edu.cornell.mannlib.vitro.webapp.auth.checks.CheckType.NOT_EQUALS;
+import static edu.cornell.mannlib.vitro.webapp.auth.checks.CheckType.NOT_ONE_OF;
 import static edu.cornell.mannlib.vitro.webapp.auth.checks.CheckType.ONE_OF;
 import static edu.cornell.mannlib.vitro.webapp.auth.checks.CheckType.SPARQL_SELECT_QUERY_RESULTS_CONTAIN;
+import static edu.cornell.mannlib.vitro.webapp.auth.checks.CheckType.SPARQL_SELECT_QUERY_RESULTS_NOT_CONTAIN;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
@@ -18,26 +21,41 @@ public class AccessRuleTest {
     @Test
     public void testAttributeOrderByComputationalCost() {
         AccessRule rule = new FastFailAccessRule();
-        Check cheapAttribute = uriCheck("test:cheapAttributeUri", value("test:objectUri"));
-        cheapAttribute.setType(EQUALS);
-        Check affordableAttribute = uriCheck("test:affordableAttributeUri", value("test:objectUri"));
-        cheapAttribute.setType(ONE_OF);
-        Check expensiveAttribute = uriCheck("test:expensiveAttributeUri", value("test:objectUri"));
-        cheapAttribute.setType(SPARQL_SELECT_QUERY_RESULTS_CONTAIN);
-        rule.addCheck(affordableAttribute);
-        rule.addCheck(expensiveAttribute);
-        rule.addCheck(cheapAttribute);
+        Check equalsAttribute = uriCheck("test:equals");
+        equalsAttribute.setType(EQUALS);
+        Check notEqualsAttribute = uriCheck("test:not-equals");
+        notEqualsAttribute.setType(NOT_EQUALS);
+        Check oneOfAttribute = uriCheck("test:one-of");
+        oneOfAttribute.setType(ONE_OF);
+        Check notOneOfAttribute = uriCheck("test:not-one-of");
+        notOneOfAttribute.setType(NOT_ONE_OF);
+        Check sparqlResultsContainAttribute = uriCheck("test:sparql-results-contain");
+        sparqlResultsContainAttribute.setType(SPARQL_SELECT_QUERY_RESULTS_CONTAIN);
+        Check sparqlResultsNotContainAttribute = uriCheck("test:sparql-results-not-contain");
+        sparqlResultsNotContainAttribute.setType(SPARQL_SELECT_QUERY_RESULTS_NOT_CONTAIN);
+
+        rule.addCheck(notOneOfAttribute);
+        rule.addCheck(oneOfAttribute);
+        rule.addCheck(sparqlResultsContainAttribute);
+        rule.addCheck(equalsAttribute);
+        rule.addCheck(notEqualsAttribute);
+        rule.addCheck(sparqlResultsNotContainAttribute);
+
         List<Check> list = rule.getChecks();
-        assertEquals(cheapAttribute.getUri(), list.get(0).getUri());
-        assertEquals(affordableAttribute.getUri(), list.get(1).getUri());
-        assertEquals(expensiveAttribute.getUri(), list.get(2).getUri());
+
+        assertEquals(equalsAttribute.getUri(), list.get(0).getUri());
+        assertEquals(notEqualsAttribute.getUri(), list.get(1).getUri());
+        assertEquals(oneOfAttribute.getUri(), list.get(2).getUri());
+        assertEquals(notOneOfAttribute.getUri(), list.get(3).getUri());
+        assertEquals(sparqlResultsContainAttribute.getUri(), list.get(4).getUri());
+        assertEquals(sparqlResultsNotContainAttribute.getUri(), list.get(5).getUri());
     }
 
     private AttributeValueSet value(String value) {
         return new MutableAttributeValueSet(value);
     }
 
-    private Check uriCheck(String uri, AttributeValueSet avc) {
-        return new AccessObjectUriCheck(uri, avc);
+    private Check uriCheck(String uri) {
+        return new AccessObjectUriCheck(uri, value("test:objectUri"));
     }
 }
