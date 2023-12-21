@@ -2,7 +2,7 @@ package edu.cornell.mannlib.vitro.webapp.auth.rules;
 
 import static edu.cornell.mannlib.vitro.webapp.auth.checks.CheckType.EQUALS;
 import static edu.cornell.mannlib.vitro.webapp.auth.checks.CheckType.ONE_OF;
-import static edu.cornell.mannlib.vitro.webapp.auth.checks.CheckType.SPARQL_SELECT_QUERY_CONTAINS;
+import static edu.cornell.mannlib.vitro.webapp.auth.checks.CheckType.SPARQL_SELECT_QUERY_RESULTS_CONTAIN;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public class AccessRuleTest {
         Check affordableAttribute = uriCheck("test:affordableAttributeUri", value("test:objectUri"));
         cheapAttribute.setType(ONE_OF);
         Check expensiveAttribute = uriCheck("test:expensiveAttributeUri", value("test:objectUri"));
-        cheapAttribute.setType(SPARQL_SELECT_QUERY_CONTAINS);
+        cheapAttribute.setType(SPARQL_SELECT_QUERY_RESULTS_CONTAIN);
         rule.addCheck(affordableAttribute);
         rule.addCheck(expensiveAttribute);
         rule.addCheck(cheapAttribute);

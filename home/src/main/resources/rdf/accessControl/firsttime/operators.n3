@@ -18,5 +18,8 @@ access-individual:NotOneOf a access:Operator;
 access-individual:StartsWith a access:Operator;
     access:id "STARTS_WITH" .
 
-access-individual:SparqlSelectQueryContains a access:Operator;
-    access:id "SPARQL_SELECT_QUERY_CONTAINS" .
+access-individual:SparqlSelectQueryResultsContain a access:Operator;
+    access:id "SPARQL_SELECT_QUERY_RESULTS_CONTAIN" .
+
+access-individual:SparqlSelectQueryResultsNotContain a access:Operator;
+    access:id "SPARQL_SELECT_QUERY_RESULTS_NOT_CONTAIN" .

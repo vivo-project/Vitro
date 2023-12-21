@@ -37,7 +37,7 @@
     access:value :SomeUri .
 
 :SubjectUriIsProfileRelatedResource a access:Check ;
-    access:useOperator access-individual:SparqlSelectQueryContains ;
+    access:useOperator access-individual:SparqlSelectQueryResultsContain ;
     access:hasTypeToCheck access-individual:StatementSubjectUri ;
     access:value access-individual:PersonProfileProximityToResourceUri .
 
