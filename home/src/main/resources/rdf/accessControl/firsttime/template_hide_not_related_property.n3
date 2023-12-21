@@ -29,6 +29,8 @@
     access:hasKeyComponent access-individual:ObjectProperty ;
     access:hasKeyComponent access-individual:SelfEditorRoleUri ;
     access:hasKeyComponent access-individual:DisplayOperation ;
+    access:hasKeyComponent access-individual:NotRelated ;
+    access:hasKeyComponent access-individual:PropertyExclusion ;
     .
 
 #Data properties
@@ -45,6 +47,8 @@
     access:hasKeyComponent access-individual:DataProperty ;
     access:hasKeyComponent access-individual:SelfEditorRoleUri ;
     access:hasKeyComponent access-individual:DisplayOperation ;
+    access:hasKeyComponent access-individual:NotRelated ;
+    access:hasKeyComponent access-individual:PropertyExclusion ;
     .
 
 #Faux object properties
@@ -61,6 +65,8 @@
     access:hasKeyComponent access-individual:FauxObjectProperty ;
     access:hasKeyComponent access-individual:SelfEditorRoleUri ;
     access:hasKeyComponent access-individual:DisplayOperation ;
+    access:hasKeyComponent access-individual:NotRelated ;
+    access:hasKeyComponent access-individual:PropertyExclusion ;
     .
 
 #Faux data properties
@@ -77,6 +83,8 @@
     access:hasKeyComponent access-individual:FauxDataProperty ;
     access:hasKeyComponent access-individual:SelfEditorRoleUri ;
     access:hasKeyComponent access-individual:DisplayOperation ;
+    access:hasKeyComponent access-individual:NotRelated ;
+    access:hasKeyComponent access-individual:PropertyExclusion ;
     .
 
 #Rule
