@@ -8,3 +8,6 @@ access-individual:UriExclusion a access:NamedKeyComponent ;
 
 access-individual:TypeExclusion a access:NamedKeyComponent ;
     access:id "TYPE_EXCLUSION" .
+
+access-individual:NotRelated a access:NamedKeyComponent ;
+    access:id "NOT_RELATED" .
