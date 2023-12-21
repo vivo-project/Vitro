@@ -6,7 +6,7 @@
 access-individual:PersonProfileProximityToResourceUri a access:SparqlSelectValuesQuery ;
     access:id """
     SELECT ?resourceUri WHERE {
-          BIND ( ?personUri as ?resourceUri)
+          BIND ( ?profileUri as ?resourceUri)
     }
     """ .
 
