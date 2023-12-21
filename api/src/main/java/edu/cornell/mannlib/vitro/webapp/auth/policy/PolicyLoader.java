@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -500,8 +501,12 @@ public class PolicyLoader {
 
     public String getEntityValueSetUri(AccessOperation ao, AccessObjectType aot, String role,
             String... namedKeyComponents) {
-        long expectedSize = 3 + namedKeyComponents.length;
-        String queryText = getDataSetByKeyQuery(ao.toString(), aot.toString(), role);
+        int expectedSize = 3 + namedKeyComponents.length;
+        String[] ids = Arrays.copyOf(namedKeyComponents, expectedSize);
+        ids[ids.length - 1] = ao.toString();
+        ids[ids.length - 2] = aot.toString();
+        ids[ids.length - 3] = role;
+        String queryText = getDataSetByKeyQuery(ids);
         ParameterizedSparqlString pss = new ParameterizedSparqlString(queryText);
         pss.setLiteral("setElementsId", aot.toString());
         queryText = pss.toString();
