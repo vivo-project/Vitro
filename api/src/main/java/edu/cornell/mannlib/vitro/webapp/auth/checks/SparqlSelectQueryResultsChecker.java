@@ -89,7 +89,7 @@ public class SparqlSelectQueryResultsChecker {
     private static Set<String> getSparqlSelectResults(Model model, String profileUri, String queryTemplate,
             AuthorizationRequest ar) {
         HashMap<String, Set<String>> queryMap = QueryResultsMapCache.get();
-        String queryMapKey = createQueryMapKey(profileUri, queryTemplate);
+        String queryMapKey = createQueryMapKey(profileUri, queryTemplate, ar);
         if (queryMap.containsKey(queryMapKey)) {
             return queryMap.get(queryMapKey);
         }
@@ -147,8 +147,16 @@ public class SparqlSelectQueryResultsChecker {
         }
     }
 
-    private static String createQueryMapKey(String profileUri, String queryTemplate) {
-        return queryTemplate + "." + profileUri;
+    private static String createQueryMapKey(String profileUri, String queryTemplate, AuthorizationRequest ar) {
+        String mapKey = queryTemplate + "." + profileUri;
+        if (queryTemplate.contains("?objectUri")) {
+            AccessObject object = ar.getAccessObject();
+            Optional<String> uri = object.getUri();
+            if (uri.isPresent()) {
+                mapKey += "." + uri.get();
+            }
+        }
+        return mapKey;
     }
 
 }
