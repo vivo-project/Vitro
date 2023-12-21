@@ -8,11 +8,11 @@ import java.util.List;
  * Results object for retrieving entries from the audit store
  */
 public class AuditResults {
-    private long total;
-    private long offset;
-    private long limit;
+    private final long total;
+    private final long offset;
+    private final long limit;
 
-    private List<AuditChangeSet> datasets;
+    private final List<AuditChangeSet> datasets;
 
     public AuditResults(long total, long offset, long limit, List<AuditChangeSet> datasets) {
         this.total = total;

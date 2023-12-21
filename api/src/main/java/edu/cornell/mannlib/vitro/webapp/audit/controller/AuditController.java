@@ -76,17 +76,17 @@ public class AuditController extends FreemarkerHttpServlet {
         }
         // Get the offset parameter (or default if unset)
         int offset = getOffset(vreq);
-        body.put("offset", offset);
+        body.put(PARAM_OFFSET, offset);
         // Get the limit parameter (or default 10 if unset)
         int limit = getLimit(vreq);
-        body.put("limit", String.valueOf(limit));
+        body.put(PARAM_LIMIT, String.valueOf(limit));
         body.put("limits", limits);
         // Get the start_date parameter (or week ago if unset)
         Date startDate = getStartDate(vreq);
-        body.put("start_date", sdf.format(startDate));
+        body.put(PARAM_START_DATE, sdf.format(startDate));
         // Get the end_date parameter (or tomorrow if unset)
         Date endDate = getEndDate(vreq);
-        body.put("end_date", sdf.format(endDate));
+        body.put(PARAM_END_DATE, sdf.format(endDate));
         // Get the user parameter (or empty if unset)
         String userUri = getUserUri(vreq);
         body.put("userUri", userUri);
@@ -95,7 +95,7 @@ public class AuditController extends FreemarkerHttpServlet {
         body.put("selectedGraphUri", graphUri);
         // Get the order parameter (or default DESC if unset)
         String order = getOrder(vreq);
-        body.put("order", order);
+        body.put(PARAM_ORDER, order);
         body.put("orders", orders);
         // Get the Audit DAO
         AuditDAO auditDAO = AuditDAOFactory.getAuditDAO();
@@ -191,7 +191,6 @@ public class AuditController extends FreemarkerHttpServlet {
             offset = Integer.parseInt(vreq.getParameter(PARAM_OFFSET));
         } catch (Throwable e) {
             log.debug(e, e);
-            offset = 0;
         }
         return offset;
     }
@@ -225,8 +224,7 @@ public class AuditController extends FreemarkerHttpServlet {
         String end = vreq.getParameter(PARAM_END_DATE);
         try {
             if (!StringUtils.isBlank(end)) {
-                Date endDate = sdf.parse(end);
-                return endDate;
+                return sdf.parse(end);
             }
         } catch (Exception e) {
             log.error(e, e);
