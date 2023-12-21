@@ -152,7 +152,7 @@
     access:values access-individual:AdminRoleValueSet .
 
 :AccessObjectClassCheck a access:Check ;
-    access:useOperator access-individual:SparqlSelectQueryContains ;
+    access:useOperator access-individual:SparqlSelectQueryResultsContain ;
     access:useConfiguration :IndividualTypeQuery ;
     access:hasTypeToCheck access-individual:AccessObjectUri ;
     access:values :AdminDisplayValueSet ;
