@@ -130,6 +130,7 @@ public class IndividualController extends FreemarkerHttpServlet {
                     return AuthorizationRequest.AUTHORIZED;
                 default:
                     AccessObject ao = new IndividualAccessObject(requestInfo.getIndividual().getURI());
+                    ao.setModel(vreq.getJenaOntModel());
                     AuthorizationRequest request = new SimpleAuthorizationRequest(ao, AccessOperation.DISPLAY);
                     return request;
             }
