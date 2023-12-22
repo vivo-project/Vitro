@@ -2,6 +2,12 @@
 
 package edu.cornell.mannlib.vitro.webapp.migration.auth;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_ADMIN_URI;
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_CURATOR_URI;
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_EDITOR_URI;
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_PUBLIC_URI;
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_SELF_EDITOR_URI;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -27,11 +33,6 @@ import org.apache.jena.query.ResultSet;
 public class AuthMigrator implements ServletContextListener {
 
     private static final Log log = LogFactory.getLog(AuthMigrator.class);
-    protected static final String ROLE_ADMIN_URI = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#ADMIN";
-    protected static final String ROLE_CURATOR_URI = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#CURATOR";
-    protected static final String ROLE_EDITOR_URI = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#EDITOR";
-    protected static final String ROLE_SELF_EDITOR_URI = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#SELF_EDITOR";
-    protected static final String ROLE_PUBLIC_URI = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#PUBLIC";
     protected static final Set<String> ALL_ROLES = new HashSet<String>(
             Arrays.asList(ROLE_ADMIN_URI, ROLE_CURATOR_URI, ROLE_EDITOR_URI, ROLE_SELF_EDITOR_URI, ROLE_PUBLIC_URI));
 

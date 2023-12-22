@@ -1,11 +1,11 @@
 package edu.cornell.mannlib.vitro.webapp.migration.auth;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_ADMIN_URI;
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_CURATOR_URI;
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_EDITOR_URI;
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_PUBLIC_URI;
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_SELF_EDITOR_URI;
 import static edu.cornell.mannlib.vitro.webapp.migration.auth.AuthMigrator.ALL_ROLES;
-import static edu.cornell.mannlib.vitro.webapp.migration.auth.AuthMigrator.ROLE_ADMIN_URI;
-import static edu.cornell.mannlib.vitro.webapp.migration.auth.AuthMigrator.ROLE_CURATOR_URI;
-import static edu.cornell.mannlib.vitro.webapp.migration.auth.AuthMigrator.ROLE_EDITOR_URI;
-import static edu.cornell.mannlib.vitro.webapp.migration.auth.AuthMigrator.ROLE_PUBLIC_URI;
-import static edu.cornell.mannlib.vitro.webapp.migration.auth.AuthMigrator.ROLE_SELF_EDITOR_URI;
 
 import java.util.Arrays;
 import java.util.HashMap;
