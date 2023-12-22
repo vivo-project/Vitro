@@ -22,7 +22,7 @@ public class RefreshCaptchaController extends HttpServlet {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
-        CaptchaBundle newChallenge = CaptchaServiceBean.generateChallenge();
+        CaptchaBundle newChallenge = CaptchaServiceBean.generateRefreshedChallenge();
         CaptchaServiceBean.getCaptchaChallenges().invalidate(oldChallengeId);
         CaptchaServiceBean.getCaptchaChallenges().put(newChallenge.getCaptchaId(), newChallenge);
 
