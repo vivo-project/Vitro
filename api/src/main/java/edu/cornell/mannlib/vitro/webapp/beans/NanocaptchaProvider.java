@@ -20,24 +20,18 @@ import net.logicsquad.nanocaptcha.image.filter.StretchImageFilter;
 import net.logicsquad.nanocaptcha.image.noise.CurvedLineNoiseProducer;
 import net.logicsquad.nanocaptcha.image.noise.StraightLineNoiseProducer;
 
+/**
+ * NanocaptchaProvider generates and manages captcha challenges using Nanocaptcha.
+ * This class extends AbstractCaptchaProvider and supports easy and hard difficulty levels.
+ *
+ * @see AbstractCaptchaProvider
+ * @see CaptchaBundle
+ * @see CaptchaServiceBean
+ * @see CaptchaDifficulty
+ */
 public class NanocaptchaProvider extends AbstractCaptchaProvider {
 
     private final SecureRandom random = new SecureRandom();
-
-    /**
-     * Converts a BufferedImage object to Base64 format.
-     *
-     * @param image The BufferedImage to convert.
-     * @return The Base64-encoded string representation of the image.
-     * @throws IOException If an error occurs during image conversion.
-     */
-    private static String convertToBase64(BufferedImage image) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(image, "png", baos);
-        byte[] imageBytes = baos.toByteArray();
-
-        return Base64.getEncoder().encodeToString(imageBytes);
-    }
 
     @Override
     public CaptchaBundle generateRefreshChallenge() throws IOException {
@@ -59,6 +53,13 @@ public class NanocaptchaProvider extends AbstractCaptchaProvider {
         return optionalChallenge.isPresent() && optionalChallenge.get().getCode().equals(captchaInput);
     }
 
+    /**
+     * Generates a captcha challenge.
+     *
+     * @return CaptchaBundle containing the captcha image encoded in Base64,
+     *         captcha content, and a randomly generated UUID.
+     * @throws IOException If there is an issue generating the captcha.
+     */
     private CaptchaBundle generateChallenge() throws IOException {
         CaptchaDifficulty difficulty = getCaptchaDifficulty();
         ImageCaptcha.Builder imageCaptchaBuilder = new ImageCaptcha.Builder(220, 85)
@@ -79,6 +80,21 @@ public class NanocaptchaProvider extends AbstractCaptchaProvider {
         ImageCaptcha imageCaptcha = imageCaptchaBuilder.build();
         return new CaptchaBundle(convertToBase64(imageCaptcha.getImage()), imageCaptcha.getContent(),
             UUID.randomUUID().toString());
+    }
+
+    /**
+     * Converts a BufferedImage object to Base64 format.
+     *
+     * @param image The BufferedImage to convert.
+     * @return The Base64-encoded string representation of the image.
+     * @throws IOException If an error occurs during image conversion.
+     */
+    private String convertToBase64(BufferedImage image) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(image, "png", baos);
+        byte[] imageBytes = baos.toByteArray();
+
+        return Base64.getEncoder().encodeToString(imageBytes);
     }
 
     /**

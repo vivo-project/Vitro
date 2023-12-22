@@ -15,8 +15,8 @@ import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 
 
 /**
- * This class provides services related to CAPTCHA challenges and reCAPTCHA validation.
- * It includes methods for generating CAPTCHA challenges, validating reCAPTCHA responses,
+ * This class provides services related to CAPTCHA challenges and validation.
+ * It includes method delegates for generating challenges, validating challenge responses,
  * and managing CAPTCHA challenges for specific hosts.
  *
  * @author Ivan Mrsulja

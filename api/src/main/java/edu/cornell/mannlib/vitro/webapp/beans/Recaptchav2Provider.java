@@ -12,6 +12,13 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
+/**
+ * Recaptchav2Provider generates and manages captcha challenges using Google RECAPTCHAv2.
+ * This class extends AbstractCaptchaProvider.
+ *
+ * @see AbstractCaptchaProvider
+ * @see CaptchaBundle
+ */
 public class Recaptchav2Provider extends AbstractCaptchaProvider {
 
     @Override

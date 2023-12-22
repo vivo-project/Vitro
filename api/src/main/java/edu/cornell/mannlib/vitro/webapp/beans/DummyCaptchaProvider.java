@@ -2,6 +2,14 @@ package edu.cornell.mannlib.vitro.webapp.beans;
 
 import java.util.Map;
 
+/**
+ * DummyCaptchaProvider is a concrete implementation of AbstractCaptchaProvider,
+ * serving as a fallback when CAPTCHA is disabled. Validation will always pass,
+ * in order to fulfill validation logic.
+ *
+ * @see AbstractCaptchaProvider
+ * @see CaptchaBundle
+ */
 public class DummyCaptchaProvider extends AbstractCaptchaProvider {
 
     @Override
