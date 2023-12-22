@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 
 import javax.servlet.ServletContext;
 
+import edu.cornell.mannlib.vitro.webapp.audit.AuditModule;
 import stubs.edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStub;
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.application.VitroHomeDirectory;
@@ -93,6 +94,12 @@ public class ApplicationStub implements Application {
 	public FileStorage getFileStorage() {
 		throw new RuntimeException(
 				"ApplicationStub.getFileStorage() not implemented.");
+	}
+
+	@Override
+	public AuditModule getAuditModule() {
+		throw new RuntimeException(
+				"ApplicationStub.getAuditModule() not implemented.");
 	}
 
 	@Override

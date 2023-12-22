@@ -1,0 +1,35 @@
+/* $This file is distributed under the terms of the license in LICENSE$ */
+
+/* Styles for the search index controller. */
+
+section#audit table.history {
+    font-size: smaller;
+    border: 1px solid gray;
+    width: 100%;
+}
+tbody tr td:nth-child(1) {
+    min-width: 2em;
+}
+
+tbody tr td:nth-child(2) {
+    max-width: 10em;
+    word-break: break-word ;
+}
+
+tbody tr td:nth-child(3) {
+    max-width: 7em;
+    word-break: break-word ;
+}
+
+section#audit table.history th {
+    font-weight: bolder;
+}
+
+section#audit table.history td {
+    padding: 2px 5px 2px 5px;
+}
+
+section#audit table.history pre {
+    line-height: normal;
+    white-space: break-spaces;
+}
