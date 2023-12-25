@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 
@@ -47,19 +48,33 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
 
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) throws Exception {
-        // Random time interval sleep so attacker can't calculate whether provided email is bound or not
+        // Random time interval sleep so attacker can't calculate whether provided email is bound to an account or not
         sleepForRandomTime();
 
         Map<String, Object> dataContext = new HashMap<>();
         setCommonValues(dataContext, vreq);
-        UserAccountsDao userAccountsDao = constructUserAccountsDao(vreq);
-        I18nBundle i18n = I18n.bundle(vreq);
-
-        boolean isEnabled = isFunctionalityEnabled(vreq);
+        boolean isEnabled = isFunctionalityEnabled();
         dataContext.put("isEnabled", isEnabled);
+
+        // Handle GET request (display the form) or print error message if functionality is disabled
         if (!isEnabled || vreq.getMethod().equalsIgnoreCase("GET")) {
             return showForm(dataContext);
         }
+
+        return handlePostRequest(vreq, dataContext);
+    }
+
+    /**
+     * Handles a POST request for password reset. Validates the captcha, checks for spam mitigation,
+     * processes the password change request, and notifies the user.
+     *
+     * @param vreq        The Vitro request object.
+     * @param dataContext A map containing additional data context for processing the request.
+     * @return A response containing the appropriate values for rendering the result.
+     */
+    private ResponseValues handlePostRequest(VitroRequest vreq, Map<String, Object> dataContext) {
+        UserAccountsDao userAccountsDao = constructUserAccountsDao(vreq);
+        I18nBundle i18n = I18n.bundle(vreq);
 
         String captchaInput = vreq.getParameter("defaultReal");
         String captchaDisplay = vreq.getParameter("defaultRealHash");
@@ -100,10 +115,8 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
      * @param i18n        The internationalization bundle for language translation.
      * @param vreq        The VitroRequest object containing request information.
      */
-    private void notifyUser(UserAccount userAccount, I18nBundle i18n,
-                            VitroRequest vreq) {
-
-        Map<String, Object> body = new HashMap<String, Object>();
+    private void notifyUser(UserAccount userAccount, I18nBundle i18n, VitroRequest vreq) {
+        Map<String, Object> body = new HashMap<>();
         body.put("userAccount", userAccount);
         body.put("passwordLink",
             buildResetPasswordLink(userAccount.getEmailAddress(), userAccount.getEmailKey(), vreq));
@@ -112,12 +125,60 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
         body.put("textMessage", i18n.text("password_reset_pending_email_plain_text"));
         body.put("htmlMessage", i18n.text("password_reset_pending_email_html_text"));
 
+        sendEmailMessage(body, vreq, userAccount.getEmailAddress());
+
+        if (adminShouldBeNotified()) {
+            notifyAdmin(userAccount, i18n, vreq);
+        }
+    }
+
+    /**
+     * Notifies the administrator about a password reset for a user account.
+     *
+     * @param userAccount The user account for which the password is being reset.
+     * @param i18n        The internationalization bundle for translating messages.
+     * @param vreq        The Vitro request object.
+     */
+    private void notifyAdmin(UserAccount userAccount, I18nBundle i18n, VitroRequest vreq) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("userAccount", userAccount);
+        body.put("siteName", vreq.getAppBean().getApplicationName());
+        body.put("subject", i18n.text("password_reset_admin_notification_email_subject"));
+        body.put("textMessage", i18n.text("password_reset_admin_notification_email_plain_text"));
+        body.put("htmlMessage", i18n.text("password_reset_admin_notification_email_html"));
+
+        String adminEmailAddress =
+            Objects.requireNonNull(ConfigurationProperties.getInstance().getProperty("email.replyTo"));
+
+        sendEmailMessage(body, vreq, adminEmailAddress);
+    }
+
+    /**
+     * Sends an email message using Freemarker templates.
+     *
+     * @param body           The map containing email body information.
+     * @param vreq           The Vitro request object.
+     * @param recipientEmail The email address of the recipient.
+     */
+    private void sendEmailMessage(Map<String, Object> body, VitroRequest vreq, String recipientEmail) {
         FreemarkerEmailMessage emailMessage = FreemarkerEmailFactory
             .createNewMessage(vreq);
-        emailMessage.addRecipient(Message.RecipientType.TO, userAccount.getEmailAddress());
+        emailMessage.addRecipient(Message.RecipientType.TO, recipientEmail);
         emailMessage.setBodyMap(body);
         emailMessage.processTemplate();
         emailMessage.send();
+    }
+
+    /**
+     * Checks whether the admin should be notified about password resets.
+     *
+     * @return True if the admin should be notified, false otherwise.
+     */
+    private boolean adminShouldBeNotified() {
+        String adminShouldBeNotified =
+            ConfigurationProperties.getInstance().getProperty("authentication.forgotPassword.notify-admin");
+
+        return Objects.nonNull(adminShouldBeNotified) && Boolean.parseBoolean(adminShouldBeNotified);
     }
 
     /**
@@ -298,11 +359,10 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
     /**
      * Checks whether the functionality for password recovery is enabled based on the configuration.
      *
-     * @param vreq The VitroRequest object representing the current request context.
      * @return 'true' if the functionality is enabled, 'false' otherwise.
      */
-    private boolean isFunctionalityEnabled(VitroRequest vreq) {
-        String enabled = ConfigurationProperties.getBean(vreq).getProperty("authentication.forgotPassword");
+    private boolean isFunctionalityEnabled() {
+        String enabled = ConfigurationProperties.getInstance().getProperty("authentication.forgotPassword");
         return enabled != null && enabled.equalsIgnoreCase("enabled");
     }
 
