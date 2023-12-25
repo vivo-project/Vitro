@@ -1,0 +1,48 @@
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix uil-data: <http://vivoweb.org/ontology/vitro/ui-label/individual#> .
+@prefix uil:  <http://vivoweb.org/ontology/vitro/ui-label/vocabulary#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+uil-data:search_results_relevance.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:PropertyKey ;
+        rdfs:label       "Relevance"@en-US ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "search_results_relevance" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:search_results_sort_by.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:PropertyKey ;
+        rdfs:label       "Sort by"@en-US ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "search_results_sort_by" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:search_results_per_page.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:PropertyKey ;
+        rdfs:label       "Results per page"@en-US ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "search_results_per_page" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:search_field_placeholder.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:PropertyKey ;
+        rdfs:label       "Enter search term"@en-US ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "search_field_placeholder" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:results_found.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:PropertyKey ;
+        rdfs:label       "results found"@en-US ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "results_found" ;
+        uil:hasPackage  "Vitro-languages" .
+

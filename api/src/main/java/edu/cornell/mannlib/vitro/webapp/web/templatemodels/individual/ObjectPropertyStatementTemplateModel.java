@@ -9,10 +9,11 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.FauxObjectPropertyStatementAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
@@ -50,11 +51,14 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     	if (property.isDeleteLinkSuppressed()) {
     		return "";
     	}
-
+    	AccessObject ao;
         // Determine whether the statement can be deleted
-		RequestedAction action = new DropObjectPropertyStatement(
-				vreq.getJenaOntModel(), subjectUri, property, objectUri);
-        if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
+    	if (isFaux()) {
+            ao = new FauxObjectPropertyStatementAccessObject(vreq.getJenaOntModel(), subjectUri, fauxProperty, objectUri);
+        } else {
+            ao = new ObjectPropertyStatementAccessObject(vreq.getJenaOntModel(), subjectUri, property, objectUri);
+        }
+        if ( ! PolicyHelper.isAuthorizedForActions(vreq, ao, AccessOperation.DROP) ) {
             return "";
         }
 
@@ -72,6 +76,10 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
                 "objectUri", objectUri,
                 "cmd", "delete",
                 "objectKey", objectKey);
+
+        if (isFaux()) {
+            params.put("fauxContextUri", fauxProperty.getContextUri());
+        }
 
         for ( String key : data.keySet() ) {
             String value = data.get(key);
@@ -105,8 +113,13 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     	}
 
        // Determine whether the statement can be edited
-        RequestedAction action =  new EditObjectPropertyStatement(vreq.getJenaOntModel(), subjectUri, property, objectUri);
-        if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
+    	AccessObject ao;
+        if (isFaux()) {
+            ao = new FauxObjectPropertyStatementAccessObject(vreq.getJenaOntModel(), subjectUri, fauxProperty, objectUri);
+        } else {
+            ao = new ObjectPropertyStatementAccessObject(vreq.getJenaOntModel(), subjectUri, property, objectUri);
+        }
+        if ( ! PolicyHelper.isAuthorizedForActions(vreq, ao, AccessOperation.EDIT) ) {
             return "";
         }
 
@@ -123,6 +136,10 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
                 "predicateUri", property.getURI(),
                 "objectUri", objectUri);
 
+        if (isFaux()) {
+            params.put("fauxContextUri", fauxProperty.getContextUri());
+        }
+        
         if ( deleteUrl.isEmpty() ) {
             params.put("deleteProhibited", "prohibited");
         }

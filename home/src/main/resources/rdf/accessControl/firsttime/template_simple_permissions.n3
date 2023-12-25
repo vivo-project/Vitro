@@ -1,0 +1,141 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix simplePermission: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/simple-permissions/> .
+
+:PolicyTemplate a access:PolicyTemplate ;
+    access:priority 1000 ;
+    access:hasRule :AllowSimplePermission ;
+    access:hasDataSetTemplate :RoleDataSetTemplate ;
+    access:hasDataSet :PublicDataSet ;
+    access:hasDataSet :SelfEditorDataSet ;
+    access:hasDataSet :EditorDataSet ;
+    access:hasDataSet :CuratorDataSet ;
+    access:hasDataSet :AdminDataSet .
+
+#Role data set template
+
+:RoleDataSetTemplate a access:DataSetTemplate ;
+    access:hasDataSetTemplateKey :RoleDataSetTemplateKey ;
+    access:hasDataSetKeyTemplate :RoleDataSetKeyTemplate ;
+    access:dataSetValueTemplate :RoleValueSetTemplate ;
+    access:dataSetValueTemplate :RolePermissionValueSetTemplate .  
+
+:RoleDataSetTemplateKey a access:DataSetTemplateKey ;
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
+
+:RoleDataSetKeyTemplate a access:DataSetKeyTemplate ;
+    access:hasKeyComponent access-individual:NamedObject ;
+    access:hasKeyComponent access-individual:ExecuteOperation ;
+    access:hasKeyComponentTemplate access-individual:SubjectRole .
+
+:RoleValueSetTemplate a access:ValueSetTemplate ;
+    access:relatedCheck :SubjectRoleEqualsDataSetRole;
+    access:containsElementsOfType access-individual:SubjectRole .
+
+:RolePermissionValueSetTemplate a access:ValueSetTemplate ;
+    access:relatedCheck :PermissionNameAllowed;
+    access:value simplePermission:PageViewablePublic;
+    access:value simplePermission:QueryFullModel ;
+    access:containsElementsOfType access-individual:NamedObject .
+
+#Data sets
+
+:PublicDataSet a access:DataSet ;
+    access:hasDataSetKey :PublicDataSetKey ;
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet :PublicSimplePermissionValueSet .
+
+:PublicDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:NamedObject ;
+    access:hasKeyComponent access-individual:ExecuteOperation ;
+    access:hasKeyComponent access-individual:PublicRoleUri .
+
+:SelfEditorDataSet a access:DataSet ;
+    access:hasDataSetKey :SelfEditorDataSetKey ;
+    access:hasRelatedValueSet access-individual:SelfEditorRoleValueSet ;
+    access:hasRelatedValueSet :SelfEditorSimplePermissionValueSet .
+
+:SelfEditorDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:NamedObject ;
+    access:hasKeyComponent access-individual:ExecuteOperation ;
+    access:hasKeyComponent access-individual:SelfEditorRoleUri .
+
+:EditorDataSet a access:DataSet ;
+    access:hasDataSetKey :EditorDataSetKey ;
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet :EditorSimplePermissionValueSet .
+
+:EditorDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:NamedObject ;
+    access:hasKeyComponent access-individual:ExecuteOperation ;
+    access:hasKeyComponent access-individual:EditorRoleUri .
+
+:CuratorDataSet a access:DataSet ;
+    access:hasDataSetKey :CuratorDataSetKey ;
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet :CuratorSimplePermissionValueSet .
+
+:CuratorDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:NamedObject ;
+    access:hasKeyComponent access-individual:ExecuteOperation ;
+    access:hasKeyComponent access-individual:CuratorRoleUri .
+
+:AdminDataSet a access:DataSet ;
+    access:hasDataSetKey :AdminDataSetKey  ;
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet :AdminSimplePermissionValueSet .
+
+:AdminDataSetKey  a access:DataSetKey ;
+    access:hasKeyComponent access-individual:NamedObject ;
+    access:hasKeyComponent access-individual:ExecuteOperation ;
+    access:hasKeyComponent access-individual:AdminRoleUri .
+
+:AllowSimplePermission a access:Rule;
+    access:requiresCheck :IsSimplePermission ;
+    access:requiresCheck :IsExecuteOperation ;
+    access:requiresCheck :PermissionNameAllowed ;
+    access:requiresCheck :SubjectRoleEqualsDataSetRole .
+
+:IsExecuteOperation a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:Operation ;
+    access:value access-individual:ExecuteOperation .
+
+:PermissionNameAllowed a access:Check ;
+    access:useOperator access-individual:OneOf ;
+    access:hasTypeToCheck access-individual:AccessObjectUri ;
+    access:values :PublicSimplePermissionValueSet ;
+    access:values :SelfEditorSimplePermissionValueSet ;
+    access:values :EditorSimplePermissionValueSet ;
+    access:values :CuratorSimplePermissionValueSet ;
+    access:values :AdminSimplePermissionValueSet .
+
+:IsSimplePermission a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:AccessObjectType ;
+    access:value access-individual:NamedObject .
+
+:PublicSimplePermissionValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:NamedObject .
+:SelfEditorSimplePermissionValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:NamedObject .
+:EditorSimplePermissionValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:NamedObject .
+:CuratorSimplePermissionValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:NamedObject .
+:AdminSimplePermissionValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:NamedObject .
+
+:SubjectRoleEqualsDataSetRole a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:SubjectRole ;
+    access:values access-individual:PublicRoleValueSet ;
+    access:values access-individual:SelfEditorRoleValueSet ;
+    access:values access-individual:EditorRoleValueSet ;
+    access:values access-individual:CuratorRoleValueSet ;
+    access:values access-individual:AdminRoleValueSet .
+

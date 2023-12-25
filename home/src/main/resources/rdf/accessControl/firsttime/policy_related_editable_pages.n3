@@ -1,0 +1,51 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/edit-related-individual-pages/> .
+
+:Policy a access:Policy ;
+    access:hasRule :AllowEditRelatedPagesRule .
+
+:AllowEditRelatedPagesRule a access:Rule;
+    access:requiresCheck :SubjectRoleIsSelfEditor ;
+    access:requiresCheck :SubjectUriIsProfileRelatedResource ;
+    access:requiresCheck :IsEditOperation ;
+    access:requiresCheck :IsObjectPropertyStatement ;
+    access:requiresCheck :ObjectUriIsSomeUri ;
+    access:requiresCheck :PredicateIsSomePredicate .
+
+:SubjectRoleIsSelfEditor a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:SubjectRole ;
+    access:value access-individual:SelfEditorRoleUri .
+
+:IsEditOperation a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:Operation ;
+    access:value access-individual:EditOperation .
+
+:PredicateIsSomePredicate a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:StatementPredicateUri ;
+    access:value :SomeUri .
+
+:ObjectUriIsSomeUri a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:StatementObjectUri ;
+    access:value :SomeUri .
+
+:SubjectUriIsProfileRelatedResource a access:Check ;
+    access:useOperator access-individual:SparqlSelectQueryContains ;
+    access:hasTypeToCheck access-individual:StatementSubjectUri ;
+    access:value access-individual:PersonProfileProximityToResourceUri .
+
+:IsObjectPropertyStatement a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:AccessObjectType ;
+    access:value access-individual:ObjectPropertyStatement .
+
+:SomeUri a access:AttributeUriValue ;
+    access:id "?SOME_URI" .
+

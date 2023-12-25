@@ -28,8 +28,9 @@ public class ManageProxiesAjaxController extends VitroAjaxController {
 
 	@Override
 	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
-		return SimplePermission.MANAGE_OWN_PROXIES.ACTION
-				.or(SimplePermission.MANAGE_PROXIES.ACTION);
+		return AuthorizationRequest.or(
+		        SimplePermission.MANAGE_OWN_PROXIES.ACTION
+				,SimplePermission.MANAGE_PROXIES.ACTION);
 	}
 
 	@Override

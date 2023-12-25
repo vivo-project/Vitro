@@ -329,4 +329,9 @@ public class FauxDataPropertyWrapper extends DataProperty implements FauxPropert
 		return faux.getContextUri();
 	}
 
+	@Override
+	public String getConfigUri() {
+		return faux.getConfigUri();
+	}
+
 }

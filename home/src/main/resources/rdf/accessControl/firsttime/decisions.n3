@@ -1,0 +1,10 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+
+access-individual:Deny a access:Decision;
+    access:id "DENY" .
+
+access-individual:Allow a access:Decision;
+    access:id "ALLOW" .

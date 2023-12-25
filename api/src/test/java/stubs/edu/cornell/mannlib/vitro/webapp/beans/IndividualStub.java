@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 
-import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
@@ -230,60 +229,6 @@ public class IndividualStub implements Individual {
 	public void setLocalName(String localName) {
 		throw new RuntimeException(
 				"IndividualStub.setLocalName() not implemented.");
-	}
-
-	@Override
-	public RoleLevel getHiddenFromDisplayBelowRoleLevel() {
-		throw new RuntimeException(
-				"IndividualStub.getHiddenFromDisplayBelowRoleLevel() not implemented.");
-	}
-
-	@Override
-	public void setHiddenFromDisplayBelowRoleLevel(RoleLevel eR) {
-		throw new RuntimeException(
-				"IndividualStub.setHiddenFromDisplayBelowRoleLevel() not implemented.");
-	}
-
-	@Override
-	public void setHiddenFromDisplayBelowRoleLevelUsingRoleUri(String roleUri) {
-		throw new RuntimeException(
-				"IndividualStub.setHiddenFromDisplayBelowRoleLevelUsingRoleUri() not implemented.");
-	}
-
-	@Override
-	public RoleLevel getProhibitedFromUpdateBelowRoleLevel() {
-		throw new RuntimeException(
-				"IndividualStub.getProhibitedFromUpdateBelowRoleLevel() not implemented.");
-	}
-
-	@Override
-	public void setProhibitedFromUpdateBelowRoleLevel(RoleLevel eR) {
-		throw new RuntimeException(
-				"IndividualStub.setProhibitedFromUpdateBelowRoleLevel() not implemented.");
-	}
-
-	@Override
-	public void setProhibitedFromUpdateBelowRoleLevelUsingRoleUri(String roleUri) {
-		throw new RuntimeException(
-				"IndividualStub.setProhibitedFromUpdateBelowRoleLevelUsingRoleUri() not implemented.");
-	}
-
-	@Override
-	public RoleLevel getHiddenFromPublishBelowRoleLevel() {
-		throw new RuntimeException(
-				"IndividualStub.getHiddenFromPublishBelowRoleLevel() not implemented.");
-	}
-
-	@Override
-	public void setHiddenFromPublishBelowRoleLevel(RoleLevel eR) {
-		throw new RuntimeException(
-				"IndividualStub.setHiddenFromPublishBelowRoleLevel() not implemented.");
-	}
-
-	@Override
-	public void setHiddenFromPublishBelowRoleLevelUsingRoleUri(String roleUri) {
-		throw new RuntimeException(
-				"IndividualStub.setHiddenFromPublishBelowRoleLevelUsingRoleUri() not implemented.");
 	}
 
 	@Override

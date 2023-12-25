@@ -1,0 +1,31 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix search: <https://vivoweb.org/ontology/vitro-search#> .
+
+<https://vivoweb.org/ontology/vitro-search> rdfs:label "Vitro search"@en-US .
+search:multivalued rdfs:label "is multivalued"@en-US .
+search:isAscending rdfs:label "is ascending order"@en-US .
+search:RangeFilter rdfs:label "Range filter"@en-US .
+search:indexField rdfs:label "Index field"@en-US .
+search:contains rdfs:label "contains"@en-US .
+search:step rdfs:label "step"@en-US .
+search:isLanguageSpecific rdfs:label "is language specific"@en-US .
+search:isUriValues rdfs:label "Contains URIs"@en-US .
+search:filterField rdfs:label "Filter field"@en-US .
+search:SearchField rdfs:label "Field"@en-US .
+search:order rdfs:label "order"@en-US .
+search:userInput rdfs:label "user input"@en-US .
+search:FilterValue rdfs:label "FilterValue"@en-US .
+search:from rdfs:label "Minimum range value"@en-US .
+search:to rdfs:label "Maximum range value"@en-US .
+search:description rdfs:label "description"@en-US .
+search:FilterGroup rdfs:label "FilterGroup"@en-US .
+search:userInputRegex rdfs:label "userInputRegex"@en-US .
+search:Filter rdfs:label "Filter"@en-US .
+search:sortField rdfs:label "Sort field"@en-US .
+search:id rdfs:label "Identifier"@en-US .
+search:facetResults rdfs:label "Show facet results"@en-US .
+search:Sort rdfs:label "Sort"@en-US .
+search:hasKnownValue rdfs:label "hasKnownValue"@en-US .
+search:public rdfs:label "public"@en-US .
+search:defaultPublic rdfs:label "Is default public value"@en-US .
+search:moreLimit rdfs:label "initial facet limit"@en-US .

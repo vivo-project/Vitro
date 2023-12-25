@@ -1,0 +1,22 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+
+access-individual:Equals a access:Operator;
+    access:id "EQUALS" .
+
+access-individual:NotEquals a access:Operator;
+    access:id "NOT_EQUALS" .
+
+access-individual:OneOf a access:Operator;
+    access:id "ONE_OF" .
+
+access-individual:NotOneOf a access:Operator;
+    access:id "NOT_ONE_OF" .
+
+access-individual:StartsWith a access:Operator;
+    access:id "STARTS_WITH" .
+
+access-individual:SparqlSelectQueryContains a access:Operator;
+    access:id "SPARQL_SELECT_QUERY_CONTAINS" .

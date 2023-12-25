@@ -1,0 +1,49 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/restrict-home-menu-items-editing/> .
+
+:Policy a access:Policy ;
+    access:priority 9000 ;
+    access:hasRule :RestrictEdit ;
+    access:hasRule :RestrictDrop .
+
+:RestrictEdit a access:Rule ;
+    access:hasDecision access-individual:Deny ;
+    access:requiresCheck :IsEditOperationCheck ;
+    access:requiresCheck :IsObjectPropertyStatement ;
+    access:requiresCheck :PredicateUriEqualsHomeMenuItem ;
+    access:requiresCheck :ObjectUriEqualsHasElement .
+
+:RestrictDrop a access:Rule ;
+    access:hasDecision access-individual:Deny ;
+    access:requiresCheck :IsDropOperationCheck ;
+    access:requiresCheck :IsObjectPropertyStatement ;
+    access:requiresCheck :PredicateUriEqualsHomeMenuItem ;
+    access:requiresCheck :ObjectUriEqualsHasElement .
+
+:IsEditOperationCheck a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:Operation ;
+    access:value access-individual:EditOperation .
+
+:IsDropOperationCheck a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:Operation ;
+    access:value access-individual:DropOperation .
+
+:IsObjectPropertyStatement a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:AccessObjectType ;
+    access:value access-individual:ObjectPropertyStatement .
+
+:PredicateUriEqualsHomeMenuItem a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:StatementPredicateUri ;
+    access:value <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#HomeMenuItem> .
+
+:ObjectUriEqualsHasElement a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:StatementObjectUri ;
+    access:value <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#hasElement> .

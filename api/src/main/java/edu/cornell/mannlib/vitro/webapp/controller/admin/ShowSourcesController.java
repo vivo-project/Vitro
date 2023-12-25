@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.admin;
 
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest.AUTHORIZED;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.LanguageOption.LANGUAGE_NEUTRAL;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONFIGURATION;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONTENT;
@@ -112,7 +111,7 @@ public class ShowSourcesController extends FreemarkerHttpServlet {
 
 	@Override
 	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
-		return AUTHORIZED;
+		return AuthorizationRequest.AUTHORIZED;
 	}
 
 	@Override

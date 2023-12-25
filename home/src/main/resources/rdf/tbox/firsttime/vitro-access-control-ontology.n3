@@ -1,0 +1,249 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+
+### Ontology
+
+<https://vivoweb.org/ontology/vitro-application/auth/vocabulary> a owl:Ontology .
+
+### Classes
+
+:PolicyTemplate a owl:Class ;
+    rdfs:comment "Policy template to define rules that can be reused by data sets" ; 
+    rdfs:label "Policy template"@en-US .
+
+:Policy a owl:Class ;
+    rdfs:comment "Policy to define access rules" ; 
+    rdfs:label "Policy"@en-US .
+
+:DataSet a owl:Class ;
+    rdfs:comment "Data set to load policy instance with values defined in it. Contains value sets used by checks. While loading policy from data set value containers not specified in current data set are ignored (not used by checks)." ;
+    rdfs:label "Dataset"@en-US .
+
+:ValueSet a owl:Class ;
+    rdfs:comment "Container for values" ; 
+    rdfs:label "Value set"@en-US .
+
+:Rule a owl:Class ;
+    rdfs:comment "Contains checks to perform. If all checks match, rule returns decision.";
+    rdfs:label "Access rule"@en-US .
+
+:Check a owl:Class ;
+    rdfs:comment "Check to perform on attribute of request";
+    rdfs:label "Access rule check"@en-US .
+
+:Operator a owl:Class ;
+    rdfs:comment "Operator to use in check";
+    rdfs:label "Operator"@en-US .
+
+:AttributeValuePattern a owl:Class ;
+    rdfs:comment "Resource represents single value, usually specified as literal with :id ";
+    rdfs:label "Value"@en-US .
+
+:Operation a owl:Class ;
+    rdfs:subClassOf :AttributeValuePattern ;
+    rdfs:comment "Access operation";
+    rdfs:label "Operation"@en-US .
+
+:ObjectType a owl:Class ;
+    rdfs:subClassOf :AttributeValuePattern ;
+    rdfs:comment "Type of access object";
+    rdfs:label "Object type"@en-US .
+
+:AttributeUriValue a owl:Class ;
+    rdfs:subClassOf :AttributeValuePattern ;
+    rdfs:comment "Represents attribute uri value";
+    rdfs:label "Attribute uri value"@en-US .
+
+:SubjectRoleUri a owl:Class ;
+    rdfs:subClassOf :AttributeUriValue ;
+    rdfs:comment "Represents role uri";
+    rdfs:label "subject role uri"@en-US .
+
+:SparqlSelectValuesQuery a owl:Class ;
+    rdfs:subClassOf :AttributeValuePattern ;
+    rdfs:comment "Represents SPARQL Select query to get attribute values";
+    rdfs:label "Attribute uri value"@en-US .
+
+:AttributeValuePrefix a owl:Class ;
+    rdfs:subClassOf :AttributeValuePattern ;
+    rdfs:comment "Represents attribute value substring pattern";
+    rdfs:label "Attribute value prefix"@en-US .
+
+:SubjectType a owl:Class ;
+    rdfs:subClassOf :AttributeValuePattern ;
+    rdfs:comment "Type of subject(user, non-personal entity) requested access";
+    rdfs:label "Subject type"@en-US .
+
+:AttributeType a owl:Class ;
+    rdfs:comment "Attribute type to check";
+    rdfs:label "Attribute type"@en-US .
+
+:Decision a owl:Class ;
+    rdfs:comment "Decision to return in case all checks in a rule match";
+    rdfs:label "Decision"@en-US .
+
+:DataSetTemplate a owl:Class ;
+    rdfs:comment "Data set template to create new data set: specify new value sets and add them into checks, create new data set key. Data set template should contain it's own key to be found and used. For example on new role creation new data sets for new role should be created, template key for that example would be access-individual:SubjectRole";
+    rdfs:label "Data set template"@en-US .
+
+:DataSetTemplateKey a owl:Class ;
+    rdfs:comment "Key to find template";
+    rdfs:label "Data set template key"@en-US .
+
+:DataSetKeyTemplate a owl:Class ;
+    rdfs:comment "Template of data set key to find data set";
+    rdfs:label "Data set key template"@en-US .
+
+:ValueSetTemplate a owl:Class ;
+    rdfs:comment "Template to create new value set from";
+    rdfs:label "Value set template"@en-US .
+    
+:Configuration a owl:Class ;
+    rdfs:comment "Access control configuration";
+    rdfs:label "Configuration"@en-US .
+
+### Data properties
+
+:id a owl:DatatypeProperty ,
+    owl:FunctionalProperty ;
+    rdfs:comment "Set string identifier";
+    rdfs:range xsd:string ;
+    rdfs:domain [ a owl:Class ; owl:unionOf  ( :Operator :Decision :AttributeValuePattern :AttributeType ) ] ;
+    rdfs:label "id"@en-US .
+
+:priority a owl:DatatypeProperty ,
+    owl:FunctionalProperty ;
+    rdfs:comment "Set priority to :Policy, :PolicyTemplate or :DataSet";
+    rdfs:range xsd:integer ;
+    rdfs:domain [ a owl:Class ; owl:unionOf  ( :Policy :PolicyTemplate :DataSet ) ] ;
+    rdfs:label "priority"@en-US . 
+    
+:version a owl:DatatypeProperty ,
+    owl:FunctionalProperty ;
+    rdfs:comment "Access control configuration version";
+    rdfs:range xsd:integer ;
+    rdfs:domain :Configuration ;
+    rdfs:label "version"@en-US .
+
+### Object properties
+
+:hasRelatedValueSet a owl:ObjectProperty ;
+    rdfs:comment "Specifies value sets related to :DataSetTemplate or :DataSet.";
+    rdfs:label "has related value set"@en-US ;
+    rdfs:domain [ a owl:Class ; owl:unionOf  ( :DataSetTemplate :DataSet ) ] ;
+    rdfs:range :ValueSet .
+
+:value a owl:ObjectProperty ;
+    rdfs:comment "Assign one value (any URI or :AttributeValuePattern with :id to define literal value)";
+    rdfs:label "value"@en-US ;
+    rdfs:domain [ a owl:Class ; owl:unionOf  ( :ValueSetTemplate :ValueSet :Check ) ] ;
+    rdfs:range :AttributeValuePattern .
+
+:useOperator a owl:ObjectProperty ;
+    rdfs:comment "Use operator in :Check";
+    rdfs:label "use operator"@en-US ;
+    rdfs:domain :Check ;
+    rdfs:range :Operator .
+
+:hasTypeToCheck a owl:ObjectProperty ,
+    owl:FunctionalProperty ;
+    rdfs:comment "Set attribute type that should be checked";
+    rdfs:label "has type to check"@en-US ;
+    rdfs:domain :Check ;
+    rdfs:range :AttributeType .
+
+:containsElementsOfType a owl:ObjectProperty ,
+    owl:FunctionalProperty ;
+    rdfs:comment "Type of values for new value set";
+    rdfs:label "set type template"@en-US ;
+    rdfs:range [ a owl:Class ; owl:unionOf  ( :AttributeType :AttributeValuePattern ) ] ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( :ValueSet :ValueSetTemplate ) ] .
+
+:values a owl:ObjectProperty ;
+    rdfs:comment "Multiple values";
+    rdfs:label "values"@en-US ;
+    rdfs:domain :Check ;
+    rdfs:range :ValueSet .
+
+:relatedCheck a owl:ObjectProperty ;
+    rdfs:comment "Specifies :Check into which new ValueSet should be added";
+    rdfs:label "related check"@en-US ;
+    rdfs:domain :ValueSetTemplate ;
+    rdfs:range :Check .
+
+:hasDataSetTemplateKey a owl:ObjectProperty, 
+    owl:FunctionalProperty ;
+    rdfs:comment "Specify data set template key";
+    rdfs:label "has data set template key"@en-US ;
+    rdfs:domain :DataSetTemplate ;
+    rdfs:range :DataSetTemplateKey .
+
+:dataSetValueTemplate a owl:ObjectProperty ;
+    rdfs:comment "Contains value set template";
+    rdfs:label "data set value template"@en-US ;
+    rdfs:domain :DataSetTemplate ;
+    rdfs:range :ValueSetTemplate .
+
+:hasTemplateKeyComponent a owl:ObjectProperty ;
+    rdfs:comment "Specifies ttribute type to use as a template key";
+    rdfs:label "has template key component"@en-US ;
+    rdfs:domain :DataSetTemplateKey ;
+    rdfs:range :AttributeType .
+
+:requiresCheck a owl:ObjectProperty ;
+    rdfs:comment "Requires check";
+    rdfs:label "requires check"@en-US ;
+    rdfs:domain :Rule ;
+    rdfs:range :Check .
+
+:hasDecision a owl:ObjectProperty ;
+    rdfs:comment "Decision to return in case of all checks match";
+    rdfs:label "has decision"@en-US ;
+    rdfs:domain :Rule ;
+    rdfs:range :Decision .    
+
+:hasDataSet a owl:ObjectProperty ;
+    rdfs:comment "Relates policy template to data set";
+    rdfs:label "has data set"@en-US ;
+    rdfs:domain :PolicyTemplate ;
+    rdfs:range :DataSet .
+
+:hasRule a owl:ObjectProperty ;
+    rdfs:comment "Assgins a rule to a policy or policy template";
+    rdfs:label "has rule"@en-US ;
+    rdfs:domain [ a owl:Class ; owl:unionOf  ( :Policy :PolicyTemplate ) ] ;
+    rdfs:range :Rule .
+
+:hasDataSetKey a owl:ObjectProperty ;
+    rdfs:comment "Assign data set template to policy data set";
+    rdfs:label "data set key"@en-US ;
+    rdfs:domain :DataSet ;
+    rdfs:range :DataSetKey .
+
+:hasDataSetKeyTemplate a owl:ObjectProperty ;
+    rdfs:comment "Assign data set key template to data set template";
+    rdfs:label "data set key template"@en-US ;
+    rdfs:domain :DataSetTemplate ;
+    rdfs:range :DataSetKeyTemplate .
+
+:hasDataSetTemplate a owl:ObjectProperty ;
+    rdfs:comment "Relates policy template to data set template";
+    rdfs:label "has data set template"@en-US ;
+    rdfs:domain :PolicyTemplate ;
+    rdfs:range :DataSetTemplate .
+
+:hasKeyComponentTemplate a owl:ObjectProperty ;
+    rdfs:comment "Specify component of combined key";
+    rdfs:domain :DataSetKeyTemplate ;
+    rdfs:range :AttributeType ;
+    rdfs:label "has key component template"@en-US .
+
+:hasKeyComponent a owl:ObjectProperty ;
+    rdfs:comment "Specify component of combined key";
+    rdfs:domain [ a owl:Class ; owl:unionOf ( :DataSetKeyTemplate :DataSetKey ) ] ;
+    rdfs:range :AttributeValuePattern ;
+    rdfs:label "has key component"@en-US .

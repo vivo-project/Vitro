@@ -2,7 +2,11 @@
 
 <!-- $This file is distributed under the terms of the license in LICENSE$ -->
 
-<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:form="http://vitro.mannlib.cornell.edu/edit/tags" version="2.0">
+<%@ taglib prefix="form" uri="http://vitro.mannlib.cornell.edu/edit/tags" %>
+<%@ taglib prefix="c"  uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+<jsp:directive.page import="edu.cornell.mannlib.vedit.controller.BaseEditController"/>
 
 <tr class="editformcell">
 	<td valign="bottom" colspan="2">
@@ -83,29 +87,32 @@
 	</td>
 </tr>
 <tr><td colspan="4"><hr class="formDivider"/></td></tr>
-<tr class="editformcell">
-    <td valign="bottom" colspan="1">
-        <b>Display level</b><br/>
-        <select name="HiddenFromDisplayBelowRoleLevelUsingRoleUri">
-            <form:option name="HiddenFromDisplayBelowRoleLevelUsingRoleUri"/>
-        </select>
-    </td>
-    <td valign="bottom" colspan="1">
-        <b>Update level</b><br/>
-        <select name="ProhibitedFromUpdateBelowRoleLevelUsingRoleUri">
-            <form:option name="ProhibitedFromUpdateBelowRoleLevelUsingRoleUri"/>
-        </select>
-    </td>
-</tr>
-<tr class="editformcell">
-    <td valign="bottom" colspan="1">
-        <b>Publish level</b><br/>
-        <select name="HiddenFromPublishBelowRoleLevelUsingRoleUri">
-            <form:option name="HiddenFromPublishBelowRoleLevelUsingRoleUri"/>
-        </select>
-    </td>
-</tr>
-<tr><td colspan="4"><hr class="formDivider"/></td></tr>
+<!-- Permissions -->
+<c:if test="${!empty operationsToRoles}">
+    <input id="_permissions" type="hidden" name="_permissions" value="enabled" />
+    <input id="${BaseEditController.ENTITY_URI_ATTRIBUTE_NAME}" type="hidden" name="${BaseEditController.ENTITY_URI_ATTRIBUTE_NAME}" value="${_permissionsEntityURI}" />
+    <input id="${BaseEditController.ENTITY_TYPE_ATTRIBUTE_NAME}" type="hidden" name="${BaseEditController.ENTITY_TYPE_ATTRIBUTE_NAME}" value="CLASS" />
+	<c:forEach var="entry" items="${operationsToRoles}">
+		<tr class="editformcell">
+			<td valign="top" colspan="5"><b>${entry.key}</b> permissions for this property<br /> 
+				<c:set var="operationLowercase" value="${fn:toLowerCase(entry.key)}" />
+				<c:forEach var="role" items="${entry.value}">
+					<input id="${operationLowercase}${role.label}"
+						type="checkbox" name="${operationLowercase}Roles"
+						value="${role.uri}" ${role.granted?'checked':''}
+						${role.enabled?'':'disabled'} />
+					<label class="inline" for="${operationLowercase}${role.label}">${role.label}</label>
+				</c:forEach>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="5">
+				<hr class="formDivider" />
+			</td>
+		</tr>
+	</c:forEach>
+</c:if>
+<!-- Permissions End -->
 <tr class="editformcell">
 	<!--td valign="top" colspan="1">
 		<b>Display Limit</b><br/>
@@ -133,4 +140,3 @@
 	</td>
 </tr>
 <tr><td colspan="4"><hr class="formDivider"/></td></tr>
-</jsp:root>

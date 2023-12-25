@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import java.net.URLEncoder;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 

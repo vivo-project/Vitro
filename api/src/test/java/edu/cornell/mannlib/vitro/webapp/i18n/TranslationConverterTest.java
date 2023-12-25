@@ -15,12 +15,16 @@ import org.apache.jena.rdf.model.Selector;
 import org.apache.jena.rdf.model.SimpleSelector;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdf.model.impl.PropertyImpl;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-
 import stubs.javax.servlet.ServletContextStub;
 
-public class TranslationConverterTest {
 
+public class TranslationConverterTest {
 	private static final String WILMA = "wilma";
 	private static final String HAS_THEME = "http://vivoweb.org/ontology/vitro/ui-label/vocabulary#hasTheme";
 	private static final String VITRO = "Vitro";
@@ -32,9 +36,21 @@ public class TranslationConverterTest {
 	ServletContextStub ctx = new ServletContextStub();
 	private OntModel model;
 	
-	@Test
-	public void testConversion() throws FileNotFoundException {
-		VitroResourceBundle.addAppPrefix("customprefix");
+    @Before
+    public void init() {
+        Logger logger = LogManager.getLogger(TranslationConverter.class);
+        logger.setLevel(Level.ERROR);
+    }
+
+    @After
+    public void finish() {
+        Logger logger = LogManager.getLogger(TranslationConverter.class);
+        logger.setLevel(Level.INFO);
+    }
+
+    @Test
+    public void testConversion() throws FileNotFoundException {
+        VitroResourceBundle.addAppPrefix("customprefix");
 		VitroResourceBundle.addAppPrefix("vivo");
 		TranslationConverter converter = TranslationConverter.getInstance();
 		model = converter.memModel;

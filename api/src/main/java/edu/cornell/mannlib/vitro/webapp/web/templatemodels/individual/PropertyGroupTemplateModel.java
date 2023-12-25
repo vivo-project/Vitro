@@ -2,8 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction.SOME_LITERAL;
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction.SOME_URI;
+import static edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject.SOME_LITERAL;
+import static edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject.SOME_URI;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,14 +11,19 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.DataPropertyAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.DataPropertyStatementAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.FauxDataPropertyAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.FauxDataPropertyStatementAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.FauxObjectPropertyAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.FauxObjectPropertyStatementAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayDataProperty;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayDataPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayObjectProperty;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
+import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
@@ -32,8 +37,6 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
 
     private final String name;
     private final List<PropertyTemplateModel> properties;
-
-
 
     PropertyGroupTemplateModel(VitroRequest vreq, PropertyGroup group,
             Individual subject, boolean editing,
@@ -73,35 +76,48 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
 	 * See if the property is permitted in its own right. If not, the property
 	 * statement might still be permitted to a self-editor.
 	 */
-	private boolean allowedToDisplay(VitroRequest vreq, ObjectProperty op,
-			Individual subject) {
-		RequestedAction dop = new DisplayObjectProperty(op);
-		if (PolicyHelper.isAuthorizedForActions(vreq, dop)) {
+	private boolean allowedToDisplay(VitroRequest vreq, ObjectProperty op, Individual subject) {
+	    AccessObject ao;
+	    if (op instanceof FauxObjectPropertyWrapper) {
+	        ao = new FauxObjectPropertyAccessObject(op);
+	    } else {
+	        ao = new ObjectPropertyAccessObject(op);    
+	    }
+		if (PolicyHelper.isAuthorizedForActions(vreq, ao, AccessOperation.DISPLAY)) {
 			return true;
 		}
-
-		RequestedAction dops = new DisplayObjectPropertyStatement(
-				subject.getURI(), op, SOME_URI);
-        return PolicyHelper.isAuthorizedForActions(vreq, dops);
-
+        //TODO: Model should be here to correctly check authorization
+		if (op instanceof FauxObjectPropertyWrapper) {
+			final FauxProperty fauxProperty = ((FauxObjectPropertyWrapper) op).getFauxProperty();
+            ao = new FauxObjectPropertyStatementAccessObject(null, subject.getURI(), fauxProperty, SOME_URI);
+		} else {
+			ao = new ObjectPropertyStatementAccessObject(null, subject.getURI(), op, SOME_URI);
+		}
+		return PolicyHelper.isAuthorizedForActions(vreq, ao, AccessOperation.DISPLAY);
     }
 
 	/**
 	 * See if the property is permitted in its own right. If not, the property
 	 * statement might still be permitted to a self-editor.
 	 */
-	private boolean allowedToDisplay(VitroRequest vreq, DataProperty dp,
-			Individual subject) {
-		RequestedAction dop = new DisplayDataProperty(dp);
-		if (PolicyHelper.isAuthorizedForActions(vreq, dop)) {
+	private boolean allowedToDisplay(VitroRequest vreq, DataProperty dp, Individual subject) {
+        AccessObject ao;
+        if (dp instanceof FauxDataPropertyWrapper) {
+            ao = new FauxDataPropertyAccessObject(dp);
+        } else {
+            ao = new DataPropertyAccessObject(dp);    
+        }
+		if (PolicyHelper.isAuthorizedForActions(vreq, ao, AccessOperation.DISPLAY)) {
 			return true;
 		}
-
-		DataPropertyStatementImpl dps = new DataPropertyStatementImpl(
-				subject.getURI(), dp.getURI(), SOME_LITERAL);
-		RequestedAction dops = new DisplayDataPropertyStatement(dps);
-        return PolicyHelper.isAuthorizedForActions(vreq, dops);
-
+        //TODO: Model should be here to correctly check authorization
+		if (dp instanceof FauxDataPropertyWrapper) {
+		    final FauxProperty fauxProperty = ((FauxDataPropertyWrapper) dp).getFauxProperty();
+			ao = new FauxDataPropertyStatementAccessObject(null, subject.getURI(), fauxProperty, SOME_LITERAL);
+		} else {
+			ao = new DataPropertyStatementAccessObject(null, subject.getURI(), dp, SOME_LITERAL);
+		}
+        return PolicyHelper.isAuthorizedForActions(vreq, ao, AccessOperation.DISPLAY);	
     }
 
 	protected boolean isEmpty() {

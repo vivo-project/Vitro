@@ -1,0 +1,36 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+
+access-individual:BrokenTestSetPolicy rdf:type access:Policy ;
+    access:hasDataSet access-individual:testDataSet1 ;
+    access:hasRule access-individual:BrokenRule .
+
+access-individual:BrokenRule rdf:type access:Rule ;
+    access:requiresCheck access-individual:BrokenAttribute1 ;
+    access:requiresCheck access-individual:BrokenAttribute2 .
+
+access-individual:BrokenAttribute1 rdf:type access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:ObjectUri ;
+    access:setValue access-individual:valueSet1 .
+
+access-individual:BrokenAttribute2 rdf:type access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:ObjectUri ;
+    access:setValue access-individual:valueSet2 .
+
+access-individual:testDataSet1 rdf:type access:DataSet ;
+    access:hasRelatedValueSet access-individual:valueSet1 .
+
+access-individual:valueSet1 rdf:type access:ValueSet ;
+    access:value <test:value1> ;
+    access:value <test:value2> ;
+    .    
+

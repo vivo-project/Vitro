@@ -65,7 +65,7 @@ public class IsRootUserFactoryTest extends AbstractTestClass {
 		req = new HttpServletRequestStub();
 		req.setSession(session);
 
-		factory = new IsRootUserFactory(ctx);
+		factory = new IsRootUserFactory();
 	}
 
 	@Test

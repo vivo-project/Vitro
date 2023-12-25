@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.i18n.selection;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.IllformedLocaleException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -67,6 +68,20 @@ public abstract class SelectedLocale {
 		Optional<Locale> forcedLocale = getForcedLocale(ctxInfo);
 		if (forcedLocale.isPresent()) {
 			return forcedLocale.get();
+		}
+
+		String languageTag = req.getParameter("lang");
+		if (languageTag != null) {
+			try {
+				Locale locale = Locale.forLanguageTag(languageTag.replace('_', '-'));
+				setSelectedLocale(req, locale);
+				log.debug("Found and set locale from 'lang' parameter: "
+					+ languageTag);
+				return locale;
+			} catch (IllformedLocaleException e) {
+				log.debug("Tried to parse invalid language tag: "
+					+ languageTag);
+			}
 		}
 
 		Object sessionInfo = session.getAttribute(ATTRIBUTE_NAME);

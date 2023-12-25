@@ -23,9 +23,10 @@ import org.apache.jena.query.QueryParseException;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.publish.PublishObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.controller.api.VitroApiServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.api.sparqlquery.InvalidQueryTypeException;
@@ -96,10 +97,10 @@ public class IndividualListRdfController extends VitroApiServlet {
 	private boolean isVclassRestricted(String vclassUri, HttpServletRequest req) {
 		ObjectProperty property = new ObjectProperty();
 		property.setURI(RDF_TYPE);
-		RequestedAction dops = new PublishObjectPropertyStatement(ModelAccess
-				.on(req).getOntModel(FULL_ASSERTIONS), RequestedAction.SOME_URI, property,
+		AccessObject dops = new ObjectPropertyStatementAccessObject(ModelAccess
+				.on(req).getOntModel(FULL_ASSERTIONS), AccessObject.SOME_URI, property,
 				vclassUri);
-		return !PolicyHelper.isAuthorizedForActions(req, dops);
+		return !PolicyHelper.isAuthorizedForActions(req, dops, AccessOperation.PUBLISH);
 	}
 
 	private void sendEmptyModel(RdfResultMediaType mediaType,

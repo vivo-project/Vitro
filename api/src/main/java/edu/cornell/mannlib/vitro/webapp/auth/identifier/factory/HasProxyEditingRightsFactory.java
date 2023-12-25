@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.identifier.factory;
 
-import javax.servlet.ServletContext;
-
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasProxyEditingRights;
@@ -14,10 +12,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
  */
 public class HasProxyEditingRightsFactory extends
 		BaseUserBasedIdentifierBundleFactory {
-
-	public HasProxyEditingRightsFactory(ServletContext ctx) {
-		super(ctx);
-	}
 
 	@Override
 	public IdentifierBundle getIdentifierBundleForUser(UserAccount user) {

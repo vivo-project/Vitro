@@ -2,124 +2,91 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction;
 
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DecisionResult;
 
-/**
- * A base class for RequestedAction that permits boolean operations on them.
- *
- * A null request is ignored, so in "and" it is equivalent to true, while in
- * "or" it is equivalent to false.
- */
 public abstract class AuthorizationRequest {
-	// ----------------------------------------------------------------------
-	// Constants
-	// ----------------------------------------------------------------------
 
-	public static final AuthorizationRequest AUTHORIZED = new AuthorizationRequest() {
-		@Override
-		public boolean isAuthorized(IdentifierBundle ids, PolicyIface policy) {
-			return true;
-		}
-	};
+    public static final AuthorizationRequest UNAUTHORIZED = new ForbiddenAuthorizationRequest();
+    public static final AuthorizationRequest AUTHORIZED = new AllowedAuthorizationRequest();
+    
+    public static enum WRAP_TYPE { AND , OR } ; 
+    
+    IdentifierBundle ids;
+    private List<String> editorUris = Collections.emptyList();
+    List<String> roleUris = Collections.emptyList();
 
-	public static final AuthorizationRequest UNAUTHORIZED = new AuthorizationRequest() {
-		@Override
-		public boolean isAuthorized(IdentifierBundle ids, PolicyIface policy) {
-			return false;
-		}
-	};
+    
+    public void setRoleUris(List<String> roleUris) {
+        this.roleUris = roleUris;
+    }
 
-	// ----------------------------------------------------------------------
-	// Static convenience methods
-	// ----------------------------------------------------------------------
+    public WRAP_TYPE getWrapType() {
+        return null;
+    }
 
-	public static AuthorizationRequest andAll(AuthorizationRequest... ars) {
-		return andAll(Arrays.asList(ars));
-	}
+    public DecisionResult getPredefinedDecision(){
+        return DecisionResult.INCONCLUSIVE;
+    }
+    
+    public List<AuthorizationRequest> getItems() {
+        return Collections.emptyList();
+    }
+    
+    public abstract AccessObject getAccessObject();
+    
+    public abstract AccessOperation getAccessOperation();
 
-	public static AuthorizationRequest andAll(
-			Iterable<? extends AuthorizationRequest> ars) {
-		AuthorizationRequest result = AUTHORIZED;
-		for (AuthorizationRequest ar : ars) {
-			result = result.and(ar);
-		}
-		return result;
-	}
+    public IdentifierBundle getIds() {
+        return ids;
+    }
+    
+    public List<String> getRoleUris() {
+        return roleUris;
+    }
+    
+    public void setIds(IdentifierBundle ids) {
+        this.ids = ids;
+    }
 
-	// ----------------------------------------------------------------------
-	// The abstract class
-	// ----------------------------------------------------------------------
+    public void setEditorUris(List<String> list) {
+        editorUris = list;
+    }
 
-	public AuthorizationRequest and(AuthorizationRequest that) {
-		if (that == null) {
-			return this;
-		} else {
-			return new AndAuthorizationRequest(this, that);
-		}
-	}
+    public List<String> getEditorUris(){
+        return editorUris;
+    }
 
-	public AuthorizationRequest or(AuthorizationRequest that) {
-		if (that == null) {
-			return this;
-		} else {
-			return new OrAuthorizationRequest(this, that);
-		}
-	}
-
-	public abstract boolean isAuthorized(IdentifierBundle ids,
-			PolicyIface policy);
-
-	// ----------------------------------------------------------------------
-	// Subclasses for boolean operations
-	// ----------------------------------------------------------------------
-
-	private static class AndAuthorizationRequest extends AuthorizationRequest {
-		private final AuthorizationRequest ar1;
-		private final AuthorizationRequest ar2;
-
-		private AndAuthorizationRequest(AuthorizationRequest ar1,
-				AuthorizationRequest ar2) {
-			this.ar1 = ar1;
-			this.ar2 = ar2;
-		}
-
-		@Override
-		public boolean isAuthorized(IdentifierBundle ids, PolicyIface policy) {
-			return ar1.isAuthorized(ids, policy)
-					&& ar2.isAuthorized(ids, policy);
-		}
-
-		@Override
-		public String toString() {
-			return "(" + ar1 + " && " + ar2 + ")";
-		}
-
-	}
-
-	private static class OrAuthorizationRequest extends AuthorizationRequest {
-		private final AuthorizationRequest ar1;
-		private final AuthorizationRequest ar2;
-
-		private OrAuthorizationRequest(AuthorizationRequest ar1,
-				AuthorizationRequest ar2) {
-			this.ar1 = ar1;
-			this.ar2 = ar2;
-		}
-
-		@Override
-		public boolean isAuthorized(IdentifierBundle ids, PolicyIface policy) {
-			return ar1.isAuthorized(ids, policy)
-					|| ar2.isAuthorized(ids, policy);
-		}
-
-		@Override
-		public String toString() {
-			return "(" + ar1 + " || " + ar2 + ")";
-		}
-
-	}
-
+    public static AuthorizationRequest or(AuthorizationRequest fist, AuthorizationRequest second) {
+        if (fist == null) {
+            return second;
+        } else if (second == null) {
+            return fist;
+        } else {
+            return new OrAuthorizationRequest(fist, second);
+        }
+    }
+    
+    public AuthorizationRequest and(AuthorizationRequest second) {
+        return new AndAuthorizationRequest(this, second);
+    }
+    
+    @Override
+    public String toString() {
+        String result = "";
+        if (!getRoleUris().isEmpty()) {
+            result += String.format("User with roles '%s' ", getRoleUris().toString());
+        }
+        if (!getEditorUris().isEmpty()) {
+            result += String.format(" profile uris '%s' ", getEditorUris().toString());
+        }
+        result += String.format(" requested '%s' ", getAccessOperation());
+        result += String.format(" on '%s' ", getAccessObject());
+        return result;
+    }
 }

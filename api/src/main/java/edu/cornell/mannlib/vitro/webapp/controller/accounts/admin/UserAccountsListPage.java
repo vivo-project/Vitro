@@ -19,8 +19,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.RootAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageRootAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
@@ -198,7 +199,7 @@ public class UserAccountsListPage extends UserAccountsPage {
 		if (!account.isRootUser()) {
 			return true;
 		}
-		if (PolicyHelper.isAuthorizedForActions(vreq, new ManageRootAccount())) {
+		if (PolicyHelper.isAuthorizedForActions(vreq, new RootAccessObject(), AccessOperation.EDIT)) {
 			return true;
 		}
 		return false;

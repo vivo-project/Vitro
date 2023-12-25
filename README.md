@@ -16,8 +16,6 @@ With Vitro, you can:
 * Search your data with Apache Solr
 
 Vitro was originally developed at Cornell University, and is used as the core of the popular
-research and scholarship portal, [VIVO](https://lyrasis.org/vivo/).
+research and scholarship portal, [VIVO](https://vivo.lyrasis.org/).
 
-For more information, contact the [VIVO community](https://lyrasis.org/vivo/resources/contact/).
-
-
+For more information, contact the [VIVO community](https://vivo.lyrasis.org/contact/).

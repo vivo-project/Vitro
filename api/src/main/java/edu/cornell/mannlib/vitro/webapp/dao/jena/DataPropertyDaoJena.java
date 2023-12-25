@@ -201,63 +201,6 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             dp.setDisplayTier((getWebappDaoFactory()).getJenaBaseDao().getPropertyNonNegativeIntValue(op, DISPLAY_RANK_ANNOT));
             dp.setDisplayLimit((getWebappDaoFactory()).getJenaBaseDao().getPropertyNonNegativeIntValue(op, DISPLAY_LIMIT));
 
-            //There might be multiple HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT properties, only use the highest
-            StmtIterator it = op.listProperties(HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT);
-            BaseResourceBean.RoleLevel hiddenRoleLevel = null;
-            while( it.hasNext() ){
-                Statement stmt = it.nextStatement();
-                RDFNode obj;
-                if( stmt != null && (obj = stmt.getObject()) != null && obj.isURIResource() ){
-                    Resource res = obj.as(Resource.class);
-                    if( res != null && res.getURI() != null ){
-                        BaseResourceBean.RoleLevel roleFromModel =  BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
-                        if( roleFromModel != null &&
-                            (hiddenRoleLevel == null || roleFromModel.compareTo(hiddenRoleLevel) > 0 )){
-                            hiddenRoleLevel = roleFromModel;
-                        }
-                    }
-                }
-            }
-            dp.setHiddenFromDisplayBelowRoleLevel(hiddenRoleLevel);//this might get set to null
-
-            //There might be multiple PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT properties, only use the highest
-            it = op.listProperties(PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT);
-            BaseResourceBean.RoleLevel prohibitedRoleLevel = null;
-            while( it.hasNext() ){
-                Statement stmt = it.nextStatement();
-                RDFNode obj;
-                if( stmt != null && (obj = stmt.getObject()) != null && obj.isURIResource() ){
-                    Resource res = obj.as(Resource.class);
-                    if( res != null && res.getURI() != null ){
-                        BaseResourceBean.RoleLevel roleFromModel =  BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
-                        if( roleFromModel != null &&
-                            (prohibitedRoleLevel == null || roleFromModel.compareTo(prohibitedRoleLevel) > 0 )){
-                            prohibitedRoleLevel = roleFromModel;
-                        }
-                    }
-                }
-            }
-            dp.setProhibitedFromUpdateBelowRoleLevel(prohibitedRoleLevel);//this might get set to null
-
-            //There might be multiple HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT properties, only use the highest
-            it = op.listProperties(HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT);
-            BaseResourceBean.RoleLevel publishRoleLevel = null;
-            while( it.hasNext() ){
-                Statement stmt = it.nextStatement();
-                RDFNode obj;
-                if( stmt != null && (obj = stmt.getObject()) != null && obj.isURIResource() ){
-                    Resource res = obj.as(Resource.class);
-                    if( res != null && res.getURI() != null ){
-                        BaseResourceBean.RoleLevel roleFromModel =  BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
-                        if( roleFromModel != null &&
-                            (publishRoleLevel == null || roleFromModel.compareTo(publishRoleLevel) > 0 )){
-                            publishRoleLevel = roleFromModel;
-                        }
-                    }
-                }
-            }
-            dp.setHiddenFromPublishBelowRoleLevel(publishRoleLevel);//this might get set to null
-
             dp.setCustomEntryForm(getPropertyStringValue(op,PROPERTY_CUSTOMENTRYFORMANNOT));
 
             dp.setExternalId( getOntModelSelector().getTBoxModel().contains(op, DATAPROPERTY_ISEXTERNALID, "TRUE") );
@@ -522,26 +465,6 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             addPropertyStringValue(jDataprop, EDITING, dtp.getEditing(), ontModel);
             addPropertyNonNegativeIntValue(jDataprop, DISPLAY_RANK_ANNOT, dtp.getDisplayTier(), ontModel);
             addPropertyNonNegativeIntValue(jDataprop, DISPLAY_LIMIT, dtp.getDisplayLimit(), ontModel);
-            //addPropertyStringValue(jDataprop, HIDDEN_ANNOT, dtp.getHidden(), ontModel);
-            jDataprop.removeAll(HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT);
-            if (HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT != null && dtp.getHiddenFromDisplayBelowRoleLevel() != null) { // only need to add if present
-                jDataprop.addProperty(HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT, ResourceFactory.createResource(dtp.getHiddenFromDisplayBelowRoleLevel().getURI()));
-            }
-            jDataprop.removeAll(PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT);
-            if (PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT != null && dtp.getProhibitedFromUpdateBelowRoleLevel() != null) { // only need to add if present
-                jDataprop.addProperty(PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT, ResourceFactory.createResource(dtp.getProhibitedFromUpdateBelowRoleLevel().getURI()));
-            }
-            jDataprop.removeAll(HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT);
-            if (HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT != null && dtp.getHiddenFromPublishBelowRoleLevel() != null) { // only need to add if present
-            	jDataprop.addProperty(HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT, ResourceFactory.createResource(dtp.getHiddenFromPublishBelowRoleLevel().getURI()));
-            }
-            /*
-            if (dtp.isSelfEditProhibited()) { // only add the property if it's true
-                addPropertyBooleanValue(jDataprop, PROPERTY_SELFEDITPROHIBITEDANNOT, dtp.isSelfEditProhibited(), ontModel);
-            }
-            if (dtp.isCuratorEditProhibited()) { // only add the property if it's true
-                addPropertyBooleanValue(jDataprop, PROPERTY_CURATOREDITPROHIBITEDANNOT, dtp.isCuratorEditProhibited(), ontModel);
-            } */
             try {
             	if (dtp.getGroupURI() != null && dtp.getGroupURI().length()>0) {
                 	String badURIErrorStr = checkURI(dtp.getGroupURI());
@@ -593,18 +516,6 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             updatePropertyStringValue(jDataprop, EDITING, dtp.getEditing(), ontModel);
             updatePropertyNonNegativeIntValue(jDataprop, DISPLAY_RANK_ANNOT, dtp.getDisplayTier(), ontModel);
             updatePropertyNonNegativeIntValue(jDataprop, DISPLAY_LIMIT, dtp.getDisplayLimit(), ontModel);
-
-            if (dtp.getHiddenFromDisplayBelowRoleLevel() != null) {
-              updatePropertyResourceURIValue(jDataprop,HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT,dtp.getHiddenFromDisplayBelowRoleLevel().getURI(),ontModel);
-            }
-
-            if (dtp.getProhibitedFromUpdateBelowRoleLevel() != null) {
-                updatePropertyResourceURIValue(jDataprop,PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT,dtp.getProhibitedFromUpdateBelowRoleLevel().getURI(),ontModel);
-            }
-
-            if (dtp.getHiddenFromPublishBelowRoleLevel() != null) {
-            	updatePropertyResourceURIValue(jDataprop,HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT,dtp.getHiddenFromPublishBelowRoleLevel().getURI(),ontModel);
-            }
 
             if (dtp.getGroupURI() != null) {
                 updatePropertyResourceURIValue(jDataprop,PROPERTY_INPROPERTYGROUPANNOT,dtp.getGroupURI(),ontModel);
@@ -709,7 +620,6 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
         //"   ?property a owl:DatatypeProperty . \n" +
         "   FILTER ( \n" +
         "       isLiteral(?object) && \n" +
-        "       ( !regex(str(?property), \"^" + VitroVocabulary.PUBLIC + "\" )) && \n" +
         "       ( !regex(str(?property), \"^" + VitroVocabulary.OWL + "\" )) && \n" +
         // NIHVIVO-2790 vitro:moniker has been deprecated, but display existing values for editorial management (deletion is encouraged).
         // This property will be hidden from public display by default.

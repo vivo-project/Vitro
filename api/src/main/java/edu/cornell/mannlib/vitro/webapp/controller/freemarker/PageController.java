@@ -3,9 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest.AUTHORIZED;
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest.UNAUTHORIZED;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,11 +16,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.NamedAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleRequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequiresActions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
@@ -57,11 +56,10 @@ public class PageController extends FreemarkerHttpServlet{
     @Override
     protected AuthorizationRequest requiredActions(VitroRequest vreq) {
         try {
-			return AUTHORIZED.and(getActionsForPage(vreq)).and(
-					getActionsForDataGetters(vreq));
+			return getActionsForPage(vreq);
         } catch (Exception e) {
             log.warn(e);
-            return UNAUTHORIZED;
+            return AuthorizationRequest.UNAUTHORIZED;
         }
     }
 
@@ -69,36 +67,16 @@ public class PageController extends FreemarkerHttpServlet{
      * Get all the required actions directly required for the page.
      */
     private AuthorizationRequest getActionsForPage( VitroRequest vreq ) throws Exception{
-        List<String> simplePremUris = vreq.getWebappDaoFactory().getPageDao()
-            .getRequiredActions( getPageUri(vreq) );
-
-        AuthorizationRequest auth = AUTHORIZED;
+        List<String> simplePremUris = vreq.getWebappDaoFactory().getPageDao().getRequiredActions( getPageUri(vreq) );
+        AuthorizationRequest auth = AuthorizationRequest.AUTHORIZED;
         for( String uri : simplePremUris ){
-            auth = auth.and( new SimpleRequestedAction(uri) );
+            if (StringUtils.isBlank(uri)) {
+                continue;
+            }
+            NamedAccessObject ao = new NamedAccessObject(uri, AccessObjectType.NAMED_OBJECT);
+            auth = auth.and( new SimpleAuthorizationRequest(ao, AccessOperation.EXECUTE));
         }
         return auth;
-    }
-
-    /**
-     * Get Actions object for the data getters for the page.
-     */
-    private AuthorizationRequest getActionsForDataGetters(VitroRequest vreq ){
-        try {
-            List<DataGetter> dgList =
-                DataGetterUtils.getDataGettersForPage(
-                    vreq, vreq.getDisplayModel(), getPageUri(vreq));
-
-            AuthorizationRequest auth = AUTHORIZED;
-            for( DataGetter dg : dgList){
-                if( dg instanceof RequiresActions ){
-                    auth = auth.and(((RequiresActions) dg).requiredActions(vreq));
-                }
-            }
-            return auth;
-        } catch (Exception e) {
-            log.debug(e);
-            return UNAUTHORIZED;
-        }
     }
 
     @Override

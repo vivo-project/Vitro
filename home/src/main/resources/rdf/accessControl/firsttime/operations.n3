@@ -1,0 +1,46 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+
+access-individual:DisplayOperation a access:Operation ;
+    access:id "DISPLAY" .
+
+access-individual:UpdateOperation a access:Operation ;
+    access:id "UPDATE" .
+
+access-individual:PublishOperation a access:Operation ;
+    access:id "PUBLISH" .    
+
+access-individual:AddOperation a access:Operation ;
+    access:id "ADD" .
+
+access-individual:DropOperation a access:Operation ;
+    access:id "DROP" .
+
+access-individual:EditOperation a access:Operation ;
+    access:id "EDIT" .
+
+access-individual:ExecuteOperation a access:Operation ;
+    access:id "EXECUTE" .
+
+access-individual:DisplayOperationValueSet a access:ValueSet ;
+    access:value access-individual:DisplayOperation .
+
+access-individual:UpdateOperationValueSet a access:ValueSet ;
+    access:value access-individual:UpdateOperation .
+
+access-individual:PublishOperationValueSet a access:ValueSet ;
+    access:value access-individual:PublishOperation .
+
+access-individual:AddOperationValueSet a access:ValueSet ;
+    access:value access-individual:AddOperation .
+
+access-individual:DropOperationValueSet a access:ValueSet ;
+    access:value access-individual:DropOperation .
+
+access-individual:EditOperationValueSet a access:ValueSet ;
+    access:value access-individual:EditOperation .
+
+access-individual:ExecuteOperationValueSet a access:ValueSet ;
+    access:value access-individual:ExecuteOperation .

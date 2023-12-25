@@ -1,0 +1,1017 @@
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+<https://sah.tib.eu/individual/n16183>
+        a       <https://osl.tib.eu/vitro-searchOntology#Sort>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Alte Inv.-Nr. abst."@de-DE , " For. inv. no. desc"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Sort> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "for_inv_no_desc" ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                60 ;
+        <https://osl.tib.eu/vitro-searchOntology#sortField>
+                <https://sah.tib.eu/individual/n35040> .
+
+<https://sah.tib.eu/individual/n30217>
+        a       <https://osl.tib.eu/vitro-searchOntology#SearchField>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Type"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#SearchField> ;
+        <https://osl.tib.eu/vitro-searchOntology#indexField>
+                "type" ;
+        <https://osl.tib.eu/vitro-searchOntology#multivalued>
+                true .
+
+<https://sah.tib.eu/individual/n60032>
+        a            <https://osl.tib.eu/vitro-searchOntology#FilterValue> ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Ornament"@en-US , "Ornament"@de-DE ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#FilterValue> ;
+        <https://osl.tib.eu/vitro-searchOntology#cropBottom>
+                "25"^^<http://www.w3.org/2001/XMLSchema#float> ;
+        <https://osl.tib.eu/vitro-searchOntology#cropLeft>
+                "25"^^<http://www.w3.org/2001/XMLSchema#float> ;
+        <https://osl.tib.eu/vitro-searchOntology#cropRight>
+                "25"^^<http://www.w3.org/2001/XMLSchema#float> ;
+        <https://osl.tib.eu/vitro-searchOntology#cropTop>
+                "25"^^<http://www.w3.org/2001/XMLSchema#float> ;
+        <https://osl.tib.eu/vitro-searchOntology#hasImage>
+                <https://sah.tib.eu/individual/bar89140519300image2digrep> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "ornament" ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                4 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true .
+
+<https://sah.tib.eu/individual/n11808>
+        a       <https://osl.tib.eu/vitro-searchOntology#SearchField>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                " Depicted places"@en-US , "Dargestellter Ort"@de-DE ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#SearchField> ;
+        <https://osl.tib.eu/vitro-searchOntology#indexField>
+                "depicted_places_ss" ;
+        <https://osl.tib.eu/vitro-searchOntology#multivalued>
+                false .
+
+<https://sah.tib.eu/individual/n39331>
+        a                 <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Startseite"@de-DE , "Group"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Filter>      ;
+        <https://osl.tib.eu/vitro-searchOntology#facetResults>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#filterField>
+                <https://sah.tib.eu/individual/n44812> ;
+        <https://osl.tib.eu/vitro-searchOntology#hasKnownValue>
+                <https://sah.tib.eu/individual/n14996> , <https://sah.tib.eu/individual/n27776> , <https://sah.tib.eu/individual/n60032> , <https://sah.tib.eu/individual/n78459> , <https://sah.tib.eu/individual/n51869> , <https://sah.tib.eu/individual/n23896> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "main_filter" ;
+        <https://osl.tib.eu/vitro-searchOntology#isUriValues>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                2 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true .
+
+<https://sah.tib.eu/individual/n55688>
+        a       <https://osl.tib.eu/vitro-searchOntology#SearchField>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Stylistic classification"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#SearchField> ;
+        <https://osl.tib.eu/vitro-searchOntology#indexField>
+                "stylistic_classification_ss" ;
+        <https://osl.tib.eu/vitro-searchOntology#multivalued>
+                true .
+
+<https://sah.tib.eu/individual/n17274>
+        a                 <https://osl.tib.eu/vitro-searchOntology#RangeFilter> , <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Datierung"@de-DE , "Dates"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#RangeFilter> ;
+        <https://osl.tib.eu/vitro-searchOntology#filterField>
+                <https://sah.tib.eu/individual/n126321> ;
+        <https://osl.tib.eu/vitro-searchOntology#from>
+                "1400" ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "dates" ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                9 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#to>
+                "1930" .
+
+<https://sah.tib.eu/individual/n55421>
+        a                 <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Personen/Organisationen"@de-DE , "Participant"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <https://osl.tib.eu/vitro-searchOntology#facetResults>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#filterField>
+                <https://sah.tib.eu/individual/n12115> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "participant" ;
+        <https://osl.tib.eu/vitro-searchOntology#isUriValues>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                7 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true .
+
+<https://sah.tib.eu/individual/n76986>
+        a            <https://osl.tib.eu/vitro-searchOntology#Filter>    ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Material"@de-DE ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <https://osl.tib.eu/vitro-searchOntology#facetResults>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#filterField>
+                <https://sah.tib.eu/individual/n65998> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "material" ;
+        <https://osl.tib.eu/vitro-searchOntology#isUriValues>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                2 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                false .
+
+<https://sah.tib.eu/individual/n11172>
+        a            <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Alte Inv.-Nr."@de-DE , "Former inventory number"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <https://osl.tib.eu/vitro-searchOntology#facetResults>
+                false ;
+        <https://osl.tib.eu/vitro-searchOntology#filterField>
+                <https://sah.tib.eu/individual/n125021> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "fornum" ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                4 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#userInput>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#userInputRegex>
+                true .
+
+<https://sah.tib.eu/individual/n61023>
+        a       <https://osl.tib.eu/vitro-searchOntology#Filter>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Geographische Einordnung"@de-DE , "Geographic assignment"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <https://osl.tib.eu/vitro-searchOntology#facetResults>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#filterField>
+                <https://sah.tib.eu/individual/n37610> ;
+        <https://osl.tib.eu/vitro-searchOntology#hasKnownValue>
+                <https://sah.tib.eu/individual/n29690> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "geographic_assignment" ;
+        <https://osl.tib.eu/vitro-searchOntology#isUriValues>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                5 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true .
+
+<https://sah.tib.eu/individual/n18286>
+        a       <https://osl.tib.eu/vitro-searchOntology#SearchField>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Depicted event"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#SearchField> ;
+        <https://osl.tib.eu/vitro-searchOntology#indexField>
+                "depicted_event_ss" ;
+        <https://osl.tib.eu/vitro-searchOntology#multivalued>
+                true .
+
+<https://sah.tib.eu/individual/n21250>
+        a            <https://osl.tib.eu/vitro-searchOntology#FilterGroup> ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Additional filters"@en-US , "Weitere Filter"@de-DE ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#FilterGroup> ;
+        <https://osl.tib.eu/vitro-searchOntology#contains>
+                <https://sah.tib.eu/individual/n53032> , <https://sah.tib.eu/individual/n11172> , <https://sah.tib.eu/individual/n33090> , <https://sah.tib.eu/individual/n43961> , <https://sah.tib.eu/individual/n11016> , <https://sah.tib.eu/individual/n60370> , <https://sah.tib.eu/individual/n10539> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "extended" ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                4 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true .
+
+<https://sah.tib.eu/individual/n11016>
+        a       <https://osl.tib.eu/vitro-searchOntology#Filter>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Depiction type"@en-US , "Art der Darstellung"@de-DE ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <https://osl.tib.eu/vitro-searchOntology#facetResults>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#filterField>
+                <https://sah.tib.eu/individual/n11248> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "depiction_type" ;
+        <https://osl.tib.eu/vitro-searchOntology#isUriValues>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                1 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true .
+
+<https://sah.tib.eu/individual/n22961>
+        a       <https://osl.tib.eu/vitro-searchOntology#Sort>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Title Z-A"@en-US , "Titel Z-A"@de-DE ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Sort> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "titleasc" ;
+        <https://osl.tib.eu/vitro-searchOntology#isAscending>
+                false ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                20 ;
+        <https://osl.tib.eu/vitro-searchOntology#sortField>
+                <https://sah.tib.eu/individual/n32987> .
+
+<https://sah.tib.eu/individual/n12115>
+        a       <https://osl.tib.eu/vitro-searchOntology#SearchField>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Participant"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#SearchField> ;
+        <https://osl.tib.eu/vitro-searchOntology#indexField>
+                "participants_ss" ;
+        <https://osl.tib.eu/vitro-searchOntology#multivalued>
+                true .
+
+<https://sah.tib.eu/individual/n8952>
+        a       <https://osl.tib.eu/vitro-searchOntology#Sort> ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Cur. inv. no. desc"@en-US , "Aktuelle Inv.-Nr. abst."@de-DE ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Sort> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "cur_inv_no_desc" ;
+        <https://osl.tib.eu/vitro-searchOntology#isAscending>
+                false ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                40 ;
+        <https://osl.tib.eu/vitro-searchOntology#sortField>
+                <https://sah.tib.eu/individual/n31182> .
+
+<https://sah.tib.eu/individual/n43961>
+        a       <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Sammlermarke"@de-DE , "Collector's mark"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <https://osl.tib.eu/vitro-searchOntology#facetResults>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#filterField>
+                <https://sah.tib.eu/individual/n31107> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "collectors_mark" ;
+        <https://osl.tib.eu/vitro-searchOntology#isUriValues>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                5 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true .
+
+<https://sah.tib.eu/individual/n54155>
+        a       <https://osl.tib.eu/vitro-searchOntology#SearchField>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Watermark"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#SearchField> ;
+        <https://osl.tib.eu/vitro-searchOntology#indexField>
+                "watermark_ss" .
+
+<https://sah.tib.eu/individual/n44812>
+        a       <https://osl.tib.eu/vitro-searchOntology#SearchField>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Startpage"@en-US , "Startseite"@de-DE ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#SearchField>      ;
+        <https://osl.tib.eu/vitro-searchOntology#indexField>
+                "overview_ss" ;
+        <https://osl.tib.eu/vitro-searchOntology#multivalued>
+                true .
+
+<https://sah.tib.eu/individual/n37610>
+        a       <https://osl.tib.eu/vitro-searchOntology#SearchField>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Geographic assignment"@en-US , "Geographische Einordnung"@de-DE ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#SearchField> ;
+        <https://osl.tib.eu/vitro-searchOntology#indexField>
+                "geographic_assignment_ss" ;
+        <https://osl.tib.eu/vitro-searchOntology#multivalued>
+                true .
+
+<https://sah.tib.eu/individual/n58365>
+        a       <https://osl.tib.eu/vitro-searchOntology#SearchField>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Default query"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#SearchField> ;
+        <https://osl.tib.eu/vitro-searchOntology#indexField>
+                "querytext" .
+
+<https://sah.tib.eu/individual/n60422>
+        a       <https://osl.tib.eu/vitro-searchOntology#SearchField>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Depicted object"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#SearchField> ;
+        <https://osl.tib.eu/vitro-searchOntology#indexField>
+                "depicted_object_ss" ;
+        <https://osl.tib.eu/vitro-searchOntology#multivalued>
+                true .
+
+<https://sah.tib.eu/individual/n25254>
+        a       <https://osl.tib.eu/vitro-searchOntology#SearchField>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Aktuelle Inv.-Nr."@de-DE , "Current inventory number"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#SearchField> ;
+        <https://osl.tib.eu/vitro-searchOntology#indexField>
+                "curnum" .
+
+<https://sah.tib.eu/individual/n25461>
+        a       <https://osl.tib.eu/vitro-searchOntology#SearchField>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Place"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#SearchField> ;
+        <https://osl.tib.eu/vitro-searchOntology#indexField>
+                "place_ss" ;
+        <https://osl.tib.eu/vitro-searchOntology#multivalued>
+                true .
+
+<https://sah.tib.eu/individual/n33090>
+        a       <https://osl.tib.eu/vitro-searchOntology#Filter>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Current inventory number"@en-US , "Aktuelle Inv.-Nr."@de-DE ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <https://osl.tib.eu/vitro-searchOntology#filterField>
+                <https://sah.tib.eu/individual/n25254> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "curnum" ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                3 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#userInput>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#userInputRegex>
+                true .
+
+<https://sah.tib.eu/individual/n32987>
+        a       <https://osl.tib.eu/vitro-searchOntology#SearchField>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Label"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#SearchField> ;
+        <https://osl.tib.eu/vitro-searchOntology#indexField>
+                "_label_sort" ;
+        <https://osl.tib.eu/vitro-searchOntology#isLanguageSpecific>
+                true .
+
+<https://sah.tib.eu/individual/n31107>
+        a       <https://osl.tib.eu/vitro-searchOntology#SearchField>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Collector's mark"@en-US , "Sammlermarke"@de-DE ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#SearchField> ;
+        <https://osl.tib.eu/vitro-searchOntology#indexField>
+                "collectors_mark_ss" ;
+        <https://osl.tib.eu/vitro-searchOntology#multivalued>
+                true .
+
+<https://sah.tib.eu/individual/n65998>
+        a       <https://osl.tib.eu/vitro-searchOntology#SearchField>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Material"@de-DE ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#SearchField> ;
+        <https://osl.tib.eu/vitro-searchOntology#indexField>
+                "material_ss" .
+
+<https://sah.tib.eu/individual/n35040>
+        a       <https://osl.tib.eu/vitro-searchOntology#SearchField>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Former inventory number single value (sorting)"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#SearchField> ;
+        <https://osl.tib.eu/vitro-searchOntology#indexField>
+                "fornum_s" .
+
+<https://sah.tib.eu/individual/n49842>
+        a       <https://osl.tib.eu/vitro-searchOntology#FilterGroup>      ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Thema"@de-DE , "Subject"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#FilterGroup> ;
+        <https://osl.tib.eu/vitro-searchOntology#contains>
+                <https://sah.tib.eu/individual/n10887> , <https://sah.tib.eu/individual/n92331> , <https://sah.tib.eu/individual/n54373> , <https://sah.tib.eu/individual/n49035> , <https://sah.tib.eu/individual/n10980> , <https://sah.tib.eu/individual/n101601> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "subject" ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                3 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true .
+
+<https://sah.tib.eu/individual/n61242>
+        a       <https://osl.tib.eu/vitro-searchOntology#FilterGroup>      ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Objects"@en-US , "Werke"@de-DE ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#FilterGroup> ;
+        <https://osl.tib.eu/vitro-searchOntology#contains>
+                <https://sah.tib.eu/individual/n60929> , <https://sah.tib.eu/individual/n61023> , <https://sah.tib.eu/individual/n55421> , <https://sah.tib.eu/individual/n25763> , <https://sah.tib.eu/individual/n41861> , <https://sah.tib.eu/individual/n17274> , <https://sah.tib.eu/individual/n92603> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "basic" ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                0 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true .
+
+<https://sah.tib.eu/individual/n17416>
+        a       <https://osl.tib.eu/vitro-searchOntology#SearchField>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Object category narrower term"@en-US , "Sachgruppe Unterbegriff"@de-DE ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#SearchField> ;
+        <https://osl.tib.eu/vitro-searchOntology#indexField>
+                "narrower_term_ss" ;
+        <https://osl.tib.eu/vitro-searchOntology#multivalued>
+                true .
+
+<https://sah.tib.eu/individual/n11248>
+        a       <https://osl.tib.eu/vitro-searchOntology#SearchField>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Depiction type"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#SearchField> ;
+        <https://osl.tib.eu/vitro-searchOntology#indexField>
+                "depiction_type_ss" ;
+        <https://osl.tib.eu/vitro-searchOntology#multivalued>
+                true .
+
+<https://sah.tib.eu/individual/n60370>
+        a                 <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Stilistische Einordnung"@de-DE , "Stylistic classification"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <https://osl.tib.eu/vitro-searchOntology#facetResults>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#filterField>
+                <https://sah.tib.eu/individual/n55688> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "stylistic_classification" ;
+        <https://osl.tib.eu/vitro-searchOntology#isUriValues>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                7 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true .
+
+<https://sah.tib.eu/individual/n53944>
+        a       <https://osl.tib.eu/vitro-searchOntology#Filter>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Type"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <https://osl.tib.eu/vitro-searchOntology#facetResults>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#filterField>
+                <https://sah.tib.eu/individual/n30217> ;
+        <https://osl.tib.eu/vitro-searchOntology#hasKnownValue>
+                <https://sah.tib.eu/individual/n38619> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "type" ;
+        <https://osl.tib.eu/vitro-searchOntology#isUriValues>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                30 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                false .
+
+<https://sah.tib.eu/individual/n126321>
+        a       <https://osl.tib.eu/vitro-searchOntology#SearchField>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Dates"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#SearchField> ;
+        <https://osl.tib.eu/vitro-searchOntology#indexField>
+                "dates_drsim" .
+
+<https://sah.tib.eu/individual/n41861>
+        a            <https://osl.tib.eu/vitro-searchOntology#Filter>      ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Text"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <https://osl.tib.eu/vitro-searchOntology#filterField>
+                <https://sah.tib.eu/individual/n58365> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "querytext" ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                1 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true .
+
+<https://sah.tib.eu/individual/n16429>
+        a       <https://osl.tib.eu/vitro-searchOntology#FilterGroup>      ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Intern"@de-DE , "Internal"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#FilterGroup> ;
+        <https://osl.tib.eu/vitro-searchOntology#contains>
+                <https://sah.tib.eu/individual/n76986> , <https://sah.tib.eu/individual/n53944> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "internal" ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                5 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                false .
+
+<https://sah.tib.eu/individual/n30114>
+        a       <https://osl.tib.eu/vitro-searchOntology#FilterGroup>      ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Advanced filters"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#FilterGroup> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "advanced" ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                4 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                false .
+
+<https://sah.tib.eu/individual/n18614>
+        a       <https://osl.tib.eu/vitro-searchOntology#Sort>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Title A-Z"@en-US , "Titel A-Z"@de-DE ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Sort> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "titledesc" ;
+        <https://osl.tib.eu/vitro-searchOntology#isAscending>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                10 ;
+        <https://osl.tib.eu/vitro-searchOntology#sortField>
+                <https://sah.tib.eu/individual/n32987> .
+
+<https://sah.tib.eu/individual/n49035>
+        a                 <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                " Depicted person"@en-US , "Dargestellte Person"@de-DE ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <https://osl.tib.eu/vitro-searchOntology#facetResults>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#filterField>
+                <https://sah.tib.eu/individual/n43480> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "depicted_persons" ;
+        <https://osl.tib.eu/vitro-searchOntology#isUriValues>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true .
+
+<https://sah.tib.eu/individual/n53032>
+        a                 <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Wasserzeichen"@de-DE , "Watermark"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <https://osl.tib.eu/vitro-searchOntology#facetResults>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#filterField>
+                <https://sah.tib.eu/individual/n54155> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "watermark" ;
+        <https://osl.tib.eu/vitro-searchOntology#isUriValues>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                6 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true .
+
+<https://sah.tib.eu/individual/n38619>
+        a       <https://osl.tib.eu/vitro-searchOntology#FilterValue>      ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Cultural object type"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#FilterValue> ;
+        <https://osl.tib.eu/vitro-searchOntology#defaultPublic>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "http://ontology.tib.eu/gesah/Cultural_Object" ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true .
+
+<https://sah.tib.eu/individual/n26802>
+        a       <https://osl.tib.eu/vitro-searchOntology#SearchField>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Object type"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#SearchField> ;
+        <https://osl.tib.eu/vitro-searchOntology#indexField>
+                "object_type_ss" ;
+        <https://osl.tib.eu/vitro-searchOntology#multivalued>
+                true .
+
+<https://sah.tib.eu/individual/n31182>
+        a       <https://osl.tib.eu/vitro-searchOntology#SearchField>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Current inventory number single value (sorting)"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#SearchField> ;
+        <https://osl.tib.eu/vitro-searchOntology#indexField>
+                "curnum_s" .
+
+<https://sah.tib.eu/individual/n29690>
+        a       <https://osl.tib.eu/vitro-searchOntology#FilterValue>      ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Not assigned"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#FilterValue> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "search:no_assignment" .
+
+<https://sah.tib.eu/individual/n92473>
+        a       <https://osl.tib.eu/vitro-searchOntology#SearchField>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Technique"@en-US , "Technik"@de-DE ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#SearchField> ;
+        <https://osl.tib.eu/vitro-searchOntology#indexField>
+                "technique_ss" ;
+        <https://osl.tib.eu/vitro-searchOntology#multivalued>
+                true .
+
+<https://sah.tib.eu/individual/n54373>
+        a       <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Schlagwort"@de-DE , "Keywords"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <https://osl.tib.eu/vitro-searchOntology#facetResults>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#filterField>
+                <https://sah.tib.eu/individual/n20261> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "keywords" ;
+        <https://osl.tib.eu/vitro-searchOntology#isUriValues>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                4 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#userInput>
+                false ;
+        <https://osl.tib.eu/vitro-searchOntology#userInputRegex>
+                false .
+
+<https://sah.tib.eu/individual/n27776>
+        a       <https://osl.tib.eu/vitro-searchOntology#FilterValue>      ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Zeichnung"@de-DE , "Drawing"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#FilterValue> ;
+        <https://osl.tib.eu/vitro-searchOntology#cropBottom>
+                "25"^^<http://www.w3.org/2001/XMLSchema#float> ;
+        <https://osl.tib.eu/vitro-searchOntology#cropLeft>
+                "25"^^<http://www.w3.org/2001/XMLSchema#float> ;
+        <https://osl.tib.eu/vitro-searchOntology#cropRight>
+                "25"^^<http://www.w3.org/2001/XMLSchema#float> ;
+        <https://osl.tib.eu/vitro-searchOntology#cropTop>
+                "25"^^<http://www.w3.org/2001/XMLSchema#float> ;
+        <https://osl.tib.eu/vitro-searchOntology#hasImage>
+                <https://sah.tib.eu/individual/bar89140499261image1digrep> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "drawing" ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                1 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true .
+
+<https://sah.tib.eu/individual/n15231>
+        a       <https://osl.tib.eu/vitro-searchOntology#Sort>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "For. inv. no. asc "@en-US , "Alte Inv.-Nr. aufst."@de-DE ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Sort> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "for_inv_no_asc " ;
+        <https://osl.tib.eu/vitro-searchOntology#isAscending>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                50 ;
+        <https://osl.tib.eu/vitro-searchOntology#sortField>
+                <https://sah.tib.eu/individual/n35040> .
+
+<https://sah.tib.eu/individual/n10887>
+        a            <https://osl.tib.eu/vitro-searchOntology#Filter>    ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Dargestelltes Ereignis"@de-DE , "Depicted event"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <https://osl.tib.eu/vitro-searchOntology#facetResults>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#filterField>
+                <https://sah.tib.eu/individual/n18286> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "depicted_event" ;
+        <https://osl.tib.eu/vitro-searchOntology#isUriValues>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true .
+
+<https://sah.tib.eu/individual/n20261>
+        a       <https://osl.tib.eu/vitro-searchOntology#SearchField>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Keywords"@en-US , "Schlagwort"@de-DE ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#SearchField> ;
+        <https://osl.tib.eu/vitro-searchOntology#indexField>
+                "keywords_ss" ;
+        <https://osl.tib.eu/vitro-searchOntology#multivalued>
+                true .
+
+<https://sah.tib.eu/individual/n10539>
+        a            <https://osl.tib.eu/vitro-searchOntology#Filter>    ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Technique"@en-US , "Technik"@de-DE ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <https://osl.tib.eu/vitro-searchOntology#facetResults>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#filterField>
+                <https://sah.tib.eu/individual/n92473> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "technique" ;
+        <https://osl.tib.eu/vitro-searchOntology#isUriValues>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                2 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true .
+
+<https://sah.tib.eu/individual/n125021>
+        a       <https://osl.tib.eu/vitro-searchOntology#SearchField>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Alte Inv.-Nr."@de-DE , "Former inventory number"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#modTime>
+                "2022-08-22T17:07:23"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#SearchField> ;
+        <https://osl.tib.eu/vitro-searchOntology#indexField>
+                "fornum" .
+
+<https://sah.tib.eu/individual/n43480>
+        a       <https://osl.tib.eu/vitro-searchOntology#SearchField>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Depicted person"@en-US , "Dargestellte Person"@de-DE ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#SearchField> ;
+        <https://osl.tib.eu/vitro-searchOntology#indexField>
+                "depicted_persons_ss" ;
+        <https://osl.tib.eu/vitro-searchOntology#multivalued>
+                true .
+
+<https://sah.tib.eu/individual/n92603>
+        a       <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Objektyp"@de-DE , "Object type"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <https://osl.tib.eu/vitro-searchOntology#facetResults>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#filterField>
+                <https://sah.tib.eu/individual/n26802> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "object_type" ;
+        <https://osl.tib.eu/vitro-searchOntology#isUriValues>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                2 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true .
+
+<https://sah.tib.eu/individual/n27297>
+        a       <https://osl.tib.eu/vitro-searchOntology#Sort>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Cur. inv. no. asc"@en-US , "Aktuelle Inv.-Nr. aufst."@de-DE ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Sort> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "cur_inv_no_asc" ;
+        <https://osl.tib.eu/vitro-searchOntology#isAscending>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                30 ;
+        <https://osl.tib.eu/vitro-searchOntology#sortField>
+                <https://sah.tib.eu/individual/n31182> .
+
+<https://sah.tib.eu/individual/n21857>
+        a       <https://osl.tib.eu/vitro-searchOntology#SearchField>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Sachgruppe Oberbegriff"@de-DE , "Object Category generic term"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#SearchField> ;
+        <https://osl.tib.eu/vitro-searchOntology#indexField>
+                "generic_term_ss" ;
+        <https://osl.tib.eu/vitro-searchOntology#multivalued>
+                true .
+
+<https://sah.tib.eu/individual/n92331>
+        a       <https://osl.tib.eu/vitro-searchOntology#Filter>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Object category (narrower term)"@en-US , "Sachgruppe (Unterbegriff)"@de-DE ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <https://osl.tib.eu/vitro-searchOntology#facetResults>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#filterField>
+                <https://sah.tib.eu/individual/n17416> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "narrower_term" ;
+        <https://osl.tib.eu/vitro-searchOntology#isUriValues>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                4 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true .
+
+<https://sah.tib.eu/individual/n25763>
+        a       <https://osl.tib.eu/vitro-searchOntology#Filter>         ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Sachgruppe (Oberbegriff)"@de-DE , "Object Category (generic term)"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <https://osl.tib.eu/vitro-searchOntology#facetResults>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#filterField>
+                <https://sah.tib.eu/individual/n21857> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "generic_term" ;
+        <https://osl.tib.eu/vitro-searchOntology#isUriValues>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                7 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true .
+
+<https://sah.tib.eu/individual/n10980>
+        a                 <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                " Depicted places"@en-US , "Dargestellter Ort"@de-DE ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <https://osl.tib.eu/vitro-searchOntology#facetResults>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#filterField>
+                <https://sah.tib.eu/individual/n11808> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "depicted_places" ;
+        <https://osl.tib.eu/vitro-searchOntology#isUriValues>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true .
+
+<https://sah.tib.eu/individual/n23896>
+        a       <https://osl.tib.eu/vitro-searchOntology#FilterValue>      ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Garden"@en-US , "Garten"@de-DE ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#FilterValue> ;
+        <https://osl.tib.eu/vitro-searchOntology#cropBottom>
+                "25"^^<http://www.w3.org/2001/XMLSchema#float> ;
+        <https://osl.tib.eu/vitro-searchOntology#cropLeft>
+                "25"^^<http://www.w3.org/2001/XMLSchema#float> ;
+        <https://osl.tib.eu/vitro-searchOntology#cropRight>
+                "25"^^<http://www.w3.org/2001/XMLSchema#float> ;
+        <https://osl.tib.eu/vitro-searchOntology#cropTop>
+                "25"^^<http://www.w3.org/2001/XMLSchema#float> ;
+        <https://osl.tib.eu/vitro-searchOntology#hasImage>
+                <https://sah.tib.eu/individual/bar89140510370image2digrep> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "garden" ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                5 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true .
+
+<https://sah.tib.eu/individual/n60929>
+        a            <https://osl.tib.eu/vitro-searchOntology#Filter>    ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Orte"@de-DE , "Place"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <https://osl.tib.eu/vitro-searchOntology#facetResults>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#filterField>
+                <https://sah.tib.eu/individual/n25461> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "place" ;
+        <https://osl.tib.eu/vitro-searchOntology#isUriValues>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                8 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true .
+
+<https://sah.tib.eu/individual/n78459>
+        a            <https://osl.tib.eu/vitro-searchOntology#FilterValue> ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Print"@en-US , "Druckgraphik"@de-DE ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#FilterValue> ;
+        <https://osl.tib.eu/vitro-searchOntology#cropTop>
+                "20"^^<http://www.w3.org/2001/XMLSchema#float> ;
+        <https://osl.tib.eu/vitro-searchOntology#hasImage>
+                <https://sah.tib.eu/individual/bar89140497781image2digrep> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "print" ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                2 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true .
+
+<https://sah.tib.eu/individual/n14996>
+        a       <https://osl.tib.eu/vitro-searchOntology#FilterValue>      ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Architecture"@en-US , "Architektur"@de-DE ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#FilterValue> ;
+        <https://osl.tib.eu/vitro-searchOntology#cropBottom>
+                "25"^^<http://www.w3.org/2001/XMLSchema#float> ;
+        <https://osl.tib.eu/vitro-searchOntology#cropLeft>
+                "20"^^<http://www.w3.org/2001/XMLSchema#float> ;
+        <https://osl.tib.eu/vitro-searchOntology#cropRight>
+                "25"^^<http://www.w3.org/2001/XMLSchema#float> ;
+        <https://osl.tib.eu/vitro-searchOntology#cropTop>
+                "25"^^<http://www.w3.org/2001/XMLSchema#float> ;
+        <https://osl.tib.eu/vitro-searchOntology#hasImage>
+                <https://sah.tib.eu/individual/bar89140495568image2digrep> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "architecture" ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                3 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true .
+
+<https://sah.tib.eu/individual/n101601>
+        a            <https://osl.tib.eu/vitro-searchOntology#Filter>    ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Dargestelltes Objekt"@de-DE , "Depicted object"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#Filter> ;
+        <https://osl.tib.eu/vitro-searchOntology#facetResults>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#filterField>
+                <https://sah.tib.eu/individual/n60422> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "depicted_object" ;
+        <https://osl.tib.eu/vitro-searchOntology#isUriValues>
+                true ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true .
+
+<https://sah.tib.eu/individual/n51869>
+        a       <https://osl.tib.eu/vitro-searchOntology#FilterValue>      ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Szenographie"@de-DE , "Scenography"@en-US ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType>
+                <https://osl.tib.eu/vitro-searchOntology#FilterValue> ;
+        <https://osl.tib.eu/vitro-searchOntology#hasImage>
+                <https://sah.tib.eu/individual/bar89140531114image2digrep> ;
+        <https://osl.tib.eu/vitro-searchOntology#id>
+                "scenography" ;
+        <https://osl.tib.eu/vitro-searchOntology#order>
+                6 ;
+        <https://osl.tib.eu/vitro-searchOntology#public>
+                true .

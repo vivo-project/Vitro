@@ -1,0 +1,63 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+
+access-individual:ObjectProperty a access:ObjectType ;
+    access:id "OBJECT_PROPERTY" .
+
+access-individual:DataProperty a access:ObjectType ;
+    access:id "DATA_PROPERTY" .
+
+access-individual:FauxDataProperty a access:ObjectType ;
+    access:id "FAUX_DATA_PROPERTY" .
+
+access-individual:FauxObjectProperty a access:ObjectType ;
+    access:id "FAUX_OBJECT_PROPERTY" .
+
+access-individual:ObjectPropertyStatement a access:ObjectType ;
+    access:id "OBJECT_PROPERTY_STATEMENT" .
+
+access-individual:DataPropertyStatement a access:ObjectType ;
+    access:id "DATA_PROPERTY_STATEMENT" .
+
+access-individual:FauxObjectPropertyStatement a access:ObjectType ;
+    access:id "FAUX_OBJECT_PROPERTY_STATEMENT" .
+
+access-individual:FauxDataPropertyStatement a access:ObjectType ;
+    access:id "FAUX_DATA_PROPERTY_STATEMENT" .
+
+access-individual:Class a access:ObjectType ;
+    access:id "CLASS" .
+
+access-individual:NamedObject a access:ObjectType ;
+    access:id "NAMED_OBJECT" .
+
+#Object type value containers
+
+access-individual:ObjectPropertyValueSet a access:ValueSet ;
+    access:value access-individual:ObjectProperty .
+
+access-individual:DataPropertyValueSet a access:ValueSet ;
+    access:value access-individual:DataProperty .
+
+access-individual:FauxObjectPropertyValueSet a access:ValueSet ;
+    access:value access-individual:FauxObjectProperty .
+
+access-individual:FauxDataPropertyValueSet a access:ValueSet ;
+    access:value access-individual:FauxDataProperty .
+
+access-individual:ObjectPropertyStatementValueSet a access:ValueSet ;
+    access:value access-individual:ObjectPropertyStatement .
+
+access-individual:DataPropertyStatementValueSet a access:ValueSet ;
+    access:value access-individual:DataPropertyStatement .
+
+access-individual:FauxObjectPropertyStatementValueSet a access:ValueSet ;
+    access:value access-individual:FauxObjectPropertyStatement .
+
+access-individual:FauxDataPropertyStatementValueSet a access:ValueSet ;
+    access:value access-individual:FauxDataPropertyStatement .
+
+access-individual:ClassValueSet a access:ValueSet ;
+    access:value access-individual:Class .

@@ -20,13 +20,15 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.DataPropertyStatementAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyStatementAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DecisionResult;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractDataPropertyStatementAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractObjectPropertyStatementAction;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Policy;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 
 /**
  * Test the function of PolicyHelper in authorizing statements and models.
@@ -51,11 +53,12 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 
 		req = new HttpServletRequestStub();
 		req.setSession(session);
+        PolicyStore.getInstance().clear();
 
 		ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 
-		setLoggerLevel(ServletPolicyList.class, Level.WARN);
-		ServletPolicyList.addPolicy(ctx, new MySimplePolicy());
+		setLoggerLevel(PolicyStore.class, Level.WARN);
+		PolicyStore.getInstance().add(new MySimplePolicy());
 	}
 
 	// ----------------------------------------------------------------------
@@ -194,24 +197,24 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 	// Helper classes
 	// ----------------------------------------------------------------------
 
-	private static class MySimplePolicy implements PolicyIface {
+	private static class MySimplePolicy implements Policy {
 		@Override
-		public PolicyDecision isAuthorized(IdentifierBundle whoToAuth,
-				RequestedAction whatToAuth) {
-			if (whatToAuth instanceof AbstractDataPropertyStatementAction) {
-				return isAuthorized((AbstractDataPropertyStatementAction) whatToAuth);
-			} else if (whatToAuth instanceof AbstractObjectPropertyStatementAction) {
-				return isAuthorized((AbstractObjectPropertyStatementAction) whatToAuth);
+		public PolicyDecision decide(AuthorizationRequest ar) {
+	        AccessObject whatToAuth = ar.getAccessObject();
+			if (whatToAuth instanceof DataPropertyStatementAccessObject) {
+				return isAuthorized((DataPropertyStatementAccessObject) whatToAuth);
+			} else if (whatToAuth instanceof ObjectPropertyStatementAccessObject) {
+				return isAuthorized((ObjectPropertyStatementAccessObject) whatToAuth);
 			} else {
 				return inconclusive();
 			}
 		}
 
 		private PolicyDecision isAuthorized(
-				AbstractDataPropertyStatementAction whatToAuth) {
-			if ((APPROVED_SUBJECT_URI.equals(whatToAuth.getSubjectUri()))
+				DataPropertyStatementAccessObject whatToAuth) {
+			if ((APPROVED_SUBJECT_URI.equals(whatToAuth.getStatementSubject()))
 					&& (APPROVED_PREDICATE_URI.equals(whatToAuth
-							.getPredicateUri()))) {
+							.getStatementPredicateUri()))) {
 				return authorized();
 			} else {
 				return inconclusive();
@@ -219,11 +222,11 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 		}
 
 		private PolicyDecision isAuthorized(
-				AbstractObjectPropertyStatementAction whatToAuth) {
-			if ((APPROVED_SUBJECT_URI.equals(whatToAuth.getSubjectUri()))
+				ObjectPropertyStatementAccessObject whatToAuth) {
+			if ((APPROVED_SUBJECT_URI.equals(whatToAuth.getStatementSubject()))
 					&& (APPROVED_PREDICATE_URI.equals(whatToAuth
-							.getPredicateUri()))
-					&& (APPROVED_OBJECT_URI.equals(whatToAuth.getObjectUri()))) {
+							.getStatementPredicateUri()))
+					&& (APPROVED_OBJECT_URI.equals(whatToAuth.getStatementObject()))) {
 				return authorized();
 			} else {
 				return inconclusive();
@@ -231,11 +234,11 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 		}
 
 		private PolicyDecision authorized() {
-			return new BasicPolicyDecision(Authorization.AUTHORIZED, "");
+			return new BasicPolicyDecision(DecisionResult.AUTHORIZED, "");
 		}
 
 		private PolicyDecision inconclusive() {
-			return new BasicPolicyDecision(Authorization.INCONCLUSIVE, "");
+			return new BasicPolicyDecision(DecisionResult.INCONCLUSIVE, "");
 		}
 	}
 

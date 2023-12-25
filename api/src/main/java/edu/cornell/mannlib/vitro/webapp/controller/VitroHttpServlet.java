@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller;
 
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest.AUTHORIZED;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -12,7 +10,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
@@ -120,7 +117,7 @@ public class VitroHttpServlet extends HttpServlet implements MultipartRequestWra
 	protected boolean isAuthorizedToDisplayPage(HttpServletRequest request,
 			HttpServletResponse response, AuthorizationRequest actions) {
 		// Record restricted pages so we won't return to them on logout
-		if (actions != AUTHORIZED) {
+		if (actions != AuthorizationRequest.AUTHORIZED) {
 			LogoutRedirector.recordRestrictedPageUri(request);
 		}
 

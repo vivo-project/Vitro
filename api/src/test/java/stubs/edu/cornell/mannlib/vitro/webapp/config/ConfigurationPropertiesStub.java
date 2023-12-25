@@ -28,7 +28,7 @@ public class ConfigurationPropertiesStub extends ConfigurationProperties {
 	}
 
 	public void setBean(ServletContext ctx) {
-		setBean(ctx, this);
+		setBean(this);
 	}
 
 	@Override

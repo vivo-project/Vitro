@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.identifier.factory;
 
-import javax.servlet.ServletContext;
-
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundleFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
@@ -15,17 +13,12 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
  */
 public abstract class BaseIdentifierBundleFactory implements
 		IdentifierBundleFactory {
-	protected final ServletContext ctx;
 	protected final WebappDaoFactory wdf;
 	protected final UserAccountsDao uaDao;
 	protected final IndividualDao indDao;
 
-	public BaseIdentifierBundleFactory(ServletContext ctx) {
-		if (ctx == null) {
-			throw new NullPointerException("ctx may not be null.");
-		}
-		this.ctx = ctx;
-		this.wdf = ModelAccess.on(ctx).getWebappDaoFactory();
+	public BaseIdentifierBundleFactory() {
+		this.wdf = ModelAccess.getInstance().getWebappDaoFactory();
 		this.uaDao = wdf.getUserAccountsDao();
 		this.indDao = wdf.getIndividualDao();
 	}

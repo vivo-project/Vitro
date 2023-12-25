@@ -1,0 +1,398 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/access-allowed-class/> .
+
+:PolicyTemplate a access:PolicyTemplate ;
+    access:hasRule :AllowMatchingClass ;
+
+    access:hasDataSet :PublicDisplayClassDataSet ;
+    access:hasDataSet :SelfEditorDisplayClassDataSet ;
+    access:hasDataSet :EditorDisplayClassDataSet ;
+    access:hasDataSet :CuratorDisplayClassDataSet ;
+    access:hasDataSet :AdminDisplayClassDataSet ;
+
+    access:hasDataSet :PublicUpdateClassDataSet ;
+    access:hasDataSet :SelfEditorUpdateClassDataSet ;
+    access:hasDataSet :EditorUpdateClassDataSet ;
+    access:hasDataSet :CuratorUpdateClassDataSet ;
+    access:hasDataSet :AdminUpdateClassDataSet ;
+
+    access:hasDataSet :SelfEditorPublishClassDataSet ;
+    access:hasDataSet :EditorPublishClassDataSet ;
+    access:hasDataSet :CuratorPublishClassDataSet ;
+    access:hasDataSet :AdminPublishClassDataSet ;
+
+    access:hasDataSetTemplate :RoleDisplayClassDataSetTemplate ;
+    access:hasDataSetTemplate :RoleUpdateClassDataSetTemplate ;
+    access:hasDataSetTemplate :RolePublishClassDataSetTemplate ;
+    .
+
+#Role Display Class data set template
+
+:RoleDisplayClassDataSetTemplate a access:DataSetTemplate ;
+    access:hasDataSetTemplateKey :RoleDisplayClassDataSetTemplateKey ;
+    access:hasDataSetKeyTemplate :RoleDisplayClassDataSetKeyTemplate ;
+    access:hasRelatedValueSet access-individual:ClassValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:dataSetValueTemplate :RoleDisplayClassRoleValueSetTemplate ;
+    access:dataSetValueTemplate :RoleDisplayClassValueSetTemplate .  
+
+:RoleDisplayClassDataSetTemplateKey a access:DataSetTemplateKey ;
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
+
+:RoleDisplayClassDataSetKeyTemplate a access:DataSetKeyTemplate ;
+    access:hasKeyComponent access-individual:Class ;
+    access:hasKeyComponent access-individual:DisplayOperation ;
+    access:hasKeyComponentTemplate access-individual:SubjectRole .
+
+:RoleDisplayClassRoleValueSetTemplate a access:ValueSetTemplate ;
+    access:relatedCheck :SubjectRoleCheck;
+    access:containsElementsOfType access-individual:SubjectRole .
+
+:RoleDisplayClassValueSetTemplate a access:ValueSetTemplate ;
+    access:relatedCheck :AccessObjectUriCheck ;
+#    access:value access-individual:defaultUri ;
+    access:containsElementsOfType access-individual:Class .
+
+#Role Update Class data set template
+
+:RoleUpdateClassDataSetTemplate a access:DataSetTemplate ;
+    access:hasDataSetTemplateKey :RoleUpdateClassDataSetTemplateKey ;
+    access:hasDataSetKeyTemplate :RoleUpdateClassDataSetKeyTemplate ;
+    access:hasRelatedValueSet access-individual:ClassValueSet ;
+    access:hasRelatedValueSet access-individual:UpdateOperationValueSet ;
+    access:dataSetValueTemplate :RoleUpdateClassRoleValueSetTemplate ;
+    access:dataSetValueTemplate :RoleUpdateClassValueSetTemplate .  
+
+:RoleUpdateClassDataSetTemplateKey a access:DataSetTemplateKey ;
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
+
+:RoleUpdateClassDataSetKeyTemplate a access:DataSetKeyTemplate ;
+    access:hasKeyComponent access-individual:Class ;
+    access:hasKeyComponent access-individual:UpdateOperation ;
+    access:hasKeyComponentTemplate access-individual:SubjectRole .
+
+:RoleUpdateClassRoleValueSetTemplate a access:ValueSetTemplate ;
+    access:relatedCheck :SubjectRoleCheck;
+    access:containsElementsOfType access-individual:SubjectRole .
+
+:RoleUpdateClassValueSetTemplate a access:ValueSetTemplate ;
+    access:relatedCheck :AccessObjectUriCheck ;
+#    access:value access-individual:defaultUri ;
+    access:containsElementsOfType access-individual:Class .
+
+#Role Publish Class data set template
+
+:RolePublishClassDataSetTemplate a access:DataSetTemplate ;
+    access:hasDataSetTemplateKey :RolePublishClassDataSetTemplateKey ;
+    access:hasDataSetKeyTemplate :RolePublishClassDataSetKeyTemplate ;
+    access:hasRelatedValueSet access-individual:ClassValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
+    access:dataSetValueTemplate :RolePublishClassRoleValueSetTemplate ;
+    access:dataSetValueTemplate :RolePublishClassValueSetTemplate .  
+
+:RolePublishClassDataSetTemplateKey a access:DataSetTemplateKey ;
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
+
+:RolePublishClassDataSetKeyTemplate a access:DataSetKeyTemplate ;
+    access:hasKeyComponent access-individual:Class ;
+    access:hasKeyComponent access-individual:PublishOperation ;
+    access:hasKeyComponentTemplate access-individual:SubjectRole .
+
+:RolePublishClassRoleValueSetTemplate a access:ValueSetTemplate ;
+    access:relatedCheck :SubjectRoleCheck;
+    access:containsElementsOfType access-individual:SubjectRole .
+
+:RolePublishClassValueSetTemplate a access:ValueSetTemplate ;
+    access:relatedCheck :AccessObjectUriCheck ;
+#    access:value access-individual:defaultUri ;
+    access:containsElementsOfType access-individual:Class .
+
+### Public display class uri data sets
+
+:PublicDisplayClassDataSet a access:DataSet ;
+    access:hasDataSetKey :PublicDisplayClassDataSetKey ;
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ClassValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :PublicDisplayClassValueSet .
+
+:PublicDisplayClassDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:Class ;
+    access:hasKeyComponent access-individual:PublicRoleUri ;
+    access:hasKeyComponent access-individual:DisplayOperation .
+
+### Self editor display class uri data sets
+
+:SelfEditorDisplayClassDataSet a access:DataSet ;
+    access:hasDataSetKey :SelfEditorDisplayClassDataSetKey ;
+    access:hasRelatedValueSet access-individual:SelfEditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ClassValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :SelfEditorDisplayClassValueSet .
+
+:SelfEditorDisplayClassDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:Class ;
+    access:hasKeyComponent access-individual:SelfEditorRoleUri ;
+    access:hasKeyComponent access-individual:DisplayOperation .
+
+### Editor display class uri data sets
+
+:EditorDisplayClassDataSet a access:DataSet ;
+    access:hasDataSetKey :EditorDisplayClassDataSetKey ;
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ClassValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :EditorDisplayClassValueSet .
+
+:EditorDisplayClassDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:Class ;
+    access:hasKeyComponent access-individual:EditorRoleUri ;
+    access:hasKeyComponent access-individual:DisplayOperation .
+
+### Curator display class uri data sets
+
+:CuratorDisplayClassDataSet a access:DataSet ;
+    access:hasDataSetKey :CuratorDisplayClassDataSetKey ;
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ClassValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :CuratorDisplayClassValueSet .
+
+:CuratorDisplayClassDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:Class ;
+    access:hasKeyComponent access-individual:CuratorRoleUri ;
+    access:hasKeyComponent access-individual:DisplayOperation .
+
+### Admin display class uri data sets
+
+:AdminDisplayClassDataSet a access:DataSet ;
+    access:hasDataSetKey :AdminDisplayClassDataSetKey ;
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ClassValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :AdminDisplayClassValueSet .
+
+:AdminDisplayClassDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:Class ;
+    access:hasKeyComponent access-individual:AdminRoleUri ;
+    access:hasKeyComponent access-individual:DisplayOperation .
+
+### Public update class uri data sets
+
+:PublicUpdateClassDataSet a access:DataSet ;
+    access:hasDataSetKey :PublicUpdateClassDataSetKey ;
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ClassValueSet ;
+    access:hasRelatedValueSet access-individual:UpdateOperationValueSet ;
+    access:hasRelatedValueSet :PublicUpdateClassValueSet .
+
+:PublicUpdateClassDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:Class ;
+    access:hasKeyComponent access-individual:PublicRoleUri ;
+    access:hasKeyComponent access-individual:UpdateOperation .
+
+### Self editor update class uri data sets
+
+:SelfEditorUpdateClassDataSet a access:DataSet ;
+    access:hasDataSetKey :SelfEditorUpdateClassDataSetKey ;
+    access:hasRelatedValueSet access-individual:SelfEditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ClassValueSet ;
+    access:hasRelatedValueSet access-individual:UpdateOperationValueSet ;
+    access:hasRelatedValueSet :SelfEditorUpdateClassValueSet .
+
+:SelfEditorUpdateClassDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:Class ;
+    access:hasKeyComponent access-individual:SelfEditorRoleUri ;
+    access:hasKeyComponent access-individual:UpdateOperation .
+
+### Editor update class uri data sets
+
+:EditorUpdateClassDataSet a access:DataSet ;
+    access:hasDataSetKey :EditorUpdateClassDataSetKey ;
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ClassValueSet ;
+    access:hasRelatedValueSet access-individual:UpdateOperationValueSet ;
+    access:hasRelatedValueSet :EditorUpdateClassValueSet .
+
+:EditorUpdateClassDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:Class ;
+    access:hasKeyComponent access-individual:EditorRoleUri ;
+    access:hasKeyComponent access-individual:UpdateOperation .
+
+### Curator update class uri data sets
+
+:CuratorUpdateClassDataSet a access:DataSet ;
+    access:hasDataSetKey :CuratorUpdateClassDataSetKey ;
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ClassValueSet ;
+    access:hasRelatedValueSet access-individual:UpdateOperationValueSet ;
+    access:hasRelatedValueSet :CuratorUpdateClassValueSet .
+
+:CuratorUpdateClassDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:Class ;
+    access:hasKeyComponent access-individual:CuratorRoleUri ;
+    access:hasKeyComponent access-individual:UpdateOperation .
+
+### Admin update class uri data sets
+
+:AdminUpdateClassDataSet a access:DataSet ;
+    access:hasDataSetKey :AdminUpdateClassDataSetKey ;
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ClassValueSet ;
+    access:hasRelatedValueSet access-individual:UpdateOperationValueSet ;
+    access:hasRelatedValueSet :AdminUpdateClassValueSet .
+
+:AdminUpdateClassDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:Class ;
+    access:hasKeyComponent access-individual:AdminRoleUri ;
+    access:hasKeyComponent access-individual:UpdateOperation .
+
+### Self editor publish class uri data sets
+
+:SelfEditorPublishClassDataSet a access:DataSet ;
+    access:hasDataSetKey :SelfEditorPublishClassDataSetKey ;
+    access:hasRelatedValueSet access-individual:SelfEditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ClassValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet :SelfEditorPublishClassValueSet .
+
+:SelfEditorPublishClassDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:Class ;
+    access:hasKeyComponent access-individual:SelfEditorRoleUri ;
+    access:hasKeyComponent access-individual:PublishOperation .
+
+### Editor publish class uri data sets
+
+:EditorPublishClassDataSet a access:DataSet ;
+    access:hasDataSetKey :EditorPublishClassDataSetKey ;
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ClassValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet :EditorPublishClassValueSet .
+
+:EditorPublishClassDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:Class ;
+    access:hasKeyComponent access-individual:EditorRoleUri ;
+    access:hasKeyComponent access-individual:PublishOperation .
+
+### Curator publish class uri data sets
+
+:CuratorPublishClassDataSet a access:DataSet ;
+    access:hasDataSetKey :CuratorPublishClassDataSetKey ;
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ClassValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet :CuratorPublishClassValueSet .
+
+:CuratorPublishClassDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:Class ;
+    access:hasKeyComponent access-individual:CuratorRoleUri ;
+    access:hasKeyComponent access-individual:PublishOperation .
+
+### Admin publish class uri data sets
+
+:AdminPublishClassDataSet a access:DataSet ;
+    access:hasDataSetKey :AdminPublishClassDataSetKey ;
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ClassValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet :AdminPublishClassValueSet .
+
+:AdminPublishClassDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:Class ;
+    access:hasKeyComponent access-individual:AdminRoleUri ;
+    access:hasKeyComponent access-individual:PublishOperation .
+
+:AllowMatchingClass a access:Rule;
+    access:requiresCheck :SubjectRoleCheck ;
+    access:requiresCheck :OperationCheck ;
+    access:requiresCheck :AccessObjectTypeCheck ;
+    access:requiresCheck :AccessObjectUriCheck .
+
+:AccessObjectTypeCheck a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:AccessObjectType ;
+    access:values access-individual:ClassValueSet ;
+    .
+
+:OperationCheck a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:Operation ;
+    access:values access-individual:DisplayOperationValueSet ;
+    access:values access-individual:PublishOperationValueSet ;
+    access:values access-individual:UpdateOperationValueSet ;
+    .
+
+:SubjectRoleCheck a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:SubjectRole ;
+    access:values access-individual:PublicRoleValueSet ;
+    access:values access-individual:SelfEditorRoleValueSet ;
+    access:values access-individual:EditorRoleValueSet ;
+    access:values access-individual:CuratorRoleValueSet ;
+    access:values access-individual:AdminRoleValueSet .
+
+:AccessObjectUriCheck a access:Check ;
+    access:useOperator access-individual:OneOf ;
+    access:hasTypeToCheck access-individual:AccessObjectUri ;
+    access:values :AdminPublishClassValueSet ;
+    access:values :AdminDisplayClassValueSet ;
+    access:values :AdminUpdateClassValueSet ;
+    access:values :CuratorPublishClassValueSet ;
+    access:values :CuratorDisplayClassValueSet ;
+    access:values :CuratorUpdateClassValueSet ;
+    access:values :EditorPublishClassValueSet ;
+    access:values :EditorDisplayClassValueSet ;
+    access:values :EditorUpdateClassValueSet ;
+    access:values :SelfEditorPublishClassValueSet ;
+    access:values :SelfEditorDisplayClassValueSet ;
+    access:values :SelfEditorUpdateClassValueSet ;
+    access:values :PublicDisplayClassValueSet ;
+    access:values :PublicUpdateClassValueSet ;
+    .
+
+:AdminPublishClassValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:Class .
+
+:AdminDisplayClassValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:Class .
+
+:AdminUpdateClassValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:Class .
+
+:CuratorPublishClassValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:Class .
+
+:CuratorDisplayClassValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:Class .
+
+:CuratorUpdateClassValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:Class .
+
+:EditorPublishClassValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:Class .
+
+:EditorDisplayClassValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:Class .
+
+:EditorUpdateClassValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:Class .
+
+:SelfEditorPublishClassValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:Class .
+
+:SelfEditorDisplayClassValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:Class .
+
+:SelfEditorUpdateClassValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:Class .
+
+:PublicDisplayClassValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:Class .
+
+:PublicUpdateClassValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:Class .

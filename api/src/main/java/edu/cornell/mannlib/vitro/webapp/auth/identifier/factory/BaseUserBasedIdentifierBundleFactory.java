@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.identifier.factory;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
@@ -15,10 +14,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
  */
 public abstract class BaseUserBasedIdentifierBundleFactory extends
 		BaseIdentifierBundleFactory implements UserBasedIdentifierBundleFactory {
-
-	public BaseUserBasedIdentifierBundleFactory(ServletContext ctx) {
-		super(ctx);
-	}
 
 	@Override
 	public final IdentifierBundle getIdentifierBundle(HttpServletRequest request) {

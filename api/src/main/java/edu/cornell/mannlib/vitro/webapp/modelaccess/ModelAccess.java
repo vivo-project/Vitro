@@ -165,15 +165,9 @@ public class ModelAccess {
 		return (req.getAttribute(ATTRIBUTE_NAME) instanceof RequestModelAccess);
 	}
 
+	@Deprecated
 	public static ContextModelAccess on(ServletContext ctx) {
-		Object o = ctx.getAttribute(ATTRIBUTE_NAME);
-		if (o instanceof ContextModelAccess) {
-			return (ContextModelAccess) o;
-		} else {
-			ContextModelAccess access = factory.buildContextModelAccess(ctx);
-			ctx.setAttribute(ATTRIBUTE_NAME, access);
-			return access;
-		}
+	    return getInstance();
 	}
 
 	// ----------------------------------------------------------------------
@@ -181,9 +175,14 @@ public class ModelAccess {
 	// ----------------------------------------------------------------------
 
 	public static class ModelAccessFactory {
-		public ContextModelAccess buildContextModelAccess(ServletContext ctx) {
-			return new ContextModelAccessImpl(ctx, combinedTripleSource);
-		}
+	    @Deprecated
+        public ContextModelAccess buildContextModelAccess(ServletContext ctx) {
+            return getInstance();
+        }
+	    @Deprecated
+        public ContextModelAccess buildContextModelAccess() {
+            return getInstance();
+        }
 
 		/**
 		 * Note that the RequestModelAccess must be closed when the request
@@ -194,4 +193,17 @@ public class ModelAccess {
 					combinedTripleSource.getShortTermCombinedTripleSource(req));
 		}
 	}
+	
+    private static ContextModelAccess INSTANCE;
+
+    public static ContextModelAccess getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new ContextModelAccessImpl(combinedTripleSource);
+        }
+        return INSTANCE;
+    }
+
+    public static void setInstance(ContextModelAccess cma) {
+        INSTANCE = cma;
+    }
 }

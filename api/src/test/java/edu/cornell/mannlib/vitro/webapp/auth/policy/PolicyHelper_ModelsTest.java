@@ -32,12 +32,13 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.util.iterator.NiceIterator;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DecisionResult;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractPropertyStatementAction;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Policy;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 
 /**
  * Test the function of PolicyHelper in authorizing models of additions and
@@ -76,12 +77,14 @@ public class PolicyHelper_ModelsTest extends AbstractTestClass {
 
 		session = new HttpSessionStub();
 		session.setServletContext(ctx);
+        PolicyStore.getInstance().clear();
+
 
 		req = new HttpServletRequestStub();
 		req.setSession(session);
 
-		setLoggerLevel(ServletPolicyList.class, Level.WARN);
-		ServletPolicyList.addPolicy(ctx, new MySimplePolicy());
+		setLoggerLevel(PolicyStore.class, Level.WARN);
+		PolicyStore.getInstance().add(new MySimplePolicy());
 
 //		setLoggerLevel(PolicyHelper.class, Level.DEBUG);
 	}
@@ -324,15 +327,15 @@ public class PolicyHelper_ModelsTest extends AbstractTestClass {
 	 * resource, or (2) The subject is related to the primary resource by a
 	 * "friend" property statement.
 	 */
-	private class MySimplePolicy implements PolicyIface {
+	private class MySimplePolicy implements Policy {
 		@Override
-		public PolicyDecision isAuthorized(IdentifierBundle whoToAuth,
-				RequestedAction whatToAuth) {
-			if (!(whatToAuth instanceof AbstractPropertyStatementAction)) {
+		public PolicyDecision decide(AuthorizationRequest ar) {
+	        AccessObject whatToAuth = ar.getAccessObject();
+			if (!(whatToAuth instanceof AccessObject)) {
 				return inconclusive();
 			}
 
-			AbstractPropertyStatementAction action = (AbstractPropertyStatementAction) whatToAuth;
+			AccessObject action = (AccessObject) whatToAuth;
 
 			String subjectUri = action.getResourceUris()[0];
 			if (PRIMARY_RESOURCE_URI.equals(subjectUri)) {
@@ -341,14 +344,14 @@ public class PolicyHelper_ModelsTest extends AbstractTestClass {
 
 			Statement friendStmt = objectStatement(PRIMARY_RESOURCE_URI,
 					FRIEND_PREDICATE_URI, subjectUri);
-			if (statementExists(action.getOntModel(), friendStmt)) {
+			if (statementExists(action.getStatementOntModel(), friendStmt)) {
 				return authorized();
 			}
 
 			return inconclusive();
 		}
 
-		private boolean statementExists(OntModel oModel, Statement stmt) {
+		private boolean statementExists(Model oModel, Statement stmt) {
 			StmtIterator stmts = oModel.listStatements(stmt.getSubject(),
 					stmt.getPredicate(), stmt.getObject());
 			try {
@@ -359,11 +362,11 @@ public class PolicyHelper_ModelsTest extends AbstractTestClass {
 		}
 
 		private PolicyDecision authorized() {
-			return new BasicPolicyDecision(Authorization.AUTHORIZED, "");
+			return new BasicPolicyDecision(DecisionResult.AUTHORIZED, "");
 		}
 
 		private PolicyDecision inconclusive() {
-			return new BasicPolicyDecision(Authorization.INCONCLUSIVE, "");
+			return new BasicPolicyDecision(DecisionResult.INCONCLUSIVE, "");
 		}
 	}
 

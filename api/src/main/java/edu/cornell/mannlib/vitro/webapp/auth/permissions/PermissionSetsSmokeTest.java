@@ -69,7 +69,6 @@ public class PermissionSetsSmokeTest implements ServletContextListener {
 		public void test() {
 			checkForPermissionSetsWithoutLabels();
 			checkForReferencesToNonexistentPermissionSets();
-			checkForReferencesToNonexistentPermissions();
 			warnIfNoPermissionSetsForNewUsers();
 		}
 
@@ -90,21 +89,6 @@ public class PermissionSetsSmokeTest implements ServletContextListener {
 								+ " " + user.getLastName()
 								+ "' has the PermissionSet '" + psUri
 								+ "', but the PermissionSet doesn't exist.");
-					}
-				}
-			}
-		}
-
-		private void checkForReferencesToNonexistentPermissions() {
-			PermissionRegistry registry = PermissionRegistry.getRegistry(ctx);
-			for (PermissionSet ps : uaDao.getAllPermissionSets()) {
-				for (String pUri : ps.getPermissionUris()) {
-					if (!registry.isPermission(pUri)) {
-						ss.warning(listener,
-								"The PermissionSet '" + ps.getLabel()
-										+ "' has the Permission '" + pUri
-										+ "', but the Permission "
-										+ "is not found in the registry.");
 					}
 				}
 			}

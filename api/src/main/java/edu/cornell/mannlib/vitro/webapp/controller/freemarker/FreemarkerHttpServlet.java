@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest.AUTHORIZED;
 import static javax.mail.Message.RecipientType.TO;
 
 import java.io.IOException;
@@ -21,7 +20,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import edu.cornell.mannlib.vitro.webapp.auth.checks.ProximityChecker;
+import edu.cornell.mannlib.vitro.webapp.auth.checks.QueryResultsMapCache;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
@@ -100,7 +101,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
         VitroRequest vreq = new VitroRequest(request);
         ResponseValues responseValues = null;
 
-    	try {
+    	try(QueryResultsMapCache personResourceCache = new QueryResultsMapCache()) {
 
             // This method does a redirect if the required authorizations are not met, so just return.
             if (!isAuthorizedToDisplayPage(request, response, requiredActions(vreq))) {
@@ -119,7 +120,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
                 }
     	    }
     	    handleException(vreq, response, e);
-    	}
+    	} 
     }
 
     /** In case of a processing error, display an error page. To an authorized user, the page displays
@@ -227,7 +228,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
      *
      */
     protected AuthorizationRequest requiredActions(VitroRequest vreq) {
-        return AUTHORIZED;
+        return AuthorizationRequest.AUTHORIZED;
     }
 
     // Subclasses will override

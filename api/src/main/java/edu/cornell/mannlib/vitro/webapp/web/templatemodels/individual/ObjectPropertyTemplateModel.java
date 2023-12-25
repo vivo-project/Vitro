@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction.SOME_URI;
+import static edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject.SOME_URI;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,9 +16,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.FauxObjectPropertyStatementAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
@@ -109,20 +111,25 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         objectKey = getQueryObjectVariableName();
 
         if (editing) {
-        	setAddUrl(op);
+        	setAddUrl();
         }
     }
 
-    protected void setAddUrl(Property property) {
+    protected void setAddUrl() {
     	// Is the add link suppressed for this property?
     	if (property.isAddLinkSuppressed()) {
     		return;
     	}
 
         // Determine whether a new statement can be added
-		RequestedAction action = new AddObjectPropertyStatement(
-				vreq.getJenaOntModel(), subjectUri, property, SOME_URI);
-        if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
+		AccessObject ao; 
+		if (isFaux()) {
+		    ao = new FauxObjectPropertyStatementAccessObject(vreq.getJenaOntModel(), subjectUri, fauxProperty, SOME_URI);
+		} else {
+	        ao = new ObjectPropertyStatementAccessObject(vreq.getJenaOntModel(), subjectUri, property, SOME_URI);
+		}
+		
+        if ( ! PolicyHelper.isAuthorizedForActions(vreq, ao, AccessOperation.ADD) ) {
             return;
         }
 
@@ -138,6 +145,11 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             ParamMap params = new ParamMap(
                     "subjectUri", subjectUri,
                     "predicateUri", propertyUri);
+    		
+            if (isFaux()){
+                String fauxPropertyContextUri = fauxProperty.getContextUri();
+                params.put("fauxContextUri", fauxPropertyContextUri);
+            } 
 
             if (domainUri != null) {
                 params.put("domainUri", domainUri);
@@ -166,6 +178,11 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
 
     protected List<Map<String, String>> getStatementData() {
         ObjectPropertyStatementDao opDao = vreq.getWebappDaoFactory().getObjectPropertyStatementDao();
+        return opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, objectKey, domainUri, rangeUri, getSelectQuery(), getConstructQueries(), sortDirection);
+    }
+    
+    protected List<Map<String, String>> getUnfilteredStatementData() {
+        ObjectPropertyStatementDao opDao = vreq.getUnfilteredWebappDaoFactory().getObjectPropertyStatementDao();
         return opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, objectKey, domainUri, rangeUri, getSelectQuery(), getConstructQueries(), sortDirection);
     }
 

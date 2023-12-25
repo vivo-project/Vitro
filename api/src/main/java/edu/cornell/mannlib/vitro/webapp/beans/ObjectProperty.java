@@ -16,13 +16,11 @@ import org.joda.time.DateTime;
 
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 
-import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.RoleRestrictedProperty;
-
 /**
  * a class representing an object property
  *
  */
-public class ObjectProperty extends Property implements Comparable<ObjectProperty>, ResourceBean, Cloneable, RoleRestrictedProperty
+public class ObjectProperty extends Property implements Comparable<ObjectProperty>, ResourceBean, Cloneable
 {
 	private static final Log log = LogFactory.getLog(ObjectProperty.class.getName());
 
@@ -631,8 +629,6 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
         clone.setExample(this.getExample());
         clone.setFunctional(this.getFunctional());
         clone.setGroupURI(this.getGroupURI());
-        clone.setHiddenFromDisplayBelowRoleLevel(this.getHiddenFromDisplayBelowRoleLevel());
-        clone.setHiddenFromPublishBelowRoleLevel(this.getHiddenFromPublishBelowRoleLevel());
         clone.setInverseFunctional(this.getInverseFunctional());
         clone.setLabel(this.getLabel());
         clone.setLocalName(this.getLocalName());
@@ -644,7 +640,6 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
         clone.setOfferCreateNewOption(this.getOfferCreateNewOption());
         clone.setParentURI(this.getParentURI());
         clone.setPickListName(this.getPickListName());
-        clone.setProhibitedFromUpdateBelowRoleLevel(this.getProhibitedFromUpdateBelowRoleLevel());
         clone.setPublicDescription(this.getPublicDescription());
         clone.setRangeDisplayLimit(this.getRangeDisplayLimit());
         clone.setRangeDisplayTier(this.getRangeDisplayTier());

@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.ajax;
 
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest.AUTHORIZED;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
@@ -68,7 +66,7 @@ public abstract class VitroAjaxController extends HttpServlet {
      */
     @SuppressWarnings("unused")
 	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
-		return AUTHORIZED;
+		return AuthorizationRequest.AUTHORIZED;
 	}
 
 	/**
