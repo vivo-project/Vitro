@@ -1,4 +1,4 @@
 # $This file is distributed under the terms of the license in LICENSE$
 
-<test:alice> <http://www.w3.org/2000/01/rdf-schema#type> <test:person> .
+<test:alice> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <test:person> .
 

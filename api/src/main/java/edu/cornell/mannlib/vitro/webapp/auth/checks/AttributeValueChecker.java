@@ -4,11 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.auth.checks;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueSet;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class AttributeValueChecker {
-    static final Log log = LogFactory.getLog(AttributeValueChecker.class);
 
     static boolean test(Check attr, AuthorizationRequest ar, String... values) {
         CheckType testType = attr.getType();

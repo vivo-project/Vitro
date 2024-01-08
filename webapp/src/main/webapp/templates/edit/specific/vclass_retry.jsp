@@ -111,8 +111,59 @@
 			</td>
 		</tr>
 	</c:forEach>
+	
+	<!-- Type suppressions -->
+	<c:if test="${!empty typeSuppressions}">
+	    <input id="_typeSuppressions" type="hidden" name="_typeSuppressions" value="enabled" />
+		<c:forEach var="entry" items="${typeSuppressions}">
+			<tr class="editformcell">
+				<td valign="top" colspan="5">Suppress <b>${entry.key}</b> for individual pages of this class<br /> 
+					<c:set var="operationLowercase" value="${fn:toLowerCase(entry.key)}" />
+					<c:forEach var="role" items="${entry.value}">
+						<input id="typeSuppression${operationLowercase}${role.label}"
+							type="checkbox" name="typeSuppression${operationLowercase}Roles"
+							value="${role.uri}" ${role.granted?'checked':''}
+							${role.enabled?'':'disabled'} />
+						<label class="inline" for="${operationLowercase}${role.label}">${role.label}</label>
+					</c:forEach>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<hr class="formDivider" />
+				</td>
+			</tr>
+		</c:forEach>
+	</c:if>
+	<!-- Type suppressions end -->
+	
+	<!-- Type suppressions (not related) -->
+	<c:if test="${!empty typeSuppressionsNotRelated}">
+	    <input id="_typeSuppressionsNotRelated" type="hidden" name="_typeSuppressionsNotRelated" value="enabled" />
+		<c:forEach var="entry" items="${typeSuppressionsNotRelated}">
+			<tr class="editformcell">
+				<td valign="top" colspan="5">Suppress <b>${entry.key}</b> for not related individual pages of this class<br /> 
+					<c:set var="operationLowercase" value="${fn:toLowerCase(entry.key)}" />
+					<c:forEach var="role" items="${entry.value}">
+						<input id="typeSuppressionNotRelated${operationLowercase}${role.label}"
+							type="checkbox" name="typeSuppressionNotRelated${operationLowercase}Roles"
+							value="${role.uri}" ${role.granted?'checked':''}
+							${role.enabled?'':'disabled'} />
+						<label class="inline" for="${operationLowercase}${role.label}">${role.label}</label>
+					</c:forEach>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<hr class="formDivider" />
+				</td>
+			</tr>
+		</c:forEach>
+	</c:if>
+	<!-- Type suppressions (not related) end -->
 </c:if>
 <!-- Permissions End -->
+
 <tr class="editformcell">
 	<!--td valign="top" colspan="1">
 		<b>Display Limit</b><br/>

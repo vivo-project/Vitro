@@ -522,7 +522,7 @@ public class PolicyLoader {
                     }
                     long keySize = qs.getLiteral("keySize").getLong();
                     if (expectedSize != keySize) {
-                        log.error("wrong key size. Expected " + expectedSize + ". Actual " + keySize );
+                        debug("wrong key size. Expected " + expectedSize + ". Actual " + keySize );
                         return;
                     }
                     uri[0] = qs.getResource("valueSet").getURI();

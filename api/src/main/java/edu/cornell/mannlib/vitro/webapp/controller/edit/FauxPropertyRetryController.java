@@ -81,6 +81,7 @@ public class FauxPropertyRetryController extends BaseEditController {
 		req.setAttribute("_faux_property_type", aot);
 
 		addAccessAttributes(req, populator.beanForEditing.getConfigUri(), aot);
+		addNotRelatedPropertySuppressions(req, populator.beanForEditing.getConfigUri(), aot);
 
 		setRequestAttributes(req, epo);
 

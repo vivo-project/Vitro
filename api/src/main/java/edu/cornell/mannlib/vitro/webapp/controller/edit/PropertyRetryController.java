@@ -184,6 +184,8 @@ public class PropertyRetryController extends BaseEditController {
         request.setAttribute("_action",action);
 
         addAccessAttributes(request, propertyForEditing.getURI(), AccessObjectType.OBJECT_PROPERTY);
+        addNotRelatedPropertySuppressions(request, propertyForEditing.getURI(), AccessObjectType.OBJECT_PROPERTY);
+
         setRequestAttributes(request,epo);
 
         try {
