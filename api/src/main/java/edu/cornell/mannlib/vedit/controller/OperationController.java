@@ -2,10 +2,16 @@
 
 package edu.cornell.mannlib.vedit.controller;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType.CLASS;
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType.INDIVIDUAL;
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation.DISPLAY;
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.NOT_RELATED;
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.PROPERTY_EXCLUSION;
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.TYPE_EXCLUSION;
+
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -19,19 +25,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.OperationGroup;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.EntityPolicyController;
-import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
-import org.apache.commons.lang3.EnumUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
-import edu.cornell.mannlib.vedit.controller.BaseEditController.RoleInfo;
 import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.listener.ChangeListener;
 import edu.cornell.mannlib.vedit.listener.EditPreProcessor;
@@ -40,6 +34,15 @@ import edu.cornell.mannlib.vedit.util.FormUtils.NegativeIntegerException;
 import edu.cornell.mannlib.vedit.util.OperationUtils;
 import edu.cornell.mannlib.vedit.validator.ValidationObject;
 import edu.cornell.mannlib.vedit.validator.Validator;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.EntityPolicyController;
+import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 @WebServlet(name = "OperationController", urlPatterns = {"/doEdit"} )
 public class OperationController extends BaseEditController {
@@ -138,39 +141,7 @@ public class OperationController extends BaseEditController {
 
             // If contains restrictions
             if (request.getParameter("_permissions") != null) {
-                // Get the namespace that we are editing
-                String entityUri = request.getParameter(ENTITY_URI_ATTRIBUTE_NAME);
-                if (StringUtils.isEmpty(entityUri)) {
-                    // If we don't have a namespace set, we are creating a new entity so use that namespace
-                    if (!StringUtils.isEmpty(request.getParameter("Namespace")) && !StringUtils.isEmpty(request.getParameter("LocalName"))) {
-                        entityUri = "" + request.getParameter("Namespace") + request.getParameter("LocalName");    
-                    }
-                }
-                String entityType = request.getParameter(ENTITY_TYPE_ATTRIBUTE_NAME);
-                List<PermissionSet> permissionSets = buildListOfSelectableRoles(ModelAccess.on(request).getWebappDaoFactory());
-                Set<RoleInfo> roles = new HashSet<>();
-                for (PermissionSet permissionSet : permissionSets) {
-                    roles.add(new RoleInfo(permissionSet));
-                }  
-                AccessObjectType aot = getAccessObjectType(entityUri, entityType);
-                if (aot != null) {
-                    List<AccessOperation> operations = AccessOperation.getOperations(aot);
-                    for (AccessOperation ao : operations) {
-                        String operationGroupName = ao.toString().toLowerCase().split("_")[0];
-                        Set<String> selectedRoles = getSelectedRoles(request, operationGroupName);
-                        for (RoleInfo role : roles) {
-                            if (role.isPublic() && isPublicForbiddenOperation(ao)) {
-                                continue;
-                            }
-                            if (selectedRoles.contains(role.getUri())) {
-                                EntityPolicyController.grantAccess(entityUri, aot, ao, role.getUri());    
-                            } else {
-                                EntityPolicyController.revokeAccess(entityUri, aot, ao, role.getUri());
-                            }
-                            
-                        }
-                    }
-                }
+                updatePermissions(request);
             }
 
             /* put request parameters and attributes into epo where the listeners can see */
@@ -228,6 +199,119 @@ public class OperationController extends BaseEditController {
             	log.error(this.getClass().getName() + " IOError on redirect: ", ioe);
             }
         }
+    }
+
+    private void updatePermissions(HttpServletRequest request) {
+        // Get the namespace that we are editing
+        String entityUri = request.getParameter(ENTITY_URI_ATTRIBUTE_NAME);
+        if (StringUtils.isEmpty(entityUri)) {
+            // If we don't have a namespace set, we are creating a new entity so use that namespace
+            if (!StringUtils.isEmpty(request.getParameter("Namespace")) && !StringUtils.isEmpty(request.getParameter("LocalName"))) {
+                entityUri = "" + request.getParameter("Namespace") + request.getParameter("LocalName");    
+            }
+        }
+        String entityType = request.getParameter(ENTITY_TYPE_ATTRIBUTE_NAME);
+        AccessObjectType aot = getAccessObjectType(entityUri, entityType);
+        if (aot == null) {
+            return;
+        }
+        updateEntityPermissions(request, entityUri, aot);
+        updateTypeSuppressions(request, aot, entityUri);
+        updateNotRelatedTypeSuppressions(request, aot, entityUri);
+        updateNotRelatedPropertySuppressions(request, aot, entityUri);
+    }
+
+    private void updateEntityPermissions(HttpServletRequest request, String entityUri, AccessObjectType aot) {
+        Set<RoleInfo> roles = getAllRoles(request);
+        List<AccessOperation> operations = AccessOperation.getOperations(aot);
+        for (AccessOperation ao : operations) {
+            String operationGroupName = ao.toString().toLowerCase();
+            Set<String> selectedRoles = getSelectedRoles(request, operationGroupName);
+            for (RoleInfo role : roles) {
+                if (role.isPublic() && isPublicForbiddenOperation(ao)) {
+                    continue;
+                }
+                if (selectedRoles.contains(role.getUri())) {
+                    EntityPolicyController.grantAccess(entityUri, aot, ao, role.getUri());    
+                } else {
+                    EntityPolicyController.revokeAccess(entityUri, aot, ao, role.getUri());
+                }
+            }
+        }
+    }
+
+    private Set<RoleInfo> getAllRoles(HttpServletRequest request) {
+        List<PermissionSet> permissionSets = buildListOfSelectableRoles(ModelAccess.on(request).getWebappDaoFactory());
+        Set<RoleInfo> roles = new HashSet<>();
+        for (PermissionSet permissionSet : permissionSets) {
+            roles.add(new RoleInfo(permissionSet));
+        }
+        return roles;
+    }
+
+    private void updateTypeSuppressions(HttpServletRequest request, AccessObjectType aot, String entityUri) {
+        if (!isTypeSuppressionsPresent(request) || !AccessObjectType.CLASS.equals(aot)) {
+            return;
+        }
+        String[] namedKeys = new String[1];
+        namedKeys[0] = TYPE_EXCLUSION.toString();
+        Set<RoleInfo> roles = getAllRoles(request);
+        String operationGroupName = "typeSuppression" + DISPLAY.toString().toLowerCase();
+        Set<String> selectedRoles = getSelectedRoles(request, operationGroupName);
+        for (RoleInfo role : roles) {
+            if (selectedRoles.contains(role.getUri())) {
+                EntityPolicyController.grantAccess(entityUri, INDIVIDUAL, DISPLAY, role.getUri(), namedKeys);
+            } else {
+                EntityPolicyController.revokeAccess(entityUri, INDIVIDUAL, DISPLAY, role.getUri(), namedKeys);
+            }
+        }
+    }
+
+    private void updateNotRelatedTypeSuppressions(HttpServletRequest request, AccessObjectType aot, String entityUri) {
+        if (!isNotRelatedTypeSuppressionsPresent(request) || !CLASS.equals(aot)) {
+            return;
+        }
+        String[] namedKeys = new String[2];
+        namedKeys[0] = TYPE_EXCLUSION.toString();
+        namedKeys[1] = NOT_RELATED.toString();
+        RoleInfo role = getSelfEditorRole(request);
+        String operationGroupName = "typeSuppressionNotRelated" + DISPLAY.toString().toLowerCase();
+        Set<String> selectedRoles = getSelectedRoles(request, operationGroupName);
+        if (selectedRoles.contains(role.getUri())) {
+            EntityPolicyController.grantAccess(entityUri, INDIVIDUAL, DISPLAY, role.getUri(), namedKeys);
+        } else {
+            EntityPolicyController.revokeAccess(entityUri, INDIVIDUAL, DISPLAY, role.getUri(), namedKeys);
+        }
+    }
+
+    private void updateNotRelatedPropertySuppressions(HttpServletRequest request, AccessObjectType aot,
+            String entityUri) {
+        if (!isNotRelatedPropertySuppressionsPresent(request)) {
+            return;
+        }
+        String[] namedKeys = new String[2];
+        namedKeys[0] = PROPERTY_EXCLUSION.toString();
+        namedKeys[1] = NOT_RELATED.toString();
+        RoleInfo role = getSelfEditorRole(request);
+        String operationGroupName = "propertySuppressionNotRelated" + DISPLAY.toString().toLowerCase();
+        Set<String> selectedRoles = getSelectedRoles(request, operationGroupName);
+        if (selectedRoles.contains(role.getUri())) {
+            EntityPolicyController.grantAccess(entityUri, aot, DISPLAY, role.getUri(), namedKeys);
+        } else {
+            EntityPolicyController.revokeAccess(entityUri, aot, DISPLAY, role.getUri(), namedKeys);
+        }
+    }
+
+    private boolean isNotRelatedPropertySuppressionsPresent(HttpServletRequest request) {
+        return request.getParameter("_propertySuppressionsNotRelated") != null;
+    }
+
+    private boolean isTypeSuppressionsPresent(HttpServletRequest request) {
+        return request.getParameter("_typeSuppressions") != null;
+    }
+
+    private boolean isNotRelatedTypeSuppressionsPresent(HttpServletRequest request) {
+        return request.getParameter("_typeSuppressionsNotRelated") != null;
     }
 
     private Set<String> getSelectedRoles(HttpServletRequest request, String operationGroupName) {

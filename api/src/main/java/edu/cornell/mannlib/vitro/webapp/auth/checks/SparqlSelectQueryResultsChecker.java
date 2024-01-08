@@ -29,39 +29,34 @@ public class SparqlSelectQueryResultsChecker {
     private static final Log log = LogFactory.getLog(SparqlSelectQueryResultsChecker.class);
 
     public static boolean sparqlSelectQueryResultsContain(Check check, AuthorizationRequest ar, String[] inputValues) {
-        AttributeValueSet values = check.getValues();
-        if (!values.containsSingleValue()) {
-            AttributeValueChecker.log.error("SparqlQueryContains more than  one value");
-            return false;
-        }
         String queryTemplate = check.getConfiguration();
         if (StringUtils.isBlank(queryTemplate)) {
-            queryTemplate = values.getSingleValue();
+            queryTemplate = check.getValues().getSingleValue();
         }
         if (StringUtils.isBlank(queryTemplate)) {
-            AttributeValueChecker.log.error("SparqlQueryContains template is empty");
+            log.error("SparqlQueryContains template is empty");
             return false;
         }
         AccessObject ao = ar.getAccessObject();
         Model m = ao.getModel();
         if (m == null) {
-            AttributeValueChecker.log.debug("SparqlQueryContains model is not provided");
+            log.debug("SparqlQueryContains model is not provided");
             return false;
         }
         Set<String> profileUris = new HashSet<String>(ar.getEditorUris());
         if (profileUris.isEmpty()) {
             if (queryTemplate.contains("?profileUri")) {
-                AttributeValueChecker.log.debug("Subject has no person URIs");
+                log.debug("Subject has no person URIs");
                 return false;
             } else {
                 profileUris.add("");
             }
         }
         Set<String> comparedValues = new HashSet<>();
-        if (isQueryProvidedInConfiguration(check)) {
+        if (isQueryNotProvidedInConfiguration(check)) {
             addRelatedUrisToComparedValues(ao, comparedValues);
         } else {
-            addValuesToComparedValues(values, comparedValues);
+            addValuesToComparedValues(check.getValues(), comparedValues);
         }
         for (String profileUri : profileUris) {
             Set<String> sparqlSelectResults = getSparqlSelectResults(m, profileUri, queryTemplate, ar);
@@ -82,7 +77,7 @@ public class SparqlSelectQueryResultsChecker {
         comparedValues.addAll(Arrays.asList(ao.getResourceUris()));
     }
 
-    private static boolean isQueryProvidedInConfiguration(Check check) {
+    private static boolean isQueryNotProvidedInConfiguration(Check check) {
         return StringUtils.isBlank(check.getConfiguration());
     }
 

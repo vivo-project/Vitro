@@ -184,6 +184,7 @@ public class DatapropRetryController extends BaseEditController {
         request.setAttribute("unqualifiedClassName","DatatypeProperty");
 
         addAccessAttributes(request, objectForEditing.getURI(), AccessObjectType.DATA_PROPERTY);
+        addNotRelatedPropertySuppressions(request, objectForEditing.getURI(), AccessObjectType.DATA_PROPERTY);
         setRequestAttributes(request,epo);
 
         try {

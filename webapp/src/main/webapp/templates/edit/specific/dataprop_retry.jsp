@@ -150,6 +150,31 @@
 			</td>
 		</tr>
 	</c:forEach>
+	<!-- Property suppressions (not related) -->
+	<c:if test="${!empty propertySuppressionsNotRelated}">
+	    <input id="_propertySuppressionsNotRelated" type="hidden" name="_propertySuppressionsNotRelated" value="enabled" />
+		<c:forEach var="entry" items="${propertySuppressionsNotRelated}">
+			<tr class="editformcell">
+				<td valign="top" colspan="5">Suppress <b>${entry.key}</b> for this property in not related individuals<br /> 
+					<c:set var="operationLowercase" value="${fn:toLowerCase(entry.key)}" />
+					<c:forEach var="role" items="${entry.value}">
+						<input id="propertySuppressionNotRelated${operationLowercase}${role.label}"
+							type="checkbox" name="propertySuppressionNotRelated${operationLowercase}Roles"
+							value="${role.uri}" ${role.granted?'checked':''}
+							${role.enabled?'':'disabled'} />
+						<label class="inline" for="${operationLowercase}${role.label}">${role.label}</label>
+					</c:forEach>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<hr class="formDivider" />
+				</td>
+			</tr>
+		</c:forEach>
+	</c:if>
+	<!-- Property suppressions (not related) end -->
+	
 </c:if>
 <!-- Permissions End -->
 <tr class="editformcell">

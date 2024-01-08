@@ -163,6 +163,9 @@ public class VclassRetryController extends BaseEditController {
         request.setAttribute("unqualifiedClassName","VClass");
 
         addAccessAttributes(request, vclassForEditing.getURI(), AccessObjectType.CLASS);
+        addTypeSuppressions(request, vclassForEditing.getURI(), AccessObjectType.INDIVIDUAL);
+        addNotRelatedTypeSuppressions(request, vclassForEditing.getURI(), AccessObjectType.INDIVIDUAL);
+
         setRequestAttributes(request,epo);
 
         try {
