@@ -37,6 +37,7 @@ import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vedit.validator.impl.RequiredFieldValidator;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
@@ -297,6 +298,8 @@ public class EntityRetryController extends BaseEditController {
         // request.setAttribute("bodyAttr"," onLoad=\"monikerInit()\"");
         request.setAttribute("_action",action);
         request.setAttribute("unqualifiedClassName","Individual");
+        addUriSuppressions(request, individualForEditing.getURI(), AccessObjectType.INDIVIDUAL);
+
         setRequestAttributes(request,epo);
         try {
             JSPPageHandler.renderBasicPage(request, response, "/templates/edit/formBasic.jsp");

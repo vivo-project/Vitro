@@ -8,6 +8,7 @@ import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation.D
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.NOT_RELATED;
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.PROPERTY_EXCLUSION;
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.TYPE_EXCLUSION;
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.URI_EXCLUSION;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -36,6 +37,7 @@ import edu.cornell.mannlib.vedit.validator.ValidationObject;
 import edu.cornell.mannlib.vedit.validator.Validator;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.EntityPolicyController;
 import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
@@ -143,6 +145,9 @@ public class OperationController extends BaseEditController {
             if (request.getParameter("_permissions") != null) {
                 updatePermissions(request);
             }
+            if (isUriSuppressionsPresent(request)) {
+                updateUriSuppressions(request);
+            }
 
             /* put request parameters and attributes into epo where the listeners can see */
             epo.setRequestParameterMap(request.getParameterMap());
@@ -201,6 +206,19 @@ public class OperationController extends BaseEditController {
         }
     }
 
+    private void updateUriSuppressions(HttpServletRequest request) {
+        String entityUri = request.getParameter(ENTITY_URI_ATTRIBUTE_NAME);
+        if (entityUri == null) {
+            return;
+        }
+        String entityType = request.getParameter(ENTITY_TYPE_ATTRIBUTE_NAME);
+        AccessObjectType aot = getAccessObjectType(entityUri, entityType);
+        if (aot == null) {
+            return;
+        }
+        updateUriSuppressions(request, aot, entityUri);
+    }
+
     private void updatePermissions(HttpServletRequest request) {
         // Get the namespace that we are editing
         String entityUri = request.getParameter(ENTITY_URI_ATTRIBUTE_NAME);
@@ -248,7 +266,25 @@ public class OperationController extends BaseEditController {
         }
         return roles;
     }
-
+    
+    private void updateUriSuppressions(HttpServletRequest request, AccessObjectType aot, String entityUri) {
+        if (!AccessObjectType.INDIVIDUAL.equals(aot)) {
+            return;
+        }
+        String[] namedKeys = new String[1];
+        namedKeys[0] = URI_EXCLUSION.toString();
+        Set<RoleInfo> roles = getAllRoles(request);
+        String operationGroupName = "uriSuppression" + DISPLAY.toString().toLowerCase();
+        Set<String> selectedRoles = getSelectedRoles(request, operationGroupName);
+        for (RoleInfo role : roles) {
+            if (selectedRoles.contains(role.getUri())) {
+                EntityPolicyController.grantAccess(entityUri, aot, DISPLAY, role.getUri(), namedKeys);
+            } else {
+                EntityPolicyController.revokeAccess(entityUri, aot, DISPLAY, role.getUri(), namedKeys);
+            }
+        }
+    }
+    
     private void updateTypeSuppressions(HttpServletRequest request, AccessObjectType aot, String entityUri) {
         if (!isTypeSuppressionsPresent(request) || !AccessObjectType.CLASS.equals(aot)) {
             return;
@@ -300,6 +336,11 @@ public class OperationController extends BaseEditController {
         } else {
             EntityPolicyController.revokeAccess(entityUri, aot, DISPLAY, role.getUri(), namedKeys);
         }
+    }
+    
+    
+    private boolean isUriSuppressionsPresent(HttpServletRequest request) {
+        return request.getParameter("_uriSuppressions") != null;
     }
 
     private boolean isNotRelatedPropertySuppressionsPresent(HttpServletRequest request) {

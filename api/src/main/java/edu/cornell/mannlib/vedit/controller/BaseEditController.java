@@ -282,6 +282,7 @@ public class BaseEditController extends VitroHttpServlet {
         }
         getRolePolicyInformation(entityURI, aot, namedKeys, operation, roleInfos);
         req.setAttribute("uriSuppressions", uriSuppressionsToRoles);
+        req.setAttribute(ENTITY_URI_ATTRIBUTE_NAME, entityURI);
     }
 
     protected static void addTypeSuppressions(HttpServletRequest req, String entityURI, AccessObjectType aot) {
