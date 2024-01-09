@@ -7,7 +7,7 @@ import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType.
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation.DISPLAY;
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation.PUBLISH;
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.NOT_RELATED;
-import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.PROPERTY_EXCLUSION;
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.SUPPRESSION_BY_URI;
 import static edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DecisionResult.INCONCLUSIVE;
 import static edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DecisionResult.UNAUTHORIZED;
 import static org.junit.Assert.assertEquals;
@@ -36,10 +36,11 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class HidePropertiesNotRelatedToSelfEditorTemplateTest extends PolicyTest {
+public class SuppressDisplayNotRelatedPropertyByUriTemplateTest extends PolicyTest {
 
-    public static final String POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "template_hide_not_related_property.n3";
-    public static final String TEST_DATA = RESOURCES_RULES_PREFIX + "exclude_from_display_test_data.n3";
+    public static final String POLICY_PATH =
+            USER_ACCOUNTS_HOME_FIRSTTIME + "template_suppress_display_not_related_property_by_uri.n3";
+    public static final String TEST_DATA = RESOURCES_RULES_PREFIX + "suppress_display_test_data.n3";
     private static final String TEST_ENTITY = "test:alice";
     private static final String OBJECT_ENTITY = "test:orange";
     private static final String TEST_PROPERTY = "test:has";
@@ -71,9 +72,9 @@ public class HidePropertiesNotRelatedToSelfEditorTemplateTest extends PolicyTest
             dataModel.leaveCriticalSection();
         }
         EntityPolicyController.grantAccess(TEST_PROPERTY, type, ao, roleUri, NOT_RELATED.toString(),
-                PROPERTY_EXCLUSION.toString());
+                SUPPRESSION_BY_URI.toString());
 
-        String dataSetUri = loader.getDataSetUriByKey(PROPERTY_EXCLUSION.toString(), NOT_RELATED.toString(),
+        String dataSetUri = loader.getDataSetUriByKey(SUPPRESSION_BY_URI.toString(), NOT_RELATED.toString(),
                 ao.toString(), type.toString(), roleUri);
         DynamicPolicy policy = loader.loadPolicyFromTemplateDataSet(dataSetUri);
         assertTrue(policy != null);
@@ -174,8 +175,7 @@ public class HidePropertiesNotRelatedToSelfEditorTemplateTest extends PolicyTest
             { DISPLAY, DATA_PROPERTY, SELF_EDITOR, 1, num(5) },
             { DISPLAY, OBJECT_PROPERTY, SELF_EDITOR, 1, num(5) },
             { DISPLAY, FAUX_DATA_PROPERTY, SELF_EDITOR, 1, num(5) },
-            { DISPLAY, FAUX_OBJECT_PROPERTY, SELF_EDITOR, 1, num(5) },
-        });
+            { DISPLAY, FAUX_OBJECT_PROPERTY, SELF_EDITOR, 1, num(5) }, });
     }
 
     private static Set<Integer> num(int i) {

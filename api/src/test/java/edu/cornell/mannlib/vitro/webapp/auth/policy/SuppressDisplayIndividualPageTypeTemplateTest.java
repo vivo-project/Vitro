@@ -2,7 +2,7 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType.INDIVIDUAL;
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation.DISPLAY;
-import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.TYPE_EXCLUSION;
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.SUPPRESSION_BY_TYPE;
 import static edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DecisionResult.INCONCLUSIVE;
 import static edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DecisionResult.UNAUTHORIZED;
 import static org.junit.Assert.assertEquals;
@@ -29,17 +29,17 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class DisplayIndividualPageExcludeByTypeTemplateTest extends PolicyTest {
+public class SuppressDisplayIndividualPageTypeTemplateTest extends PolicyTest {
 
-    private static final NamedKeyComponent NAMED_KEY = TYPE_EXCLUSION;
+    private static final NamedKeyComponent NAMED_KEY = SUPPRESSION_BY_TYPE;
 
     private static final String TEST_ENTITY = "test:alice";
     private static final String TEST_TYPE = "test:person";
 
 
     public static final String POLICY_PATH =
-            USER_ACCOUNTS_HOME_FIRSTTIME + "template_exclude_display_individual_page_type.n3";
-    public static final String TEST_DATA = RESOURCES_RULES_PREFIX + "exclude_from_display_test_data.n3";
+            USER_ACCOUNTS_HOME_FIRSTTIME + "template_suppress_display_individual_page_by_type.n3";
+    public static final String TEST_DATA = RESOURCES_RULES_PREFIX + "suppress_display_test_data.n3";
 
     @org.junit.runners.Parameterized.Parameter(0)
     public AccessOperation ao;

@@ -3,14 +3,11 @@
 @prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
 @prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
-access-individual:UriExclusion a access:NamedKeyComponent ;
-    access:id "URI_EXCLUSION" .
+access-individual:SuppressionByUri a access:NamedKeyComponent ;
+    access:id "SUPPRESSION_BY_URI" .
 
-access-individual:TypeExclusion a access:NamedKeyComponent ;
-    access:id "TYPE_EXCLUSION" .
-
-access-individual:PropertyExclusion a access:NamedKeyComponent ;
-    access:id "PROPERTY_EXCLUSION" .
+access-individual:SuppressionByType a access:NamedKeyComponent ;
+    access:id "SUPPRESSION_BY_TYPE" .
 
 access-individual:NotRelated a access:NamedKeyComponent ;
     access:id "NOT_RELATED" .

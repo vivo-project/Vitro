@@ -3,7 +3,7 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy;
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType.INDIVIDUAL;
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation.DISPLAY;
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.NOT_RELATED;
-import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.TYPE_EXCLUSION;
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.SUPPRESSION_BY_TYPE;
 import static edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DecisionResult.INCONCLUSIVE;
 import static edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DecisionResult.UNAUTHORIZED;
 import static org.junit.Assert.assertEquals;
@@ -29,14 +29,14 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class DisplayIndividualPageExcludeByTypeNotRelatedTemplateTest extends PolicyTest {
+public class SuppressDisplayNotRelatedIndividualPageByTypeTemplateTest extends PolicyTest {
 
     private static final String TEST_ENTITY = "test:alice";
     private static final String TEST_TYPE = "test:person";
 
     public static final String POLICY_PATH =
-            USER_ACCOUNTS_HOME_FIRSTTIME + "template_exclude_display_individual_page_type_not_related.n3";
-    public static final String TEST_DATA = RESOURCES_RULES_PREFIX + "exclude_from_display_test_data.n3";
+            USER_ACCOUNTS_HOME_FIRSTTIME + "template_suppress_display_not_related_individual_page_by_type.n3";
+    public static final String TEST_DATA = RESOURCES_RULES_PREFIX + "suppress_display_test_data.n3";
 
     @org.junit.runners.Parameterized.Parameter(0)
     public AccessOperation ao;
@@ -66,11 +66,11 @@ public class DisplayIndividualPageExcludeByTypeNotRelatedTemplateTest extends Po
         if (roleUri.equals(CUSTOM)) {
             PolicyTemplateController.createRoleDataSets(CUSTOM);
         }
-        EntityPolicyController.grantAccess(TEST_TYPE, type, ao, roleUri, TYPE_EXCLUSION.toString(),
+        EntityPolicyController.grantAccess(TEST_TYPE, type, ao, roleUri, SUPPRESSION_BY_TYPE.toString(),
                 NOT_RELATED.toString());
 
-        String dataSetUri = loader.getDataSetUriByKey(TYPE_EXCLUSION.toString(), NOT_RELATED.toString(), ao.toString(),
-                type.toString(), roleUri);
+        String dataSetUri = loader.getDataSetUriByKey(SUPPRESSION_BY_TYPE.toString(), NOT_RELATED.toString(),
+                ao.toString(), type.toString(), roleUri);
         assertFalse(dataSetUri == null);
         DynamicPolicy policy = loader.loadPolicyFromTemplateDataSet(dataSetUri);
         assertTrue(policy != null);

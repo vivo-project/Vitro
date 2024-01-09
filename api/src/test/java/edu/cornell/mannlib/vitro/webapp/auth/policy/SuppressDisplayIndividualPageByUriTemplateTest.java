@@ -2,7 +2,7 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType.INDIVIDUAL;
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation.DISPLAY;
-import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.URI_EXCLUSION;
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.SUPPRESSION_BY_URI;
 import static edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DecisionResult.INCONCLUSIVE;
 import static edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DecisionResult.UNAUTHORIZED;
 import static org.junit.Assert.assertEquals;
@@ -25,12 +25,12 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class DisplayIndividualPageExcludeByUriTemplateTest extends PolicyTest {
+public class SuppressDisplayIndividualPageByUriTemplateTest extends PolicyTest {
 
     private static final String TEST_ENTITY = "test:entity";
 
     public static final String POLICY_PATH =
-            USER_ACCOUNTS_HOME_FIRSTTIME + "template_exclude_display_individual_page_uri.n3";
+            USER_ACCOUNTS_HOME_FIRSTTIME + "template_suppress_display_individual_page_by_uri.n3";
 
     @org.junit.runners.Parameterized.Parameter(0)
     public AccessOperation ao;
@@ -54,10 +54,10 @@ public class DisplayIndividualPageExcludeByUriTemplateTest extends PolicyTest {
         if (roleUri.equals(CUSTOM)) {
             PolicyTemplateController.createRoleDataSets(CUSTOM);
         }
-        EntityPolicyController.grantAccess(TEST_ENTITY, type, ao, roleUri, URI_EXCLUSION.toString());
+        EntityPolicyController.grantAccess(TEST_ENTITY, type, ao, roleUri, SUPPRESSION_BY_URI.toString());
 
         String dataSetUri =
-                loader.getDataSetUriByKey(URI_EXCLUSION.toString(), ao.toString(), type.toString(), roleUri);
+                loader.getDataSetUriByKey(SUPPRESSION_BY_URI.toString(), ao.toString(), type.toString(), roleUri);
         assertFalse(dataSetUri == null);
         DynamicPolicy policy = loader.loadPolicyFromTemplateDataSet(dataSetUri);
         assertTrue(policy != null);

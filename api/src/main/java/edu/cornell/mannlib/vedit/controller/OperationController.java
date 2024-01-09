@@ -6,9 +6,8 @@ import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType.
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType.INDIVIDUAL;
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation.DISPLAY;
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.NOT_RELATED;
-import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.PROPERTY_EXCLUSION;
-import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.TYPE_EXCLUSION;
-import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.URI_EXCLUSION;
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.SUPPRESSION_BY_TYPE;
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.SUPPRESSION_BY_URI;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -37,7 +36,6 @@ import edu.cornell.mannlib.vedit.validator.ValidationObject;
 import edu.cornell.mannlib.vedit.validator.Validator;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.EntityPolicyController;
 import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
@@ -272,7 +270,7 @@ public class OperationController extends BaseEditController {
             return;
         }
         String[] namedKeys = new String[1];
-        namedKeys[0] = URI_EXCLUSION.toString();
+        namedKeys[0] = SUPPRESSION_BY_URI.toString();
         Set<RoleInfo> roles = getAllRoles(request);
         String operationGroupName = "uriSuppression" + DISPLAY.toString().toLowerCase();
         Set<String> selectedRoles = getSelectedRoles(request, operationGroupName);
@@ -290,7 +288,7 @@ public class OperationController extends BaseEditController {
             return;
         }
         String[] namedKeys = new String[1];
-        namedKeys[0] = TYPE_EXCLUSION.toString();
+        namedKeys[0] = SUPPRESSION_BY_TYPE.toString();
         Set<RoleInfo> roles = getAllRoles(request);
         String operationGroupName = "typeSuppression" + DISPLAY.toString().toLowerCase();
         Set<String> selectedRoles = getSelectedRoles(request, operationGroupName);
@@ -308,7 +306,7 @@ public class OperationController extends BaseEditController {
             return;
         }
         String[] namedKeys = new String[2];
-        namedKeys[0] = TYPE_EXCLUSION.toString();
+        namedKeys[0] = SUPPRESSION_BY_TYPE.toString();
         namedKeys[1] = NOT_RELATED.toString();
         RoleInfo role = getSelfEditorRole(request);
         String operationGroupName = "typeSuppressionNotRelated" + DISPLAY.toString().toLowerCase();
@@ -326,7 +324,7 @@ public class OperationController extends BaseEditController {
             return;
         }
         String[] namedKeys = new String[2];
-        namedKeys[0] = PROPERTY_EXCLUSION.toString();
+        namedKeys[0] = SUPPRESSION_BY_URI.toString();
         namedKeys[1] = NOT_RELATED.toString();
         RoleInfo role = getSelfEditorRole(request);
         String operationGroupName = "propertySuppressionNotRelated" + DISPLAY.toString().toLowerCase();
