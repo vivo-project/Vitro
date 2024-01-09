@@ -3,9 +3,8 @@
 package edu.cornell.mannlib.vedit.controller;
 
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.NOT_RELATED;
-import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.PROPERTY_EXCLUSION;
-import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.TYPE_EXCLUSION;
-import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.URI_EXCLUSION;
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.SUPPRESSION_BY_TYPE;
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.NamedKeyComponent.SUPPRESSION_BY_URI;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.ReasoningOption.ASSERTIONS_ONLY;
 
 import java.text.Collator;
@@ -264,7 +263,7 @@ public class BaseEditController extends VitroHttpServlet {
     protected static void addUriSuppressions(HttpServletRequest req, String entityURI, AccessObjectType aot) {
         AccessOperation operation = AccessOperation.DISPLAY;
         String[] namedKeys = new String[1];
-        namedKeys[0] = URI_EXCLUSION.toString();
+        namedKeys[0] = SUPPRESSION_BY_URI.toString();
         // Get the available permission sets
         List<PermissionSet> permissionSets = buildListOfSelectableRoles(ModelAccess.on(req).getWebappDaoFactory());
         List<RoleInfo> roles = new ArrayList<>();
@@ -288,7 +287,7 @@ public class BaseEditController extends VitroHttpServlet {
     protected static void addTypeSuppressions(HttpServletRequest req, String entityURI, AccessObjectType aot) {
         AccessOperation operation = AccessOperation.DISPLAY;
         String[] namedKeys = new String[1];
-        namedKeys[0] = TYPE_EXCLUSION.toString();
+        namedKeys[0] = SUPPRESSION_BY_TYPE.toString();
         // Get the available permission sets
         List<PermissionSet> permissionSets = buildListOfSelectableRoles(ModelAccess.on(req).getWebappDaoFactory());
         List<RoleInfo> roles = new ArrayList<>();
@@ -311,7 +310,7 @@ public class BaseEditController extends VitroHttpServlet {
     protected static void addNotRelatedTypeSuppressions(HttpServletRequest req, String entityURI, AccessObjectType aot) {
         AccessOperation operation = AccessOperation.DISPLAY;
         String[] namedKeys = new String[2];
-        namedKeys[0] = TYPE_EXCLUSION.toString();
+        namedKeys[0] = SUPPRESSION_BY_TYPE.toString();
         namedKeys[1] = NOT_RELATED.toString();
         
         RoleInfo role = getSelfEditorRole(req);
@@ -336,7 +335,7 @@ public class BaseEditController extends VitroHttpServlet {
             AccessObjectType aot) {
         AccessOperation operation = AccessOperation.DISPLAY;
         String[] namedKeys = new String[2];
-        namedKeys[0] = PROPERTY_EXCLUSION.toString();
+        namedKeys[0] = SUPPRESSION_BY_URI.toString();
         namedKeys[1] = NOT_RELATED.toString();
         
         RoleInfo role = getSelfEditorRole(req);

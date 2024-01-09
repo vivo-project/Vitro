@@ -3,33 +3,33 @@
 @prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
 @prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
 @prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
-@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/display-individual-page-exclude-by-type-not-related/> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/suppress-display-not-related-individual-page-by-type-/> .
 
 :PolicyTemplate a access:PolicyTemplate ;
     access:priority 1500 ;
-    access:hasRule :ExcludeMatchingUri ;
-    access:hasDataSet :SelfEditorDisplayExclusionDataSet ;
+    access:hasRule :SuppressMatchingUri ;
+    access:hasDataSet :SelfEditorDisplaySuppressionDataSet ;
     .
 
 ### SelfEditor display uri data sets
 
-:SelfEditorDisplayExclusionDataSet a access:DataSet ;
-    access:hasDataSetKey :SelfEditorDisplayExclusionDataSetKey ;
+:SelfEditorDisplaySuppressionDataSet a access:DataSet ;
+    access:hasDataSetKey :SelfEditorDisplaySuppressionDataSetKey ;
     access:hasRelatedValueSet access-individual:SelfEditorRoleValueSet ;
     access:hasRelatedValueSet access-individual:IndividualValueSet ;
     access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
     access:hasRelatedValueSet :SelfEditorDisplayValueSet .
 
-:SelfEditorDisplayExclusionDataSetKey a access:DataSetKey ;
+:SelfEditorDisplaySuppressionDataSetKey a access:DataSetKey ;
     access:hasKeyComponent access-individual:IndividualAccessObject ;
     access:hasKeyComponent access-individual:SelfEditorRoleUri ;
-    access:hasKeyComponent access-individual:TypeExclusion ;
+    access:hasKeyComponent access-individual:SuppressionByType ;
     access:hasKeyComponent access-individual:NotRelated ;
     access:hasKeyComponent access-individual:DisplayOperation .
 
 ### Rule
 
-:ExcludeMatchingUri a access:Rule;
+:SuppressMatchingUri a access:Rule;
     access:hasDecision access-individual:Deny ;
     access:requiresCheck :SubjectRoleCheck ;
     access:requiresCheck :OperationCheck ;
