@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.web.widgets;
 
 import java.util.Map;
+import java.util.Objects;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -89,16 +90,22 @@ public class LoginWidget extends Widget {
         LoginProcessBean bean = LoginProcessBean.getBean(request);
         log.trace("Going to login screen: " + bean);
 
+        String forgotPasswordEnabled = ConfigurationProperties.getInstance()
+            .getProperty("authentication.forgotPassword");
+
+        if (!Objects.nonNull(forgotPasswordEnabled)) {
+            forgotPasswordEnabled = "disabled";
+        }
+
         WidgetTemplateValues values = new WidgetTemplateValues(Macro.LOGIN.toString());
         values.put(TemplateVariable.FORM_ACTION.toString(), getAuthenticateUrl(request));
         values.put(TemplateVariable.LOGIN_NAME.toString(), bean.getUsername());
         values.put(TemplateVariable.FORGOT_PASSWORD.toString(), getForgotPasswordUrl(request));
         values.put(TemplateVariable.FORGOT_PASSWORD_ENABLED.toString(),
-            ConfigurationProperties.getBean(request).getProperty("authentication.forgotPassword")
-                .equalsIgnoreCase("enabled"));
+            forgotPasswordEnabled.equalsIgnoreCase("enabled"));
 
         boolean showExternalAuth = StringUtils.isNotBlank(
-            ConfigurationProperties.getBean(request).getProperty(
+            ConfigurationProperties.getInstance().getProperty(
                 "externalAuth.netIdHeaderName"));
         if (showExternalAuth) {
             values.put(TemplateVariable.EXTERNAL_AUTH_URL.toString(),

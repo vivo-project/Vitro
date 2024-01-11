@@ -16,6 +16,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.beans.CaptchaImplementation;
+import edu.cornell.mannlib.vitro.webapp.beans.CaptchaServiceBean;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -42,17 +44,19 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
     private static final int DAYS_TO_USE_PASSWORD_LINK = 5;
 
     private static final String TEMPLATE_NAME = "userAccounts-resetPasswordRequest.ftl";
-
     private static final Log log = LogFactory.getLog(ForgotPasswordController.class.getName());
-
+    private CaptchaImplementation captchaImpl;
 
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) throws Exception {
         // Random time interval sleep so attacker can't calculate whether provided email is bound to an account or not
         sleepForRandomTime();
 
+        captchaImpl = CaptchaServiceBean.getCaptchaImpl();
+
         Map<String, Object> dataContext = new HashMap<>();
         setCommonValues(dataContext, vreq);
+        CaptchaServiceBean.addCaptchaRelatedFieldsToPageContext(dataContext);
         boolean isEnabled = isFunctionalityEnabled();
         dataContext.put("isEnabled", isEnabled);
 
@@ -76,15 +80,15 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
         UserAccountsDao userAccountsDao = constructUserAccountsDao(vreq);
         I18nBundle i18n = I18n.bundle(vreq);
 
-        String captchaInput = vreq.getParameter("defaultReal");
-        String captchaDisplay = vreq.getParameter("defaultRealHash");
-        if (!captchaHash(captchaInput).equals(captchaDisplay)) {
+        String email = vreq.getParameter("email");
+
+        if (!captchaIsValid(vreq)) {
             dataContext.put("wrongCaptcha", true);
+            dataContext.put("emailValue", email);
             return showForm(dataContext);
         }
 
         dataContext.put("showPasswordChangeForm", false);
-        String email = vreq.getParameter("email");
 
         PasswordChangeRequestSpamMitigationResponse mitigationResponse =
             PasswordChangeRequestSpamMitigation.isPasswordResetRequestable(email);
@@ -106,6 +110,33 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
 
         PasswordChangeRequestSpamMitigation.requestSuccessfullyHandledAndUserIsNotified(email);
         return emailSentMessage(dataContext, i18n, email);
+    }
+
+    /**
+     * Validates the captcha input based on the configured captcha implementation.
+     * The method extracts the necessary input parameters from the provided VitroRequest.
+     * For reCAPTCHA v2, it uses the "g-recaptcha-response" parameter.
+     * For other captcha implementations (e.g., NanoCaptcha), it uses "userSolution" for captcha input
+     * and "challengeId" for challenge identification.
+     *
+     * @param vreq the VitroRequest containing the captcha parameters
+     * @return true if the captcha is valid, false otherwise
+     */
+    private boolean captchaIsValid(VitroRequest vreq) {
+        String captchaInput;
+        String challengeId;
+        switch (captchaImpl) {
+            case RECAPTCHAV2:
+                captchaInput = nonNullAndTrim(vreq, "g-recaptcha-response");
+                challengeId = "";
+                break;
+            case NANOCAPTCHA:
+            default:
+                captchaInput = nonNullAndTrim(vreq, "userSolution");
+                challengeId = nonNullAndTrim(vreq, "challengeId");
+        }
+
+        return CaptchaServiceBean.validateCaptcha(captchaInput, challengeId);
     }
 
     /**
@@ -182,21 +213,6 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
     }
 
     /**
-     * Generates a hash value for a given string.
-     *
-     * @param value The input string to be hashed.
-     * @return The computed hash value as a string.
-     */
-    private String captchaHash(String value) {
-        int hash = 5381;
-        value = value.toUpperCase();
-        for (int i = 0; i < value.length(); i++) {
-            hash = ((hash << 5) + hash) + value.charAt(i);
-        }
-        return String.valueOf(hash);
-    }
-
-    /**
      * Sets common values in the data context for rendering templates.
      *
      * @param dataContext The data context to store common values.
@@ -207,7 +223,9 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
 
         dataContext.put("forgotPasswordUrl", getForgotPasswordUrl(vreq));
         dataContext.put("contactUrl", getContactUrl(vreq));
+        dataContext.put("contextPath", vreq.getContextPath());
         dataContext.put("emailConfigured", FreemarkerEmailFactory.isConfigured(vreq));
+        dataContext.put("emailValue", "");
         dataContext.put("contactEmailConfigured", StringUtils.isNotBlank(appBean.getContactMail()));
         dataContext.put("wrongCaptcha", false);
     }
@@ -380,5 +398,20 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
         } catch (InterruptedException e) {
             log.error(randomSleepTime + "ms sleep time for mitigating time-based attacks was interrupted.");
         }
+    }
+
+    /**
+     * Retrieves the value of the specified request parameter and ensures it is non-null.
+     * If the parameter value is null, an empty string is returned.
+     * Leading and trailing whitespace is removed from the parameter value.
+     *
+     * @param req the HttpServletRequest containing the parameters
+     * @param key the key of the parameter to retrieve
+     * @return the non-null and trimmed value of the specified request parameter,
+     * or an empty string if the parameter is null
+     */
+    private String nonNullAndTrim(HttpServletRequest req, String key) {
+        String value = req.getParameter(key);
+        return (value == null) ? "" : value.trim();
     }
 }

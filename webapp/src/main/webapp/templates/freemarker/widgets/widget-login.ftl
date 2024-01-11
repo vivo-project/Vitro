@@ -67,7 +67,7 @@
 
                 <#if forgotPasswordEnabled == true>
                     <p class="forgot-password">
-                        <a href="${forgotPassword}" style="display: block;">${i18n().password_reset_label}</a>
+                        <a href="${forgotPassword}" style="display: block; margin-left: -40px;">${i18n().password_reset_label}</a>
                     </p>
                 </#if>
 

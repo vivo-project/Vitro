@@ -40,7 +40,6 @@
             <div class="g-recaptcha" data-sitekey="${siteKey!}"></div>
             <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response" />
         <#elseif captchaToUse == "NANOCAPTCHA">
-            <!-- Your custom captcha implementation -->
             <p>
                 <label class="realpersonLabel">${i18n().enter_in_security_field}:<span class="requiredHint"> *</span></label>
                 <div class="captcha-container">
@@ -67,8 +66,7 @@
     };
 </script>
 
-${stylesheets.add('<link rel="stylesheet" href="${urls.base}/templates/freemarker/edit/forms/css/customForm.css" />',
-                  '<link rel="stylesheet" href="${urls.base}/css/jquery_plugins/jquery.realperson.css" />')}
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/templates/freemarker/edit/forms/css/customForm.css" />')}
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/commentForm.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.12.1.min.js"></script>')}
 
