@@ -8,7 +8,7 @@
 :sort_title_asc rdfs:label "Titel A-Z"@de-DE .
 :sort_by_relevance rdfs:label "Relevanz"@de-DE .
 :field_label_sort rdfs:label "Etikettensortierfeld"@de-DE .
-:field_category rdfs:label "KlasseGruppe"@de-DE .
+:field_category rdfs:label "Klassengruppe"@de-DE .
 :field_type rdfs:label "Typ"@de-DE .
 :filter_querytext rdfs:label "Text"@de-DE .
 :field_querytext rdfs:label "Standardfeld"@de-DE .
