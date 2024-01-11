@@ -27,5 +27,5 @@ search:facetResults rdfs:label "Show facet results"@en-US .
 search:Sort rdfs:label "Sort"@en-US .
 search:hasKnownValue rdfs:label "hasKnownValue"@en-US .
 search:public rdfs:label "public"@en-US .
-search:defaultPublic rdfs:label "Is default public value"@en-US .
+search:isDefaultForRole rdfs:label "Is default for role"@en-US .
 search:moreLimit rdfs:label "initial facet limit"@en-US .

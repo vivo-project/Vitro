@@ -36,6 +36,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.HAS_DELETE_QUERY;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.N3EditUtils;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
@@ -190,7 +191,7 @@ public class DeleteIndividualController extends FreemarkerHttpServlet {
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			model.write(out, "N3");
 			InputStream in = new ByteArrayInputStream(out.toByteArray());
-			cs.addRemoval(in, RDFServiceUtils.getSerializationFormatFromJenaString("N3"), ModelNames.ABOX_ASSERTIONS);
+			cs.addRemoval(in, RDFServiceUtils.getSerializationFormatFromJenaString("N3"), ModelNames.ABOX_ASSERTIONS, N3EditUtils.getEditorUri(vreq));
 			rdfService.changeSetUpdate(cs);
 		} catch (Exception e) {
 			StringWriter sw = new StringWriter();

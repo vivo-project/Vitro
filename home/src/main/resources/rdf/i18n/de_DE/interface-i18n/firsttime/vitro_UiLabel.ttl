@@ -6357,3 +6357,43 @@ uil-data:no_individual_associated_with_id.Vitro
         uil:hasApp      "Vitro" ;
         uil:hasKey      "no_individual_associated_with_id" ;
         uil:hasPackage  "Vitro-languages" .
+
+uil-data:full_name_empty.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Bitte geben Sie ihren vollständigen Namen an."@de-DE ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "full_name_empty" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:email_address_empty.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Bitte geben Sie eine gültige E-Mail-Adresse ein."@de-DE ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "email_address_empty" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:comments_empty.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Bitte geben Sie Ihre Kommentare oder Fragen in das bereitgestellte Feld ein."@de-DE ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "comments_empty" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:captcha_user_sol_empty.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Bitte lösen Sie die CAPTCHA-Herausforderung im bereitgestellten Sicherheitsfeld."@de-DE ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "captcha_user_sol_empty" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:captcha_user_sol_invalid.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Ungültige CAPTCHA-Lösung, bitte versuchen Sie es erneut."@de-DE ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "captcha_user_sol_invalid" ;
+        uil:hasPackage  "Vitro-languages" .

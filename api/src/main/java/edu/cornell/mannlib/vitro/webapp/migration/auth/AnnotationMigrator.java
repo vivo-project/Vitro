@@ -1,11 +1,12 @@
 package edu.cornell.mannlib.vitro.webapp.migration.auth;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_ADMIN_URI;
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_CURATOR_URI;
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_EDITOR_URI;
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_PUBLIC_URI;
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_SELF_EDITOR_URI;
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.VITRO_AUTH;
 import static edu.cornell.mannlib.vitro.webapp.migration.auth.AuthMigrator.ALL_ROLES;
-import static edu.cornell.mannlib.vitro.webapp.migration.auth.AuthMigrator.ROLE_ADMIN_URI;
-import static edu.cornell.mannlib.vitro.webapp.migration.auth.AuthMigrator.ROLE_CURATOR_URI;
-import static edu.cornell.mannlib.vitro.webapp.migration.auth.AuthMigrator.ROLE_EDITOR_URI;
-import static edu.cornell.mannlib.vitro.webapp.migration.auth.AuthMigrator.ROLE_PUBLIC_URI;
-import static edu.cornell.mannlib.vitro.webapp.migration.auth.AuthMigrator.ROLE_SELF_EDITOR_URI;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,10 +32,7 @@ import org.apache.jena.query.ResultSet;
 
 public class AnnotationMigrator {
 
-    private static final String ROLE_PREFIX = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#";
-
     private static final Log log = LogFactory.getLog(AnnotationMigrator.class);
-
     private static final String PREFIX = "http://vitro.mannlib.cornell.edu/ns/vitro/role#";
     private static final String OLD_ROLE_PUBLIC = PREFIX + "public";
     private static final String OLD_ROLE_SELF = PREFIX + "selfEditor";
@@ -219,8 +217,8 @@ public class AnnotationMigrator {
         String result = "";
         for (String roleUri : roles) {
             String roleName = roleUri;
-            if (roleName.startsWith(ROLE_PREFIX)) {
-                roleName = roleName.substring(ROLE_PREFIX.length());
+            if (roleName.startsWith(VITRO_AUTH)) {
+                roleName = roleName.substring(VITRO_AUTH.length());
             }
             if (!result.isEmpty()) {
                 result += ", ";

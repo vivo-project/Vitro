@@ -6357,3 +6357,43 @@ uil-data:no_individual_associated_with_id.Vitro
         uil:hasApp      "Vitro" ;
         uil:hasKey      "no_individual_associated_with_id" ;
         uil:hasPackage  "Vitro-languages" .
+
+uil-data:full_name_empty.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Пожалуйста, введите Ваше имя."@ru-RU ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "full_name_empty" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:email_address_empty.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Пожалуйста, введите действительный адрес электронной почты."@ru-RU ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "email_address_empty" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:comments_empty.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Пожалуйста, заполните поле для комментариев, вопросов и предложений."@ru-RU ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "comments_empty" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:captcha_user_sol_empty.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Пожалуйста, выполните полностью автоматизированный тест Тьюринга для различения компьютеров и людей."@ru-RU ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "captcha_user_sol_empty" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:captcha_user_sol_invalid.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Недопустимое решение теста Тьюринга для различения компьютеров и людей. Пожалуйста, попробуйте снова."@ru-RU ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "captcha_user_sol_invalid" ;
+        uil:hasPackage  "Vitro-languages" .

@@ -1,6 +1,9 @@
 package edu.cornell.mannlib.vitro.webapp.search.controller;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_PUBLIC_URI;
+
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -10,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -45,11 +49,10 @@ public class SearchFiltering {
 
     private static final String FILTER_QUERY = ""
             + "PREFIX search: <https://vivoweb.org/ontology/vitro-search#>\n"
-            + "PREFIX gesah:    <http://ontology.tib.eu/gesah/>\n"
             + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
             + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
             + "SELECT ?filter_id ?filter_type ?filter_label ?value_label ?value_id  ?field_name ?public ?filter_order "
-            + "?value_order (STR(?isUriReq) as ?isUri ) ?multivalued ?input ?regex ?facet ?min ?max ?public_default "
+            + "?value_order (STR(?isUriReq) as ?isUri ) ?multivalued ?input ?regex ?facet ?min ?max ?role "
             + "?value_public ?more_limit \n"
             + "WHERE {\n"
             + "    ?filter rdf:type search:Filter .\n"
@@ -58,7 +61,8 @@ public class SearchFiltering {
             + "    ?filter a ?filter_type .\n"
             + "    ?filter search:filterField ?field .\n"
             + "    ?field search:indexField ?field_name .\n"
-            + "    OPTIONAL {?filter search:hasKnownValue ?value . \n"
+            + "    OPTIONAL {\n"
+            + "        ?filter search:hasKnownValue ?value . \n"
             + "        ?value rdfs:label ?value_label .\n"
             + "        ?value search:id ?value_id .\n"
             + "        OPTIONAL {"
@@ -66,7 +70,7 @@ public class SearchFiltering {
             + "            bind(?v_order as ?value_order_found).\n"
             + "        }\n"
             + "        OPTIONAL {\n"
-            + "            ?value search:defaultPublic ?public_default .\n"
+            + "            ?value search:isDefaultForRole ?role .\n"
             + "        }\n"
             + "        OPTIONAL {\n"
             + "            ?value search:public ?value_public .\n"
@@ -92,7 +96,6 @@ public class SearchFiltering {
     private static final String FILTER_GROUPS_QUERY = ""
             + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
             + "PREFIX search: <https://vivoweb.org/ontology/vitro-search#>\n"
-            + "PREFIX gesah:    <http://ontology.tib.eu/gesah/>\n"
             + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
             + "SELECT ?group_id (STR(?group_l) AS ?group_label) ?filter_id ?order ?filter_order ?public\n"
             + "WHERE {\n"
@@ -119,8 +122,7 @@ public class SearchFiltering {
     private static final String SORT_QUERY = ""
             + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
             + "PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n"
-            + "PREFIX gesah:    <http://ontology.tib.eu/gesah/>\n"
-            + "Prefix search: <https://vivoweb.org/ontology/vitro-search#> \n"
+            + "PREFIX search: <https://vivoweb.org/ontology/vitro-search#> \n"
             + "SELECT ( STR(?sort_label) as ?label ) ?id ?searchField ?multilingual ?isAsc ?sort_order \n"
             + "WHERE {\n"
             + "    ?sort rdf:type search:Sort . \n"
@@ -176,7 +178,7 @@ public class SearchFiltering {
                 SearchFiltering.addRangeFilter(query, searchFilter);
             }
             for (FilterValue fv : searchFilter.getValues().values()) {
-                if (fv.isDefaultPublic()) {
+                if (fv.isDefault()) {
                     query.addFilterQuery(searchFilter.getField() + ":\"" + fv.getId() + "\"");
                 }
             }
@@ -240,15 +242,21 @@ public class SearchFiltering {
                     continue;
                 }
                 String valueId = solution.get("value_id").toString();
+                FilterValue value;
                 if (!filter.contains(valueId)) {
-                    FilterValue value = new FilterValue(valueId);
+                    value = new FilterValue(valueId);
                     value.setName(solution.get("value_label"));
                     value.setOrder(solution.get("value_order"));
                     value.setPubliclyAvailable(solution.get("value_public"));
                     filter.addValue(value);
-                    RDFNode pubDefault = solution.get("public_default");
-                    if (pubDefault != null && pubDefault.asLiteral().getBoolean() && isNotLoggedIn(vreq)) {
-                        value.setDefaultPublic(true);
+                }
+                value = filter.getValue(valueId);
+                RDFNode role = solution.get("role");
+                if (role != null && role.isResource()) {
+                    String roleUri = role.asResource().getURI();
+                    Set<String> currentRoles = getCurrentUserRoles(vreq);
+                    if (currentRoles.contains(roleUri)) {
+                        value.setDefault(true);
                     }
                 }
             }
@@ -489,9 +497,12 @@ public class SearchFiltering {
         }
     }
 
-    private static boolean isNotLoggedIn(VitroRequest vreq) {
+    private static Set<String> getCurrentUserRoles(VitroRequest vreq) {
         UserAccount user = LoginStatusBean.getCurrentUser(vreq);
-        return user == null;
+        if (user == null) {
+            return Collections.singleton(ROLE_PUBLIC_URI);
+        }
+        return user.getPermissionSetUris();
     }
 
     static boolean isEmptyValues(List<String> requestedValues) {

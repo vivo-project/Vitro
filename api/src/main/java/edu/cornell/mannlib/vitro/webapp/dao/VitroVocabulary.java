@@ -261,4 +261,10 @@ public class VitroVocabulary {
         }
         public String uri(){return URI;}
     }
+
+    public static final String ROLE_PUBLIC_URI = VITRO_AUTH + "PUBLIC";
+    public static final String ROLE_SELF_EDITOR_URI = VITRO_AUTH + "SELF_EDITOR";
+    public static final String ROLE_EDITOR_URI = VITRO_AUTH + "EDITOR";
+    public static final String ROLE_CURATOR_URI = VITRO_AUTH + "CURATOR";
+    public static final String ROLE_ADMIN_URI = VITRO_AUTH +  "ADMIN";
 }

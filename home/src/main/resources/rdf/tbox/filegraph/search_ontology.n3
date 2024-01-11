@@ -31,6 +31,7 @@
 @prefix ro:    <http://purl.obolibrary.org/obo/ro.owl#> .
 @prefix obo:   <http://purl.obolibrary.org/obo/> .
 @prefix dc:    <http://purl.org/dc/elements/1.1/> .
+@prefix auth:  <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
 
 <https://vivoweb.org/ontology/vitro-search>
         a                          owl:Ontology ;
@@ -129,11 +130,10 @@ search:public  a                      owl:DatatypeProperty , owl:FunctionalPrope
         rdfs:domain                   search:PublicParameter ;
         rdfs:range                    xsd:boolean .
 
-search:defaultPublic
-        a                   <http://www.w3.org/2002/07/owl#DatatypeProperty> , <http://www.w3.org/2002/07/owl#FunctionalProperty> ;
+search:isDefaultForRole
+        a                   <http://www.w3.org/2002/07/owl#ObjectProperty> ;
         rdfs:domain         <https://vivoweb.org/ontology/vitro-search#FilterValue> ;
-        rdfs:range          <http://www.w3.org/2001/XMLSchema#boolean> ;
-        rdfs:subPropertyOf  <http://www.w3.org/2002/07/owl#topDataProperty> .
+        rdfs:range          auth:PermissionSet .
 
 search:moreLimit
         a                   <http://www.w3.org/2002/07/owl#DatatypeProperty> , <http://www.w3.org/2002/07/owl#FunctionalProperty> ;

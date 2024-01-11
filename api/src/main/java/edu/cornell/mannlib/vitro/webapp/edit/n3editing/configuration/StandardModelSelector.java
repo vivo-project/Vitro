@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration;
 
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.ABOX_UNION;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.ABOX_ASSERTIONS;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -19,9 +19,14 @@ public class StandardModelSelector implements ModelSelector {
 
     @Override
 	public OntModel getModel(HttpServletRequest request, ServletContext context) {
-    	return ModelAccess.on(context).getOntModel(ABOX_UNION);
+    	return ModelAccess.on(context).getOntModel(ABOX_ASSERTIONS);
     }
 
     public static final ModelSelector selector = new StandardModelSelector();
+
+	@Override
+	public String getDefaultGraphUri() {
+		return ABOX_ASSERTIONS;
+	}
 
 }

@@ -6357,3 +6357,43 @@ uil-data:no_individual_associated_with_id.Vitro
         uil:hasApp      "Vitro" ;
         uil:hasKey      "no_individual_associated_with_id" ;
         uil:hasPackage  "Vitro-languages" .
+
+uil-data:full_name_empty.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Molimo vas da unesete vrednost u polje za puno ime."@sr-Latn-RS ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "full_name_empty" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:email_address_empty.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Molimo vas da unesete ispravnu email adresu."@sr-Latn-RS ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "email_address_empty" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:comments_empty.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Molimo vas da unesete vaše komentare ili pitanja u predviđeno polje."@sr-Latn-RS ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "comments_empty" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:captcha_user_sol_empty.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Molimo vas da rešite CAPTCHA izazov u predviđenom sigurnosnom polju."@sr-Latn-RS ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "captcha_user_sol_empty" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:captcha_user_sol_invalid.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Pogrešno rešenje CAPTCHA izazova, molimo vas da pokušate ponovo."@sr-Latn-RS ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "captcha_user_sol_invalid" ;
+        uil:hasPackage  "Vitro-languages" .

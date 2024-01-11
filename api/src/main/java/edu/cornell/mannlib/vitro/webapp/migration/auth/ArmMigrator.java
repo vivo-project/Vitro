@@ -1,5 +1,12 @@
 package edu.cornell.mannlib.vitro.webapp.migration.auth;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.LABEL;
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_ADMIN_URI;
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_CURATOR_URI;
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_EDITOR_URI;
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_PUBLIC_URI;
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_SELF_EDITOR_URI;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,7 +21,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.attributes.OperationGroup;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.EntityPolicyController;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyLoader;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyTemplateController;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
@@ -79,11 +85,11 @@ public class ArmMigrator {
         operationMap.put(PUBLISH, OperationGroup.PUBLISH_GROUP);
 
         roleMap = new HashMap<>();
-        roleMap.put(ARM_ADMIN, AuthMigrator.ROLE_ADMIN_URI);
-        roleMap.put(ARM_CURATOR, AuthMigrator.ROLE_CURATOR_URI);
-        roleMap.put(ARM_EDITOR, AuthMigrator.ROLE_EDITOR_URI);
-        roleMap.put(ARM_SELF_EDITOR, AuthMigrator.ROLE_SELF_EDITOR_URI);
-        roleMap.put(ARM_PUBLIC, AuthMigrator.ROLE_PUBLIC_URI);
+        roleMap.put(ARM_ADMIN, ROLE_ADMIN_URI);
+        roleMap.put(ARM_CURATOR, ROLE_CURATOR_URI);
+        roleMap.put(ARM_EDITOR, ROLE_EDITOR_URI);
+        roleMap.put(ARM_SELF_EDITOR, ROLE_SELF_EDITOR_URI);
+        roleMap.put(ARM_PUBLIC, ROLE_PUBLIC_URI);
         Set<String> actualRoles = getPermissionSets();
         for (String role : actualRoles) {
             if (!roleMap.values().contains(role)) {
@@ -223,7 +229,7 @@ public class ArmMigrator {
             //Allow any role to display/update/publish rdfs:label
             //with exception to public role and update/publish operations groups
             if (!(ARM_PUBLIC.equals(role) && !OperationGroup.DISPLAY_GROUP.equals(og))) {
-                intersectionEntities.add(VitroVocabulary.LABEL);
+                intersectionEntities.add(LABEL);
             }
         }
         if (AccessObjectType.FAUX_OBJECT_PROPERTY.equals(type)) {

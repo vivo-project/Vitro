@@ -113,6 +113,28 @@ form.customForm label.dateTime {
 fieldset.dateTime select {
     margin-top: 0;
 }
+
+.captcha-container {
+    position: relative;
+    display: inline-block;
+}
+
+.captcha-container span {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #ffffffeb;
+    color: #595b5b;
+    border: 1px solid #595b5b;
+    font-size: 0.8em;
+    padding: 0 8px;
+}
+
+.captcha-container span input {
+    border: 0;
+    background: transparent;
+}
+
 /* ---------------------------------- */
 /* ----- FOR MANAGE PUBLICATIONS ---- */
 /* ---------------------------------- */

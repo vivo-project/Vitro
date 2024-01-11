@@ -386,7 +386,7 @@ public class KnowledgeBaseUpdater {
 			ChangeSet changeSet = rdfService.manufactureChangeSet();
 		    File successAssertionsFile = new File(settings.getSuccessAssertionsFile());
 		    InputStream inStream = new FileInputStream(successAssertionsFile);
-		    changeSet.addAddition(inStream, RDFService.ModelSerializationFormat.N3, ModelNames.APPLICATION_METADATA);
+		    changeSet.addAddition(inStream, RDFService.ModelSerializationFormat.N3, ModelNames.APPLICATION_METADATA, getClassUri());
 			rdfService.changeSetUpdate(changeSet);
 		} catch (Exception e) {
 			log.error("unable to make RDF assertions about successful " +
@@ -400,6 +400,10 @@ public class KnowledgeBaseUpdater {
 	            && !graphName.contains("x-arq:UnionGraph"));
 	}
 
+	private String getClassUri() {
+		return "java:" + this.getClass().getCanonicalName();
+	}
+	
 	/**
 	 * A class that allows to access two different ontology change lists,
 	 * one for class changes and the other for property changes.  The

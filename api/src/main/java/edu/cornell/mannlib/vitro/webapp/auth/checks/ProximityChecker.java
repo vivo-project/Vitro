@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.auth.checks;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -16,6 +17,7 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
 
 public class ProximityChecker {
     private static final Log log = LogFactory.getLog(ProximityChecker.class);
@@ -39,8 +41,7 @@ public class ProximityChecker {
         if (queryMap.containsKey(queryMapKey)) {
             return queryMap.get(queryMapKey);
         }
-
-        List<String> resourceUris = new ArrayList<>();
+        List<String> results = new ArrayList<>();
         ParameterizedSparqlString pss = new ParameterizedSparqlString();
         pss.setCommandText(queryTemplate);
         pss.setIri("personUri", personUri);
@@ -52,15 +53,28 @@ public class ProximityChecker {
             ResultSet resultSet = queryExecution.execSelect();
             while (resultSet.hasNext()) {
                 QuerySolution qs = resultSet.nextSolution();
-                resourceUris.add(qs.getResource("resourceUri").getURI());
+                addSolutionValues(results, qs);
             }
         } finally {
             queryExecution.close();
         }
-        debug("query results: " + resourceUris);
-        queryMap.put(queryMapKey, resourceUris);
+        debug("query results: " + results);
+        queryMap.put(queryMapKey, results);
         QueryResultsMapCache.update(queryMap);
-        return resourceUris;
+        return results;
+    }
+
+    private static void addSolutionValues(List<String> results, QuerySolution qs) {
+        Iterator<String> names = qs.varNames();
+        while (names.hasNext()) {
+            String name = names.next();
+            RDFNode node = qs.get(name);
+            if (node.isURIResource()) {
+                results.add(node.asResource().getURI());
+            } else if (node.isLiteral()) {
+                results.add(node.asLiteral().toString());
+            }
+        }
     }
 
     private static void debug(String queryText) {
