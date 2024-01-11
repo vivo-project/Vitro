@@ -7,7 +7,7 @@
 :sort_title_desc rdfs:label "Título Z-A"@pt-BR .
 :sort_title_asc rdfs:label "Título A-Z"@pt-BR .
 :sort_by_relevance rdfs:label "Relevância"@pt-BR .
-:field_label_sort rdfs:label "Campo de classificação de rótulo"@pt-BR .
+:field_label_sort rdfs:label "Campo de ordenação por rótulo"@pt-BR .
 :field_category rdfs:label "Grupo de Classe"@pt-BR .
 :field_type rdfs:label "Tipo"@pt-BR .
 :filter_querytext rdfs:label "Texto"@pt-BR .
