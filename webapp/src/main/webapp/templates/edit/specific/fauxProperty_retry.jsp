@@ -69,7 +69,7 @@
     <input id="${BaseEditController.ENTITY_TYPE_ATTRIBUTE_NAME}" type="hidden" name="${BaseEditController.ENTITY_TYPE_ATTRIBUTE_NAME}" value="${_faux_property_type}" />
 	<c:forEach var="entry" items="${operationsToRoles}">
 		<tr class="editformcell">
-			<td valign="top" colspan="5"><b>${entry.key}</b> permissions for this property<br /> 
+			<td valign="top" colspan="5">${i18n.text('operation_permissions_for_this_property', entry.key)}<br /> 
 				<c:set var="operationLowercase" value="${fn:toLowerCase(entry.key)}" />
 				<c:forEach var="role" items="${entry.value}">
 					<input id="${operationLowercase}${role.label}"
@@ -91,7 +91,7 @@
 	    <input id="_propertySuppressionsNotRelated" type="hidden" name="_propertySuppressionsNotRelated" value="enabled" />
 		<c:forEach var="entry" items="${propertySuppressionsNotRelated}">
 			<tr class="editformcell">
-				<td valign="top" colspan="5">Suppress <b>${entry.key}</b> for this property in not related individuals<br /> 
+				<td valign="top" colspan="5">${i18n.text('suppress_operation_for_this_property_in_not_related_individuals', entry.key)}<br /> 
 					<c:set var="operationLowercase" value="${fn:toLowerCase(entry.key)}" />
 					<c:forEach var="role" items="${entry.value}">
 						<input id="propertySuppressionNotRelated${operationLowercase}${role.label}"

@@ -13,7 +13,7 @@
     <input id="${BaseEditController.ENTITY_TYPE_ATTRIBUTE_NAME}" type="hidden" name="${BaseEditController.ENTITY_TYPE_ATTRIBUTE_NAME}" value="INDIVIDUAL" />
 	<c:forEach var="entry" items="${uriSuppressions}">
 		<tr class="editformcell">
-			<td valign="top" colspan="5">Suppress <b>${entry.key}</b> for roles <br /> 
+			<td valign="top" colspan="5">${i18n.text('suppress_operation_for_roles', entry.key)} <br /> 
 				<c:set var="operationLowercase" value="${fn:toLowerCase(entry.key)}" />
 				<c:forEach var="role" items="${entry.value}">
 					<input id="uriSuppression${operationLowercase}${role.label}"
