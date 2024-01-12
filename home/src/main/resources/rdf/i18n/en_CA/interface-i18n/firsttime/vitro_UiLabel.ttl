@@ -6334,12 +6334,12 @@ uil-data:operation_permissions_for_this_class.Vitro
         uil:hasKey       "operation_permissions_for_this_class" ;
         uil:hasPackage   "Vitro-languages" .
 
-uil-data:suppress_operation_for_this_property_in_not_related_individuals.Vitro
+uil-data:suppress_operation_for_this_property_in_unrelated_individuals.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Suppress <b>{0}</b> for this property in not related individuals"@en-CA ;
+        rdfs:label       "Suppress <b>{0}</b> for this property in unrelated individuals"@en-CA ;
         uil:hasApp       "Vitro" ;
-        uil:hasKey       "suppress_operation_for_this_property_in_not_related_individuals" ;
+        uil:hasKey       "suppress_operation_for_this_property_in_unrelated_individuals" ;
         uil:hasPackage   "Vitro-languages" .
 
 uil-data:suppress_operation_for_individuals_of_this_class.Vitro
@@ -6350,11 +6350,11 @@ uil-data:suppress_operation_for_individuals_of_this_class.Vitro
         uil:hasKey       "suppress_operation_for_individuals_of_this_class" ;
         uil:hasPackage   "Vitro-languages" .
 
-uil-data:suppress_operation_for_not_related_individuals_of_this_class.Vitro
+uil-data:suppress_operation_for_unrelated_individuals_of_this_class.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
         rdfs:label       "Suppress <b>{0}</b> for not related individual pages of this class"@en-CA ;
         uil:hasApp       "Vitro" ;
-        uil:hasKey       "suppress_operation_for_not_related_individuals_of_this_class" ;
+        uil:hasKey       "suppress_operation_for_unrelated_individuals_of_this_class" ;
         uil:hasPackage   "Vitro-languages" .
 
