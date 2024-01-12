@@ -142,7 +142,7 @@
 	    <input id="_typeSuppressionsNotRelated" type="hidden" name="_typeSuppressionsNotRelated" value="enabled" />
 		<c:forEach var="entry" items="${typeSuppressionsNotRelated}">
 			<tr class="editformcell">
-				<td valign="top" colspan="5">${i18n.text('suppress_operation_for_not_related_individuals_of_this_class', entry.key)}<br /> 
+				<td valign="top" colspan="5">${i18n.text('suppress_operation_for_unrelated_individuals_of_this_class', entry.key)}<br /> 
 					<c:set var="operationLowercase" value="${fn:toLowerCase(entry.key)}" />
 					<c:forEach var="role" items="${entry.value}">
 						<input id="typeSuppressionNotRelated${operationLowercase}${role.label}"

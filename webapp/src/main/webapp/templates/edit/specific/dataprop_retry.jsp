@@ -155,7 +155,7 @@
 	    <input id="_propertySuppressionsNotRelated" type="hidden" name="_propertySuppressionsNotRelated" value="enabled" />
 		<c:forEach var="entry" items="${propertySuppressionsNotRelated}">
 			<tr class="editformcell">
-				<td valign="top" colspan="5">${i18n.text('suppress_operation_for_this_property_in_not_related_individuals', entry.key)}<br /> 
+				<td valign="top" colspan="5">${i18n.text('suppress_operation_for_this_property_in_unrelated_individuals', entry.key)}<br /> 
 					<c:set var="operationLowercase" value="${fn:toLowerCase(entry.key)}" />
 					<c:forEach var="role" items="${entry.value}">
 						<input id="propertySuppressionNotRelated${operationLowercase}${role.label}"
