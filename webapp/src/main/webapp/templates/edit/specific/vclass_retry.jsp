@@ -94,7 +94,7 @@
     <input id="${BaseEditController.ENTITY_TYPE_ATTRIBUTE_NAME}" type="hidden" name="${BaseEditController.ENTITY_TYPE_ATTRIBUTE_NAME}" value="CLASS" />
 	<c:forEach var="entry" items="${operationsToRoles}">
 		<tr class="editformcell">
-			<td valign="top" colspan="5"><b>${entry.key}</b> permissions for this property<br /> 
+			<td valign="top" colspan="5">${i18n.text('operation_permissions_for_this_class', entry.key)}<br /> 
 				<c:set var="operationLowercase" value="${fn:toLowerCase(entry.key)}" />
 				<c:forEach var="role" items="${entry.value}">
 					<input id="${operationLowercase}${role.label}"
@@ -117,7 +117,7 @@
 	    <input id="_typeSuppressions" type="hidden" name="_typeSuppressions" value="enabled" />
 		<c:forEach var="entry" items="${typeSuppressions}">
 			<tr class="editformcell">
-				<td valign="top" colspan="5">Suppress <b>${entry.key}</b> for individual pages of this class<br /> 
+				<td valign="top" colspan="5">${i18n.text('suppress_operation_for_individuals_of_this_class', entry.key)}<br /> 
 					<c:set var="operationLowercase" value="${fn:toLowerCase(entry.key)}" />
 					<c:forEach var="role" items="${entry.value}">
 						<input id="typeSuppression${operationLowercase}${role.label}"
@@ -142,7 +142,7 @@
 	    <input id="_typeSuppressionsNotRelated" type="hidden" name="_typeSuppressionsNotRelated" value="enabled" />
 		<c:forEach var="entry" items="${typeSuppressionsNotRelated}">
 			<tr class="editformcell">
-				<td valign="top" colspan="5">Suppress <b>${entry.key}</b> for not related individual pages of this class<br /> 
+				<td valign="top" colspan="5">${i18n.text('suppress_operation_for_not_related_individuals_of_this_class', entry.key)}<br /> 
 					<c:set var="operationLowercase" value="${fn:toLowerCase(entry.key)}" />
 					<c:forEach var="role" items="${entry.value}">
 						<input id="typeSuppressionNotRelated${operationLowercase}${role.label}"

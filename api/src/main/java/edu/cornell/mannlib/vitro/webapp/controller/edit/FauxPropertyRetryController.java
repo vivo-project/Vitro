@@ -43,6 +43,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.FauxPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
 /**
@@ -82,6 +83,7 @@ public class FauxPropertyRetryController extends BaseEditController {
 
 		addAccessAttributes(req, populator.beanForEditing.getConfigUri(), aot);
 		addNotRelatedPropertySuppressions(req, populator.beanForEditing.getConfigUri(), aot);
+		req.setAttribute("i18n", I18n.bundle(req));
 
 		setRequestAttributes(req, epo);
 

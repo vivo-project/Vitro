@@ -35,6 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
 @WebServlet(name = "VclassRetryController", urlPatterns = {"/vclass_retry"} )
@@ -161,6 +162,7 @@ public class VclassRetryController extends BaseEditController {
         request.setAttribute("title","Class Editing Form");
         request.setAttribute("_action",action);
         request.setAttribute("unqualifiedClassName","VClass");
+        request.setAttribute("i18n", I18n.bundle(request));
 
         addAccessAttributes(request, vclassForEditing.getURI(), AccessObjectType.CLASS);
         addTypeSuppressions(request, vclassForEditing.getURI(), AccessObjectType.INDIVIDUAL);
