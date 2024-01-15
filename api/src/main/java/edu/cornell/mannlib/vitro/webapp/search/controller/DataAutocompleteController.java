@@ -16,22 +16,29 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.query.ParameterizedSparqlString;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.rdf.model.Model;
-
+import org.apache.jena.rdf.model.RDFNode;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.DataPropertyStatementAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.IndividualAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.SparqlUtils;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.SparqlUtils.AjaxControllerException;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
 
 /**
@@ -49,17 +56,25 @@ public class DataAutocompleteController extends VitroAjaxController {
     private static final String PARAM_QUERY = "term";
     //To get the data property
     private static final String PARAM_PROPERTY = "property";
-
-
-    String NORESULT_MSG = "";
+    
     private static final int DEFAULT_MAX_HIT_COUNT = 1000;
 
-    public static final int MAX_QUERY_LENGTH = 500;
+    private static final String QUERY_TEXT = ""
+            + "SELECT DISTINCT ?subject ?prop ?object ?dataLiteral \n"
+            + "WHERE {\n"
+            + "  ?subject ?prop ?object .\n"
+            + "  VALUES ?prop { ?property }\n"
+            + "  BIND(STR(?object) as ?dataLiteral )\n"
+            + "  FILTER(REGEX(?dataLiteral, ?term, \"i\"))\n"
+            + "}\n"
+            + "ORDER BY ?dataLiteral\n "
+            + "LIMIT " + DEFAULT_MAX_HIT_COUNT;
+
+    String NORESULT_MSG = "";
 
     @Override
     protected AuthorizationRequest requiredActions(VitroRequest vreq) {
-    	//used to be basic vitro ajax permission but need to query full model
-    	return SimplePermission.QUERY_FULL_MODEL.ACTION;
+    	return SimplePermission.USE_BASIC_AJAX_CONTROLLERS.ACTION;
     }
 
     @Override
@@ -72,17 +87,10 @@ public class DataAutocompleteController extends VitroAjaxController {
             String property = vreq.getParameter(PARAM_PROPERTY);
             //Get sparql query for this property
             String sparqlQuery = getSparqlQuery(qtxt, property);
-            //Forward this to SparqlQueryAjaxController as that already
-            //handles execution of query and will return json results
-      //      String encodedQuery = URLEncoder.encode(sparqlQuery, "UTF-8");
-      //      response.sendRedirect(vreq.getContextPath() + "/ajax/sparqlQuery?query=" + encodedQuery);
-            //RequestDispatcher dispatcher = vreq.getRequestDispatcher("/ajax/sparqlQuery?query=" + encodedQuery );
-            //dispatcher.forward(vreq, response);
-
             //Get Model and execute query
-            Model model = getModel(vreq);
+            OntModel model = getModel(vreq);
             Query query = SparqlUtils.createQuery(sparqlQuery);
-			outputResults(response, query, model);
+			outputResults(response, query, model, vreq);
         } catch(AjaxControllerException ex) {
         	log.error(ex, ex);
 			response.sendError(ex.getStatusCode());
@@ -94,7 +102,7 @@ public class DataAutocompleteController extends VitroAjaxController {
     }
 
     private void outputResults(HttpServletResponse response, Query query,
-			Model model)     throws IOException{
+			OntModel model, VitroRequest vreq)     throws IOException{
     	Dataset dataset = DatasetFactory.create(model);
     	//Iterate through results and print out array of strings
     	List<String> outputResults = new ArrayList<String>();
@@ -103,6 +111,24 @@ public class DataAutocompleteController extends VitroAjaxController {
 			ResultSet results = qe.execSelect();
 			while(results.hasNext()) {
 	    		QuerySolution qs = results.nextSolution();
+	    		RDFNode subject = qs.get("subject");
+	    		if (!subject.isResource() || subject.isAnon()) {
+	    		    continue;
+	    		}
+	    		RDFNode property = qs.get("prop");
+	    		if (!property.isResource() || property.isAnon()) {
+	    		    continue;
+	    		}
+	    		RDFNode object = qs.get("object");
+	    		if (!object.isLiteral()) {
+	    		    continue;
+	    		}
+	    		String subjectUri = subject.asResource().getURI();
+	    		String propertyUri = property.asResource().getURI();
+	    		String objectValue = object.asLiteral().getLexicalForm();
+	    		if (!isAuthorized(vreq, qs, model, subjectUri, propertyUri, objectValue)) {
+	    		    continue;
+	    		}
 	    		Literal dataLiteral = qs.getLiteral("dataLiteral");
 	    		String dataValue = dataLiteral.getString();
 	    		outputResults.add(dataValue);
@@ -120,12 +146,23 @@ public class DataAutocompleteController extends VitroAjaxController {
 		} finally {
 			qe.close();
 		}
-
-
 	}
 
-	private Model getModel(VitroRequest vreq) throws AjaxControllerException{
-    	Model model = vreq.getJenaOntModel();
+	private boolean isAuthorized(VitroRequest vreq, QuerySolution qs, OntModel model, String subjectUri, String propertyUri, String objectValue) {
+	    AccessObject dataPropertyStatementAccessObject = new DataPropertyStatementAccessObject(model, subjectUri, propertyUri, objectValue);
+	    AuthorizationRequest dataPropertyRequest = new SimpleAuthorizationRequest(dataPropertyStatementAccessObject, AccessOperation.DISPLAY);
+	    if (VitroVocabulary.LABEL.equals(propertyUri)) {
+	        AccessObject individualAccessObject = new IndividualAccessObject(subjectUri);
+	        individualAccessObject.setModel(model);
+	        AuthorizationRequest individualRequest = new SimpleAuthorizationRequest(individualAccessObject, AccessOperation.DISPLAY);
+	        AuthorizationRequest requests = dataPropertyRequest.and(individualRequest);
+	        return PolicyHelper.isAuthorizedForActions(vreq, requests);
+	    }
+	    return PolicyHelper.isAuthorizedForActions(vreq, dataPropertyRequest);
+	}
+
+	private OntModel getModel(VitroRequest vreq) throws AjaxControllerException{
+		OntModel model = vreq.getJenaOntModel();
 
 		if (model == null) {
 			throw new AjaxControllerException(SC_INTERNAL_SERVER_ERROR,
@@ -135,12 +172,11 @@ public class DataAutocompleteController extends VitroAjaxController {
     }
 
 	private String getSparqlQuery(String qtxt, String property) {
-		//"i" denotes case insensitive
 		//Searches for data literals whose string version begins with the text denoted
-		String query = "SELECT DISTINCT ?dataLiteral where {" +
-		"?s <" + property + "> ?dataLiteral . " +
-		"FILTER(regex(str(?dataLiteral), \"^" + qtxt + "\", \"i\")) } ORDER BY ?dataLiteral";
-		return query;
+	    ParameterizedSparqlString pss = new ParameterizedSparqlString(QUERY_TEXT);
+	    pss.setIri(PARAM_PROPERTY, property);
+	    pss.setLiteral(PARAM_QUERY, "^" + qtxt);
+	    return pss.toString();
 	}
 
 
