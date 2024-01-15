@@ -28,6 +28,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
+import edu.cornell.mannlib.vitro.webapp.search.controller.SearchFilter;
+import edu.cornell.mannlib.vitro.webapp.search.controller.SearchFiltering;
 import edu.cornell.mannlib.vitro.webapp.utils.searchengine.SearchQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividual;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividualBuilder;
@@ -188,7 +190,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
 		boolean languageFilter = Boolean.valueOf(props.getProperty(LANGUAGE_FILTER_PROPERTY, "false"));
 		IndividualListQueryResults results = buildAndExecuteVClassQuery(classUris, alpha,
 				((languageFilter) ? vreq.getLocale() : null), page, pageSize,
-				vreq.getWebappDaoFactory().getIndividualDao());
+				vreq);
 		IndividualListResults indListResults = getResultsForVClassQuery(results, page, pageSize, alpha, vreq);
 		return indListResults;
 	}
@@ -196,7 +198,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
     public static IndividualListResults getRandomResultsForVClass(String vclassURI, int page, int pageSize, VitroRequest vreq) {
    	 	try{
             List<String> classUris = Collections.singletonList(vclassURI);
-			IndividualListQueryResults results = buildAndExecuteRandomVClassQuery(classUris, page, pageSize, vreq.getWebappDaoFactory().getIndividualDao());
+			IndividualListQueryResults results = buildAndExecuteRandomVClassQuery(classUris, page, pageSize, vreq);
 	        return getResultsForVClassQuery(results, page, pageSize, "", vreq);
    	 	} catch(Throwable th) {
 	   		log.error("An error occurred retrieving random results for vclass query", th);
@@ -216,9 +218,12 @@ public class IndividualListController extends FreemarkerHttpServlet {
 
     private static IndividualListQueryResults buildAndExecuteVClassQuery(
 			List<String> vclassURIs, String alpha, Locale locale, int page,
-			int pageSize, IndividualDao indDao)
+			int pageSize, VitroRequest vreq)
 			throws SearchEngineException {
+		 IndividualDao indDao = vreq.getWebappDaoFactory().getIndividualDao();
 		 SearchQuery query = SearchQueryUtils.getQuery(vclassURIs, alpha, locale, page, pageSize);
+		 Map<String, SearchFilter> filtersByField = SearchFiltering.readFilterConfigurations(vreq);
+		 SearchFiltering.addPreconfiguredFiltersToQuery(query, filtersByField.values());
 		 IndividualListQueryResults results = IndividualListQueryResults.runQuery(query, indDao);
 		 log.debug("Executed search query for " + vclassURIs);
 		 if (results.getIndividuals().isEmpty()) {
@@ -228,9 +233,12 @@ public class IndividualListController extends FreemarkerHttpServlet {
 	}
 
     private static IndividualListQueryResults buildAndExecuteRandomVClassQuery(
-			List<String> vclassURIs, int page, int pageSize, IndividualDao indDao)
+			List<String> vclassURIs, int page, int pageSize, VitroRequest vreq)
 			throws SearchEngineException {
+		 IndividualDao indDao = vreq.getWebappDaoFactory().getIndividualDao();
 		 SearchQuery query = SearchQueryUtils.getRandomQuery(vclassURIs, page, pageSize);
+		 Map<String, SearchFilter> filtersByField = SearchFiltering.readFilterConfigurations(vreq);
+		 SearchFiltering.addPreconfiguredFiltersToQuery( query, filtersByField.values());
 		 IndividualListQueryResults results = IndividualListQueryResults.runQuery(query, indDao);
 		 log.debug("Executed search query for " + vclassURIs);
 		 if (results.getIndividuals().isEmpty()) {
