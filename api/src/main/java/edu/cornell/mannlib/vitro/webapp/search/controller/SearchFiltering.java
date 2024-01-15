@@ -3,6 +3,7 @@ package edu.cornell.mannlib.vitro.webapp.search.controller;
 import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_PUBLIC_URI;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
@@ -156,7 +157,8 @@ public class SearchFiltering {
             + "    BIND(COALESCE(?bind_multilingual, false) as ?multilingual)\n"
             + "} ORDER BY ?sort_order ?label ";
 
-    public static void addFiltersToQuery(VitroRequest vreq, SearchQuery query, Map<String, SearchFilter> filterById) {
+    protected static void addFiltersToQuery(VitroRequest vreq, SearchQuery query,
+            Map<String, SearchFilter> filterById) {
         Enumeration<String> paramNames = vreq.getParameterNames();
         while (paramNames.hasMoreElements()) {
             String paramFilterName = paramNames.nextElement();
@@ -179,8 +181,11 @@ public class SearchFiltering {
 
             }
         }
-        for (String filterId : filterById.keySet()) {
-            SearchFilter searchFilter = filterById.get(filterId);
+        addPreconfiguredFiltersToQuery(query, filterById.values());
+    }
+
+    public static void addPreconfiguredFiltersToQuery(SearchQuery query, Collection<SearchFilter> collection) {
+        for (SearchFilter searchFilter : collection) {
             if (searchFilter.isInput()) {
                 SearchFiltering.addInputFilter(query, searchFilter);
             } else if (searchFilter.isRange()) {
@@ -227,6 +232,10 @@ public class SearchFiltering {
 
         Map<String, SearchFilter> filtersByField = new LinkedHashMap<>();
         Model model = ModelAccess.on(vreq).getOntModelSelector().getDisplayModel();
+        if (model == null) {
+            return filtersByField;
+        }
+        Set<String> currentRoles = getCurrentUserRoles(vreq);
         model.enterCriticalSection(Lock.READ);
         try {
             Query facetQuery = QueryFactory.create(FILTER_QUERY);
@@ -263,7 +272,6 @@ public class SearchFiltering {
                 RDFNode role = solution.get("role");
                 if (role != null && role.isResource()) {
                     String roleUri = role.asResource().getURI();
-                    Set<String> currentRoles = getCurrentUserRoles(vreq);
                     if (currentRoles.contains(roleUri)) {
                         value.setDefault(true);
                     }
@@ -566,7 +574,7 @@ public class SearchFiltering {
         }
     }
 
-    static Map<String, SearchFilter> getFiltersById(Map<String, SearchFilter> filtersByField) {
+    public static Map<String, SearchFilter> getFiltersById(Map<String, SearchFilter> filtersByField) {
         Map<String, SearchFilter> filtersById =
                 filtersByField.values().stream().collect(Collectors.toMap(SearchFilter::getId, Function.identity()));
         return filtersById;
