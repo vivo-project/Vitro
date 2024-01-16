@@ -257,7 +257,7 @@ uil-data:reset_password_note.Vitro
 uil-data:password_reset_email_sent.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Um e-mail de recuperação de senha será enviado para {0}, se esse estiver vinculado a uma conta existente."@pt-BR ;
+        rdfs:label       "Um e-mail de recuperação de senha será enviado para a conta {0} se essa estiver vinculado a uma conta existente."@pt-BR ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "password_reset_email_sent" ;
         uil:hasPackage  "Vitro-languages" .
@@ -273,17 +273,9 @@ uil-data:wrong_captcha.Vitro
 uil-data:password_reset_too_many_requests.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Você poderá enviar a próxima solicitação no dia "@pt-BR ;
+        rdfs:label       "Você poderá enviar a próxima solicitação no dia {0} às {1}."@pt-BR ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "password_reset_too_many_requests" ;
-        uil:hasPackage  "Vitro-languages" .
-
-uil-data:password_reset_too_many_requests_at_time.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        rdfs:label       " às "@pt-BR ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "password_reset_too_many_requests_at_time" ;
         uil:hasPackage  "Vitro-languages" .
 
 uil-data:password_reset_label.Vitro

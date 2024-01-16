@@ -273,17 +273,9 @@ uil-data:wrong_captcha.Vitro
 uil-data:password_reset_too_many_requests.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Die nächste Anfrage können Sie am "@de-DE ;
+        rdfs:label       "Die nächste Anfrage können Sie am {0} um {1}."@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "password_reset_too_many_requests" ;
-        uil:hasPackage  "Vitro-languages" .
-
-uil-data:password_reset_too_many_requests_at_time.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        rdfs:label       " um "@de-DE ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "password_reset_too_many_requests_at_time" ;
         uil:hasPackage  "Vitro-languages" .
 
 uil-data:password_reset_label.Vitro

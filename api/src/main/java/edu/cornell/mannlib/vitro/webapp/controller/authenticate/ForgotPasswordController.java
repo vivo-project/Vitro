@@ -94,9 +94,8 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
             PasswordChangeRequestSpamMitigation.isPasswordResetRequestable(email);
         if (!mitigationResponse.getCanBeRequested()) {
             dataContext.put("message",
-                i18n.text("password_reset_too_many_requests") + mitigationResponse.getNextRequestAvailableAtDate() +
-                    i18n.text("password_reset_too_many_requests_at_time") +
-                    mitigationResponse.getNextRequestAvailableAtTime());
+                i18n.text("password_reset_too_many_requests", mitigationResponse.getNextRequestAvailableAtDate(),
+                    mitigationResponse.getNextRequestAvailableAtTime()));
             return new TemplateResponseValues(TEMPLATE_NAME, dataContext);
         }
 
