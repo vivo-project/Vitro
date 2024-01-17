@@ -251,7 +251,6 @@ public class GroupedPropertyList extends BaseTemplateModel {
         WebappDaoFactory wadf = vreq.getLanguageNeutralWebappDaoFactory();
         PropertyInstanceDao piDao = wadf.getPropertyInstanceDao();
         ObjectPropertyDao opDao = wadf.getObjectPropertyDao();
-        Set<String> vClassUris = subject.getVClasses().stream().map(vclass -> vclass.getURI()).collect(Collectors.toSet());
     	Map<String, Property> possiblePropertiesMap = new HashMap<String,Property>();
 
         Collection<PropertyInstance> allPossiblePI = piDao.getAllPossiblePropInstForIndividual(subject.getURI());
@@ -265,9 +264,6 @@ public class GroupedPropertyList extends BaseTemplateModel {
                         continue;
                     }
                     if (isInPopulatedOPs(populatedOPs, possibleOP)) {
-                    	continue;
-                    }
-                    if (!vClassUris.contains(possibleOP.getDomainVClassURI())) {
                     	continue;
                     }
                     possiblePropertiesMap.put(possibleOP.getURI(), possibleOP);
