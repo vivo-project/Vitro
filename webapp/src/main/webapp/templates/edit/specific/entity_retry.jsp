@@ -8,7 +8,7 @@
 
 <!--  Uri suppressions -->
 <c:if test="${!empty uriSuppressions}">
-    <input id="_uriSuppressions" type="hidden" name="_uriSuppressions" value="enabled" />
+    <input id="${BaseEditController.URI_SUPPRESSIONS}" type="hidden" name="${BaseEditController.URI_SUPPRESSIONS}" value="enabled" />
     <input id="${BaseEditController.ENTITY_URI_ATTRIBUTE_NAME}" type="hidden" name="${BaseEditController.ENTITY_URI_ATTRIBUTE_NAME}" value="${_permissionsEntityURI}" />
     <input id="${BaseEditController.ENTITY_TYPE_ATTRIBUTE_NAME}" type="hidden" name="${BaseEditController.ENTITY_TYPE_ATTRIBUTE_NAME}" value="INDIVIDUAL" />
 	<c:forEach var="entry" items="${uriSuppressions}">
