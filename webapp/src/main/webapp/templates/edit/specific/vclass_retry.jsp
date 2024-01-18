@@ -114,7 +114,7 @@
 	
 	<!-- Type suppressions -->
 	<c:if test="${!empty typeSuppressions}">
-	    <input id="_typeSuppressions" type="hidden" name="_typeSuppressions" value="enabled" />
+	    <input id="${BaseEditController.TYPE_SUPPRESSIONS}" type="hidden" name="${BaseEditController.TYPE_SUPPRESSIONS}" value="enabled" />
 		<c:forEach var="entry" items="${typeSuppressions}">
 			<tr class="editformcell">
 				<td valign="top" colspan="5">${i18n.text('suppress_operation_for_individuals_of_this_class', entry.key)}<br /> 
@@ -139,7 +139,7 @@
 	
 	<!-- Type suppressions (not related) -->
 	<c:if test="${!empty typeSuppressionsNotRelated}">
-	    <input id="_typeSuppressionsNotRelated" type="hidden" name="_typeSuppressionsNotRelated" value="enabled" />
+	    <input id="${BaseEditController.TYPE_SUPPRESSIONS_NOT_RELATED}" type="hidden" name="${BaseEditController.TYPE_SUPPRESSIONS_NOT_RELATED}" value="enabled" />
 		<c:forEach var="entry" items="${typeSuppressionsNotRelated}">
 			<tr class="editformcell">
 				<td valign="top" colspan="5">${i18n.text('suppress_operation_for_unrelated_individuals_of_this_class', entry.key)}<br /> 

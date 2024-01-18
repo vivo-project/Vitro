@@ -42,6 +42,16 @@ import org.apache.commons.logging.LogFactory;
 
 public class BaseEditController extends VitroHttpServlet {
 
+    private static final String OPERATIONS_TO_ROLES = "operationsToRoles";
+
+    public static final String URI_SUPPRESSIONS = "uriSuppressions";
+
+    public static final String TYPE_SUPPRESSIONS = "typeSuppressions";
+
+    public static final String TYPE_SUPPRESSIONS_NOT_RELATED = "typeSuppressionsNotRelated";
+
+    public static final String PROPERTY_SUPPRESSIONS_NOT_RELATED = "propertySuppressionsNotRelated";
+
     public static final String ENTITY_URI_ATTRIBUTE_NAME = "_permissionsEntityURI";
     
     public static final String ENTITY_TYPE_ATTRIBUTE_NAME = "_permissionsEntityType";
@@ -245,7 +255,7 @@ public class BaseEditController extends VitroHttpServlet {
             }
             getRolePolicyInformation(entityURI, aot, namedKeys, operation, roleInfos);
         }
-        req.setAttribute("operationsToRoles", operationsToRoles);
+        req.setAttribute(OPERATIONS_TO_ROLES, operationsToRoles);
     }
 
     private static void getRolePolicyInformation(String entityURI, AccessObjectType aot, String[] namedKeys,
@@ -280,7 +290,7 @@ public class BaseEditController extends VitroHttpServlet {
             roleInfos.add(roleCopy);
         }
         getRolePolicyInformation(entityURI, aot, namedKeys, operation, roleInfos);
-        req.setAttribute("uriSuppressions", uriSuppressionsToRoles);
+        req.setAttribute(URI_SUPPRESSIONS, uriSuppressionsToRoles);
         req.setAttribute(ENTITY_URI_ATTRIBUTE_NAME, entityURI);
     }
 
@@ -304,7 +314,7 @@ public class BaseEditController extends VitroHttpServlet {
             roleInfos.add(roleCopy);
         }
         getRolePolicyInformation(entityURI, aot, namedKeys, operation, roleInfos);
-        req.setAttribute("typeSuppressions", typeSuppressionsToRoles);
+        req.setAttribute(TYPE_SUPPRESSIONS, typeSuppressionsToRoles);
     }
 
     protected static void addNotRelatedTypeSuppressions(HttpServletRequest req, String entityURI, AccessObjectType aot) {
@@ -321,7 +331,7 @@ public class BaseEditController extends VitroHttpServlet {
         roleInfos.add(role);
 
         getRolePolicyInformation(entityURI, aot, namedKeys, operation, roleInfos);
-        req.setAttribute("typeSuppressionsNotRelated", typeSuppressionsToRoles);
+        req.setAttribute(TYPE_SUPPRESSIONS_NOT_RELATED, typeSuppressionsToRoles);
     }
 
     protected static RoleInfo getSelfEditorRole(HttpServletRequest req) {
@@ -346,7 +356,7 @@ public class BaseEditController extends VitroHttpServlet {
         roleInfos.add(role);
 
         getRolePolicyInformation(entityURI, aot, namedKeys, operation, roleInfos);
-        req.setAttribute("propertySuppressionsNotRelated", propertySuppressionsToRoles);
+        req.setAttribute(PROPERTY_SUPPRESSIONS_NOT_RELATED, propertySuppressionsToRoles);
     }
 
     static boolean isPublicForbiddenOperation(AccessOperation operation) {

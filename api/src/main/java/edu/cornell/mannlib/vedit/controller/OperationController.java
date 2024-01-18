@@ -338,19 +338,19 @@ public class OperationController extends BaseEditController {
     
     
     private boolean isUriSuppressionsPresent(HttpServletRequest request) {
-        return request.getParameter("_uriSuppressions") != null;
+        return request.getParameter(URI_SUPPRESSIONS) != null;
     }
 
     private boolean isNotRelatedPropertySuppressionsPresent(HttpServletRequest request) {
-        return request.getParameter("_propertySuppressionsNotRelated") != null;
+        return request.getParameter(PROPERTY_SUPPRESSIONS_NOT_RELATED) != null;
     }
 
     private boolean isTypeSuppressionsPresent(HttpServletRequest request) {
-        return request.getParameter("_typeSuppressions") != null;
+        return request.getParameter(TYPE_SUPPRESSIONS) != null;
     }
 
     private boolean isNotRelatedTypeSuppressionsPresent(HttpServletRequest request) {
-        return request.getParameter("_typeSuppressionsNotRelated") != null;
+        return request.getParameter(TYPE_SUPPRESSIONS_NOT_RELATED) != null;
     }
 
     private Set<String> getSelectedRoles(HttpServletRequest request, String operationGroupName) {

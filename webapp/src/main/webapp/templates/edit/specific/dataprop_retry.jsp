@@ -152,7 +152,7 @@
 	</c:forEach>
 	<!-- Property suppressions (not related) -->
 	<c:if test="${!empty propertySuppressionsNotRelated}">
-	    <input id="_propertySuppressionsNotRelated" type="hidden" name="_propertySuppressionsNotRelated" value="enabled" />
+	    <input id="${BaseEditController.PROPERTY_SUPPRESSIONS_NOT_RELATED}" type="hidden" name="${BaseEditController.PROPERTY_SUPPRESSIONS_NOT_RELATED}" value="enabled" />
 		<c:forEach var="entry" items="${propertySuppressionsNotRelated}">
 			<tr class="editformcell">
 				<td valign="top" colspan="5">${i18n.text('suppress_operation_for_this_property_in_unrelated_individuals', entry.key)}<br /> 
