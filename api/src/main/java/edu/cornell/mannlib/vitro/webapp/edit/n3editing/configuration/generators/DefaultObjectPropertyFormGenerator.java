@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
@@ -45,6 +46,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocumentList;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
+import edu.cornell.mannlib.vitro.webapp.search.controller.SearchFiltering;
 import edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils.EditMode;
 
@@ -187,7 +189,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	if(types.size() == 0 ){
     		types.add(VitroVocabulary.OWL_THING);
     	}
-
+    	Set<String> currentRoles = SearchFiltering.getCurrentUserRoles(vreq);
     	long count = 0;
     	for( String type:types){
     		//search query for type count.
@@ -198,6 +200,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     			query.setQuery( VitroSearchTermNames.RDFTYPE + ":" + type);
     		}
     		query.setRows(0);
+    		SearchFiltering.addDefaultFilters(query, currentRoles);
     		SearchResponse rsp = searchEngine.query(query);
     		SearchResultDocumentList docs = rsp.getResults();
     		long found = docs.getNumFound();
@@ -549,9 +552,9 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 			String objectLabel = EditConfigurationUtils.getObjectIndividual(vreq).getName();
 			formSpecificData.put("objectLabel", objectLabel);
 		}
-
+		Set<String> currentRoles = SearchFiltering.getCurrentUserRoles(vreq);
 		//TODO: find out if there are any individuals in the classes of objectTypes
-		formSpecificData.put("rangeIndividualsExist", rangeIndividualsExist(types) );
+		formSpecificData.put("rangeIndividualsExist", rangeIndividualsExist(types, currentRoles) );
 
 		formSpecificData.put("sparqlForAcFilter", getSparqlForAcFilter(vreq));
 		if(customErrorMessages != null && !customErrorMessages.isEmpty()) {
@@ -561,7 +564,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 		editConfiguration.setFormSpecificData(formSpecificData);
 	}
 
-	private Object rangeIndividualsExist(List<VClass> types) throws SearchEngineException {
+	private Object rangeIndividualsExist(List<VClass> types, Set<String> currentRoles) throws SearchEngineException {
 		SearchEngine searchEngine = ApplicationUtils.instance().getSearchEngine();
 
     	boolean rangeIndividualsFound = false;
@@ -570,6 +573,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     		SearchQuery query = searchEngine.createQuery();
     		query.setQuery( VitroSearchTermNames.RDFTYPE + ":" + type.getURI());
     		query.setRows(0);
+    		SearchFiltering.addDefaultFilters(query, currentRoles);
 
     		SearchResponse rsp = searchEngine.query(query);
     		SearchResultDocumentList docs = rsp.getResults();
