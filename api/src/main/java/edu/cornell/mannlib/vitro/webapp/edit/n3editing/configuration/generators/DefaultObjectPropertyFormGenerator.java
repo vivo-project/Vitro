@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators;
 
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.LANGUAGE_NEUTRAL;
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.POLICY_NEUTRAL;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
 
 import java.util.ArrayList;
