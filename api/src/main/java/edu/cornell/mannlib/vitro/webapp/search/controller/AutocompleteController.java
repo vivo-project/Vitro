@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -100,9 +101,8 @@ public class AutocompleteController extends VitroAjaxController {
                 return;
             }
             log.debug("query for '" + qtxt +"' is " + query.toString());
-
-            Map<String, SearchFilter> filtersByField = SearchFiltering.readFilterConfigurations(vreq);
-            SearchFiltering.addPreconfiguredFiltersToQuery( query, filtersByField.values());
+            Set<String> currentRoles = SearchFiltering.getCurrentUserRoles(vreq);
+            SearchFiltering.addDefaultFilters( query, currentRoles);
 
 			SearchEngine search = ApplicationUtils.instance().getSearchEngine();
             SearchResponse queryResponse = search.query(query);
