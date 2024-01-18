@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.annotation.WebServlet;
 
@@ -222,8 +223,8 @@ public class IndividualListController extends FreemarkerHttpServlet {
 			throws SearchEngineException {
 		 IndividualDao indDao = vreq.getWebappDaoFactory().getIndividualDao();
 		 SearchQuery query = SearchQueryUtils.getQuery(vclassURIs, alpha, locale, page, pageSize);
-		 Map<String, SearchFilter> filtersByField = SearchFiltering.readFilterConfigurations(vreq);
-		 SearchFiltering.addPreconfiguredFiltersToQuery(query, filtersByField.values());
+		 Set<String> currentRoles = SearchFiltering.getCurrentUserRoles(vreq);
+		 SearchFiltering.addDefaultFilters(query, currentRoles);
 		 IndividualListQueryResults results = IndividualListQueryResults.runQuery(query, indDao);
 		 log.debug("Executed search query for " + vclassURIs);
 		 if (results.getIndividuals().isEmpty()) {
@@ -237,8 +238,8 @@ public class IndividualListController extends FreemarkerHttpServlet {
 			throws SearchEngineException {
 		 IndividualDao indDao = vreq.getWebappDaoFactory().getIndividualDao();
 		 SearchQuery query = SearchQueryUtils.getRandomQuery(vclassURIs, page, pageSize);
-		 Map<String, SearchFilter> filtersByField = SearchFiltering.readFilterConfigurations(vreq);
-		 SearchFiltering.addPreconfiguredFiltersToQuery( query, filtersByField.values());
+		 Set<String> currentRoles = SearchFiltering.getCurrentUserRoles(vreq);
+		 SearchFiltering.addDefaultFilters(query, currentRoles);
 		 IndividualListQueryResults results = IndividualListQueryResults.runQuery(query, indDao);
 		 log.debug("Executed search query for " + vclassURIs);
 		 if (results.getIndividuals().isEmpty()) {
