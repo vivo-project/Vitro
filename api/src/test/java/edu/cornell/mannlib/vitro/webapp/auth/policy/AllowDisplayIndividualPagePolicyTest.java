@@ -18,7 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.objects.NamedAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorizationRequest;
 import org.junit.Test;
 
-public class AllowDisplayIndividualPagePolicy extends PolicyTest {
+public class AllowDisplayIndividualPagePolicyTest extends PolicyTest {
 
     public static final String POLICY_PATH = USER_ACCOUNTS_HOME_FIRSTTIME + "policy_allow_display_individual_page.n3";
 
