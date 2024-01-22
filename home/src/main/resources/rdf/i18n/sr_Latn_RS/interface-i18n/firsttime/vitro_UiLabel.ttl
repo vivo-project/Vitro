@@ -6313,7 +6313,7 @@ uil-data:captcha_user_sol_invalid.Vitro
 uil-data:suppress_operation_for_roles.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Zabrani <b>{0}</b> operacije za uloge"@sr-Latn-RS ;
+        rdfs:label       "Zabrani <b>{0}</b> operacije za role"@sr-Latn-RS ;
         uil:hasApp       "Vitro" ;
         uil:hasKey       "suppress_operation_for_roles" ;
         uil:hasPackage   "Vitro-languages" .
@@ -6345,7 +6345,7 @@ uil-data:suppress_operation_for_this_property_in_unrelated_individuals.Vitro
 uil-data:suppress_operation_for_individuals_of_this_class.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Zabrani <b>{0}</b> operacije za objekte koje pripadaju ovoj klasi"@sr-Latn-RS ;
+        rdfs:label       "Zabrani <b>{0}</b> operacije za objekte koji pripadaju ovoj klasi"@sr-Latn-RS ;
         uil:hasApp       "Vitro" ;
         uil:hasKey       "suppress_operation_for_individuals_of_this_class" ;
         uil:hasPackage   "Vitro-languages" .
