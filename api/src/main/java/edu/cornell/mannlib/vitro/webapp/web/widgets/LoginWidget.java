@@ -93,7 +93,7 @@ public class LoginWidget extends Widget {
         String forgotPasswordEnabled = ConfigurationProperties.getInstance()
             .getProperty("authentication.forgotPassword");
 
-        if (!Objects.nonNull(forgotPasswordEnabled)) {
+        if (forgotPasswordEnabled == null) {
             forgotPasswordEnabled = "disabled";
         }
 
@@ -210,7 +210,7 @@ public class LoginWidget extends Widget {
      */
     private String getForgotPasswordUrl(HttpServletRequest request) {
         String contextPath = request.getContextPath();
-        return contextPath + "/forgot-password";
+        return contextPath + "/forgotPassword";
     }
 
     private enum Macro {

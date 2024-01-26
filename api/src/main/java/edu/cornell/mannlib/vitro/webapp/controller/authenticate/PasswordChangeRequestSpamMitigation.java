@@ -24,12 +24,12 @@ public class PasswordChangeRequestSpamMitigation {
     }
 
     /**
-     * Determines whether a password reset request is allowed based on spam mitigation criteria.
+     * Checks whether a password reset request is allowed based on spam mitigation criteria.
      *
      * @param emailAddress The email address associated with the password reset request.
      * @return A PasswordChangeRequestSpamMitigationResponse indicating if the request is allowed.
      */
-    public static PasswordChangeRequestSpamMitigationResponse isPasswordResetRequestable(String emailAddress) {
+    public static PasswordChangeRequestSpamMitigationResponse checkPasswordResetRequestAllowed(String emailAddress) {
         initializeHistoryRequestDataIfNotExists(emailAddress);
 
         Integer numberOfSuccessiveRequests = requestFrequency.get(emailAddress);
@@ -55,10 +55,10 @@ public class PasswordChangeRequestSpamMitigation {
      * Updates request frequency and timestamp when a password reset request is successfully handled,
      * and the user is notified.
      *
-     * @param email The email address for which the request was successfully handled.
+     * @param emailAddress The email address for which the request was successfully handled.
      */
-    public static void requestSuccessfullyHandledAndUserIsNotified(String email) {
-        requestFrequency.merge(email, 1, Integer::sum);
+    public static void updateRequestHandlingAndNotifyUserIfExists(String emailAddress) {
+        requestFrequency.merge(emailAddress, 1, Integer::sum);
     }
 
 
@@ -68,7 +68,7 @@ public class PasswordChangeRequestSpamMitigation {
      *
      * @param email The email address for which the request was successfully handled.
      */
-    public static void requestSuccessfullyHandledAndUserPasswordUpdated(String email) {
+    public static void removeRequestHistoryAndFrequencyData(String email) {
         requestHistory.remove(email);
         requestFrequency.remove(email);
     }

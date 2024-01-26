@@ -318,18 +318,10 @@ uil-data:password_reset_forgot_email_contact_us.Vitro
         uil:hasKey      "password_reset_forgot_email_contact_us" ;
         uil:hasPackage  "Vitro-languages" .
 
-uil-data:wrong_captcha.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        rdfs:label       "The letters you have entered do not match what is shown in the security field. Please try again."@en-CA ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "wrong_captcha" ;
-        uil:hasPackage  "Vitro-languages" .
-
 uil-data:functionality_disabled.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Functionality disabled by site admin"@en-CA ;
+        rdfs:label       "Functionality disabled by site admin."@en-CA ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "functionality_disabled" ;
         uil:hasPackage  "Vitro-languages" .
@@ -6412,4 +6404,12 @@ uil-data:captcha_user_sol_invalid.Vitro
         rdfs:label       "Invalid CAPTCHA solution, please try again."@en-CA ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "captcha_user_sol_invalid" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:captcha_not_displayed.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Refresh page if not displayed..."@en-CA ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "captcha_not_displayed" ;
         uil:hasPackage  "Vitro-languages" .

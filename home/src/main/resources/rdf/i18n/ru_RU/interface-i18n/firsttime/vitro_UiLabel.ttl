@@ -262,14 +262,6 @@ uil-data:password_reset_email_sent.Vitro
         uil:hasKey      "password_reset_email_sent" ;
         uil:hasPackage  "Vitro-languages" .
 
-uil-data:wrong_captcha.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        rdfs:label       "Введенные символы не совпали с отображенными в поле безопасности. Пожалуйста, попробуйте еще раз."@ru-RU ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "wrong_captcha" ;
-        uil:hasPackage  "Vitro-languages" .
-
 uil-data:password_reset_too_many_requests.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
@@ -329,7 +321,7 @@ uil-data:password_reset_forgot_email_contact_us.Vitro
 uil-data:functionality_disabled.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Функциональность отключена администратором сайта"@ru-RU ;
+        rdfs:label       "Функциональность отключена администратором сайта."@ru-RU ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "functionality_disabled" ;
         uil:hasPackage  "Vitro-languages" .
@@ -6388,4 +6380,12 @@ uil-data:captcha_user_sol_invalid.Vitro
         rdfs:label       "Недопустимое решение теста Тьюринга для различения компьютеров и людей. Пожалуйста, попробуйте снова."@ru-RU ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "captcha_user_sol_invalid" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:captcha_not_displayed.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Обновите страницу, если не отображается..."@ru-RU ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "captcha_not_displayed" ;
         uil:hasPackage  "Vitro-languages" .

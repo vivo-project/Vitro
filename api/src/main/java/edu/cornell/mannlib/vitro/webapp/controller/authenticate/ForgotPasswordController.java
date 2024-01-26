@@ -11,7 +11,6 @@ import java.util.Optional;
 import java.util.Random;
 
 import javax.mail.Message;
-import javax.servlet.ServletContext;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 
@@ -36,7 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-@WebServlet(name = "forgot-password", urlPatterns = {"/forgot-password"})
+@WebServlet(name = "forgotPassword", urlPatterns = {"/forgotPassword"})
 public class ForgotPasswordController extends FreemarkerHttpServlet {
 
     private static final String RESET_PASSWORD_URL = "/accounts/resetPassword";
@@ -77,10 +76,10 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
      * @return A response containing the appropriate values for rendering the result.
      */
     private ResponseValues handlePostRequest(VitroRequest vreq, Map<String, Object> dataContext) {
-        UserAccountsDao userAccountsDao = constructUserAccountsDao(vreq);
+        UserAccountsDao userAccountsDao = constructUserAccountsDao();
         I18nBundle i18n = I18n.bundle(vreq);
 
-        String email = vreq.getParameter("email");
+        String email = getNonNullTrimmedParameterValue(vreq, "email");
 
         if (!captchaIsValid(vreq)) {
             dataContext.put("wrongCaptcha", true);
@@ -91,7 +90,7 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
         dataContext.put("showPasswordChangeForm", false);
 
         PasswordChangeRequestSpamMitigationResponse mitigationResponse =
-            PasswordChangeRequestSpamMitigation.isPasswordResetRequestable(email);
+            PasswordChangeRequestSpamMitigation.checkPasswordResetRequestAllowed(email);
         if (!mitigationResponse.getCanBeRequested()) {
             dataContext.put("message",
                 i18n.text("password_reset_too_many_requests", mitigationResponse.getNextRequestAvailableAtDate(),
@@ -99,7 +98,7 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
             return new TemplateResponseValues(TEMPLATE_NAME, dataContext);
         }
 
-        Optional<UserAccount> userAccountOptional = getAccountForInternalAuth(email, vreq);
+        Optional<UserAccount> userAccountOptional = getAccountForInternalAuth(email);
         if (userAccountOptional.isPresent()) {
             requestPasswordChange(userAccountOptional.get(), userAccountsDao);
             notifyUser(userAccountOptional.get(), i18n, vreq);
@@ -107,8 +106,8 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
             log.info("User tried to reset password with an unassociated email: " + email);
         }
 
-        PasswordChangeRequestSpamMitigation.requestSuccessfullyHandledAndUserIsNotified(email);
-        return emailSentMessage(dataContext, i18n, email);
+        PasswordChangeRequestSpamMitigation.updateRequestHandlingAndNotifyUserIfExists(email);
+        return emailSentNotification(dataContext, i18n, email);
     }
 
     /**
@@ -126,13 +125,13 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
         String challengeId;
         switch (captchaImpl) {
             case RECAPTCHAV2:
-                captchaInput = nonNullAndTrim(vreq, "g-recaptcha-response");
+                captchaInput = getNonNullTrimmedParameterValue(vreq, "g-recaptcha-response");
                 challengeId = "";
                 break;
             case NANOCAPTCHA:
             default:
-                captchaInput = nonNullAndTrim(vreq, "userSolution");
-                challengeId = nonNullAndTrim(vreq, "challengeId");
+                captchaInput = getNonNullTrimmedParameterValue(vreq, "userSolution");
+                challengeId = getNonNullTrimmedParameterValue(vreq, "challengeId");
         }
 
         return CaptchaServiceBean.validateCaptcha(captchaInput, challengeId);
@@ -208,7 +207,7 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
         String adminShouldBeNotified =
             ConfigurationProperties.getInstance().getProperty("authentication.forgotPassword.notify-admin");
 
-        return Objects.nonNull(adminShouldBeNotified) && Boolean.parseBoolean(adminShouldBeNotified);
+        return Boolean.parseBoolean(adminShouldBeNotified);
     }
 
     /**
@@ -237,7 +236,7 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
      * @param email       The email address to which the notification was sent.
      * @return A ResponseValues object containing the email sent message.
      */
-    private ResponseValues emailSentMessage(Map<String, Object> dataContext, I18nBundle i18n, String email) {
+    private ResponseValues emailSentNotification(Map<String, Object> dataContext, I18nBundle i18n, String email) {
         dataContext.put("message", i18n.text("password_reset_email_sent", email));
         return new TemplateResponseValues(TEMPLATE_NAME, dataContext);
     }
@@ -256,12 +255,10 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
     /**
      * Constructs a UserAccountsDao using the provided VitroRequest.
      *
-     * @param vreq The VitroRequest object for database access.
      * @return A UserAccountsDao instance for user account operations.
      */
-    private UserAccountsDao constructUserAccountsDao(VitroRequest vreq) {
-        ServletContext ctx = vreq.getSession().getServletContext();
-        WebappDaoFactory wdf = ModelAccess.on(ctx).getWebappDaoFactory();
+    private UserAccountsDao constructUserAccountsDao() {
+        WebappDaoFactory wdf = ModelAccess.getInstance().getWebappDaoFactory();
         return wdf.getUserAccountsDao();
     }
 
@@ -281,12 +278,11 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
      * Retrieves a user account for internal authentication based on the provided email address.
      *
      * @param emailAddress The email address associated with the user account.
-     * @param request      The HttpServletRequest containing the context information.
      * @return An Optional containing the user account if found,
      * or empty if not found or if the UserAccountsDao is null.
      */
-    private Optional<UserAccount> getAccountForInternalAuth(String emailAddress, HttpServletRequest request) {
-        UserAccountsDao userAccountsDao = getUserAccountsDao(request);
+    private Optional<UserAccount> getAccountForInternalAuth(String emailAddress) {
+        UserAccountsDao userAccountsDao = getUserAccountsDao();
         if (userAccountsDao == null) {
             return Optional.empty();
         }
@@ -297,11 +293,10 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
     /**
      * Retrieves a UserAccountsDao instance from the provided HttpServletRequest.
      *
-     * @param request The HttpServletRequest for accessing the UserAccountsDao.
      * @return A UserAccountsDao instance for user account operations.
      */
-    private UserAccountsDao getUserAccountsDao(HttpServletRequest request) {
-        UserAccountsDao userAccountsDao = getWebappDaoFactory(request)
+    private UserAccountsDao getUserAccountsDao() {
+        UserAccountsDao userAccountsDao = getWebappDaoFactory()
             .getUserAccountsDao();
         if (userAccountsDao == null) {
             log.error("getUserAccountsDao: no UserAccountsDao");
@@ -313,11 +308,10 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
     /**
      * Retrieves a WebappDaoFactory instance from the provided HttpServletRequest.
      *
-     * @param request The HttpServletRequest for accessing the WebappDaoFactory.
      * @return A WebappDaoFactory instance for database access.
      */
-    private WebappDaoFactory getWebappDaoFactory(HttpServletRequest request) {
-        return ModelAccess.on(request).getWebappDaoFactory();
+    private WebappDaoFactory getWebappDaoFactory() {
+        return ModelAccess.getInstance().getWebappDaoFactory();
     }
 
     /**
@@ -359,7 +353,7 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
      */
     private String getForgotPasswordUrl(VitroRequest request) {
         String contextPath = request.getContextPath();
-        return contextPath + "/forgot-password";
+        return contextPath + "/forgotPassword";
     }
 
     /**
@@ -400,17 +394,17 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
     }
 
     /**
-     * Retrieves the value of the specified request parameter and ensures it is non-null.
+     * Retrieves the non-null and trimmed value of the specified request parameter.
      * If the parameter value is null, an empty string is returned.
      * Leading and trailing whitespace is removed from the parameter value.
      *
-     * @param req the HttpServletRequest containing the parameters
-     * @param key the key of the parameter to retrieve
+     * @param request      the HttpServletRequest containing the parameters
+     * @param parameterKey the key of the parameter to retrieve
      * @return the non-null and trimmed value of the specified request parameter,
      * or an empty string if the parameter is null
      */
-    private String nonNullAndTrim(HttpServletRequest req, String key) {
-        String value = req.getParameter(key);
-        return (value == null) ? "" : value.trim();
+    private String getNonNullTrimmedParameterValue(HttpServletRequest request, String parameterKey) {
+        String parameterValue = request.getParameter(parameterKey);
+        return (parameterValue == null) ? "" : parameterValue.trim();
     }
 }

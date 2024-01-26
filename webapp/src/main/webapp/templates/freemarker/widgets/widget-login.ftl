@@ -67,7 +67,7 @@
 
                 <#if forgotPasswordEnabled == true>
                     <p class="forgot-password">
-                        <a href="${forgotPassword}" style="display: block; margin-left: -40px;">${i18n().password_reset_label}</a>
+                        <a href="${forgotPassword}" class="reset-password-link">${i18n().password_reset_label}</a>
                     </p>
                 </#if>
 
@@ -82,6 +82,13 @@
         </form>
 
     </section><!-- #log-in -->
+
+    <style>
+        .reset-password-link {
+            display: block;
+            margin-left: -40px;
+        }
+    </style>
 </#macro>
 
 <#macro forcePasswordChange>

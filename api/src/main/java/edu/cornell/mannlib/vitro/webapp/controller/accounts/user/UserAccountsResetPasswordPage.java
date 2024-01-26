@@ -42,7 +42,7 @@ public class UserAccountsResetPasswordPage extends UserAccountsPasswordBasePage 
 				+ "' to '" + newPassword + "'");
 
 		PasswordChangeRequestSpamMitigation
-			.requestSuccessfullyHandledAndUserPasswordUpdated(userAccount.getEmailAddress());
+			.removeRequestHistoryAndFrequencyData(userAccount.getEmailAddress());
 		notifyUser();
 	}
 

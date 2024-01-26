@@ -262,14 +262,6 @@ uil-data:password_reset_email_sent.Vitro
         uil:hasKey      "password_reset_email_sent" ;
         uil:hasPackage  "Vitro-languages" .
 
-uil-data:wrong_captcha.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        rdfs:label       "Las letras introducidas no coinciden con las mostradas en el campo de seguridad. Vuelve a intentarlo."@es ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "wrong_captcha" ;
-        uil:hasPackage  "Vitro-languages" .
-
 uil-data:password_reset_too_many_requests.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
@@ -329,7 +321,7 @@ uil-data:password_reset_forgot_email_contact_us.Vitro
 uil-data:functionality_disabled.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Funcionalidad desactivada por el administrador del sitio"@es ;
+        rdfs:label       "Funcionalidad desactivada por el administrador del sitio."@es ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "functionality_disabled" ;
         uil:hasPackage  "Vitro-languages" .
@@ -6388,4 +6380,12 @@ uil-data:captcha_user_sol_invalid.Vitro
         rdfs:label       "Solución CAPTCHA no válida, por favor, inténtelo de nuevo."@es ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "captcha_user_sol_invalid" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:captcha_not_displayed.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Actualizar la página si no se muestra..."@es ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "captcha_not_displayed" ;
         uil:hasPackage  "Vitro-languages" .
