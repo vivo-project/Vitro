@@ -33,7 +33,7 @@ $(document).ready(function(){
         sanitize: false,
         trigger: "click",
         customClass: "vivoTooltip downloadTip",
-        fallbackPlacements: ['bottom', 'left', 'top', 'right'],
+        fallbackPlacements: ['left', 'bottom', 'top', 'right'],
         afterCreate: configSlider,
 
     })
