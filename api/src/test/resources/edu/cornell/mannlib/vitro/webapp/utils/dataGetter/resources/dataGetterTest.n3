@@ -19,6 +19,44 @@ display:query1data
     display:query "SELECT * WHERE { ?uri a <http://xmlns.com/foaf/0.1/Person> } " ;
     display:saveToVar "people" .
 
+display:dataGetterUriParam
+    a <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter>;
+    display:uri "param" ;
+    display:query "SELECT * WHERE { ?uri a ?param } " ;
+    display:saveToVar "people" .
+    
+display:dataGetterStringParam
+    a <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter>;
+    display:string "param" ;
+    display:query "SELECT * WHERE { ?uri <test:has-id> ?param } " ;
+    display:saveToVar "people" .
+    
+display:dataGetterIntParam
+    a <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter>;
+    display:int "param" ;
+    display:query "SELECT * WHERE { ?uri <test:has-id> ?param } " ;
+    display:saveToVar "people" .
+    
+display:dataGetterLongParam
+    a <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter>;
+    display:long "param" ;
+    display:query "SELECT * WHERE { ?uri <test:has-id> ?param } " ;
+    display:saveToVar "people" .
 
+display:dataGetterFloatParam
+    a <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter>;
+    display:float "param" ;
+    display:query "SELECT * WHERE { ?uri <test:has-id> ?param } " ;
+    display:saveToVar "people" .
+    
+display:dataGetterDoubleParam
+    a <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter>;
+    display:double "param" ;
+    display:query "SELECT * WHERE { ?uri <test:has-id> ?param } " ;
+    display:saveToVar "people" .
 
-
+display:dataGetterBooleanParam
+    a <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter>;
+    display:boolean "param" ;
+    display:query "SELECT * WHERE { ?uri <test:has-id> ?param } " ;
+    display:saveToVar "people" .

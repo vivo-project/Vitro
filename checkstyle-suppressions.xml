@@ -1237,7 +1237,6 @@
     <suppress files="src[\\/]test[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]utils[\\/]configuration[\\/]ConfigurationBeanLoader_PropertyTest\.java" checks="."/>
     <suppress files="src[\\/]test[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]utils[\\/]configuration[\\/]ConfigurationBeanLoader_ValidationTest\.java" checks="."/>
     <suppress files="src[\\/]test[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]utils[\\/]dataGetter[\\/]DataGetterUtilsTest\.java" checks="."/>
-    <suppress files="src[\\/]test[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]utils[\\/]dataGetter[\\/]SparqlQueryDataGetterTest\.java" checks="."/>
     <suppress files="src[\\/]test[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]utils[\\/]http[\\/]ContentTypeUtilTest\.java" checks="."/>
     <suppress files="src[\\/]test[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]utils[\\/]ingest[\\/]JenaIngestUtilsTest\.java" checks="."/>
     <suppress files="src[\\/]test[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]utils[\\/]jena[\\/]JenaIngestUtilsTest\.java" checks="."/>

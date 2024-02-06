@@ -28,6 +28,7 @@ import edu.cornell.mannlib.vitro.webapp.i18n.freemarker.I18nMethodModel;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings;
 import edu.cornell.mannlib.vitro.webapp.utils.developer.Key;
+import edu.cornell.mannlib.vitro.webapp.web.directives.DataGetterDirective;
 import edu.cornell.mannlib.vitro.webapp.web.directives.IndividualShortViewDirective;
 import edu.cornell.mannlib.vitro.webapp.web.directives.UrlDirective;
 import edu.cornell.mannlib.vitro.webapp.web.directives.WidgetDirective;
@@ -263,6 +264,7 @@ public abstract class FreemarkerConfiguration {
 			c.setSharedVariable("shortView", new IndividualShortViewDirective());
 			c.setSharedVariable("url", new UrlDirective());
 			c.setSharedVariable("widget", new WidgetDirective());
+			c.setSharedVariable("dataGetter", new DataGetterDirective());
 		}
 
 		private void addMethods(FreemarkerConfigurationImpl c) {
