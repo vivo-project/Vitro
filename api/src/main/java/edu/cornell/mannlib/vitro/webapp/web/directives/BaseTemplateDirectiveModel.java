@@ -4,6 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.web.directives;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -14,7 +16,11 @@ import freemarker.template.SimpleScalar;
 import freemarker.template.Template;
 import freemarker.template.TemplateDirectiveModel;
 import freemarker.template.TemplateException;
+import freemarker.template.TemplateHashModel;
+import freemarker.template.TemplateHashModelEx;
+import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
+import freemarker.template.TemplateModelIterator;
 
 public abstract class BaseTemplateDirectiveModel implements TemplateDirectiveModel {
 
@@ -83,4 +89,23 @@ public abstract class BaseTemplateDirectiveModel implements TemplateDirectiveMod
 		return o.toString();
 	}
 
+    protected Map<String, Object> getOptionalHashModelParameter(Map<?, ?> params, String name) throws TemplateModelException {
+        Object object = params.get(name);
+        if (object == null) {
+            return Collections.emptyMap();
+        }
+        if (!(object instanceof TemplateHashModelEx)) {
+            throw new TemplateModelException(String.format("The %s parameter must be a string value.", name));
+        }
+        TemplateHashModelEx hashModel = (TemplateHashModelEx) object;
+        Map<String, Object> map = new HashMap<>();
+
+        TemplateModelIterator it = hashModel.keys().iterator();
+        while (it.hasNext()) {
+            TemplateModel key = it.next();
+            TemplateModel value = hashModel.get(key.toString());
+            map.put(key.toString(), value);
+        }
+        return map;
+    }
 }

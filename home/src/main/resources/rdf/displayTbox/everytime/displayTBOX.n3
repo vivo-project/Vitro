@@ -135,6 +135,27 @@ display:htmlValue
 display:cannotDeletePage
     a owl:DatatypeProperty.
 
+display:uri
+    a owl:DatatypeProperty.
+
+display:string
+    a owl:DatatypeProperty.
+
+display:int
+    a owl:DatatypeProperty.
+
+display:long
+    a owl:DatatypeProperty.
+
+display:float
+    a owl:DatatypeProperty.
+
+display:double
+    a owl:DatatypeProperty.
+
+display:boolean
+    a owl:DatatypeProperty.
+
 ######### Object Properties#########
 ###Basic
 rdfs:range
