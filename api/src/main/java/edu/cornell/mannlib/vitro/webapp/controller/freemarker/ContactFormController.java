@@ -2,20 +2,24 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.servlet.annotation.WebServlet;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.beans.CaptchaBundle;
+import edu.cornell.mannlib.vitro.webapp.beans.CaptchaServiceBean;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
-
-import javax.servlet.annotation.WebServlet;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  *  Controller for comments ("contact us") page
@@ -30,14 +34,14 @@ public class ContactFormController extends FreemarkerHttpServlet {
     private static final String TEMPLATE_DEFAULT = "contactForm-form.ftl";
     private static final String TEMPLATE_ERROR = "contactForm-error.ftl";
 
+
     @Override
     protected String getTitle(String siteName, VitroRequest vreq) {
         return siteName + " Feedback Form";
     }
 
     @Override
-    protected ResponseValues processRequest(VitroRequest vreq) {
-
+    protected ResponseValues processRequest(VitroRequest vreq) throws IOException {
         ApplicationBean appBean = vreq.getAppBean();
 
         String templateName;
@@ -58,7 +62,9 @@ public class ContactFormController extends FreemarkerHttpServlet {
         }
 
         else {
+            CaptchaServiceBean.addCaptchaRelatedFieldsToPageContext(body);
 
+            body.put("contextPath", vreq.getContextPath());
             body.put("formAction", "submitFeedback");
 
             if (vreq.getHeader("Referer") == null) {
