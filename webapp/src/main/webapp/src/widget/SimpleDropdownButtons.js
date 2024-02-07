@@ -74,7 +74,7 @@ dojo.widget.HtmlSimpleDropdownButtons = function() {
 				if( dojo.html.hasClass(a, "disabled") ) {
 					dojo.html.addClass(arrow, "disabled");
 					dojo.html.disableSelection(li);
-					arrow.onfocus = function(){ this.blur(); }
+					arrow.onfocus = function(){ this.trigger("blur"); }
 				} else {
 					dojo.html.addClass(submenu, this.menuClass);
 					document.body.appendChild(submenu);
@@ -99,7 +99,7 @@ dojo.widget.HtmlSimpleDropdownButtons = function() {
 							sm.style.display = sm.style.display == "block" ? "none" : "block";
 							if(sm.style.display == "none") {
 								dojo.html.removeClass(ar, "pressed");
-								e.target.blur()
+								e.target.trigger("blur")
 							}
 							if(!setWidth && sm.style.display == "block"
 								&& sm.offsetWidth < aa.offsetWidth + ar.offsetWidth) {
@@ -113,7 +113,7 @@ dojo.widget.HtmlSimpleDropdownButtons = function() {
 
 				dojo.event.connect(a, "onclick", function(e) {
 					if(e && e.target && e.target.blur) {
-						e.target.blur();
+						e.target.trigger("blur");
 					}
 				});
 
