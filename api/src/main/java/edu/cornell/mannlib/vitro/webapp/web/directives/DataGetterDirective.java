@@ -40,17 +40,15 @@ public class DataGetterDirective extends BaseTemplateDirectiveModel {
         String variableName = getOptionalSimpleScalarParameter(params, "var");
         HttpServletRequest req = (HttpServletRequest) env.getCustomAttribute("request");
         VitroRequest vreq = new VitroRequest(req);
-        debug(getTimeSince(startTime) + "ms .1");
         try {
-            debug(getTimeSince(startTime) + "ms .2");
             OntModel model = vreq.getDisplayModel();
-            debug(getTimeSince(startTime) + "ms .3");
+            debug(getTimeSince(startTime) + "ms spent before DataGetter retrieval.");
             DataGetter dataGetter = DataGetterUtils.dataGetterForURI(vreq, model, dataGetterUri);
-            debug(getTimeSince(startTime) + "ms .4");
+            debug(getTimeSince(startTime) + "ms spent after DataGetter retrieval.");
             Map<String, Object> parameters = getOptionalHashModelParameter(params, "parameters");
-            debug(getTimeSince(startTime) + "ms .5");
+            debug(getTimeSince(startTime) + "ms spent before DataGetter execution.");
             applyDataGetter(dataGetter, env, parameters, variableName);
-            debug(getTimeSince(startTime) + "ms .6");
+            debug(getTimeSince(startTime) + "ms spent after DataGetter execution.");
         } catch (Exception e) {
             handleException(dataGetterUri, "Could not process data getter '%s'", e);
         }
@@ -79,23 +77,26 @@ public class DataGetterDirective extends BaseTemplateDirectiveModel {
     }
 
     /**
-     * Wrap DataGetter results and assign it to Freemarker environment variable.
+     * Decide under which variable store the data, wrap DataGetter results
+     * and assign it to Freemarker environment variable.
      * 
      * @param env - Freemarker environment
-     * @param overrideVariableName - name of Freemarker variable
-     * @param key - name of data returned by DataGetter
+     * @param overriddenVariable - overridden name of Freemarker variable
+     * @param dataGetterVariableName - default variable name specified in DataGetter configuration
      * @param value - value of data returned by DataGetter
      * 
      */
-    private static void setVariable(Environment env, String overrideVariableName, String key, Object value)
+    private static void setVariable(Environment env, String overriddenVariable, String defaultVariable, Object value)
             throws TemplateModelException {
         ObjectWrapper wrapper = env.getObjectWrapper();
-        if (!StringUtils.isBlank(overrideVariableName)) {
-            env.setVariable(overrideVariableName, wrapper.wrap(value));
-            debug(String.format("Stored in environment: '%s' = '%s'", overrideVariableName, value));
+        if (!StringUtils.isBlank(overriddenVariable)) {
+            env.setVariable(overriddenVariable, wrapper.wrap(value));
+            debug(String.format("Stored overridden variable in Freemarker environment: '%s' = '%s'", overriddenVariable,
+                    value));
         } else {
-            env.setVariable(key, wrapper.wrap(value));
-            debug(String.format("Stored in environment: '%s' = '%s'", key, value));
+            env.setVariable(defaultVariable, wrapper.wrap(value));
+            debug(String.format("Stored default variable in Freemarker environment: '%s' = '%s'", defaultVariable,
+                    value));
         }
     }
 
