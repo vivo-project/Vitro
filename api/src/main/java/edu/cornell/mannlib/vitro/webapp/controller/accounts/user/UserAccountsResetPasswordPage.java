@@ -6,8 +6,6 @@ import static javax.mail.Message.RecipientType.TO;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import edu.cornell.mannlib.vitro.webapp.controller.authenticate.PasswordChangeRequestSpamMitigation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -41,8 +39,6 @@ public class UserAccountsResetPasswordPage extends UserAccountsPasswordBasePage 
 		log.debug("Set password on '" + userAccount.getEmailAddress()
 				+ "' to '" + newPassword + "'");
 
-		PasswordChangeRequestSpamMitigation
-			.removeRequestHistoryAndFrequencyData(userAccount.getEmailAddress());
 		notifyUser();
 	}
 

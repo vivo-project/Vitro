@@ -89,15 +89,6 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
 
         dataContext.put("showPasswordChangeForm", false);
 
-        PasswordChangeRequestSpamMitigationResponse mitigationResponse =
-            PasswordChangeRequestSpamMitigation.checkPasswordResetRequestAllowed(email);
-        if (!mitigationResponse.getCanBeRequested()) {
-            dataContext.put("message",
-                i18n.text("password_reset_too_many_requests", mitigationResponse.getNextRequestAvailableAtDate(),
-                    mitigationResponse.getNextRequestAvailableAtTime()));
-            return new TemplateResponseValues(TEMPLATE_NAME, dataContext);
-        }
-
         Optional<UserAccount> userAccountOptional = getAccountForInternalAuth(email);
         if (userAccountOptional.isPresent()) {
             requestPasswordChange(userAccountOptional.get(), userAccountsDao);
@@ -106,7 +97,6 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
             log.info("User tried to reset password with an unassociated email: " + email);
         }
 
-        PasswordChangeRequestSpamMitigation.updateRequestHandlingAndNotifyUserIfExists(email);
         return emailSentNotification(dataContext, i18n, email);
     }
 
