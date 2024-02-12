@@ -24,7 +24,7 @@ $(document).ready(function(){
                 html: true,
                 sanitize: false,
                 trigger: "click",
-                class: "vivoTooltip",
+                customClass: "vivoTooltip",
                 fallbackPlacements: ['bottom', 'left', 'top', 'right']
 
             }
@@ -32,11 +32,11 @@ $(document).ready(function(){
         {
             querySelector: "span#iconControlsRightSide > img#uriIcon",
             data: {
-                content: '<h5>' + i18nStringsUriRdf.shareProfileUri + '</h5> <input id="uriLink" type="text" value="' + $('#uriIcon').attr('title') + '" /><h5><a class ="rdf-url" href="' + individualRdfUrl + '">' + i18nStringsUriRdf.viewRDFProfile + '</a></h5><a class="close" href="#">' + i18nStringsUriRdf.closeString + '</a>',
+                title: '<h5>' + i18nStringsUriRdf.shareProfileUri + '</h5> <input id="uriLink" type="text" value="' + $('#uriIcon').attr('title') + '" /><h5><a class ="rdf-url" href="' + individualRdfUrl + '">' + i18nStringsUriRdf.viewRDFProfile + '</a></h5><a class="close" href="#">' + i18nStringsUriRdf.closeString + '</a>',
                 html: true,
                 sanitize: false,
                 trigger: "click",
-                class: "vivoTooltip",
+                customClass: "vivoTooltip",
                 fallbackPlacements: ['bottom', 'right', 'top', 'left']
             }
         },
