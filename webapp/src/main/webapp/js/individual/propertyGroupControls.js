@@ -18,6 +18,27 @@ $(document).ready(function(){
         });
     }
 
+    showAllBtn?.addEventListener('show.bs.tab', function (event) {
+        event.preventDefault()
+        showAllTabs();
+        manageLocalStorage();
+    })
+
+    showAllBtn?.addEventListener('hide.bs.tab', function (event) {
+        $(".tab-content>section.tab-pane").removeClass('show active')
+    })
+
+    tabList?.addEventListener('shown.bs.tab', function (event) {
+        manageLocalStorage();
+    })
+
+    function showAllTabs() {
+        $('.propertyTabsList.nav.nav-tabs > li').each(function() {
+            $(this).attr("aria-selected", "false");
+            $(this).removeClass("active");
+        });
+    }
+
     // controls the property group tabs
     $.each($('li.clickable'), function() {
         var groupName = $(this).attr("groupName");
