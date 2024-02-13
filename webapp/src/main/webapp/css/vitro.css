@@ -73,7 +73,14 @@
 .contentNote p {
     font-size: .8em;
 }
-
+.clearfix:before,
+.clearfix:after {
+  display: table;
+  content: " ";
+}
+.clearfix:after {
+  clear: both;
+}
 
 /* <------ INDEX PAGE*/
 .siteMap h2 {
@@ -530,6 +537,14 @@ table#table-listing td  a {
     border-radius: 0;
 }
 
+.vivoTooltip > .tooltip-inner .close-footer {
+    display: flex;
+}
+  
+.vivoTooltip > .tooltip-inner .close-footer a.close {
+    margin-left: auto;
+}
+
 .vivoTooltip > .tooltip-inner h5 {
     padding-bottom: 0;
 }
@@ -557,3 +572,4 @@ table#table-listing td  a {
     text-align: left;
     line-height: 12px;
 } 
+
