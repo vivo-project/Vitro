@@ -14,7 +14,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.IndividualAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
@@ -22,6 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Exc
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.controller.individual.IndividualRequestInfo.Type;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 
 /**
@@ -113,6 +118,26 @@ public class IndividualController extends FreemarkerHttpServlet {
 			return new ExceptionResponseValues(e);
 		}
 	}
+	
+    @Override
+    public AuthorizationRequest requiredActions(VitroRequest vreq) {
+        try {
+            IndividualRequestInfo requestInfo = analyzeTheRequest(vreq);
+            switch (requestInfo.getType()) {
+                case RDF_REDIRECT:
+                case NO_INDIVIDUAL:
+                case BYTESTREAM_REDIRECT:
+                    return AuthorizationRequest.AUTHORIZED;
+                default:
+                    AccessObject ao = new IndividualAccessObject(requestInfo.getIndividual().getURI());
+                    ao.setModel(vreq.getJenaOntModel());
+                    AuthorizationRequest request = new SimpleAuthorizationRequest(ao, AccessOperation.DISPLAY);
+                    return request;
+            }
+        } catch (Throwable e) {
+            return AuthorizationRequest.UNAUTHORIZED;
+        }
+    }
 
 	private IndividualRequestInfo analyzeTheRequest(VitroRequest vreq) {
 		return new IndividualRequestAnalyzer(vreq,

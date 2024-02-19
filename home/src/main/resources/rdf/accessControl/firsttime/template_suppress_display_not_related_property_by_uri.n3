@@ -1,0 +1,164 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/suppress-display-not-related-property/> .
+
+:PolicyTemplate a access:PolicyTemplate ;
+    access:priority 5000 ;
+    access:hasRule :SuppressDisplayPropertyStatementWithBlacklistedProperty ;
+    access:hasDataSet :SelfEditorObjectPropertyDataSet ;
+    access:hasDataSet :SelfEditorDataPropertyDataSet ;
+    access:hasDataSet :SelfEditorFauxObjectPropertyDataSet ;
+    access:hasDataSet :SelfEditorFauxDataPropertyDataSet ;
+    .
+
+### Suppress Display not related object property data sets
+
+#Object properties
+
+:SelfEditorObjectPropertyDataSet a access:DataSet ;
+    access:hasDataSetKey :SelfEditorObjectPropertyDataSetKey ;
+    access:hasRelatedValueSet access-individual:SelfEditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :SelfEditorObjectPropertyValueSet ;
+    .
+
+:SelfEditorObjectPropertyDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:ObjectProperty ;
+    access:hasKeyComponent access-individual:SelfEditorRoleUri ;
+    access:hasKeyComponent access-individual:DisplayOperation ;
+    access:hasKeyComponent access-individual:NotRelated ;
+    access:hasKeyComponent access-individual:SuppressionByUri ;
+    .
+
+#Data properties
+
+:SelfEditorDataPropertyDataSet a access:DataSet ;
+    access:hasDataSetKey :SelfEditorDataPropertyDataSetKey ;
+    access:hasRelatedValueSet access-individual:SelfEditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :SelfEditorDataPropertyValueSet ;
+    .
+
+:SelfEditorDataPropertyDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:DataProperty ;
+    access:hasKeyComponent access-individual:SelfEditorRoleUri ;
+    access:hasKeyComponent access-individual:DisplayOperation ;
+    access:hasKeyComponent access-individual:NotRelated ;
+    access:hasKeyComponent access-individual:SuppressionByUri ;
+    .
+
+#Faux object properties
+
+:SelfEditorFauxObjectPropertyDataSet a access:DataSet ;
+    access:hasDataSetKey :SelfEditorFauxObjectPropertyDataSetKey ;
+    access:hasRelatedValueSet access-individual:SelfEditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :SelfEditorFauxObjectPropertyValueSet ;
+    .
+
+:SelfEditorFauxObjectPropertyDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:FauxObjectProperty ;
+    access:hasKeyComponent access-individual:SelfEditorRoleUri ;
+    access:hasKeyComponent access-individual:DisplayOperation ;
+    access:hasKeyComponent access-individual:NotRelated ;
+    access:hasKeyComponent access-individual:SuppressionByUri ;
+    .
+
+#Faux data properties
+
+:SelfEditorFauxDataPropertyDataSet a access:DataSet ;
+    access:hasDataSetKey :SelfEditorFauxDataPropertyDataSetKey ;
+    access:hasRelatedValueSet access-individual:SelfEditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :SelfEditorFauxDataPropertyValueSet ;
+    .
+
+:SelfEditorFauxDataPropertyDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:FauxDataProperty ;
+    access:hasKeyComponent access-individual:SelfEditorRoleUri ;
+    access:hasKeyComponent access-individual:DisplayOperation ;
+    access:hasKeyComponent access-individual:NotRelated ;
+    access:hasKeyComponent access-individual:SuppressionByUri ;
+    .
+
+#Rule
+
+:SuppressDisplayPropertyStatementWithBlacklistedProperty a access:Rule;
+    access:hasDecision access-individual:Deny ;
+    access:requiresCheck :SubjectRoleCheck ;
+    access:requiresCheck :OperationCheck ;
+    access:requiresCheck :AccessObjectStatementTypeCheck ;
+    access:requiresCheck :StatementPredicateCheck ;
+    access:requiresCheck :RelationCheck ;
+    .
+
+#Checks
+
+:RelationCheck a access:Check ;
+    access:useOperator access-individual:SparqlSelectQueryResultsNotContain ;
+    access:hasTypeToCheck access-individual:StatementSubjectUri ;
+    access:value access-individual:PersonProfileProximityToResourceUri ;
+    .
+
+:AccessObjectStatementTypeCheck a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:AccessObjectType ;
+    access:values access-individual:ObjectPropertyStatementValueSet ;
+    access:values access-individual:DataPropertyStatementValueSet ;
+    access:values access-individual:FauxObjectPropertyStatementValueSet ;
+    access:values access-individual:FauxDataPropertyStatementValueSet ;
+    .
+
+:OperationCheck a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:Operation ;
+    access:values access-individual:DisplayOperationValueSet ;
+    .
+
+:SubjectRoleCheck a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:SubjectRole ;
+    access:values access-individual:SelfEditorRoleValueSet ;
+    .
+
+:StatementPredicateCheck a access:Check ;
+    access:useOperator access-individual:OneOf ;
+    access:hasTypeToCheck access-individual:StatementPredicateUri ;
+    access:values :SelfEditorObjectPropertyValueSet ;
+    access:values :SelfEditorDataPropertyValueSet ;
+    access:values :SelfEditorFauxObjectPropertyValueSet ;
+    access:values :SelfEditorFauxDataPropertyValueSet ;
+    .
+
+:AccessObjectUriCheck a access:Check ;
+    access:useOperator access-individual:OneOf ;
+    access:hasTypeToCheck access-individual:AccessObjectUri ;
+    access:values :SelfEditorObjectPropertyValueSet ;
+    access:values :SelfEditorDataPropertyValueSet ;
+    access:values :SelfEditorFauxObjectPropertyValueSet ;
+    access:values :SelfEditorFauxDataPropertyValueSet ;
+    .
+
+#Value sets
+
+:SelfEditorObjectPropertyValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:ObjectProperty ;
+    .
+
+:SelfEditorDataPropertyValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:DataProperty ;
+    .
+
+:SelfEditorFauxObjectPropertyValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:FauxObjectProperty ;
+    .
+
+:SelfEditorFauxDataPropertyValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:FauxDataProperty ;
+    .

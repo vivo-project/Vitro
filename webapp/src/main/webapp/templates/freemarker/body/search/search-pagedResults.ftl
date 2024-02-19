@@ -47,7 +47,7 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/bootstrap-5.
 <#macro printResultNumbers>
 	<h2 class="searchResultsHeader">
 	<#escape x as x?html>
-	    ${hitCount} ${i18n().results_found} 
+	    ${i18n().results_found(hitCount)} 
 	</#escape>
 	<script type="text/javascript">
 		var url = window.location.toString();
@@ -266,14 +266,18 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/bootstrap-5.
 	<#if sorting?has_content>
 		<div>
 			<select form="search-form" name="sort" id="search-form-sort" onchange="this.form.submit()" >
-				<option value="">${i18n().search_results_sort_by} ${i18n().search_results_relevance}</option>
+			    <#assign addDefaultOption = true>
 				<#list sorting as option>
 					<#if option.selected>
-						<option value="${option.id}" selected="selected">${i18n().search_results_sort_by} ${option.label}</option>
+						<option value="${option.id}" selected="selected">${i18n().search_results_sort_by(option.label)}</option>
+						<#assign addDefaultOption = false>
 					<#else>
-						<option value="${option.id}" >${i18n().search_results_sort_by} ${option.label}</option>
+						<option value="${option.id}" >${i18n().search_results_sort_by(option.label)}</option>
 					</#if>
 				</#list>
+				<#if addDefaultOption>
+					<option disabled selected value="" style="display:none">${i18n().search_results_sort_by('')}</option>
+				</#if>
 			</select>
 		</div>
 	</#if>
@@ -284,9 +288,9 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/bootstrap-5.
 	<select form="search-form" name="hitsPerPage" id="search-form-hits-per-page" onchange="this.form.submit()">
 		<#list hitsPerPageOptions as option>
 			<#if option == hitsPerPage>
-				<option value="${option}" selected="selected">${option} ${i18n().search_results_per_page}</option>
+				<option value="${option}" selected="selected">${i18n().search_results_per_page(option)}</option>
 			<#else>
-				<option value="${option}">${option} ${i18n().search_results_per_page}</option>
+				<option value="${option}">${i18n().search_results_per_page(option)}</option>
 			</#if>
 		</#list>
 	</select>

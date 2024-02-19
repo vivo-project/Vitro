@@ -34,6 +34,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
 public class PropertyRetryController extends BaseEditController {
@@ -182,8 +183,11 @@ public class PropertyRetryController extends BaseEditController {
         request.setAttribute("scripts","/templates/edit/formBasic.js");
         request.setAttribute("title","Property Editing Form");
         request.setAttribute("_action",action);
+        request.setAttribute("i18n", I18n.bundle(request));
 
         addAccessAttributes(request, propertyForEditing.getURI(), AccessObjectType.OBJECT_PROPERTY);
+        addNotRelatedPropertySuppressions(request, propertyForEditing.getURI(), AccessObjectType.OBJECT_PROPERTY);
+
         setRequestAttributes(request,epo);
 
         try {

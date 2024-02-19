@@ -69,7 +69,7 @@
     <input id="${BaseEditController.ENTITY_TYPE_ATTRIBUTE_NAME}" type="hidden" name="${BaseEditController.ENTITY_TYPE_ATTRIBUTE_NAME}" value="${_faux_property_type}" />
 	<c:forEach var="entry" items="${operationsToRoles}">
 		<tr class="editformcell">
-			<td valign="top" colspan="5"><b>${entry.key}</b> permissions for this property<br /> 
+			<td valign="top" colspan="5">${i18n.text('operation_permissions_for_this_property', entry.key)}<br /> 
 				<c:set var="operationLowercase" value="${fn:toLowerCase(entry.key)}" />
 				<c:forEach var="role" items="${entry.value}">
 					<input id="${operationLowercase}${role.label}"
@@ -86,6 +86,30 @@
 			</td>
 		</tr>
 	</c:forEach>
+	<!-- Property suppressions (not related) -->
+	<c:if test="${!empty propertySuppressionsNotRelated}">
+	    <input id="${BaseEditController.PROPERTY_SUPPRESSIONS_NOT_RELATED}" type="hidden" name="${BaseEditController.PROPERTY_SUPPRESSIONS_NOT_RELATED}" value="enabled" />
+		<c:forEach var="entry" items="${propertySuppressionsNotRelated}">
+			<tr class="editformcell">
+				<td valign="top" colspan="5">${i18n.text('suppress_operation_for_this_property_in_unrelated_individuals', entry.key)}<br /> 
+					<c:set var="operationLowercase" value="${fn:toLowerCase(entry.key)}" />
+					<c:forEach var="role" items="${entry.value}">
+						<input id="propertySuppressionNotRelated${operationLowercase}${role.label}"
+							type="checkbox" name="propertySuppressionNotRelated${operationLowercase}Roles"
+							value="${role.uri}" ${role.granted?'checked':''}
+							${role.enabled?'':'disabled'} />
+						<label class="inline" for="${operationLowercase}${role.label}">${role.label}</label>
+					</c:forEach>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<hr class="formDivider" />
+				</td>
+			</tr>
+		</c:forEach>
+	</c:if>
+	<!-- Property suppressions (not related) end -->
 </c:if>
 <!-- Permissions End -->
 

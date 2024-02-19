@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -95,38 +96,51 @@ public class PolicyLoader {
     private static final String NO_DATASET_RULES_QUERY = ""
             + "prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#>\n"
             + "prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
-            + "SELECT DISTINCT ?policyUri ?rule ?check ?testId ?typeId ?value ?lit_value ?decision_id \n"
+            + "SELECT DISTINCT ?policyUri ?rule ?check ?config ?attributeValue "
+            + "?testId ?typeId ?value ?lit_value ?decision_id \n"
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
-            + "?policy a access:Policy .\n"
-            + "?policy access:hasRule ?rule . \n"
-            + "?rule access:requiresCheck ?check .\n"
-            + "OPTIONAL {\n"
-            + "  ?check access:useOperator ?checkTest .\n"
-            + "  OPTIONAL {\n"
-            + "    ?checkTest access:id ?testId . \n"
+            + "    ?policy a access:Policy .\n"
+            + "    ?policy access:hasRule ?rule . \n"
+            + "    ?rule access:requiresCheck ?check .\n"
+            + "    OPTIONAL {\n"
+            + "      ?check access:useOperator ?checkTest .\n"
+            + "      OPTIONAL {\n"
+            + "        ?checkTest access:id ?testId . \n"
+            + "      }\n"
+            + "    }\n"
+            + "    OPTIONAL {\n"
+            + "      ?check access:hasTypeToCheck ?checkType . \n"
+            + "      OPTIONAL {\n"
+            + "        ?checkType access:id ?typeId . \n"
+            + "      }\n"
+            + "    }\n"
+            + "    OPTIONAL {\n"
+            + "      ?check access:useConfiguration ?configUri . \n"
+            + "      ?configUri access:id ?config . \n"
+            + "    }\n"
+            + "    OPTIONAL {\n"
+            + "      ?rule access:hasDecision ?decision . \n"
+            + "      ?decision access:id ?decision_id . \n"
+            + "    }\n"
+            + "    {\n"
+            + "      ?check access:values ?attributeValue .\n"
+            + "      ?attributeValue access:value ?value .\n"
+            + "      OPTIONAL { ?value access:id ?lit_value . }\n"
+            + "    }\n"
+            + "      UNION \n"
+            + "    {\n"
+            + "      ?check access:value ?value .\n"
+            + "      OPTIONAL {?value access:id ?lit_value . }\n"
+            + "    }\n"
+            + "    BIND(?policy as ?policyUri)\n"
             + "  }\n"
-            + "}"
-            + "OPTIONAL {\n"
-            + "  ?check access:hasTypeToCheck ?checkType . \n"
-            + "  OPTIONAL {\n"
-            + "    ?checkType access:id ?typeId . \n"
-            + "  }\n"
-            + "}\n"
-            + "OPTIONAL {\n"
-            + "   ?rule access:hasDecision ?decision . \n"
-            + "   ?decision access:id ?decision_id . \n"
-            + "}\n"
-            + "?check access:value ?value . \n"
-            + "OPTIONAL {?value access:id ?lit_value . }\n"
-            + "  }\n"
-            + "BIND(?policy as ?policyUri)\n"
             + "} ORDER BY ?rule ?check";
 
     private static final String DATASET_RULES_QUERY = ""
             + "prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#>\n"
             + "prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
-            + "SELECT DISTINCT ?policyUri ?rule ?check ?testId ?typeId ?value ?lit_value ?decision_id "
+            + "SELECT DISTINCT ?policyUri ?rule ?check ?config ?testId ?typeId ?value ?lit_value ?decision_id "
             + " ?dataSetUri ?attributeValue ?setElementsType \n"
             + "WHERE {\n"
             + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
@@ -146,6 +160,10 @@ public class PolicyLoader {
             + "      OPTIONAL {\n"
             + "        ?checkType access:id ?typeId .\n"
             + "      }\n"
+            + "    }\n"
+            + "    OPTIONAL {\n"
+            + "      ?check access:useConfiguration ?configUri . \n"
+            + "      ?configUri access:id ?config . \n"
             + "    }\n"
             + "    OPTIONAL {\n"
             + "      ?rule access:hasDecision ?decision .\n"
@@ -261,6 +279,10 @@ public class PolicyLoader {
             + "    OPTIONAL {\n"
             + "      ?keyComponent a access:SubjectRoleUri .\n"
             + "      BIND('SUBJECT_ROLE_URI' as ?type)\n"
+            + "    }\n"
+            + "    OPTIONAL {\n"
+            + "      ?keyComponent a access:NamedKeyComponent .\n"
+            + "      BIND('NAMED_KEY_COMPONENT' as ?type)\n"
             + "    }\n"
             + "  }\n"
             + "}\n";
@@ -443,8 +465,7 @@ public class PolicyLoader {
     public Set<String> getDataSetValues(AccessOperation ao, AccessObjectType aot, String role) {
         Set<String> values = new HashSet<>();
         long expectedSize = 3;
-        String queryText = getDataSetByKeyQuery(new String[] {},
-                new String[] { ao.toString(), aot.toString(), role });
+        String queryText = getDataSetByKeyQuery(ao.toString(), aot.toString(), role);
         ParameterizedSparqlString pss = new ParameterizedSparqlString(queryText);
         pss.setLiteral("setElementsId", aot.toString());
         queryText = pss.toString();
@@ -478,9 +499,14 @@ public class PolicyLoader {
         return values;
     }
 
-    public String getEntityValueSetUri(AccessOperation ao, AccessObjectType aot, String role) {
-        long expectedSize = 3;
-        String queryText = getDataSetByKeyQuery(new String[] { }, new String[] { ao.toString(), aot.toString(), role });
+    public String getEntityValueSetUri(AccessOperation ao, AccessObjectType aot, String role,
+            String... namedKeyComponents) {
+        int expectedSize = 3 + namedKeyComponents.length;
+        String[] ids = Arrays.copyOf(namedKeyComponents, expectedSize);
+        ids[ids.length - 1] = ao.toString();
+        ids[ids.length - 2] = aot.toString();
+        ids[ids.length - 3] = role;
+        String queryText = getDataSetByKeyQuery(ids);
         ParameterizedSparqlString pss = new ParameterizedSparqlString(queryText);
         pss.setLiteral("setElementsId", aot.toString());
         queryText = pss.toString();
@@ -496,7 +522,7 @@ public class PolicyLoader {
                     }
                     long keySize = qs.getLiteral("keySize").getLong();
                     if (expectedSize != keySize) {
-                        log.error("wrong key size. Expected " + expectedSize + ". Actual " + keySize );
+                        debug("wrong key size. Expected " + expectedSize + ". Actual " + keySize );
                         return;
                     }
                     uri[0] = qs.getResource("valueSet").getURI();
@@ -579,11 +605,8 @@ public class PolicyLoader {
         return query.toString();
     }
 
-    private static String getDataSetByKeyQuery(String[] uris, String[] ids) {
+    private static String getDataSetByKeyQuery(String... ids) {
         StringBuilder query = new StringBuilder(policyKeyTemplatePrefix);
-        for (String uri : uris) {
-            query.append(String.format("  ?dataSetKeyUri access:hasKeyComponent <%s> . \n", uri));
-        }
         int i = 0;
         for (String id : ids) {
             query.append(String.format(
@@ -626,9 +649,7 @@ public class PolicyLoader {
                 @Override
                 protected void processQuerySolution(QuerySolution qs) {
                     try {
-                        if (isInvalidPolicySolution(qs)) {
-                            throw new Exception();
-                        }
+                        isInvalidPolicySolution(qs);
                         if (isRuleContinues(rules, qs)) {
                             String ruleUri = qs.getResource("rule").getURI();
                             populateRule(rules.get(ruleUri), qs, null);
@@ -666,9 +687,7 @@ public class PolicyLoader {
                 @Override
                 protected void processQuerySolution(QuerySolution qs) {
                     try {
-                        if (isInvalidPolicySolution(qs)) {
-                            throw new Exception();
-                        }
+                        isInvalidPolicySolution(qs);
                         if (isRuleContinues(rules, qs)) {
                             String ruleUri = qs.getResource("rule").getURI();
                             populateRule(rules.get(ruleUri), qs, dataSetKey);
@@ -748,36 +767,33 @@ public class PolicyLoader {
         }
     }
 
-    private static boolean isInvalidPolicySolution(QuerySolution qs) {
+    private static void isInvalidPolicySolution(QuerySolution qs) {
         if (!qs.contains("policyUri") || !qs.get("policyUri").isResource()) {
-            log.debug("Query solution doesn't contain policy uri");
-            return true;
+            throw new InvalidSolutionException("Query solution doesn't contain policy uri");
         }
         String policy = qs.get("policyUri").asResource().getURI();
         if (!qs.contains("rule") || !qs.get("rule").isResource()) {
-            log.debug(String.format("Query solution for policy <%s> doesn't contain rule uri", policy));
-            return true;
+            throw new InvalidSolutionException(
+                    String.format("Query solution for policy <%s> doesn't contain rule uri", policy));
         }
         String rule = qs.get("rule").asResource().getLocalName();
         if (!qs.contains("check") || !qs.get("check").isResource()) {
-            log.debug(String.format("Query solution for policy <%s> doesn't contain check uri", policy));
-            return true;
+            throw new InvalidSolutionException(
+                    String.format("Query solution for policy <%s> doesn't contain check uri", policy));
         }
         String check = qs.get("check").asResource().getLocalName();
         if (!qs.contains("value")) {
-            log.debug(String.format("Query solution for policy <%s> rule %s check %s doesn't contain value", policy,
-                    rule, check));
-            return true;
+            throw new InvalidSolutionException(String.format(
+                    "Query solution for policy <%s> rule %s check %s doesn't contain value", policy, rule, check));
         }
         if (!qs.contains("typeId") || !qs.get("typeId").isLiteral()) {
-            log.debug(String.format("Query solution for policy <%s> doesn't contain check type id", policy));
-            return true;
+            throw new InvalidSolutionException(
+                    String.format("Query solution for policy <%s> doesn't contain check type id", policy));
         }
         if (!qs.contains("testId") || !qs.get("testId").isLiteral()) {
-            log.debug(String.format("Query solution for policy <%s> doesn't contain check test id", policy));
-            return true;
+            throw new InvalidSolutionException(
+                    String.format("Query solution for policy <%s> doesn't contain check test id", policy));
         }
-        return false;
     }
 
     private static void debug(String template, Object... objects) {
@@ -801,9 +817,9 @@ public class PolicyLoader {
         return cs;
     }
 
-    public String getDataSetUriByKey(String[] uris, String[] ids) {
-        long expectedSize = uris.length + ids.length;
-        final String queryText = getDataSetByKeyQuery(uris, ids);
+    public String getDataSetUriByKey(String... ids) {
+        long expectedSize = ids.length;
+        final String queryText = getDataSetByKeyQuery(ids);
         debug("SPARQL Query to get policy data set values:\n %s", queryText);
         String[] uri = new String[1];
         try {
@@ -850,6 +866,9 @@ public class PolicyLoader {
                             }
                             if (Attribute.SUBJECT_ROLE_URI.toString().equals(type)) {
                                 compositeKey.setRole(id);
+                            }
+                            if ("NAMED_KEY_COMPONENT".equals(type)) {
+                                compositeKey.addNamedKey(id);
                             }
                         }
                     } else {

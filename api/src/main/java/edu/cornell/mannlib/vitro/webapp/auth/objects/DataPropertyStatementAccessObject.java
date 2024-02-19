@@ -15,7 +15,7 @@ public class DataPropertyStatementAccessObject extends AccessObject {
 
     public DataPropertyStatementAccessObject(OntModel ontModel, String subjectUri, String predicateUri,
             String dataValue) {
-        setStatementOntModel(ontModel);
+        setModel(ontModel);
         setStatementSubject(subjectUri);
         setStatementPredicate(new Property(predicateUri));
         setStatementObject(dataValue);
@@ -24,7 +24,7 @@ public class DataPropertyStatementAccessObject extends AccessObject {
 
     public DataPropertyStatementAccessObject(OntModel ontModel, String subjectUri, Property predicate,
             String dataValue) {
-        setStatementOntModel(ontModel);
+        setModel(ontModel);
         setStatementSubject(subjectUri);
         setStatementPredicate(predicate);
         setStatementObject(dataValue);
@@ -32,7 +32,7 @@ public class DataPropertyStatementAccessObject extends AccessObject {
     }
 
     public DataPropertyStatementAccessObject(OntModel ontModel, DataPropertyStatement dps) {
-        setStatementOntModel(ontModel);
+        setModel(ontModel);
         setStatementSubject((dps.getIndividual() == null) ? dps.getIndividualURI() : dps.getIndividual().getURI());
         setStatementPredicate(new Property(dps.getDatapropURI()));
         setStatementObject(dps.getData());

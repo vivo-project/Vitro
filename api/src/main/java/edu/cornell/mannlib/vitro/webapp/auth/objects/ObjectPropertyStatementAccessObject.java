@@ -14,7 +14,7 @@ public class ObjectPropertyStatementAccessObject extends AccessObject {
 
     public ObjectPropertyStatementAccessObject(Model ontModel, String subjectUri, Property predicate,
             String objectUri) {
-        setStatementOntModel(ontModel);
+        setModel(ontModel);
         setStatementSubject(subjectUri);
         setStatementPredicate(predicate);
         setStatementObject(objectUri);

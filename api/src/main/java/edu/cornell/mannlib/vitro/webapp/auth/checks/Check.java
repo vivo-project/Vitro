@@ -26,4 +26,8 @@ public interface Check {
 
     long getComputationalCost();
 
+    void setConfiguration(String configuration);
+
+    String getConfiguration();
+
 }

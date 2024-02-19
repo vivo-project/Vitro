@@ -1,0 +1,84 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/suppress-display-not-related-individual-page-by-type-/> .
+
+:PolicyTemplate a access:PolicyTemplate ;
+    access:priority 1500 ;
+    access:hasRule :SuppressMatchingUri ;
+    access:hasDataSet :SelfEditorDisplaySuppressionDataSet ;
+    .
+
+### SelfEditor display uri data sets
+
+:SelfEditorDisplaySuppressionDataSet a access:DataSet ;
+    access:hasDataSetKey :SelfEditorDisplaySuppressionDataSetKey ;
+    access:hasRelatedValueSet access-individual:SelfEditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:IndividualValueSet ;
+    access:hasRelatedValueSet access-individual:DisplayOperationValueSet ;
+    access:hasRelatedValueSet :SelfEditorDisplayValueSet .
+
+:SelfEditorDisplaySuppressionDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:IndividualAccessObject ;
+    access:hasKeyComponent access-individual:SelfEditorRoleUri ;
+    access:hasKeyComponent access-individual:SuppressionByType ;
+    access:hasKeyComponent access-individual:NotRelated ;
+    access:hasKeyComponent access-individual:DisplayOperation .
+
+### Rule
+
+:SuppressMatchingUri a access:Rule;
+    access:hasDecision access-individual:Deny ;
+    access:requiresCheck :SubjectRoleCheck ;
+    access:requiresCheck :OperationCheck ;
+    access:requiresCheck :AccessObjectTypeCheck ;
+    access:requiresCheck :RelationCheck ;
+    access:requiresCheck :AccessObjectClassCheck .
+
+### Checks
+
+:AccessObjectTypeCheck a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:AccessObjectType ;
+    access:values access-individual:IndividualValueSet ;
+    .
+
+:OperationCheck a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:Operation ;
+    access:values access-individual:DisplayOperationValueSet ;
+    .
+
+:SubjectRoleCheck a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:SubjectRole ;
+    access:values access-individual:SelfEditorRoleValueSet .
+
+:AccessObjectClassCheck a access:Check ;
+    access:useOperator access-individual:SparqlSelectQueryResultsContain ;
+    access:useConfiguration :IndividualTypeQuery ;
+    access:hasTypeToCheck access-individual:AccessObjectUri ;
+    access:values :SelfEditorDisplayValueSet ;
+    .
+
+:RelationCheck a access:Check ;
+    access:useOperator access-individual:SparqlSelectQueryResultsNotContain ;
+    access:hasTypeToCheck access-individual:AccessObjectUri ;
+    access:value access-individual:PersonProfileProximityToResourceUri
+    .
+
+
+:IndividualTypeQuery a access:SparqlSelectValuesQuery ;
+    access:id """
+		SELECT ?type WHERE {
+		    ?objectUri <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?type .
+		}
+    """ .
+
+###Value sets
+
+:SelfEditorDisplayValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:IndividualAccessObject .
+

@@ -1,0 +1,14 @@
+@prefix : <https://vivoweb.org/ontology/vitro-search-individual/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+:filter_group_search_filters rdfs:label "Filteri za pretragu"@sr-Latn-RS .
+:filter_type rdfs:label "Tip"@sr-Latn-RS .
+:filter_category rdfs:label "Kategorija"@sr-Latn-RS .
+:sort_title_desc rdfs:label "Naslov Z-A"@sr-Latn-RS .
+:sort_title_asc rdfs:label "Naslov A-Z"@sr-Latn-RS .
+:sort_by_relevance rdfs:label "Relevantnost"@sr-Latn-RS .
+:field_label_sort rdfs:label "Polje za sortiranje oznaka"@sr-Latn-RS .
+:field_category rdfs:label "Odeljenska grupa"@sr-Latn-RS .
+:field_type rdfs:label "Tip"@sr-Latn-RS .
+:filter_querytext rdfs:label "Tekst"@sr-Latn-RS .
+:field_querytext rdfs:label "Podrazumevano polje"@sr-Latn-RS .

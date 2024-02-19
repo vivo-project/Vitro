@@ -22,6 +22,6 @@ access-individual:PublicationInProximityAttribute rdf:type access:Check ;
 access-individual:PublicationProximityToPerson rdf:type access:ValueSet ;
     access:id """
     SELECT ?resourceUri WHERE {
-              ?personUri <test:has_publication> ?resourceUri .
+              ?profileUri <test:has_publication> ?resourceUri .
     }
     """ .

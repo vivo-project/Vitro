@@ -344,7 +344,7 @@ public class PolicyHelper_ModelsTest extends AbstractTestClass {
 
 			Statement friendStmt = objectStatement(PRIMARY_RESOURCE_URI,
 					FRIEND_PREDICATE_URI, subjectUri);
-			if (statementExists(action.getStatementOntModel(), friendStmt)) {
+			if (statementExists(action.getModel(), friendStmt)) {
 				return authorized();
 			}
 

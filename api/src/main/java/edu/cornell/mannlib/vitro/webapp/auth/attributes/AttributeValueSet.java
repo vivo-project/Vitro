@@ -1,5 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.auth.attributes;
 
+import java.util.Set;
+
 public interface AttributeValueSet {
 
     void add(String value);
@@ -25,5 +27,7 @@ public interface AttributeValueSet {
     void setDataSetUri(String dataSetUri);
 
     void setKey(AttributeValueKey key);
+
+    Set<String> getValues();
 
 }

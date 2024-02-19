@@ -44,6 +44,9 @@
         vitro-search:order         30 ;
         vitro-search:id            "titleasc" .
 
+:sort_by_relevance a                vitro-search:Sort ;
+        vitro-search:id            "relevance" .
+
 :field_label_sort
         a                          vitro-search:SearchField ;
         vitro-search:isLanguageSpecific true ;

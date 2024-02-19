@@ -1,0 +1,13 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/hide-not-related-property/> .
+
+:SelfEditorHideNotRelatedObjectPropertyValueSet access:value <http://vivoweb.org/ontology/core#hasCollaborator> .
+
+:SelfEditorHideNotRelatedFauxObjectPropertyValueSet access:value <http://vitro.mannlib.cornell.edu/ns/vitro/siteConfig/hasResearcherRoleConfig> .
+
+:SelfEditorHideNotRelatedDataPropertyValueSet access:value <http://www.w3.org/2000/01/rdf-schema#label> .
+
+:SelfEditorHideNotRelatedFauxDataPropertyValueSet access:value <http://vitro.mannlib.cornell.edu/ns/vitro/siteConfig/fp4181> .
+

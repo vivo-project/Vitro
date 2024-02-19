@@ -58,6 +58,11 @@
     rdfs:comment "Represents attribute uri value";
     rdfs:label "Attribute uri value"@en-US .
 
+:NamedKeyComponent a owl:Class ;
+    rdfs:subClassOf :AttributeValuePattern ;
+    rdfs:comment "Represents named key component";
+    rdfs:label "Named key component"@en-US .
+
 :SubjectRoleUri a owl:Class ;
     rdfs:subClassOf :AttributeUriValue ;
     rdfs:comment "Represents role uri";
@@ -148,6 +153,12 @@
     rdfs:label "use operator"@en-US ;
     rdfs:domain :Check ;
     rdfs:range :Operator .
+
+:useConfiguration a owl:ObjectProperty ;
+    rdfs:comment "Use configuration in case :Check needs additional configuration";
+    rdfs:label "use configuration"@en-US ;
+    rdfs:domain :Check ;
+    rdfs:range :AttributeValuePattern .
 
 :hasTypeToCheck a owl:ObjectProperty ,
     owl:FunctionalProperty ;
