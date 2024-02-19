@@ -258,73 +258,73 @@ uil-data:password_reset_email_sent.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
         rdfs:label       "Письмо для восстановления пароля отправлено на {0}, если оно связано с существующим аккаунтом."@ru-RU ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "password_reset_email_sent" ;
-        uil:hasPackage  "Vitro-languages" .
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_email_sent" ;
+        uil:hasPackage   "Vitro-languages" .
 
 uil-data:password_reset_too_many_requests.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
         rdfs:label       "Следующий запрос вы сможете отправить {0} в {1}."@ru-RU ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "password_reset_too_many_requests" ;
-        uil:hasPackage  "Vitro-languages" .
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_too_many_requests" ;
+        uil:hasPackage   "Vitro-languages" .
 
 uil-data:password_reset_label.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
         rdfs:label       "Я забыл свой пароль"@ru-RU ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "password_reset_label" ;
-        uil:hasPackage  "Vitro-languages" .
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_label" ;
+        uil:hasPackage   "Vitro-languages" .
 
 uil-data:password_reset_title.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
         rdfs:label       "Сброс пароля"@ru-RU ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "password_reset_title" ;
-        uil:hasPackage  "Vitro-languages" .
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_title" ;
+        uil:hasPackage   "Vitro-languages" .
 
 uil-data:password_reset_button.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
         rdfs:label       "Сбросить пароль"@ru-RU ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "password_reset_button" ;
-        uil:hasPackage  "Vitro-languages" .
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_button" ;
+        uil:hasPackage   "Vitro-languages" .
 
 uil-data:password_reset_manual.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
         rdfs:label       "Для сброса пароля, введите ваш адрес электронной почты:"@ru-RU ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "password_reset_manual" ;
-        uil:hasPackage  "Vitro-languages" .
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_manual" ;
+        uil:hasPackage   "Vitro-languages" .
 
 uil-data:password_reset_forgot_email.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
         rdfs:label       "Если вы не помните свой адрес электронной почты, пожалуйста,"@ru-RU ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "password_reset_forgot_email" ;
-        uil:hasPackage  "Vitro-languages" .
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_forgot_email" ;
+        uil:hasPackage   "Vitro-languages" .
 
 uil-data:password_reset_forgot_email_contact_us.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
         rdfs:label       "свяжитесь с нами"@ru-RU ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "password_reset_forgot_email_contact_us" ;
-        uil:hasPackage  "Vitro-languages" .
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_forgot_email_contact_us" ;
+        uil:hasPackage   "Vitro-languages" .
 
 uil-data:functionality_disabled.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
         rdfs:label       "Функциональность отключена администратором сайта."@ru-RU ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "functionality_disabled" ;
-        uil:hasPackage  "Vitro-languages" .
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "functionality_disabled" ;
+        uil:hasPackage   "Vitro-languages" .
 
 uil-data:startup_status.Vitro
         rdf:type         owl:NamedIndividual ;
