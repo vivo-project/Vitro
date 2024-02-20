@@ -6382,7 +6382,6 @@ uil-data:captcha_user_sol_invalid.Vitro
         uil:hasKey      "captcha_user_sol_invalid" ;
         uil:hasPackage  "Vitro-languages" .
 
-<<<<<<< HEAD
 uil-data:captcha_not_displayed.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;

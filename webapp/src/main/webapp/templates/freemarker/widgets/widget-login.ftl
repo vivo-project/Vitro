@@ -82,13 +82,6 @@
         </form>
 
     </section><!-- #log-in -->
-
-    <style>
-        .reset-password-link {
-            display: block;
-            margin-left: -40px;
-        }
-    </style>
 </#macro>
 
 <#macro forcePasswordChange>
