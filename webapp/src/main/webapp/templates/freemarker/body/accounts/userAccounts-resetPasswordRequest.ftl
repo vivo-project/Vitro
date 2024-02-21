@@ -40,8 +40,9 @@
                 </#if>
 
                 <br/>
+                <#assign contactFormUrl = "${contactUrl}" />
                 <#if contactEmailConfigured>
-                    <p>${i18n().password_reset_forgot_email} <a href="${contactUrl}">${i18n().password_reset_forgot_email_contact_us}</a>.</p>
+                    <p>${i18n().password_reset_forgot_email(contactFormUrl)}</p>
                 </#if>
             </div>
         </form>

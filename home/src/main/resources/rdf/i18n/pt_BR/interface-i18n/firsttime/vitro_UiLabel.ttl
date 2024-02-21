@@ -297,17 +297,9 @@ uil-data:password_reset_manual.Vitro
 uil-data:password_reset_forgot_email.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Se você não se lembra do seu email, por favor"@pt-BR ;
+        rdfs:label       "Se você não se lembra do seu email, por favor <a href=\"{0}\">entre em contato conosco</a>."@pt-BR ;
         uil:hasApp       "Vitro" ;
         uil:hasKey       "password_reset_forgot_email" ;
-        uil:hasPackage   "Vitro-languages" .
-
-uil-data:password_reset_forgot_email_contact_us.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        rdfs:label       "entre em contato conosco"@pt-BR ;
-        uil:hasApp       "Vitro" ;
-        uil:hasKey       "password_reset_forgot_email_contact_us" ;
         uil:hasPackage   "Vitro-languages" .
 
 uil-data:functionality_disabled.Vitro
