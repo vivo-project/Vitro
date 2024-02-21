@@ -6389,7 +6389,7 @@ uil-data:captcha_not_displayed.Vitro
         uil:hasApp      "Vitro" ;
         uil:hasKey      "captcha_not_displayed" ;
         uil:hasPackage  "Vitro-languages" .
-=======
+
 	uil-data:suppress_operation_for_roles.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
@@ -6437,5 +6437,3 @@ uil-data:suppress_operation_for_unrelated_individuals_of_this_class.Vitro
         uil:hasApp       "Vitro" ;
         uil:hasKey       "suppress_operation_for_unrelated_individuals_of_this_class" ;
         uil:hasPackage   "Vitro-languages" .
-
->>>>>>> main
