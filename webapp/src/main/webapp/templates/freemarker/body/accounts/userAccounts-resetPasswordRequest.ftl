@@ -12,6 +12,10 @@
                 <label for="email">${i18n().password_reset_manual}</label>
                 <input type="email" id="email" name="email" value="${emailValue}" class="text-field focus" placeholder="user@example.com" required>
 
+                <#if errorMessage??>
+                    <p class="errorMessage">${errorMessage!}</p>
+                </#if>
+
                 <#if captchaToUse == "RECAPTCHAV2">
                     <div class="g-recaptcha" data-sitekey="${siteKey!}"></div>
                     <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response" />
