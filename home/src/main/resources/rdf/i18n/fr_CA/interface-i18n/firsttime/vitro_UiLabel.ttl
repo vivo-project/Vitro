@@ -262,14 +262,6 @@ uil-data:password_reset_email_sent.Vitro
         uil:hasKey       "password_reset_email_sent" ;
         uil:hasPackage   "Vitro-languages" .
 
-uil-data:password_reset_too_many_requests.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        rdfs:label       "Vous pourrez envoyer la prochaine demande le {0} à {1}."@fr-CA ;
-        uil:hasApp       "Vitro" ;
-        uil:hasKey       "password_reset_too_many_requests" ;
-        uil:hasPackage   "Vitro-languages" .
-
 uil-data:password_reset_label.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
