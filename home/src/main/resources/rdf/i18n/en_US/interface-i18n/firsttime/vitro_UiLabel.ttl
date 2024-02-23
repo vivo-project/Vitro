@@ -6329,7 +6329,7 @@ uil-data:no_individual_associated_with_id.Vitro
 uil-data:password_reset_admin_notification_email_subject.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "${siteName} reset password request"@en-CA ;
+        rdfs:label       "Password Reset Request for ${siteName}"@en-CA ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "password_reset_admin_notification_email_subject" ;
         uil:hasPackage  "Vitro-languages" .
