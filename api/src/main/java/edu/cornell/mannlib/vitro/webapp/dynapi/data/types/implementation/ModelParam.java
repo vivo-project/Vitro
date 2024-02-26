@@ -47,7 +47,7 @@ public class ModelParam extends Parameter {
 	private ImplementationConfig getSerializationConfig() throws ClassNotFoundException {
 		ImplementationConfig serializationConfig = new ImplementationConfig();
 		serializationConfig.setClassName(DynapiInMemoryOntModel.class.getCanonicalName());
-		serializationConfig.setMethodName("serialize");
+		serializationConfig.setMethodName("serializeN3");
 		serializationConfig.setMethodArguments("input");
 		serializationConfig.setStaticMethod(true);
 		return serializationConfig;

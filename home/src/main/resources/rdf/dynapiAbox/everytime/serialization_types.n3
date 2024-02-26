@@ -93,8 +93,8 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/internal-model>
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Jena internal model deserialization config"@en-US ;
-        dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory" ;
-        dynapi:methodName 		"getModel";
+        dynapi:className 	"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory" ;
+        dynapi:methodName 	"getModel";
         dynapi:methodArguments	"input";
         dynapi:isStaticMethod	"true"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
@@ -103,7 +103,7 @@
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Jena internal model serialization config"@en-US ;
         dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiInMemoryOntModel" ;
-        dynapi:methodName 		"serialize";
+        dynapi:methodName 		"serializeN3";
         dynapi:methodArguments	"input";
         dynapi:isStaticMethod	"true"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
@@ -112,7 +112,7 @@
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Jena model deserialization config"@en-US ;
         dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiInMemoryOntModel" ;
-        dynapi:methodName 		"deserialize";
+        dynapi:methodName 		"deserializeN3";
         dynapi:methodArguments	"input";
         dynapi:isStaticMethod	"true"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
@@ -121,7 +121,7 @@
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Jena model serialization config"@en-US ;
         dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiInMemoryOntModel" ;
-        dynapi:methodName 		"serialize";
+        dynapi:methodName	 	"serializeN3";
         dynapi:methodArguments	"input";
         dynapi:isStaticMethod	"true"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
