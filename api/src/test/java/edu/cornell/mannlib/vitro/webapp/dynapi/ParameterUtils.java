@@ -39,10 +39,10 @@ public class ParameterUtils {
 		implType.setClassName(Model.class.getCanonicalName());
 		paramType.setImplementationType(implType);
 
-		ImplementationConfig serConfig = createConfig(ModelWriterTest.MODEL_CONVERSION_CLASS, "input", "serialize",
+		ImplementationConfig serConfig = createConfig(ModelWriterTest.MODEL_CONVERSION_CLASS, "input", "serializeN3",
 				true);
 		implType.setSerializationConfig(serConfig);
-		ImplementationConfig desConfig = createConfig(ModelWriterTest.MODEL_CONVERSION_CLASS, "input", "deserialize",
+		ImplementationConfig desConfig = createConfig(ModelWriterTest.MODEL_CONVERSION_CLASS, "input", "deserializeN3",
 				true);
 		implType.setDeserializationConfig(desConfig);
 		uriParam.setType(paramType);
