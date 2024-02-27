@@ -133,7 +133,7 @@ public class JSONConverter {
             return mapper.convertValue(Boolean.parseBoolean(serializedValue), BooleanNode.class);
         }
         if (BinaryView.isByteArray(data)) {
-            return mapper.convertValue(Boolean.parseBoolean(serializedValue), BinaryNode.class);
+            return mapper.convertValue(serializedValue, TextNode.class);
         }
         // TODO: implement other types: BigIntegerNode, DecimalNode, DoubleNode,
         // FloatNode, IntNode, LongNode, ShortNode
