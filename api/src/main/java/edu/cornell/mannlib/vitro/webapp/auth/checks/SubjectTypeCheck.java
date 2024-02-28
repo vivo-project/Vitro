@@ -4,8 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.auth.checks;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.Attribute;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueSet;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.IsRootUser;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,8 +18,7 @@ public class SubjectTypeCheck extends AbstractCheck {
 
     @Override
     public boolean check(AuthorizationRequest ar) {
-        IdentifierBundle ac_subject = ar.getIds();
-        String inputValue = IsRootUser.isRootUser(ac_subject) ? "ROOT_USER" : "";
+        String inputValue = ar.isRootUser() ? "ROOT_USER" : "";
         if (AttributeValueChecker.test(this, ar, inputValue)) {
             log.debug("Attribute subject type match requested object type '");
             return true;

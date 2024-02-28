@@ -21,13 +21,8 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
-
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasAssociatedIndividual;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.IdentifierPermissionSetProvider;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.DataPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyStatementAccessObject;
@@ -46,84 +41,77 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
  * are authorized by current policy.
  */
 public class PolicyHelper {
-	private static final Log log = LogFactory.getLog(PolicyHelper.class);
+    private static final Log log = LogFactory.getLog(PolicyHelper.class);
+    private static UserAccount nullUserAccount = new UserAccount();
 
-	public static boolean isAuthorizedForActions(HttpServletRequest req, AccessObject ar, AccessOperation operation) {
-		IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(req);
-		return actionRequestIsAuthorized(ids, ar, operation);
-	}
-	
-    public static boolean isAuthorizedForActions(IdentifierBundle ids, AccessObject ar, AccessOperation op) {
-        return actionRequestIsAuthorized(ids, ar, op);
+    public static UserAccount getUserAccount(HttpServletRequest req) {
+        UserAccount userAccount = LoginStatusBean.getCurrentUser(req);
+        if (userAccount == null) {
+            return nullUserAccount ;
+        }
+        return userAccount;
     }
     
-    public static boolean isAuthorizedForActions(IdentifierBundle ids, AuthorizationRequest ar) {
-        if (ar == null) {
-            log.error("AuthorizationRequest is null");
-            return false;
-        }
-        if (ar.getPredefinedDecision() != DecisionResult.INCONCLUSIVE){
-            return ar.getPredefinedDecision() == DecisionResult.AUTHORIZED;
-        }
-        if (ar.getWrapType() != null) {
-            return processUnwrappedAuthorizationRequest(ar, ids);
-        }
-        return actionRequestIsAuthorized(ids, ar.getAccessObject(), ar.getAccessOperation());
+    public static boolean isAuthorizedForActions(UserAccount user, AccessObject ar, AccessOperation op) {
+        return actionRequestIsAuthorized(user, ar, op);
     }
 
     public static boolean isAuthorizedForActions(HttpServletRequest req, AuthorizationRequest ar) {
+        UserAccount userAccount = getUserAccount(req);
+        return isAuthorizedForActions(userAccount, ar);
+    }
+
+    public static boolean isAuthorizedForActions(HttpServletRequest req, AccessObject ar, AccessOperation operation) {
+        UserAccount userAccount = getUserAccount(req);
+        return actionRequestIsAuthorized(userAccount, ar, operation);
+    }
+
+    public static boolean isAuthorizedForActions(UserAccount userAccount, AuthorizationRequest ar) {
         if (ar == null) {
             log.error("AuthorizationRequest is null");
             return false;
         }
-        if (ar.getPredefinedDecision() != DecisionResult.INCONCLUSIVE){
+        if (ar.getPredefinedDecision() != DecisionResult.INCONCLUSIVE) {
             return ar.getPredefinedDecision() == DecisionResult.AUTHORIZED;
         }
-        IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(req);
         if (ar.getWrapType() != null) {
-            return processUnwrappedAuthorizationRequest(ar, ids);
+            return processUnwrappedAuthorizationRequest(ar, userAccount);
         }
-        return actionRequestIsAuthorized(ids, ar.getAccessObject(), ar.getAccessOperation());
+        return actionRequestIsAuthorized(userAccount, ar.getAccessObject(), ar.getAccessOperation());
     }
 
-    private static boolean processUnwrappedAuthorizationRequest(AuthorizationRequest ar, IdentifierBundle ids) {
+    private static boolean processUnwrappedAuthorizationRequest(AuthorizationRequest ar, UserAccount userAccount) {
         List<AuthorizationRequest> items = ar.getItems();
         boolean result = false;
         if (WRAP_TYPE.OR == ar.getWrapType()) {
-            for (AuthorizationRequest item : items ) {
-                result = result || isAuthorizedForActions(ids, item);
-            }    
+            for (AuthorizationRequest item : items) {
+                result = result || isAuthorizedForActions(userAccount, item);
+            }
         } else {
             result = true;
-            for (AuthorizationRequest item : items ) {
-                result = result && isAuthorizedForActions(ids, item);
-            } 
+            for (AuthorizationRequest item : items) {
+                result = result && isAuthorizedForActions(userAccount, item);
+            }
         }
         return result;
     }
 
-	private static boolean actionRequestIsAuthorized(IdentifierBundle ids, AccessObject ao, AccessOperation operation) {
-	    if (operation == null) {
-	        log.error("Opeartion is null, accessObject " + ao );
-	        return false;
-	    }
+    private static boolean actionRequestIsAuthorized(UserAccount userAccount, AccessObject ao,
+            AccessOperation operation) {
+        if (operation == null) {
+            log.error("Opeartion is null, accessObject " + ao);
+            return false;
+        }
         if (ao == null) {
             log.error("Access object is null, operation " + operation);
             return false;
         }
         AuthorizationRequest ar = new SimpleAuthorizationRequest(ao, operation);
-        Collection<String> uris = IdentifierPermissionSetProvider.getPermissionSetUris(ids);
-        if (uris.isEmpty()) {
-            uris.add(VitroVocabulary.VITRO_AUTH + "PUBLIC");
-        }
-        ar.setRoleUris(new ArrayList<String>(uris));
-        
-        ar.setIds(ids);
-        ar.setEditorUris(new ArrayList<String>(HasAssociatedIndividual.getIndividualUris(ids)));
-	    PolicyDecision decision = PolicyDecisionPoint.decide(ar);
-	    debug(ar, decision);
+        ar.setUserAccount(userAccount);
+        PolicyDecision decision = PolicyDecisionPoint.decide(ar);
+        debug(ar, decision);
         return decision.getDecisionResult() == DecisionResult.AUTHORIZED;
-	}
+    }
 
 	private static void debug(AuthorizationRequest ar, PolicyDecision decision) {
 	    if (log.isDebugEnabled()) {
@@ -166,8 +154,7 @@ public class PolicyHelper {
 					+ "account URI: %s", email, uri));
 
 			// figure out if that account can do the actions
-			IdentifierBundle ids = ActiveIdentifierBundleFactories.getUserIdentifierBundle(user);
-			return isAuthorizedForActions(ids, ar);
+			return isAuthorizedForActions(user, ar);
 		} catch (Exception ex) {
 			log.error("Error while attempting to authorize actions " + ar, ex);
 			return false;

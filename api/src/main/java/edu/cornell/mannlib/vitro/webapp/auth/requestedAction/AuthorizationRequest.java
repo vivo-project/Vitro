@@ -4,11 +4,12 @@ package edu.cornell.mannlib.vitro.webapp.auth.requestedAction;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DecisionResult;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 
 public abstract class AuthorizationRequest {
 
@@ -17,14 +18,7 @@ public abstract class AuthorizationRequest {
     
     public static enum WRAP_TYPE { AND , OR } ; 
     
-    IdentifierBundle ids;
-    private List<String> editorUris = Collections.emptyList();
-    List<String> roleUris = Collections.emptyList();
-
-    
-    public void setRoleUris(List<String> roleUris) {
-        this.roleUris = roleUris;
-    }
+    private UserAccount userAccount;
 
     public WRAP_TYPE getWrapType() {
         return null;
@@ -42,24 +36,20 @@ public abstract class AuthorizationRequest {
     
     public abstract AccessOperation getAccessOperation();
 
-    public IdentifierBundle getIds() {
-        return ids;
-    }
-    
-    public List<String> getRoleUris() {
-        return roleUris;
-    }
-    
-    public void setIds(IdentifierBundle ids) {
-        this.ids = ids;
+    public Set<String> getRoleUris() {
+        return userAccount.getPermissionSetUris();
     }
 
-    public void setEditorUris(List<String> list) {
-        editorUris = list;
+    public void setUserAccount(UserAccount userAccount) {
+        this.userAccount = userAccount;
+    }
+    
+    public UserAccount getUserAccount() {
+        return userAccount;
     }
 
-    public List<String> getEditorUris(){
-        return editorUris;
+    public Set<String> getEditorUris() {
+        return userAccount.getProxiedIndividualUris();
     }
 
     public static AuthorizationRequest or(AuthorizationRequest fist, AuthorizationRequest second) {
@@ -79,14 +69,13 @@ public abstract class AuthorizationRequest {
     @Override
     public String toString() {
         String result = "";
-        if (!getRoleUris().isEmpty()) {
-            result += String.format("User with roles '%s' ", getRoleUris().toString());
-        }
-        if (!getEditorUris().isEmpty()) {
-            result += String.format(" profile uris '%s' ", getEditorUris().toString());
-        }
         result += String.format(" requested '%s' ", getAccessOperation());
         result += String.format(" on '%s' ", getAccessObject());
         return result;
     }
+
+    public boolean isRootUser() {
+        return userAccount.isRootUser();
+    }
+
 }

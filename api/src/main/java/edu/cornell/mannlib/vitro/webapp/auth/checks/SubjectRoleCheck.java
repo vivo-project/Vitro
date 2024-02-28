@@ -2,11 +2,13 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.checks;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.Attribute;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueSet;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -20,7 +22,10 @@ public class SubjectRoleCheck extends AbstractCheck {
 
     @Override
     public boolean check(AuthorizationRequest ar) {
-        final List<String> inputValues = ar.getRoleUris();
+        List<String> inputValues = new ArrayList<String>(ar.getRoleUris());
+        if (inputValues.isEmpty()) {
+            inputValues.add(VitroVocabulary.ROLE_PUBLIC_URI);
+        }
         if (AttributeValueChecker.test(this, ar, inputValues.toArray(new String[0]))) {
             log.debug("Attribute match requested '" + inputValues + "'");
             return true;

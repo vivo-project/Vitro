@@ -9,7 +9,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DecisionResult;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.TestAuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.auth.rules.AccessRule;
 import org.junit.Test;
 
@@ -36,7 +36,7 @@ public class SimplePermissionTemplateTest extends PolicyTest {
         assertEquals(true, rule.isAllowMatched());
         assertEquals(4, rule.getChecksCount());
 
-        SimpleAuthorizationRequest ar = new SimpleAuthorizationRequest(SimplePermission.NS + "SeeSiteAdminPage");
+        TestAuthorizationRequest ar = new TestAuthorizationRequest(SimplePermission.NS + "SeeSiteAdminPage");
         ar.setRoleUris(Arrays.asList(CURATOR));
         assertEquals(DecisionResult.INCONCLUSIVE, policy.decide(ar).getDecisionResult());
         ar.setRoleUris(Arrays.asList(ADMIN));
@@ -57,7 +57,7 @@ public class SimplePermissionTemplateTest extends PolicyTest {
         assertEquals(true, rule.isAllowMatched());
         assertEquals(4, rule.getChecksCount());
 
-        SimpleAuthorizationRequest ar = new SimpleAuthorizationRequest(SimplePermission.NS + "EditOntology");
+        TestAuthorizationRequest ar = new TestAuthorizationRequest(SimplePermission.NS + "EditOntology");
         ar.setRoleUris(Arrays.asList(EDITOR));
         assertEquals(DecisionResult.INCONCLUSIVE, policy.decide(ar).getDecisionResult());
         ar.setRoleUris(Arrays.asList(CURATOR));
@@ -78,7 +78,7 @@ public class SimplePermissionTemplateTest extends PolicyTest {
         assertEquals(true, rule.isAllowMatched());
         assertEquals(4, rule.getChecksCount());
 
-        SimpleAuthorizationRequest ar = new SimpleAuthorizationRequest(SimplePermission.NS + "DoBackEndEditing");
+        TestAuthorizationRequest ar = new TestAuthorizationRequest(SimplePermission.NS + "DoBackEndEditing");
         ar.setRoleUris(Arrays.asList(SELF_EDITOR));
         assertEquals(DecisionResult.INCONCLUSIVE, policy.decide(ar).getDecisionResult());
         ar.setRoleUris(Arrays.asList(EDITOR));
@@ -99,7 +99,7 @@ public class SimplePermissionTemplateTest extends PolicyTest {
         assertEquals(true, rule.isAllowMatched());
         assertEquals(4, rule.getChecksCount());
 
-        SimpleAuthorizationRequest ar = new SimpleAuthorizationRequest(SimplePermission.NS + "DoFrontEndEditing");
+        TestAuthorizationRequest ar = new TestAuthorizationRequest(SimplePermission.NS + "DoFrontEndEditing");
         ar.setRoleUris(Arrays.asList(PUBLIC));
         assertEquals(DecisionResult.INCONCLUSIVE, policy.decide(ar).getDecisionResult());
         ar.setRoleUris(Arrays.asList(SELF_EDITOR));
@@ -120,7 +120,7 @@ public class SimplePermissionTemplateTest extends PolicyTest {
         assertEquals(true, rule.isAllowMatched());
         assertEquals(4, rule.getChecksCount());
 
-        SimpleAuthorizationRequest ar = new SimpleAuthorizationRequest(SimplePermission.NS + "QueryFullModel");
+        TestAuthorizationRequest ar = new TestAuthorizationRequest(SimplePermission.NS + "QueryFullModel");
         ar.setRoleUris(Arrays.asList(""));
         assertEquals(DecisionResult.INCONCLUSIVE, policy.decide(ar).getDecisionResult());
         ar.setRoleUris(Arrays.asList(PUBLIC));
@@ -146,7 +146,7 @@ public class SimplePermissionTemplateTest extends PolicyTest {
         assertEquals(true, rule.isAllowMatched());
         assertEquals(4, rule.getChecksCount());
 
-        SimpleAuthorizationRequest ar = new SimpleAuthorizationRequest(SimplePermission.NS + "QueryFullModel");
+        TestAuthorizationRequest ar = new TestAuthorizationRequest(SimplePermission.NS + "QueryFullModel");
         ar.setRoleUris(Arrays.asList(PUBLIC));
         assertEquals(DecisionResult.INCONCLUSIVE, policy.decide(ar).getDecisionResult());
         ar.setRoleUris(Arrays.asList(CUSTOM));
