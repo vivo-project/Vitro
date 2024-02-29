@@ -46,4 +46,9 @@ public class TestAuthorizationRequest extends SimpleAuthorizationRequest {
         return isRoot;
     }
 
+    @Override
+    public String getExternalAuthId() {
+        return "";
+    }
+
 }

@@ -32,7 +32,7 @@ public class EditablePagesPolicyTest extends PolicyTest {
         assertEquals(1, policies.size());
         DynamicPolicy policy = policies.iterator().next();
         assertTrue(policy != null);
-        countRulesAndAttributes(policy, 1, new HashSet<>(Arrays.asList(6)));
+        countRulesAndAttributes(policy, 2, new HashSet<>(Arrays.asList(6)));
     }
 
     @Test

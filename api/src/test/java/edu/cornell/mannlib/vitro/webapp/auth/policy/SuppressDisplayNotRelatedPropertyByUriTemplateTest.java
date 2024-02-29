@@ -80,7 +80,7 @@ public class SuppressDisplayNotRelatedPropertyByUriTemplateTest extends PolicyTe
         DynamicPolicy policy = loader.loadPolicyFromTemplateDataSet(dataSetUri);
         assertTrue(policy != null);
         assertEquals(5000, policy.getPriority());
-        countRulesAndAttributes(policy, 1, Collections.singleton(5));
+        countRulesAndAttributes(policy, 1, Collections.singleton(6));
         policyDeniesAccess(policy, dataModel);
         policyNotAffectsOtherTypes(policy, dataModel);
         policyNotAffectsOtherEntities(policy, dataModel);
@@ -93,7 +93,7 @@ public class SuppressDisplayNotRelatedPropertyByUriTemplateTest extends PolicyTe
         AccessObject object = getAccessObject(targetModel, TEST_PROPERTY);
         TestAuthorizationRequest ar = new TestAuthorizationRequest(object, ao);
         ar.setRoleUris(Arrays.asList(roleUri));
-        ar.setEditorUris(new HashSet(Arrays.asList(TEST_ENTITY)));
+        ar.setEditorUris(new HashSet<String>(Arrays.asList(TEST_ENTITY)));
         assertEquals(INCONCLUSIVE, policy.decide(ar).getDecisionResult());
     }
 

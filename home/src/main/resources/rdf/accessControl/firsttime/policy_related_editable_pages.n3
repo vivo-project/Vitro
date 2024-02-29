@@ -6,11 +6,20 @@
 @prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/edit-related-individual-pages/> .
 
 :Policy a access:Policy ;
+    access:hasRule :AllowEditRelatedPagesMatchedByExternalIdRule ;
     access:hasRule :AllowEditRelatedPagesRule .
 
 :AllowEditRelatedPagesRule a access:Rule;
     access:requiresCheck :SubjectRoleIsSelfEditor ;
     access:requiresCheck :SubjectUriIsProfileRelatedResource ;
+    access:requiresCheck :IsEditOperation ;
+    access:requiresCheck :IsObjectPropertyStatement ;
+    access:requiresCheck :ObjectUriIsSomeUri ;
+    access:requiresCheck :PredicateIsSomePredicate .
+    
+:AllowEditRelatedPagesMatchedByExternalIdRule a access:Rule;
+    access:requiresCheck :SubjectRoleIsSelfEditor ;
+    access:requiresCheck :SubjectUriIsProfileMatchedByExternalIdRelatedResource ;
     access:requiresCheck :IsEditOperation ;
     access:requiresCheck :IsObjectPropertyStatement ;
     access:requiresCheck :ObjectUriIsSomeUri ;
@@ -40,6 +49,11 @@
     access:useOperator access-individual:SparqlSelectQueryResultsContain ;
     access:hasTypeToCheck access-individual:StatementSubjectUri ;
     access:value access-individual:PersonProfileProximityToResourceUri .
+    
+:SubjectUriIsProfileMatchedByExternalIdRelatedResource a access:Check ;
+    access:useOperator access-individual:SparqlSelectQueryResultsContain ;
+    access:hasTypeToCheck access-individual:StatementSubjectUri ;
+    access:value access-individual:ExternalIdMatchProfileProximityToResourceUri .
 
 :IsObjectPropertyStatement a access:Check ;
     access:useOperator access-individual:Equals ;

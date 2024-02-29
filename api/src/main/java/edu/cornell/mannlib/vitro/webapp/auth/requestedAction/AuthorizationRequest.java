@@ -51,6 +51,10 @@ public abstract class AuthorizationRequest {
     public Set<String> getEditorUris() {
         return userAccount.getProxiedIndividualUris();
     }
+    
+    public String getExternalAuthId() {
+        return userAccount.getExternalAuthId();
+    }
 
     public static AuthorizationRequest or(AuthorizationRequest fist, AuthorizationRequest second) {
         if (fist == null) {
