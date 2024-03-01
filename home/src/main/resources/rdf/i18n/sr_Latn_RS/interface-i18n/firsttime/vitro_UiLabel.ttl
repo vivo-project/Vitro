@@ -6429,3 +6429,27 @@ uil-data:suppress_operation_for_unrelated_individuals_of_this_class.Vitro
         uil:hasApp       "Vitro" ;
         uil:hasKey       "suppress_operation_for_unrelated_individuals_of_this_class" ;
         uil:hasPackage   "Vitro-languages" .
+
+uil-data:password_reset_admin_notification_email_subject.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "${siteName} zahtev za resetovanje lozinke"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_admin_notification_email_subject" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:password_reset_admin_notification_email_plain_text.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Primili smo zahtev za resetovanje lozinke za korisnika ${userAccount.firstName} ${userAccount.lastName} (${userAccount.emailAddress}).\n\nDobili ste ovu poruku jer su obaveštenja za administratore o resetovanju lozinke omogućena."@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_admin_notification_email_plain_text" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:password_reset_admin_notification_email_html.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "<p><br /> Primili smo zahtev za resetovanje lozinke za korisnika ${userAccount.firstName} ${userAccount.lastName} (${userAccount.emailAddress}).<br /> </p> <br /><br /> <p><br /> Dobili ste ovu poruku jer su obaveštenja za administratore o resetovanju lozinke omogućena.</p>"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_admin_notification_email_html" ;
+        uil:hasPackage   "Vitro-languages" .

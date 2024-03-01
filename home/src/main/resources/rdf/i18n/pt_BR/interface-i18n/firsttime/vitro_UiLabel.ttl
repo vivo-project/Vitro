@@ -6421,3 +6421,27 @@ uil-data:suppress_operation_for_unrelated_individuals_of_this_class.Vitro
         uil:hasApp       "Vitro" ;
         uil:hasKey       "suppress_operation_for_unrelated_individuals_of_this_class" ;
         uil:hasPackage   "Vitro-languages" .
+
+uil-data:password_reset_admin_notification_email_subject.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "${siteName} solicitação de redefinição de senha"@pt-BR ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_admin_notification_email_subject" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:password_reset_admin_notification_email_plain_text.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Recebemos uma solicitação para redefinir a senha do usuário ${userAccount.firstName} ${userAccount.lastName} (${userAccount.emailAddress}).\n\nVocê está recebendo este email porque as notificações de administrador para redefinições de senha estão habilitadas."@pt-BR ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_admin_notification_email_plain_text" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:password_reset_admin_notification_email_html.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "<p><br /> Recebemos uma solicitação para redefinir a senha do usuário ${userAccount.firstName} ${userAccount.lastName} (${userAccount.emailAddress}).<br /> </p> <br /><br /> <p><br /> Você está recebendo este email porque as notificações de administrador para redefinições de senha estão habilitadas.</p>"@pt-BR ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_admin_notification_email_html" ;
+        uil:hasPackage   "Vitro-languages" .

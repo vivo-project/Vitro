@@ -6330,25 +6330,25 @@ uil-data:password_reset_admin_notification_email_subject.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
         rdfs:label       "${siteName} reset password request"@en-CA ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "password_reset_admin_notification_email_subject" ;
-        uil:hasPackage  "Vitro-languages" .
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_admin_notification_email_subject" ;
+        uil:hasPackage   "Vitro-languages" .
 
 uil-data:password_reset_admin_notification_email_plain_text.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
         rdfs:label       "We have received a request to reset the password for user ${userAccount.firstName} ${userAccount.lastName} (${userAccount.emailAddress}).\n\nYou are receiving this because admin notifications for password resets are enabled.\n"@en-CA ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "password_reset_admin_notification_email_plain_text" ;
-        uil:hasPackage  "Vitro-languages" .
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_admin_notification_email_plain_text" ;
+        uil:hasPackage   "Vitro-languages" .
 
 uil-data:password_reset_admin_notification_email_html.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "<p>\n We have received a request to reset the password for user ${userAccount.firstName} ${userAccount.lastName} (${userAccount.emailAddress}).\n </p> \n\n <p>\n You are receiving this because admin notifications for password resets are enabled.</p>"@en-CA ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "password_reset_admin_notification_email_html" ;
-        uil:hasPackage  "Vitro-languages" .
+        rdfs:label       "<p><br /> We have received a request to reset the password for user ${userAccount.firstName} ${userAccount.lastName} (${userAccount.emailAddress}).<br /> </p> <br /><br /> <p><br /> You are receiving this because admin notifications for password resets are enabled.</p>"@en-CA ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_admin_notification_email_html" ;
+        uil:hasPackage   "Vitro-languages" .
 
 uil-data:full_name_empty.Vitro
         rdf:type         owl:NamedIndividual ;

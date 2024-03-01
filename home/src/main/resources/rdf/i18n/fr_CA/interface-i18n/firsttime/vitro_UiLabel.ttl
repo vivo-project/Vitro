@@ -6421,3 +6421,27 @@ uil-data:suppress_operation_for_unrelated_individuals_of_this_class.Vitro
         uil:hasApp       "Vitro" ;
         uil:hasKey       "suppress_operation_for_unrelated_individuals_of_this_class" ;
         uil:hasPackage   "Vitro-languages" .
+
+uil-data:password_reset_admin_notification_email_subject.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "${siteName} demande de réinitialisation de mot de passe"@fr-CA ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_admin_notification_email_subject" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:password_reset_admin_notification_email_plain_text.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Nous avons reçu une demande de réinitialisation du mot de passe pour l'utilisateur ${userAccount.firstName} ${userAccount.lastName} (${userAccount.emailAddress}).\n\nVous recevez ce message car les notifications administratives pour les réinitialisations de mot de passe sont activées."@fr-CA ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_admin_notification_email_plain_text" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:password_reset_admin_notification_email_html.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "<p><br /> Nous avons reçu une demande de réinitialisation du mot de passe pour l'utilisateur ${userAccount.firstName} ${userAccount.lastName} (${userAccount.emailAddress}).<br /> </p> <br /><br /> <p><br /> Vous recevez ce message car les notifications administratives pour les réinitialisations de mot de passe sont activées.</p>"@fr-CA ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_admin_notification_email_html" ;
+        uil:hasPackage   "Vitro-languages" .

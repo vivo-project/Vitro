@@ -6421,3 +6421,27 @@ uil-data:suppress_operation_for_unrelated_individuals_of_this_class.Vitro
         uil:hasApp       "Vitro" ;
         uil:hasKey       "suppress_operation_for_unrelated_individuals_of_this_class" ;
         uil:hasPackage   "Vitro-languages" .
+
+uil-data:password_reset_admin_notification_email_subject.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "${siteName} Anfrage zur Zurücksetzung des Passworts"@de-DE ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_admin_notification_email_subject" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:password_reset_admin_notification_email_plain_text.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Wir haben eine Anfrage erhalten, das Passwort für den Benutzer ${userAccount.firstName} ${userAccount.lastName} (${userAccount.emailAddress}) zurückzusetzen.\n\nSie erhalten diese E-Mail, weil Administratorbenachrichtigungen für Passwortzurücksetzungen aktiviert sind."@de-DE ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_admin_notification_email_plain_text" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:password_reset_admin_notification_email_html.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "<p><br /> Wir haben eine Anfrage erhalten, das Passwort für den Benutzer ${userAccount.firstName} ${userAccount.lastName} (${userAccount.emailAddress}) zurückzusetzen.<br /> </p> <br /><br /> <p><br /> Sie erhalten diese E-Mail, weil Administratorbenachrichtigungen für Passwortzurücksetzungen aktiviert sind.</p>"@de-DE ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_admin_notification_email_html" ;
+        uil:hasPackage   "Vitro-languages" .
