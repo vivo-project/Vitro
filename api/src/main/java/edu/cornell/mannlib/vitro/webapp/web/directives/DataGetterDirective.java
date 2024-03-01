@@ -82,7 +82,7 @@ public class DataGetterDirective extends BaseTemplateDirectiveModel {
      * 
      * @param env - Freemarker environment
      * @param overriddenVariable - overridden name of Freemarker variable
-     * @param dataGetterVariableName - default variable name specified in DataGetter configuration
+     * @param defaultVariable - default variable name specified in DataGetter configuration
      * @param value - value of data returned by DataGetter
      * 
      */
