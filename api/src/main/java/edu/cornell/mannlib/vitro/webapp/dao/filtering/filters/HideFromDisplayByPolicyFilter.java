@@ -80,7 +80,7 @@ public class HideFromDisplayByPolicyFilter extends VitroFiltersImpl {
 			ObjectProperty predicate = getOrCreateProperty(ops);
 			String objectUri = ops.getObjectURI();
 			return checkAuthorization(new ObjectPropertyStatementAccessObject(
-					ModelAccess.getInstance().getOntModel(), subjectUri, predicate, objectUri));
+					null, subjectUri, predicate, objectUri));
 		}
 
 		/**
