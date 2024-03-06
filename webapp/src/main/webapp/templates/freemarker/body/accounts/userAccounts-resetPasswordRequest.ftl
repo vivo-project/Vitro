@@ -1,10 +1,11 @@
 <#-- $This file is distributed under the terms of the license in LICENSE$ -->
 
 <#-- Template for notifying user about reset password request state -->
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/account/passwordReset.css" />')}
 
 <#if isEnabled && emailConfigured>
     <#if showPasswordChangeForm == true>
-        <h1>${i18n().password_reset_title}</h1>
+        <h1 class="notification-text">${i18n().password_reset_title}</h1>
         <br/>
 
         <form id="forgotPasswordForm" action="${forgotPasswordUrl}" method="POST" style="margin-top: 10px;">
@@ -20,7 +21,7 @@
                     <div class="g-recaptcha" data-sitekey="${siteKey!}"></div>
                     <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response" />
                 <#elseif captchaToUse == "NANOCAPTCHA">
-                    <p>
+                    <p class="paragraph-text">
                         <label class="realpersonLabel">${i18n().enter_in_security_field}:<span class="requiredHint"> *</span></label>
                         <div class="captcha-container">
                             <span><input id="refresh" type="button" value="↻" /></span>
@@ -42,60 +43,15 @@
                 <br/>
                 <#assign contactFormUrl = "${contactUrl}" />
                 <#if contactEmailConfigured>
-                    <p>${i18n().password_reset_forgot_email(contactFormUrl)}</p>
+                    <p class="paragraph-text">${i18n().password_reset_forgot_email(contactFormUrl)}</p>
                 </#if>
             </div>
         </form>
     <#else>
-        <h1>${message}</h1>
+        <h1 class="notification-text">${message}</h1>
     </#if>
 <#else>
-    <h1>${i18n().functionality_disabled}</h1>
+    <h1 class="notification-text">${i18n().functionality_disabled}</h1>
 </#if>
-
-<style>
-    label[for="email"] {
-        font-size: 18px;
-        display: block;
-        margin-bottom: 5px;
-    }
-
-    input#email {
-        font-size: 16px;
-        height: 1.5em;
-        width: 20em;
-        margin-bottom: 2em;
-    }
-
-    .submit button.green {
-        font-size: 16px;
-    }
-
-    p {
-        font-size: 16px;
-    }
-
-    a {
-        color: #0072b5;
-        text-decoration: none;
-    }
-
-    h1 {
-        font-size: 24px;
-    }
-
-    #defaultReal {
-         display: block;
-         margin-top: 1em;
-         margin-left: 0;
-         width: 246px;
-    }
-
-    #forgotPasswordForm .errorMessage {
-        color: red;
-        background: #efefef;
-        padding: 1em;
-    }
-</style>
 
 <#include "webapp/src/main/webapp/templates/freemarker/body/captcha/captcha-clientExecutionLogic.ftl">
