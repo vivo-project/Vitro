@@ -6,12 +6,11 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
 import edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 @WebServlet(name = "RPCEndpoint", urlPatterns = { RPC_SERVLET_PATH + "/*" })
 public class RPCEndpoint extends Endpoint {
@@ -32,13 +31,13 @@ public class RPCEndpoint extends Endpoint {
             return;
         }
         String rpcKey = requestPath.getRpcKey();
-        
-        try(RPC rpc = rpcAPIPool.get(rpcKey)) {
-            //TODO Implement version negotiations
+
+        try (RPC rpc = rpcAPIPool.get(rpcKey)) {
+            // TODO Implement version negotiations
             processRequest(request, response, requestPath, rpc.getProcedureUri());
         } catch (Exception e) {
-           log.error(e, e);
-        } 
+            log.error(e, e);
+        }
     }
 
     @Override

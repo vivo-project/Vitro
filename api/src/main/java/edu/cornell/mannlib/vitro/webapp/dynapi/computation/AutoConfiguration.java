@@ -4,12 +4,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class AutoConfiguration {
 
@@ -29,14 +28,14 @@ public class AutoConfiguration {
             path.add(exit);
             findAllPaths(tree, exit, path, paths);
         }
-        for (List<StepInfo> path: paths) {
+        for (List<StepInfo> path : paths) {
             Parameters computed = computeRequirements(path, provided);
             mergeParameters(required, internal, computed);
         }
-        if( log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             Set<String> names = procedure.getInputParams().getNames();
             String toLog = String.join(", ", names);
-            log.debug("Required params: " + toLog);    
+            log.debug("Required params: " + toLog);
         }
     }
 
@@ -45,12 +44,12 @@ public class AutoConfiguration {
             Parameter param = provided.get(name);
             if (param.isInternal()) {
                 internal.add(param);
-            } 
-        }        
+            }
+        }
     }
 
     private static void mergeParameters(Parameters required, Parameters internal, Parameters computed) {
-        //TODO: Support optional steps
+        // TODO: Support optional steps
         for (String name : computed.getNames()) {
             Parameter param = computed.get(name);
             if (param.isInternal()) {
@@ -65,10 +64,10 @@ public class AutoConfiguration {
         Parameters requirements = new Parameters();
         requirements.addAll(provided);
         int position = list.size();
-        //Add required by last node
+        // Add required by last node
         position--;
         while (position > 0) {
-            StepInfo step =  list.get(position);
+            StepInfo step = list.get(position);
             Parameters stepRequired = step.getInputParams();
             Parameters stepProvided = step.getOutputParams();
             requirements.removeAll(stepProvided);
@@ -78,7 +77,8 @@ public class AutoConfiguration {
         return requirements;
     }
 
-    private static void findAllPaths(ExecutionTree graph, StepInfo vertex, List<StepInfo> path, List<List<StepInfo>> resultPaths) {
+    private static void findAllPaths(ExecutionTree graph, StepInfo vertex, List<StepInfo> path,
+            List<List<StepInfo>> resultPaths) {
         List<StepInfo> nodes = graph.getPrevOf(vertex);
         for (StepInfo node : nodes) {
             LinkedList<StepInfo> newPath = new LinkedList<StepInfo>(path);

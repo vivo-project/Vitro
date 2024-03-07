@@ -1,11 +1,10 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data;
 
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class Data {
 
@@ -30,7 +29,7 @@ public class Data {
     public void setParam(Parameter param) {
         this.param = param;
     }
-    
+
     public Parameter getParam() {
         return param;
     }
@@ -46,13 +45,13 @@ public class Data {
     public void earlyInitialization() {
         initialization();
     }
-    
+
     public boolean isInitialized() {
         return object != null;
     }
 
     public void initialization() {
-        if(isOnlyInternalParameter() || isOptionalWithoutValue()) {
+        if (isOnlyInternalParameter() || isOptionalWithoutValue()) {
             initializeDefault();
             return;
         }
@@ -66,7 +65,7 @@ public class Data {
     private boolean isOptionalWithoutValue() {
         return param.isOptional() && rawString == null;
     }
-    
+
     public void initializeFromString() {
         final ParameterType type = param.getType();
         final ImplementationType implementationType = type.getImplementationType();
@@ -93,14 +92,14 @@ public class Data {
 
     @Override
     public boolean equals(Object object) {
-        if(!(object instanceof Data)) {
+        if (!(object instanceof Data)) {
             return false;
         }
         if (object == this) {
             return true;
         }
         Data d = (Data) object;
-        
+
         return new EqualsBuilder()
                 .append(param, d.param)
                 .append(this.object, d.object)

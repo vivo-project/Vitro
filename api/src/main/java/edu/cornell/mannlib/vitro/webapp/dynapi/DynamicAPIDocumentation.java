@@ -8,18 +8,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.APIInformation;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.CustomRESTAction;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullProcedure;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullRPC;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Version;
@@ -51,6 +48,8 @@ import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class DynamicAPIDocumentation {
 
@@ -58,7 +57,7 @@ public class DynamicAPIDocumentation {
 
     private final static DynamicAPIDocumentation INSTANCE = new DynamicAPIDocumentation();
 
-    private ConfigurationBeanLoader loader = new ConfigurationBeanLoader(DynapiModelProvider.getInstance().getModel());;
+    private ConfigurationBeanLoader loader = new ConfigurationBeanLoader(DynapiModelProvider.getInstance().getModel());
 
     public static DynamicAPIDocumentation getInstance() {
         return INSTANCE;
@@ -89,7 +88,7 @@ public class DynamicAPIDocumentation {
         log.info("Matched api (" + apiInformation.getVersion() + ") is " + apiInformation.getTitle() + ".");
 
         openApi.setInfo(info(apiInformation));
-        
+
         openApi.setServers(getServers(requestPath));
 
         Paths paths = new Paths();
@@ -114,15 +113,16 @@ public class DynamicAPIDocumentation {
                 paths.put(resourceCollectionPathKey, collectionPathItem(resourceAPI, tag));
 
                 // resource individual API
-                String resourceIndividualPathKey = format("%s/resource:{%s}", resourceCollectionPathKey, RESTEndpoint.RESOURCE_ID);
+                String resourceIndividualPathKey = format("%s/resource:{%s}", resourceCollectionPathKey,
+                        RESTEndpoint.RESOURCE_ID);
 
                 paths.put(resourceIndividualPathKey, individualPathItem(resourceAPI, tag));
 
                 for (CustomRESTAction customRestAction : resourceAPI.getCustomRESTActions()) {
 
                     // resource custom REST action
-                    String resourceCustomRESTActionPathKey = format("%s/%s", resourceCollectionPathKey,
-                            customRestAction.getName());
+                    String resourceCustomRESTActionPathKey = format("%s/%s", resourceCollectionPathKey, customRestAction
+                            .getName());
 
                     paths.put(resourceCustomRESTActionPathKey, customRESTActionPathItem(customRestAction, tag));
                 }
@@ -146,15 +146,16 @@ public class DynamicAPIDocumentation {
                 paths.put(resourceCollectionPathKey, collectionPathItem(resourceAPI, tag));
 
                 // resource individual API
-                String resourceIndividualPathKey = format("%s/resource:{%s}", resourceCollectionPathKey, RESTEndpoint.RESOURCE_ID);
+                String resourceIndividualPathKey = format("%s/resource:{%s}", resourceCollectionPathKey,
+                        RESTEndpoint.RESOURCE_ID);
 
                 paths.put(resourceIndividualPathKey, individualPathItem(resourceAPI, tag));
 
                 for (CustomRESTAction customRestAction : resourceAPI.getCustomRESTActions()) {
 
                     // resource custom REST action
-                    String resourceCustomRESTActionPathKey = format("%s/%s", resourceCollectionPathKey,
-                            customRestAction.getName());
+                    String resourceCustomRESTActionPathKey = format("%s/%s", resourceCollectionPathKey, customRestAction
+                            .getName());
 
                     paths.put(resourceCustomRESTActionPathKey, customRESTActionPathItem(customRestAction, tag));
                 }
@@ -192,7 +193,7 @@ public class DynamicAPIDocumentation {
         apiInformation.setVersion("");
 
         openApi.setInfo(info(apiInformation));
-        
+
         openApi.setServers(getServers(requestPath));
 
         if (requestPath.getRPCName() == null) {
@@ -205,13 +206,13 @@ public class DynamicAPIDocumentation {
             for (RPC rpc : rpcs.values()) {
 
                 String actionPathKey = format("%s/%s", servletPath, rpc.getKey());
-                
+
                 Procedure procedure = ProcedurePool.getInstance().get(rpc.getProcedureUri());
-                
+
                 if (!(NullProcedure.getInstance().equals(procedure))) {
                     paths.put(actionPathKey, actionPathItem(procedure, tag));
                 }
-                
+
                 procedure.removeClient();
             }
 
@@ -367,11 +368,11 @@ public class DynamicAPIDocumentation {
         PathItem pathItem = new PathItem();
 
         String targetRPC = customRESTAction.getTargetProcedureUri();
-       
+
         if (targetRPC != null) {
             try (Procedure action = actionPool.get(targetRPC)) {
                 String httpMethodName = customRESTAction.getHttpMethodName();
-                    switch (httpMethodName) {
+                switch (httpMethodName) {
                     case "POST":
                         pathItem.setPost(customRESTActionPostOperation(action, tag));
                         break;
@@ -387,7 +388,7 @@ public class DynamicAPIDocumentation {
                     case "PATCH":
                         pathItem.setPatch(customRESTActionPatchOperation(action, tag));
                         break;
-                    }
+                }
             }
         }
 
@@ -558,7 +559,7 @@ public class DynamicAPIDocumentation {
     private Operation customRESTActionPutOperation(Procedure action, Tag tag) {
         return individualPutOperation(action, tag);
     }
-    
+
     private Operation customRESTActionPostOperation(Procedure action, Tag tag) {
         return collectionPostOperation(action, tag);
     }
@@ -574,7 +575,6 @@ public class DynamicAPIDocumentation {
     private Operation customRESTActionDeleteOperation(Procedure action, Tag tag) {
         return individualDeleteOperation(action, tag);
     }
-     
 
     private Operation actionPostOperation(Procedure action, Tag tag) {
         Operation operation = new Operation();
@@ -662,7 +662,8 @@ public class DynamicAPIDocumentation {
 
                 objectSchema.addProperties(parameterName, objectParameter);
 
-                buildObjectSchema(objectParameter, ((JsonContainerSerializationType) serializationType).getInternalElements());
+                buildObjectSchema(objectParameter, ((JsonContainerSerializationType) serializationType)
+                        .getInternalElements());
 
             } else if (serializationType instanceof ArraySerializationType) {
 
@@ -692,8 +693,8 @@ public class DynamicAPIDocumentation {
 
             primitiveParameter.setDescription(parameter.getDescription());
 
-            buildObjectSchema((ObjectSchema) primitiveParameter,
-                    ((JsonContainerSerializationType) arrayParameterType).getInternalElements());
+            buildObjectSchema((ObjectSchema) primitiveParameter, ((JsonContainerSerializationType) arrayParameterType)
+                    .getInternalElements());
 
         } else if (parameterType instanceof ArraySerializationType) {
 

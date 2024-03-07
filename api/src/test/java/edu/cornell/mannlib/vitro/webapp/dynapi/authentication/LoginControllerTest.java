@@ -1,5 +1,16 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.authentication;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mockConstruction;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.BasicAuthenticator;
 import org.junit.Before;
@@ -8,12 +19,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import static org.mockito.Mockito.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LoginControllerTest {
@@ -52,10 +57,10 @@ public class LoginControllerTest {
         when(request.getParameter("username")).thenReturn("testUsername");
         when(request.getParameter("password")).thenReturn("testPassword");
 
-        try (MockedConstruction<BasicAuthenticator> mocked = mockConstruction(BasicAuthenticator.class,
-                (mock, context)-> {
+        try (MockedConstruction<BasicAuthenticator> mocked =
+                mockConstruction(BasicAuthenticator.class, (mock, context) -> {
                     when(mock.getAccountForInternalAuth("testUsername")).thenReturn(null);
-                })){
+                })) {
             loginController.doPost(request, response);
         }
 
@@ -70,11 +75,11 @@ public class LoginControllerTest {
         when(request.getParameter("username")).thenReturn("testUsername");
         when(request.getParameter("password")).thenReturn("testPassword");
 
-        try (MockedConstruction<BasicAuthenticator> mocked = mockConstruction(BasicAuthenticator.class,
-                (mock, context)->{
+        try (MockedConstruction<BasicAuthenticator> mocked =
+                mockConstruction(BasicAuthenticator.class, (mock, context) -> {
                     when(mock.getAccountForInternalAuth("testUsername")).thenReturn(new UserAccount());
                     when(mock.isUserPermittedToLogin(any(UserAccount.class))).thenReturn(false);
-                })){
+                })) {
             loginController.doPost(request, response);
         }
 
@@ -89,12 +94,12 @@ public class LoginControllerTest {
         when(request.getParameter("username")).thenReturn("testUsername");
         when(request.getParameter("password")).thenReturn("testPassword");
 
-        try (MockedConstruction<BasicAuthenticator> mocked = mockConstruction(BasicAuthenticator.class,
-                (mock, context)->{
+        try (MockedConstruction<BasicAuthenticator> mocked =
+                mockConstruction(BasicAuthenticator.class, (mock, context) -> {
                     when(mock.getAccountForInternalAuth("testUsername")).thenReturn(new UserAccount());
                     when(mock.isUserPermittedToLogin(any(UserAccount.class))).thenReturn(true);
-                    when(mock.isCurrentPasswordArgon2(any(UserAccount.class),eq("testPassword"))).thenReturn(false);
-                })){
+                    when(mock.isCurrentPasswordArgon2(any(UserAccount.class), eq("testPassword"))).thenReturn(false);
+                })) {
             loginController.doPost(request, response);
         }
 
@@ -112,12 +117,12 @@ public class LoginControllerTest {
         testUser.setEmailAddress("test@mail.com");
         when(request.getSession()).thenReturn(session);
 
-        try (MockedConstruction<BasicAuthenticator> mocked = mockConstruction(BasicAuthenticator.class,
-                (mock, context)->{
+        try (MockedConstruction<BasicAuthenticator> mocked =
+                mockConstruction(BasicAuthenticator.class, (mock, context) -> {
                     when(mock.getAccountForInternalAuth("testUsername")).thenReturn(testUser);
                     when(mock.isUserPermittedToLogin(any(UserAccount.class))).thenReturn(true);
-                    when(mock.isCurrentPasswordArgon2(any(UserAccount.class),eq("testPassword"))).thenReturn(true);
-                })){
+                    when(mock.isCurrentPasswordArgon2(any(UserAccount.class), eq("testPassword"))).thenReturn(true);
+                })) {
             loginController.doPost(request, response);
         }
 

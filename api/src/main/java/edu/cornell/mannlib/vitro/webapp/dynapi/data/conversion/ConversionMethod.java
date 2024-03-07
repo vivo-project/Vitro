@@ -1,12 +1,11 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -75,7 +74,8 @@ public class ConversionMethod {
         }
         ImplementationType implType = type.getImplementationType();
         if (implType == null) {
-            throw new InitializationException("Implemenation type in parameter type provided into constructor is null");
+            throw new InitializationException("Implemenation type in parameter type " +
+                    "provided into constructor is null");
         }
         ImplementationConfig validatingConfig;
         if (serialize) {
@@ -86,26 +86,31 @@ public class ConversionMethod {
             validatingConfig = implType.getSerializationConfig();
             if (validatingConfig == null) {
                 throw new InitializationException(
-                        "Serialization config from implemenation type in parameter type provided into constructor is null");
+                        "Serialization config from implemenation type in parameter type " +
+                        "provided into constructor is null");
             }
         } else {
             validatingConfig = implType.getDeserializationConfig();
             if (validatingConfig == null) {
                 throw new InitializationException(
-                        "Deserialization config from implemenation type in parameter type provided into constructor is null");
+                        "Deserialization config from implemenation type in parameter type " +
+                        "provided into constructor is null");
             }
         }
         if (validatingConfig.getClassObject() == null) {
             throw new InitializationException(
-                    "Class object of implementation config from implemenation type in parameter type provided into constructor is null");
+                    "Class object of implementation config from implemenation type in parameter " +
+                    "type provided into constructor is null");
         }
         if (validatingConfig.getMethodName() == null) {
             throw new InitializationException(
-                    "Method name of implementation config from implemenation type in parameter type provided into constructor is null");
+                    "Method name of implementation config from implemenation type in parameter " +
+                    "type provided into constructor is null");
         }
         if (validatingConfig.getMethodArguments() == null) {
             throw new InitializationException(
-                    "Method arguments of implementation config from implemenation type in parameter type provided into constructor is null");
+                    "Method arguments of implementation config from implemenation type in parameter " +
+                    "type provided into constructor is null");
         }
 
     }
@@ -175,7 +180,7 @@ public class ConversionMethod {
         }
         throw new ConversionException("Variable name " + var + " is not known");
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (!(object instanceof ConversionMethod)) {

@@ -13,18 +13,15 @@ import java.util.Collection;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.matcher.APIResponseMatcher;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import edu.cornell.mannlib.vitro.webapp.dynapi.matcher.APIResponseMatcher;
 
 @RunWith(Parameterized.class)
 public class RPCDocumentationEndpointIntegrationTest extends ServletContextIntegrationTest {
@@ -66,7 +63,7 @@ public class RPCDocumentationEndpointIntegrationTest extends ServletContextInteg
 
         procedurePool.init(servletContext);
         procedurePool.reload();
-        
+
         RPCPool rpcPool = RPCPool.getInstance();
 
         rpcPool.init(servletContext);
@@ -79,7 +76,7 @@ public class RPCDocumentationEndpointIntegrationTest extends ServletContextInteg
     public void after() {
         LoggingControl.restoreLogs();
     }
-    
+
     @Test
     public void doTest() throws IOException {
         String pathInfo = "";
@@ -117,20 +114,22 @@ public class RPCDocumentationEndpointIntegrationTest extends ServletContextInteg
         final String action = "test_action";
         final String actionUri = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testProcedure1";
         final String collection = "test_collection";
-        final String collectionUri = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testCollectionProcedure1";
+        final String collectionUri =
+                "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testCollectionProcedure1";
         final String concept = "test_concept";
         final String conceptUri = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testConceptProcedure1";
         final String document = "test_document";
         final String documentUri = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testDocumentProcedure1";
         final String organization = "test_organization";
-        final String organizationUri = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testOrganizationProcedure1";
+        final String organizationUri =
+                "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testOrganizationProcedure1";
         final String person = "test_person";
         final String personUri = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testPersonProcedure1";
         final String process = "test_process";
         final String processUri = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testProcessProcedure1";
         final String relationship = "test_relationship";
-        final String relationshipUri = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testRelationshipProcedure1";
-
+        final String relationshipUri =
+                "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testRelationshipProcedure1";
 
         return Arrays.asList(new Object[][] {
             // action,      json,  expected response,     message

@@ -1,9 +1,9 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
 import static edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath.RPC_SERVLET_PATH;
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_METHOD_NOT_ALLOWED;
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.junit.Assert.assertEquals;
@@ -24,6 +24,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionMethod;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.FormDataConverter;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
 import org.junit.After;
@@ -38,12 +43,6 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 
-import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionMethod;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.FormDataConverter;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
-
 @RunWith(Parameterized.class)
 public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
 
@@ -52,12 +51,11 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
     private static MockedStatic<DynapiModelFactory> dynapiModelFactory;
 
     private ByteArrayOutputStream baos;
-    
+
     private RPCEndpoint rpcEndpoint;
 
     private ProcedurePool procedurePool;
     private RPCPool rpcPool;
-
 
     @Mock
     private HttpServletRequest request;
@@ -94,14 +92,14 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
 
     @BeforeClass
     public static void setupStaticObjects() {
-    	dynapiModelFactory = mockStatic(DynapiModelFactory.class);
+        dynapiModelFactory = mockStatic(DynapiModelFactory.class);
     }
-    
+
     @AfterClass
     public static void after() {
-        dynapiModelFactory.close();   
+        dynapiModelFactory.close();
     }
-    
+
     @Before
     public void beforeEach() throws Exception {
         offLogs();
@@ -114,12 +112,12 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
 
         procedurePool.init(servletContext);
         procedurePool.reload();
-        
+
         rpcPool.init(servletContext);
         rpcPool.reload();
 
         MockitoAnnotations.openMocks(this);
-        
+
         baos = new ByteArrayOutputStream();
         when(request.getHeader(HttpHeaders.ACCEPT)).thenReturn(ContentType.APPLICATION_JSON.toString());
         PrintWriter writer = new PrintWriter(baos, true);
@@ -131,7 +129,7 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
         when(session.getAttribute("user")).thenReturn(user);
         when(user.isRootUser()).thenReturn(true);
         dynapiModelFactory.when(() -> DynapiModelFactory.getModel(any(String.class))).thenReturn(ontModel);
-        
+
         if (testProcedureName != null) {
             StringBuffer buffer = new StringBuffer(URI_BASE + "/" + testProcedureName);
             when(request.getRequestURL()).thenReturn(buffer);
@@ -158,8 +156,8 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
         }
         restoreLogs();
     }
-    
-    public static void offLogs(){
+
+    public static void offLogs() {
         LoggingControl.offLogs();
         LoggingControl.offLog(RPCEndpoint.class);
         LoggingControl.offLog(Endpoint.class);
@@ -167,8 +165,8 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
         LoggingControl.offLog(ConversionMethod.class);
         LoggingControl.offLog(ImplementationType.class);
     }
-    
-    public static void restoreLogs(){
+
+    public static void restoreLogs() {
         LoggingControl.restoreLogs();
         LoggingControl.restoreLog(RPCEndpoint.class);
         LoggingControl.restoreLog(Endpoint.class);
@@ -212,7 +210,8 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
     }
 
     @Parameterized.Parameters
-    public static Collection<Object[]> requests() throws MalformedURLException, NoSuchMethodException, SecurityException {
+    public static Collection<Object[]> requests()
+            throws MalformedURLException, NoSuchMethodException, SecurityException {
         int nf = SC_NOT_FOUND;
         int se = SC_INTERNAL_SERVER_ERROR;
         int br = SC_BAD_REQUEST;

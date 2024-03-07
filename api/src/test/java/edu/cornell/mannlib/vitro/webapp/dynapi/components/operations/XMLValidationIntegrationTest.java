@@ -9,6 +9,16 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collection;
 
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
+import edu.cornell.mannlib.vitro.webapp.dynapi.ProcedurePool;
+import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullProcedure;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.StringParam;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
@@ -20,17 +30,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
-import edu.cornell.mannlib.vitro.webapp.dynapi.ProcedurePool;
-import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
-import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullProcedure;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.StringParam;
-
 @RunWith(Parameterized.class)
 public class XMLValidationIntegrationTest extends ServletContextTest {
 
@@ -39,7 +38,8 @@ public class XMLValidationIntegrationTest extends ServletContextTest {
     private static final String TEST_PROCEDURE_URI = "test:xml-validation-procedure";
     private static final String OUTPUT = "result";
     private static final String ERROR_PARAM_NAME = "error";
-    private static final String RESOURCES_PATH = "src/test/resources/edu/cornell/mannlib/vitro/webapp/dynapi/components/operations/";
+    private static final String RESOURCES_PATH =
+            "src/test/resources/edu/cornell/mannlib/vitro/webapp/dynapi/components/operations/";
     private static final String TEST_PROCEDURE_FILE_PATH = RESOURCES_PATH + "xml-validation-test-procedure.n3";
 
     Model storeModel;
@@ -124,51 +124,51 @@ public class XMLValidationIntegrationTest extends ServletContextTest {
     @Parameterized.Parameters
     public static Collection<Object[]> requests() {
         return Arrays.asList(new Object[][] {
-            { "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
-                    + "<individual>\n"
-                    + "    <name>Bob</name>\n"
-                    + "</individual>", 
-              "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
-              + "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\">\n"
-              + "    <xs:element name=\"individual\">\n"
-              + "        <xs:complexType>\n"
-              + "            <xs:sequence>\n"
-              + "                <xs:element name=\"name\">\n"
-              + "                    <xs:simpleType>\n"
-              + "                        <xs:restriction base=\"xs:string\">\n"
-              + "                            <xs:maxLength value=\"3\" />\n"
-              + "                        </xs:restriction>\n"
-              + "                    </xs:simpleType>\n"
-              + "                </xs:element>"
-              + "            </xs:sequence>\n"
-              + "        </xs:complexType>\n"
-              + "    </xs:element>\n"
-              + "</xs:schema>",
-              ""
-            },
-            { "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
-                    + "<individual>\n"
-                    + "    <name>Alice</name>\n"
-                    + "</individual>", 
-              "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
-              + "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\">\n"
-              + "    <xs:element name=\"individual\">\n"
-              + "        <xs:complexType>\n"
-              + "            <xs:sequence>\n"
-              + "                <xs:element name=\"name\">\n"
-              + "                    <xs:simpleType>\n"
-              + "                        <xs:restriction base=\"xs:string\">\n"
-              + "                            <xs:maxLength value=\"3\" />\n"
-              + "                        </xs:restriction>\n"
-              + "                    </xs:simpleType>\n"
-              + "                </xs:element>"
-              + "            </xs:sequence>\n"
-              + "        </xs:complexType>\n"
-              + "    </xs:element>\n"
-              + "</xs:schema>",
-              "cvc-maxLength-valid: Value 'Alice' with length = '5' is not facet-valid with respect to maxLength '3' for type '#AnonType_nameindividual'."
-            }
-        });
+                {
+                "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
+                    "<individual>\n" +
+                    "    <name>Bob</name>\n" +
+                    "</individual>",
+                "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
+                    "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\">\n" +
+                    "    <xs:element name=\"individual\">\n" +
+                    "        <xs:complexType>\n" +
+                    "            <xs:sequence>\n" +
+                    "                <xs:element name=\"name\">\n" +
+                    "                    <xs:simpleType>\n" +
+                    "                        <xs:restriction base=\"xs:string\">\n" +
+                    "                            <xs:maxLength value=\"3\" />\n" +
+                    "                        </xs:restriction>\n" +
+                    "                    </xs:simpleType>\n" +
+                    "                </xs:element>" +
+                    "            </xs:sequence>\n" +
+                    "        </xs:complexType>\n" +
+                    "    </xs:element>\n" +
+                    "</xs:schema>",
+                "" },
+                {
+                "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
+                    "<individual>\n" +
+                    "    <name>Alice</name>\n" +
+                    "</individual>",
+                "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
+                    "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\">\n" +
+                    "    <xs:element name=\"individual\">\n" +
+                    "        <xs:complexType>\n" +
+                    "            <xs:sequence>\n" +
+                    "                <xs:element name=\"name\">\n" +
+                    "                    <xs:simpleType>\n" +
+                    "                        <xs:restriction base=\"xs:string\">\n" +
+                    "                            <xs:maxLength value=\"3\" />\n" +
+                    "                        </xs:restriction>\n" +
+                    "                    </xs:simpleType>\n" +
+                    "                </xs:element>" +
+                    "            </xs:sequence>\n" +
+                    "        </xs:complexType>\n" +
+                    "    </xs:element>\n" +
+                    "</xs:schema>",
+                "cvc-maxLength-valid: Value 'Alice' with length = '5' is not facet-valid" +
+                    " with respect to maxLength '3' for type '#AnonType_nameindividual'." } });
     }
 
     protected void loadModel(Model model, String... files) throws IOException {

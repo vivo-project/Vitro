@@ -1,23 +1,22 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components.steps;
 
 import java.util.Collections;
-import java.util.Map;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.ProcedureDescriptor;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ParameterSubstitution;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ParameterSubstitutor;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.ProcedureDescriptor;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.AbstractOperation;
 import edu.cornell.mannlib.vitro.webapp.dynapi.computation.StepInfo;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class OperationalStep implements Step {
 
@@ -48,7 +47,7 @@ public class OperationalStep implements Step {
         }
         substitutions.add(substitution);
     }
-    
+
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasNextStep", maxOccurs = 1)
     public void setNextStep(Step step) {
         this.nextStep = step;
@@ -70,11 +69,11 @@ public class OperationalStep implements Step {
         if (log.isDebugEnabled()) {
             log.debug("Started execution in step.");
             if (optional) {
-                log.debug("Operation step is optional.");    
+                log.debug("Operation step is optional.");
             }
         }
         if (operation != null) {
-            ParameterSubstitutor.forwardSubstitution(substitutions, data);    
+            ParameterSubstitutor.forwardSubstitution(substitutions, data);
             result = operation.run(data);
             ParameterSubstitutor.backwardSubstitution(substitutions, data);
             if (!optional && result.hasError()) {
@@ -107,7 +106,7 @@ public class OperationalStep implements Step {
     public Parameters getInputParams() {
         Parameters params = operation.getInputParams();
         if (substitutions.isEmpty()) {
-            return params;    
+            return params;
         } else {
             return ParameterSubstitutor.substituteDependencies(params, substitutions);
         }
@@ -117,7 +116,7 @@ public class OperationalStep implements Step {
     public Parameters getOutputParams() {
         Parameters params = operation.getOutputParams();
         if (substitutions.isEmpty()) {
-            return params;    
+            return params;
         } else {
             return ParameterSubstitutor.substituteDependencies(params, substitutions);
         }

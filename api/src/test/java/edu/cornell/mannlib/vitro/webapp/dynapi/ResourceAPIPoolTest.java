@@ -9,23 +9,28 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 public class ResourceAPIPoolTest extends ServletContextTest {
 
-    protected final static String TEST_PERSON_RESOURCE_URI = "https://vivoweb.org/ontology/vitro-dynamic-api/resourceAPI/testPersonResource1";
-    protected final static String TEST_PERSON_PROCEDURE_URI_1_1 = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testPersonProcedure1_1";
-    protected final static String TEST_PERSON_PROCEDURE_URI_2 = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testPersonProcedure2";
-    protected final static String TEST_PERSON_PROCEDURE_URI_3 = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testPersonProcedure3";
-    protected final static String TEST_PERSON_PROCEDURE_URI_4 = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testPersonProcedure4";
-    protected final static String TEST_PERSON_PROCEDURE_URI_5 = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testPersonProcedure5";
+    protected final static String TEST_PERSON_RESOURCE_URI =
+            "https://vivoweb.org/ontology/vitro-dynamic-api/resourceAPI/testPersonResource1";
+    protected final static String TEST_PERSON_PROCEDURE_URI_1_1 =
+            "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testPersonProcedure1_1";
+    protected final static String TEST_PERSON_PROCEDURE_URI_2 =
+            "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testPersonProcedure2";
+    protected final static String TEST_PERSON_PROCEDURE_URI_3 =
+            "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testPersonProcedure3";
+    protected final static String TEST_PERSON_PROCEDURE_URI_4 =
+            "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testPersonProcedure4";
+    protected final static String TEST_PERSON_PROCEDURE_URI_5 =
+            "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testPersonProcedure5";
 
     @Before
     public void beforeEach() {
@@ -45,7 +50,7 @@ public class ResourceAPIPoolTest extends ServletContextTest {
         assertEquals(0, procedurePool.count());
         assertEquals(0, procedurePool.obsoleteCount());
     }
-    
+
     @After
     public void reset() {
         setup();
@@ -65,7 +70,6 @@ public class ResourceAPIPoolTest extends ServletContextTest {
         assertEquals(0, procedurePool.obsoleteCount());
         LoggingControl.restoreLogs();
     }
-    
 
     @Test
     public void testGetInstance() {
@@ -114,7 +118,8 @@ public class ResourceAPIPoolTest extends ServletContextTest {
         ResourceAPIKey document_v0 = ResourceAPIKey.of("test_document_resource", "0");
         ResourceAPIKey document_v1 = ResourceAPIKey.of("test_document_resource", "1");
 
-        String testDocumentProcedureUri = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testDocumentProcedure1";
+        String testDocumentProcedureUri =
+                "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testDocumentProcedure1";
 
         ResourceAPIKey person_v0 = ResourceAPIKey.of("test_person_resource", "0");
         ResourceAPIKey person_v1 = ResourceAPIKey.of("test_person_resource", "1");
@@ -140,7 +145,6 @@ public class ResourceAPIPoolTest extends ServletContextTest {
         ResourceAPIKey expectedPerson_v1_1_0 = ResourceAPIKey.of("test_person_resource", "1.1.0");
         ResourceAPIKey expectedPerson_v2_0_0 = ResourceAPIKey.of("test_person_resource", "2.0.0");
         ResourceAPIKey expectedPerson_v4_3_7 = ResourceAPIKey.of("test_person_resource", "4.3.7");
-
 
         // base test for test_resource
         assertResource(TEST_RESOURCE_KEY, TEST_PROCEDURE_URI, resourceAPIPool.get(resouce_v0));
@@ -177,13 +181,13 @@ public class ResourceAPIPoolTest extends ServletContextTest {
 
         // no person version 0 in pool
         assertTrue(resourceAPIPool.get(person_v0) instanceof NullResourceAPI);
-        // person resource version 1.0.0 has no max version, any major version request greater than 1 should return version 1.0.0
+        // person resource version 1.0.0 has no max version, any major version request greater than 1 should return
+        // version 1.0.0
         assertResource(expectedPerson_v1_0_0, TEST_PERSON_PROCEDURE_URI_1, resourceAPIPool.get(person_v1));
         assertResource(expectedPerson_v1_0_0, TEST_PERSON_PROCEDURE_URI_1, resourceAPIPool.get(person_v2));
         assertResource(expectedPerson_v1_0_0, TEST_PERSON_PROCEDURE_URI_1, resourceAPIPool.get(person_v3));
         assertResource(expectedPerson_v1_0_0, TEST_PERSON_PROCEDURE_URI_1, resourceAPIPool.get(person_v4));
         assertResource(expectedPerson_v1_0_0, TEST_PERSON_PROCEDURE_URI_1, resourceAPIPool.get(person_v5));
-
 
         loadPersonVersion1_1Model();
         resourceAPIPool.reload();
@@ -208,12 +212,12 @@ public class ResourceAPIPoolTest extends ServletContextTest {
         // person version 1 does not have specific minor version 2
         assertTrue(resourceAPIPool.get(person_v1_2) instanceof NullResourceAPI);
 
-        // person resource version 1.1.0 has no max version, any major version request greater than 1 should return version 1.1.0
+        // person resource version 1.1.0 has no max version, any major version request greater than 1 should return
+        // version 1.1.0
         assertResource(expectedPerson_v1_1_0, TEST_PERSON_PROCEDURE_URI_1_1, resourceAPIPool.get(person_v2));
         assertResource(expectedPerson_v1_1_0, TEST_PERSON_PROCEDURE_URI_1_1, resourceAPIPool.get(person_v3));
         assertResource(expectedPerson_v1_1_0, TEST_PERSON_PROCEDURE_URI_1_1, resourceAPIPool.get(person_v4));
         assertResource(expectedPerson_v1_1_0, TEST_PERSON_PROCEDURE_URI_1_1, resourceAPIPool.get(person_v5));
-
 
         loadPersonVersion2Model();
         resourceAPIPool.reload();
@@ -224,28 +228,28 @@ public class ResourceAPIPoolTest extends ServletContextTest {
         assertTrue(resourceAPIPool.get(document_v0) instanceof NullResourceAPI);
         assertResource(expectedDocument_v1_0_0, testDocumentProcedureUri, resourceAPIPool.get(document_v1));
 
-         // no person version 0 in pool
-         assertTrue(resourceAPIPool.get(person_v0) instanceof NullResourceAPI);
-         // still able to get person version 1.0.0
-         assertResource(expectedPerson_v1_0_0, TEST_PERSON_PROCEDURE_URI_1, resourceAPIPool.get(person_v1_0));
-         assertResource(expectedPerson_v1_0_0, TEST_PERSON_PROCEDURE_URI_1, resourceAPIPool.get(person_v1_0_0));
- 
-         // able to get person version 1.1.0 from varying levels of specificity
-         assertResource(expectedPerson_v1_1_0, TEST_PERSON_PROCEDURE_URI_1_1, resourceAPIPool.get(person_v1));
-         assertResource(expectedPerson_v1_1_0, TEST_PERSON_PROCEDURE_URI_1_1, resourceAPIPool.get(person_v1_1));
-         assertResource(expectedPerson_v1_1_0, TEST_PERSON_PROCEDURE_URI_1_1, resourceAPIPool.get(person_v1_1_0));
- 
-         // person version 1 does not have specific minor version 2
-         assertTrue(resourceAPIPool.get(person_v1_2) instanceof NullResourceAPI);
+        // no person version 0 in pool
+        assertTrue(resourceAPIPool.get(person_v0) instanceof NullResourceAPI);
+        // still able to get person version 1.0.0
+        assertResource(expectedPerson_v1_0_0, TEST_PERSON_PROCEDURE_URI_1, resourceAPIPool.get(person_v1_0));
+        assertResource(expectedPerson_v1_0_0, TEST_PERSON_PROCEDURE_URI_1, resourceAPIPool.get(person_v1_0_0));
 
-         // able to get person version 2.0.0
-         assertResource(expectedPerson_v2_0_0, TEST_PERSON_PROCEDURE_URI_2, resourceAPIPool.get(person_v2));
+        // able to get person version 1.1.0 from varying levels of specificity
+        assertResource(expectedPerson_v1_1_0, TEST_PERSON_PROCEDURE_URI_1_1, resourceAPIPool.get(person_v1));
+        assertResource(expectedPerson_v1_1_0, TEST_PERSON_PROCEDURE_URI_1_1, resourceAPIPool.get(person_v1_1));
+        assertResource(expectedPerson_v1_1_0, TEST_PERSON_PROCEDURE_URI_1_1, resourceAPIPool.get(person_v1_1_0));
 
-         // person resource version 2.0.0 has no max version, any major version request greater than 2 should return version 2.0.0
-         assertResource(expectedPerson_v2_0_0, TEST_PERSON_PROCEDURE_URI_2, resourceAPIPool.get(person_v3));
-         assertResource(expectedPerson_v2_0_0, TEST_PERSON_PROCEDURE_URI_2, resourceAPIPool.get(person_v4));
-         assertResource(expectedPerson_v2_0_0, TEST_PERSON_PROCEDURE_URI_2, resourceAPIPool.get(person_v5));
+        // person version 1 does not have specific minor version 2
+        assertTrue(resourceAPIPool.get(person_v1_2) instanceof NullResourceAPI);
 
+        // able to get person version 2.0.0
+        assertResource(expectedPerson_v2_0_0, TEST_PERSON_PROCEDURE_URI_2, resourceAPIPool.get(person_v2));
+
+        // person resource version 2.0.0 has no max version, any major version request greater than 2 should return
+        // version 2.0.0
+        assertResource(expectedPerson_v2_0_0, TEST_PERSON_PROCEDURE_URI_2, resourceAPIPool.get(person_v3));
+        assertResource(expectedPerson_v2_0_0, TEST_PERSON_PROCEDURE_URI_2, resourceAPIPool.get(person_v4));
+        assertResource(expectedPerson_v2_0_0, TEST_PERSON_PROCEDURE_URI_2, resourceAPIPool.get(person_v5));
 
         loadPersonVersion4_3_7Model();
         resourceAPIPool.reload();
@@ -255,7 +259,6 @@ public class ResourceAPIPoolTest extends ServletContextTest {
         // base test for test_document
         assertTrue(resourceAPIPool.get(document_v0) instanceof NullResourceAPI);
         assertResource(expectedDocument_v1_0_0, testDocumentProcedureUri, resourceAPIPool.get(document_v1));
-
 
         // no person version 0 in pool
         assertTrue(resourceAPIPool.get(person_v0) instanceof NullResourceAPI);
@@ -292,7 +295,8 @@ public class ResourceAPIPoolTest extends ServletContextTest {
         assertResource(expectedPerson_v4_3_7, TEST_PERSON_PROCEDURE_URI_4, resourceAPIPool.get(person_v4_3));
         assertResource(expectedPerson_v4_3_7, TEST_PERSON_PROCEDURE_URI_4, resourceAPIPool.get(person_v4_3_7));
 
-        // person resource version 4.3.7 has no max version, any major version request greater than 4 should return version 4.0.0
+        // person resource version 4.3.7 has no max version, any major version request greater than 4 should return
+        // version 4.0.0
         assertResource(expectedPerson_v4_3_7, TEST_PERSON_PROCEDURE_URI_4, resourceAPIPool.get(person_v5));
     }
 
@@ -311,14 +315,15 @@ public class ResourceAPIPoolTest extends ServletContextTest {
         loadTestModel();
 
         ResourceAPI resourceAPI = loader.loadInstance(TEST_PERSON_RESOURCE_URI, ResourceAPI.class);
-        
+
         resourceAPI.setUri(TEST_PERSON_RESOURCE_URI);
 
         resourceAPIPool.add(TEST_PERSON_RESOURCE_URI, resourceAPI);
 
         assertEquals(0, resourceAPIPool.obsoleteCount());
 
-        assertResource(TEST_PERSON_RESOURCE_KEY, TEST_PERSON_PROCEDURE_URI_1, resourceAPIPool.get(TEST_PERSON_RESOURCE_KEY));
+        assertResource(TEST_PERSON_RESOURCE_KEY, TEST_PERSON_PROCEDURE_URI_1,
+                resourceAPIPool.get(TEST_PERSON_RESOURCE_KEY));
     }
 
     @Test
@@ -366,7 +371,7 @@ public class ResourceAPIPoolTest extends ServletContextTest {
         resourceAPIPool.reload();
 
         ResourceAPI resourceAPI = resourceAPIPool.get(TEST_PERSON_RESOURCE_KEY);
-        
+
         resourceAPI.removeClient();
 
         assertFalse(resourceAPI instanceof NullResourceAPI);
@@ -425,12 +430,13 @@ public class ResourceAPIPoolTest extends ServletContextTest {
         ResourceAPI resourceAPI = resourceAPIPool.get(TEST_PERSON_RESOURCE_KEY);
 
         assertTrue(NullResourceAPI.getInstance().equals(resourceAPI));
-        
+
         resourceAPI.removeClient();
-        
+
         resourceAPIPool.load(TEST_PERSON_RESOURCE_URI);
 
-        assertResource(TEST_PERSON_RESOURCE_KEY, TEST_PERSON_PROCEDURE_URI_1, resourceAPIPool.get(TEST_PERSON_RESOURCE_KEY));
+        assertResource(TEST_PERSON_RESOURCE_KEY, TEST_PERSON_PROCEDURE_URI_1,
+                resourceAPIPool.get(TEST_PERSON_RESOURCE_KEY));
     }
 
     @Test
@@ -438,7 +444,7 @@ public class ResourceAPIPoolTest extends ServletContextTest {
         ResourceAPIPool resourceAPIPool = initWithDefaultModel();
 
         ResourceAPI actualResourceAPI = resourceAPIPool.get(TEST_RESOURCE_KEY);
-        
+
         assertResource(TEST_RESOURCE_KEY, TEST_PROCEDURE_URI, actualResourceAPI);
 
         loadTestModel();
@@ -450,36 +456,37 @@ public class ResourceAPIPoolTest extends ServletContextTest {
         assertEquals(8, resourceAPIPool.count());
         assertEquals(0, resourceAPIPool.obsoleteCount());
 
-        assertResource(TEST_PERSON_RESOURCE_KEY, TEST_PERSON_PROCEDURE_URI_1, resourceAPIPool.get(TEST_PERSON_RESOURCE_KEY));
+        assertResource(TEST_PERSON_RESOURCE_KEY, TEST_PERSON_PROCEDURE_URI_1,
+                resourceAPIPool.get(TEST_PERSON_RESOURCE_KEY));
     }
-    
+
     @Test
     public void testUnload() throws IOException {
         ResourceAPIPool resourceAPIPool = initWithDefaultModel();
 
         ResourceAPI actualResourceAPI = resourceAPIPool.get(TEST_RESOURCE_KEY);
-        
+
         assertResource(TEST_RESOURCE_KEY, TEST_PROCEDURE_URI, actualResourceAPI);
 
         actualResourceAPI.removeClient();
-        
+
         resourceAPIPool.unload();
 
         assertEquals(0, resourceAPIPool.count());
     }
-    
+
     @Test
     public void testUnloadUri() throws IOException {
         ResourceAPIPool resourceAPIPool = initWithDefaultModel();
-        
+
         long resourceCount = resourceAPIPool.count();
 
         ResourceAPI actualResourceAPI = resourceAPIPool.get(TEST_RESOURCE_KEY);
-        
+
         String uri = actualResourceAPI.getUri();
 
         assertResource(TEST_RESOURCE_KEY, TEST_PROCEDURE_URI, actualResourceAPI);
-        
+
         resourceAPIPool.unload(uri);
 
         assertEquals(resourceCount - 1, resourceAPIPool.count());
@@ -501,7 +508,8 @@ public class ResourceAPIPoolTest extends ServletContextTest {
 
         assertResource(TEST_RESOURCE_KEY, TEST_PROCEDURE_URI, resourceAPIPool.get(TEST_RESOURCE_KEY));
 
-        assertResource(TEST_PERSON_RESOURCE_KEY, TEST_PERSON_PROCEDURE_URI_1, resourceAPIPool.get(TEST_PERSON_RESOURCE_KEY));
+        assertResource(TEST_PERSON_RESOURCE_KEY, TEST_PERSON_PROCEDURE_URI_1,
+                resourceAPIPool.get(TEST_PERSON_RESOURCE_KEY));
     }
 
     @Test
@@ -571,26 +579,27 @@ public class ResourceAPIPoolTest extends ServletContextTest {
         return resourceAPIPool;
     }
 
-    private void assertResource(ResourceAPIKey expctedResourceAPIKey, String expectedActionName, ResourceAPI actualResourceAPI) {
+    private void assertResource(ResourceAPIKey expctedResourceAPIKey, String expectedActionName,
+            ResourceAPI actualResourceAPI) {
         try {
-        assertNotNull(actualResourceAPI);
-        assertFalse(format("%s not loaded!", expctedResourceAPIKey), actualResourceAPI instanceof NullResourceAPI);
-        assertEquals(expctedResourceAPIKey, actualResourceAPI.getKey());
-        assertTrue(actualResourceAPI.hasClients());
-        assertEquals(expectedActionName, actualResourceAPI.getProcedureUriOnGet());
-        assertEquals(expctedResourceAPIKey.getVersion().toString(), actualResourceAPI.getVersionMin());
-        assertEquals(expectedActionName, actualResourceAPI.getProcedureUriOnPost());
-        assertEquals(expctedResourceAPIKey.getVersion().toString(), actualResourceAPI.getVersionMin());
-        assertEquals(expectedActionName, actualResourceAPI.getProcedureUriOnDelete());
-        assertEquals(expctedResourceAPIKey.getVersion().toString(), actualResourceAPI.getVersionMin());
-        assertEquals(expectedActionName, actualResourceAPI.getProcedureUriOnPut());
-        assertEquals(expctedResourceAPIKey.getVersion().toString(), actualResourceAPI.getVersionMin());
-        assertEquals(expectedActionName, actualResourceAPI.getProcedureUriOnPatch());
-        assertEquals(expctedResourceAPIKey.getVersion().toString(), actualResourceAPI.getVersionMin());
+            assertNotNull(actualResourceAPI);
+            assertFalse(format("%s not loaded!", expctedResourceAPIKey), actualResourceAPI instanceof NullResourceAPI);
+            assertEquals(expctedResourceAPIKey, actualResourceAPI.getKey());
+            assertTrue(actualResourceAPI.hasClients());
+            assertEquals(expectedActionName, actualResourceAPI.getProcedureUriOnGet());
+            assertEquals(expctedResourceAPIKey.getVersion().toString(), actualResourceAPI.getVersionMin());
+            assertEquals(expectedActionName, actualResourceAPI.getProcedureUriOnPost());
+            assertEquals(expctedResourceAPIKey.getVersion().toString(), actualResourceAPI.getVersionMin());
+            assertEquals(expectedActionName, actualResourceAPI.getProcedureUriOnDelete());
+            assertEquals(expctedResourceAPIKey.getVersion().toString(), actualResourceAPI.getVersionMin());
+            assertEquals(expectedActionName, actualResourceAPI.getProcedureUriOnPut());
+            assertEquals(expctedResourceAPIKey.getVersion().toString(), actualResourceAPI.getVersionMin());
+            assertEquals(expectedActionName, actualResourceAPI.getProcedureUriOnPatch());
+            assertEquals(expctedResourceAPIKey.getVersion().toString(), actualResourceAPI.getVersionMin());
         } finally {
-            actualResourceAPI.removeClient();    
+            actualResourceAPI.removeClient();
         }
-        
+
     }
 
 }

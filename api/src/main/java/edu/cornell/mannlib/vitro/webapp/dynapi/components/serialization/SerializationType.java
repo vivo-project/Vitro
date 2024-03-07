@@ -1,10 +1,9 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Removable;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public abstract class SerializationType implements Removable {
 
@@ -16,11 +15,12 @@ public abstract class SerializationType implements Removable {
     }
 
     @Override
-    public void dereference() {}
+    public void dereference() {
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
     @Override
     public boolean equals(Object object) {
@@ -32,16 +32,12 @@ public abstract class SerializationType implements Removable {
         }
         SerializationType compared = (SerializationType) object;
 
-        return new EqualsBuilder()
-                .append(getName(), compared.getName())
-                .isEquals();
+        return new EqualsBuilder().append(getName(), compared.getName()).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 103)
-                .append(getName())
-                .toHashCode();
+        return new HashCodeBuilder(17, 103).append(getName()).toHashCode();
     }
-	
+
 }

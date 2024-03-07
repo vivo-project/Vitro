@@ -1,9 +1,8 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.rdf.model.Literal;
-
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 
 public class LiteralParamFactory {
 
@@ -26,7 +25,9 @@ public class LiteralParamFactory {
         if (INTEGER_DATA_TYPE.equals(dataTypeUri)) {
             return new IntegerLiteralParam(var);
         }
-        throw new RuntimeException(
-                "Parameter for " + dataTypeUri + " not implemented in " + LiteralParamFactory.class.getSimpleName());
+        throw new RuntimeException("Parameter for " +
+                dataTypeUri +
+                " not implemented in " +
+                LiteralParamFactory.class.getSimpleName());
     }
 }

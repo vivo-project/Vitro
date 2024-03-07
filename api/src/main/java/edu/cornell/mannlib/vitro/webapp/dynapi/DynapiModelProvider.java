@@ -20,9 +20,9 @@ public class DynapiModelProvider {
         permanentModel = ModelFactory.createOntologyModel();
         permanentModel.addSubModel(abox);
         permanentModel.addSubModel(tbox);
-        log.debug("abox size:" +  abox.size());
-        log.debug("tbox size:" +  tbox.size());
-        log.debug("OntModel size:" +  permanentModel.size());
+        log.debug("abox size:" + abox.size());
+        log.debug("tbox size:" + tbox.size());
+        log.debug("OntModel size:" + permanentModel.size());
     }
 
     public void setModel(OntModel model) {

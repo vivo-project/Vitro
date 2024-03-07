@@ -1,9 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
-
-import org.apache.commons.lang3.StringUtils;
-
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
+import org.apache.commons.lang3.StringUtils;
 
 public class RPC extends AbstractPoolComponent implements Removable, Poolable<String> {
 
@@ -17,13 +15,15 @@ public class RPC extends AbstractPoolComponent implements Removable, Poolable<St
         return procedureUri;
     }
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#procedure", minOccurs = 1, maxOccurs = 1, asString = true)
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#procedure", minOccurs = 1, maxOccurs = 1,
+            asString = true)
     public void setProcedureUri(String procedureUri) {
         this.procedureUri = procedureUri;
     }
 
     @Override
-    public void dereference() {}
+    public void dereference() {
+    }
 
     public String getName() {
         return name;
@@ -64,7 +64,7 @@ public class RPC extends AbstractPoolComponent implements Removable, Poolable<St
         }
         return true;
     }
-    
+
     public HTTPMethod getHttpMethod() {
         return httpMethod;
     }
@@ -73,5 +73,5 @@ public class RPC extends AbstractPoolComponent implements Removable, Poolable<St
     public void setHttpMethod(HTTPMethod httpMethod) {
         this.httpMethod = httpMethod;
     }
-    
+
 }

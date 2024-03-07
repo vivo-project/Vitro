@@ -7,70 +7,69 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.entity.ContentType;
-
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullProcedure;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.entity.ContentType;
 
 public class DataStore {
 
-	protected Map<String, Data> dataMap = new HashMap<>();
-	private ContentType responseType = ContentType.APPLICATION_JSON;
-	private List<String> acceptLangs = new LinkedList<>();
-	private String resourceId = "";
-	private UserAccount user;
-	private Map<String, Procedure> dependencyComponents = new HashMap<>();
+    protected Map<String, Data> dataMap = new HashMap<>();
+    private ContentType responseType = ContentType.APPLICATION_JSON;
+    private List<String> acceptLangs = new LinkedList<>();
+    private String resourceId = "";
+    private UserAccount user;
+    private Map<String, Procedure> dependencyComponents = new HashMap<>();
 
-	public DataStore() {
-	}
+    public DataStore() {
+    }
 
-	public void addData(String name, Data data) {
-		dataMap.put(name, data);
-	}
+    public void addData(String name, Data data) {
+        dataMap.put(name, data);
+    }
 
-	public Data getData(String name) {
-		return dataMap.get(name);
-	}
+    public Data getData(String name) {
+        return dataMap.get(name);
+    }
 
-	public String getResourceId() {
-		return resourceId;
-	}
+    public String getResourceId() {
+        return resourceId;
+    }
 
-	public void setResourceID(String resourceId) {
-		this.resourceId = resourceId;
-	}
+    public void setResourceID(String resourceId) {
+        this.resourceId = resourceId;
+    }
 
-	public ContentType getResponseType() {
-		return responseType;
-	}
+    public ContentType getResponseType() {
+        return responseType;
+    }
 
-	public void setResponseType(ContentType contentType) {
-		this.responseType = contentType;
-	}
+    public void setResponseType(ContentType contentType) {
+        this.responseType = contentType;
+    }
 
-	public void setAcceptLangs(List<String> acceptLangs) {
-		this.acceptLangs.clear();
-		this.acceptLangs.addAll(acceptLangs);
-	}
+    public void setAcceptLangs(List<String> acceptLangs) {
+        this.acceptLangs.clear();
+        this.acceptLangs.addAll(acceptLangs);
+    }
 
-	public List<String> getAcceptLangs() {
-		return acceptLangs;
-	}
+    public List<String> getAcceptLangs() {
+        return acceptLangs;
+    }
 
-	public boolean contains(String name) {
-		return dataMap.containsKey(name);
-	}
+    public boolean contains(String name) {
+        return dataMap.containsKey(name);
+    }
 
-	protected Set<Entry<String, Data>> entrySet() {
-		return dataMap.entrySet();
-	}
+    protected Set<Entry<String, Data>> entrySet() {
+        return dataMap.entrySet();
+    }
 
-	protected Set<String> keySet() {
-		return dataMap.keySet();
-	}
-	
+    protected Set<String> keySet() {
+        return dataMap.keySet();
+    }
+
     public void putDependency(String uri, Procedure dependency) {
         dependencyComponents.put(uri, dependency);
     }
@@ -78,7 +77,7 @@ public class DataStore {
     public void putDependencies(Map<String, Procedure> dependencies) {
         dependencyComponents.putAll(dependencies);
     }
-    
+
     public Map<String, Procedure> getDependencies() {
         return dependencyComponents;
     }
@@ -89,7 +88,7 @@ public class DataStore {
         }
         return dependencyComponents.get(uri);
     }
-    
+
     public boolean containsDependency(String uri) {
         return dependencyComponents.containsKey(uri);
     }
@@ -115,11 +114,11 @@ public class DataStore {
         }
         return true;
     }
-    
+
     public void setUser(UserAccount user) {
         this.user = user;
     }
-    
+
     public UserAccount getUser() {
         return user;
     }

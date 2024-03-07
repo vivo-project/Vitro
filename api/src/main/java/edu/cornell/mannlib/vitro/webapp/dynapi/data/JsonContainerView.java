@@ -5,18 +5,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.rdf.model.RDFNode;
-
 import com.fasterxml.jackson.databind.JsonNode;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer.Type;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.LiteralParamFactory;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.URIResourceParam;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.RDFNode;
 
 public class JsonContainerView {
 
@@ -74,7 +72,7 @@ public class JsonContainerView {
         }
         return jsonArrays;
     }
-    
+
     public static List<JsonContainer> getJsonArrayList(Parameters params, DataStore dataStore) {
         List<JsonContainer> jsonArrays = new LinkedList<>();
         for (String name : params.getNames()) {
@@ -123,7 +121,7 @@ public class JsonContainerView {
 
         for (String var : vars) {
             RDFNode node = solution.get(var);
-            if(node == null) {
+            if (node == null) {
                 continue;
             }
             if (node.isLiteral()) {

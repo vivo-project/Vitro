@@ -3,9 +3,6 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components.conditions;
 import java.util.Collections;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ProcedureDescriptor;
@@ -16,6 +13,8 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class ConditionContainerContains implements Condition {
 
@@ -29,18 +28,18 @@ public class ConditionContainerContains implements Condition {
     public Parameters getInputParams() {
         return inputParams;
     }
-    
+
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#targetContainer", minOccurs = 1, maxOccurs = 1)
-    public void setContainer(Parameter param) throws InitializationException{
+    public void setContainer(Parameter param) throws InitializationException {
         if (!param.isJsonContainer()) {
             throw new InitializationException("Only JsonContainer parameter is allowed as a target");
         }
         inputParams.add(param);
         containerParam = param;
     }
-    
+
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter", minOccurs = 1, maxOccurs = 1)
-    public void addInputParameter(Parameter param){
+    public void addInputParameter(Parameter param) {
         inputParams.add(param);
         keys.add(param);
     }
@@ -49,7 +48,7 @@ public class ConditionContainerContains implements Condition {
     public Map<String, ProcedureDescriptor> getDependencies() {
         return Collections.emptyMap();
     }
-    
+
     private Data firstKeyData(DataStore dataStore) {
         return dataStore.getData(firstKeyName());
     }
@@ -57,7 +56,7 @@ public class ConditionContainerContains implements Condition {
     private String firstKeyName() {
         return keys.getNames().iterator().next();
     }
-    
+
     @Override
     public boolean isSatisfied(DataStore dataStore) {
         if (!isValid(dataStore)) {
@@ -67,7 +66,7 @@ public class ConditionContainerContains implements Condition {
         String key = SimpleDataView.getStringRepresentation(firstKeyData(dataStore));
         return container.contains(key);
     }
-    
+
     public boolean isValid() {
         if (containerParam == null) {
             log.error("container param is not set");
@@ -79,7 +78,7 @@ public class ConditionContainerContains implements Condition {
         }
         return true;
     }
-    
+
     public boolean isValid(DataStore dataStore) {
         if (!isValid()) {
             return false;
@@ -93,7 +92,7 @@ public class ConditionContainerContains implements Condition {
             log.error("container data is not provided in data store");
             return false;
         }
-        if(container.getParam() == null) {
+        if (container.getParam() == null) {
             log.error("container data param is null");
             return false;
         }

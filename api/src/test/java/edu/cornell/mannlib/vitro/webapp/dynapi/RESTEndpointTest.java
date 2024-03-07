@@ -25,9 +25,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.http.entity.ContentType;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.HTTPMethod;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPI;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import org.apache.http.HttpHeaders;
-
+import org.apache.http.entity.ContentType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,15 +45,6 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
-
-import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.HTTPMethod;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPI;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 
 @RunWith(Parameterized.class)
 public class RESTEndpointTest {
@@ -87,7 +85,7 @@ public class RESTEndpointTest {
 
     @Mock
     private UserAccount user;
-    
+
     @Mock
     private HttpServletRequest request;
 
@@ -115,7 +113,7 @@ public class RESTEndpointTest {
     public String testMessage;
 
     @Before
-    public void beforeEach() throws Exception{
+    public void beforeEach() throws Exception {
         baos = new ByteArrayOutputStream();
         MockitoAnnotations.openMocks(this);
         resourceAPIPoolStatic = mockStatic(ResourceAPIPool.class);
@@ -157,8 +155,7 @@ public class RESTEndpointTest {
 
         PrintWriter writer = new PrintWriter(baos, true);
         when(response.getWriter()).thenReturn(writer);
-        when(procedure.run(any(DataStore.class)))
-            .thenReturn(new OperationResult(testExpectedStatus));
+        when(procedure.run(any(DataStore.class))).thenReturn(new OperationResult(testExpectedStatus));
 
         when(httpMethod.getName()).thenReturn(testMethod);
 
@@ -209,21 +206,29 @@ public class RESTEndpointTest {
 
         return Arrays.asList(new Object[][] {
             // expected counts key
-            // resource.getRestRPC, resource.getCustomRestActionRPC, resource.removeClient, action.run, action.removeClient, response.setStatus
+            // resource.getRestRPC, resource.getCustomRestActionRPC, resource.removeClient, action.run,
+            // action.removeClient, response.setStatus
 
-            // method   path info                 action      expected counts                 expected status        message
-            { "POST",   PATH_INFO,                actionName, new int[] { 1, 0, 1, 1, 1, 1 }, SC_OK,                 "Create collection resource" },
-            { "GET",    PATH_INFO,                actionName, new int[] { 1, 0, 1, 1, 1, 1 }, SC_OK,                 "Get collection resources" },
-            { "PUT",    PATH_INFO,                actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Cannot put on resource collecion" },
-            { "PATCH",  PATH_INFO,                actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Cannot patch on resource collection" },
-            { "DELETE", PATH_INFO,                actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Cannot delete on resource collection" },
-
-            { "POST",   customRestActionPathInfo, actionName, new int[] { 0, 1, 1, 1, 1, 1 }, SC_METHOD_NOT_ALLOWED, "Resource found with supported method" },
-            { "GET",    customRestActionPathInfo, actionName, new int[] { 0, 1, 1, 1, 1, 1 }, SC_METHOD_NOT_ALLOWED, "Resource found with supported method" },
-            { "PUT",    customRestActionPathInfo, actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Method unsupported by custom REST action" },
-            { "PATCH",  customRestActionPathInfo, actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Method unsupported by custom REST action" },
-            { "DELETE", customRestActionPathInfo, actionName, new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Method unsupported by custom REST action" }
-            
+            // method   path info                 action
+            //  expected counts                 expected status        message
+            { "POST",   PATH_INFO,                actionName,
+                new int[] { 1, 0, 1, 1, 1, 1 }, SC_OK,                 "Create collection resource" },
+            { "GET",    PATH_INFO,                actionName,
+                new int[] { 1, 0, 1, 1, 1, 1 }, SC_OK,                 "Get collection resources" },
+            { "PUT",    PATH_INFO,                actionName,
+                new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Cannot put on resource collecion" },
+            { "PATCH",  PATH_INFO,                actionName,
+                new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Cannot patch on resource collection" },
+            { "DELETE", PATH_INFO,                actionName,
+                new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Cannot delete on resource collection" },
+            { "POST",   customRestActionPathInfo, actionName,
+                new int[] { 0, 1, 1, 1, 1, 1 }, SC_METHOD_NOT_ALLOWED, "Resource found with supported method" },
+            { "GET",    customRestActionPathInfo, actionName,
+                new int[] { 0, 1, 1, 1, 1, 1 }, SC_METHOD_NOT_ALLOWED, "Resource found with supported method" },
+            { "PATCH",  customRestActionPathInfo, actionName,
+                new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Method unsupported by custom REST action" },
+            { "DELETE", customRestActionPathInfo, actionName,
+                new int[] { 0, 0, 0, 0, 0, 1 }, SC_METHOD_NOT_ALLOWED, "Method unsupported by custom REST action" }
         });
     }
 

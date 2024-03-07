@@ -33,10 +33,8 @@ import javax.servlet.http.HttpSession;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory;
-
 import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
 import org.junit.After;
@@ -58,9 +56,9 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
     private final static String BASE_URL = "http://localhost:8080";
 
     private final static String MOCK_BASE_PATH = "src/test/resources/dynapi/mock";
-    
+
     private final static boolean overwrite = false;
-    
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private RESTEndpoint restEndpoint;
@@ -80,7 +78,7 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
 
     @Mock
     private UserAccount user;
-    
+
     @Mock
     private PrintWriter responsePrintWriter;
 
@@ -109,14 +107,14 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
 
     @BeforeClass
     public static void setupStaticObjects() {
-    	dynapiModelFactory = mockStatic(DynapiModelFactory.class);
+        dynapiModelFactory = mockStatic(DynapiModelFactory.class);
     }
-    
+
     @AfterClass
     public static void after() {
-    	dynapiModelFactory.close();
+        dynapiModelFactory.close();
     }
-    
+
     @Before
     public void beforeEach() throws IOException {
         LoggingControl.offLogs();
@@ -139,7 +137,7 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
         dynapiModelFactory.when(() -> DynapiModelFactory.getModel(any(String.class))).thenReturn(ontModel);
         mockStatus(response);
     }
-    
+
     @After
     public void reset() {
         LoggingControl.restoreLogs();
@@ -156,17 +154,20 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
         when(session.getAttribute("user")).thenReturn(user);
         when(user.isRootUser()).thenReturn(true);
 
-
         when(request.getHeader(HttpHeaders.ACCEPT)).thenReturn(ContentType.APPLICATION_JSON.toString());
 
         if (testRequestParamsFile != null) {
-            String filePath = format("%s/rest/request/params/%s/%s", MOCK_BASE_PATH, testRequestMethod.toLowerCase(), testRequestParamsFile);
-            Map<String, String[]> params = objectMapper.readValue(new File(filePath), new TypeReference<HashMap<String, String[]>>() {});
+            String filePath = format("%s/rest/request/params/%s/%s", MOCK_BASE_PATH, testRequestMethod.toLowerCase(),
+                    testRequestParamsFile);
+            Map<String, String[]> params =
+                    objectMapper.readValue(new File(filePath), new TypeReference<HashMap<String, String[]>>() {
+                    });
             when(request.getParameterMap()).thenReturn(params);
         }
 
         if (testRequestBodyFile != null) {
-            String filePath = format("%s/rest/request/body/%s/%s", MOCK_BASE_PATH, testRequestMethod.toLowerCase(), testRequestParamsFile);
+            String filePath = format("%s/rest/request/body/%s/%s", MOCK_BASE_PATH, testRequestMethod.toLowerCase(),
+                    testRequestParamsFile);
             when(request.getContentType()).thenReturn("application/json;UTF-8");
             when(request.getReader()).thenReturn(new BufferedReader(new FileReader(filePath)));
         }
@@ -181,10 +182,11 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
             verify(response, times(1)).setStatus(testResponseStatus);
 
             if (testResponseBodyFile != null) {
-                String filePath = format("rest/response/body/%s/%s", testRequestMethod.toLowerCase(), testRequestParamsFile);
+                String filePath =
+                        format("rest/response/body/%s/%s", testRequestMethod.toLowerCase(), testRequestParamsFile);
                 String expectedReponseBody = readMockFile(filePath);
                 if (overwrite) {
-                	overwrite(filePath);	
+                    overwrite(filePath);
                 }
                 verify(responsePrintWriter, times(1)).print(expectedReponseBody.trim());
                 verify(responsePrintWriter, times(1)).flush();
@@ -195,18 +197,18 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
         }
 
         assertEquals("Invalid Status for test: " + testMessage, status, response.getStatus());
-	}
+    }
 
-	private void overwrite(String filePath) throws FileNotFoundException {
-		final ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
-		verify(responsePrintWriter).print(captor.capture());
-		final String argument = captor.getValue();
-		PrintWriter out = new PrintWriter(getTestFilePath(filePath));
-		out.print(argument);
-		out.flush();
-	}
+    private void overwrite(String filePath) throws FileNotFoundException {
+        final ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(responsePrintWriter).print(captor.capture());
+        final String argument = captor.getValue();
+        PrintWriter out = new PrintWriter(getTestFilePath(filePath));
+        out.print(argument);
+        out.flush();
+    }
 
-	private void run(String method) {
+    private void run(String method) {
         switch (method) {
             case "POST":
                 restEndpoint.doPost(request, response);
@@ -231,21 +233,33 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
     @Parameterized.Parameters
     public static Collection<Object[]> requests() {
         List<Object[]> requests = new ArrayList<>(Arrays.asList(new Object[][] {
-            { "POST",   "/1/test_not_found", null, null, SC_NOT_FOUND,          null, "Resource not found" },
-            { "GET",    "/1/test_not_found", null, null, SC_NOT_FOUND,          null, "Resource not found" },
-            { "PUT",    "/1/test_not_found", null, null, SC_METHOD_NOT_ALLOWED, null, "Method not allowed before looking for resource" },
-            { "PATCH",  "/1/test_not_found", null, null, SC_METHOD_NOT_ALLOWED, null, "Method not allowed before looking for resource" },
-            { "DELETE", "/1/test_not_found", null, null, SC_METHOD_NOT_ALLOWED, null, "Method not allowed before looking for resource" }
+            { "POST",   "/1/test_not_found", null, null, SC_NOT_FOUND,          null,
+                "Resource not found" },
+            { "GET",    "/1/test_not_found", null, null, SC_NOT_FOUND,          null,
+                "Resource not found" },
+            { "PUT",    "/1/test_not_found", null, null, SC_METHOD_NOT_ALLOWED, null,
+                "Method not allowed before looking for resource" },
+            { "PATCH",  "/1/test_not_found", null, null, SC_METHOD_NOT_ALLOWED, null,
+                "Method not allowed before looking for resource" },
+            { "DELETE", "/1/test_not_found", null, null, SC_METHOD_NOT_ALLOWED, null,
+                "Method not allowed before looking for resource" }
         }));
 
         // update with applicable individual ids, ideally they would exist in model for integration testing
-        requests.addAll(requests("test_collection_resource",   "https://scholars.institution.edu/individual/n1f9d4ddc", "test_collection_custom_action_name"));
-        requests.addAll(requests("test_concept_resource",      "https://scholars.institution.edu/individual/n1f9d4ddc", "test_concept_custom_action_name"));
-        requests.addAll(requests("test_document_resource",     "https://scholars.institution.edu/individual/n1f9d4ddc", "test_document_custom_action_name"));
-        requests.addAll(requests("test_organization_resource", "https://scholars.institution.edu/individual/n1f9d4ddc", "test_organization_custom_action_name"));
-        requests.addAll(requests("test_person_resource",       "https://scholars.institution.edu/individual/n1f9d4ddc", "test_person_custom_action_name"));
-        requests.addAll(requests("test_process_resource",      "https://scholars.institution.edu/individual/n1f9d4ddc", "test_process_custom_action_name"));
-        requests.addAll(requests("test_relationship_resource", "https://scholars.institution.edu/individual/n1f9d4ddc", "test_relationship_custom_action_name"));
+        requests.addAll(requests("test_collection_resource",
+                "https://scholars.institution.edu/individual/n1f9d4ddc", "test_collection_custom_action_name"));
+        requests.addAll(requests("test_concept_resource",
+                "https://scholars.institution.edu/individual/n1f9d4ddc", "test_concept_custom_action_name"));
+        requests.addAll(requests("test_document_resource",
+                "https://scholars.institution.edu/individual/n1f9d4ddc", "test_document_custom_action_name"));
+        requests.addAll(requests("test_organization_resource",
+                "https://scholars.institution.edu/individual/n1f9d4ddc", "test_organization_custom_action_name"));
+        requests.addAll(requests("test_person_resource",
+                "https://scholars.institution.edu/individual/n1f9d4ddc", "test_person_custom_action_name"));
+        requests.addAll(requests("test_process_resource",
+                "https://scholars.institution.edu/individual/n1f9d4ddc", "test_process_custom_action_name"));
+        requests.addAll(requests("test_relationship_resource",
+                "https://scholars.institution.edu/individual/n1f9d4ddc", "test_relationship_custom_action_name"));
 
         return requests;
     }
@@ -261,28 +275,44 @@ public class RESTEndpointIntegrationTest extends ServletContextIntegrationTest {
 
         String resourcePath = format("/1/%s", resourceName);
 
-        String individualResourcePath = format("%s/resource:%s", resourcePath, new String(Base64.getEncoder().encode(individualUri.getBytes())));
+        String individualResourcePath = format("%s/resource:%s", resourcePath,
+                new String(Base64.getEncoder().encode(individualUri.getBytes())));
 
         String customRestActionPath = format("%s/%s", individualResourcePath, customRestActionName);
 
         return new ArrayList<>(Arrays.asList(new Object[][] {
-            { "POST",   resourcePath,           restReqParamsFile, restReqBodyFile, SC_OK,                 restResBodyFile, "Create collection resource" },
-            { "GET",    resourcePath,           restReqParamsFile, null,            SC_OK,                 restResBodyFile, "Get collection resources" },
-            { "PUT",    resourcePath,           restReqParamsFile, null,            SC_METHOD_NOT_ALLOWED, null,            "Update not allowed on collection" },
-            { "PATCH",  resourcePath,           restReqParamsFile, null,            SC_METHOD_NOT_ALLOWED, null,            "Patch not allowed on collection" },
-            { "DELETE", resourcePath,           restReqParamsFile, null,            SC_METHOD_NOT_ALLOWED, null,            "Delete not allowed on collection" },
+            { "POST",   resourcePath,           restReqParamsFile, restReqBodyFile,
+                SC_OK,                 restResBodyFile, "Create collection resource" },
+            { "GET",    resourcePath,           restReqParamsFile, null,
+                SC_OK,                 restResBodyFile, "Get collection resources" },
+            { "PUT",    resourcePath,           restReqParamsFile, null,
+                SC_METHOD_NOT_ALLOWED, null,            "Update not allowed on collection" },
+            { "PATCH",  resourcePath,           restReqParamsFile, null,
+                SC_METHOD_NOT_ALLOWED, null,            "Patch not allowed on collection" },
+            { "DELETE", resourcePath,           restReqParamsFile, null,
+                SC_METHOD_NOT_ALLOWED, null,            "Delete not allowed on collection" },
 
-            { "POST",   individualResourcePath, restReqParamsFile, null,            SC_METHOD_NOT_ALLOWED, null,            "Create not allowed on individualt resource" },
-            { "GET",    individualResourcePath, restReqParamsFile, null,            SC_OK,                 restResBodyFile, "Get individual resource" },
-            { "PUT",    individualResourcePath, restReqParamsFile, restReqBodyFile, SC_OK,                 restResBodyFile, "Update individual resource" },
-            { "PATCH",  individualResourcePath, restReqParamsFile, restReqBodyFile, SC_OK,                 restResBodyFile, "Patch individual resource" },
-            { "DELETE", individualResourcePath, restReqParamsFile, null,            SC_OK,                 restResBodyFile, "Delete individual resource" },
+            { "POST",   individualResourcePath, restReqParamsFile, null,
+                SC_METHOD_NOT_ALLOWED, null,            "Create not allowed on individualt resource" },
+            { "GET",    individualResourcePath, restReqParamsFile, null,
+                SC_OK,                 restResBodyFile, "Get individual resource" },
+            { "PUT",    individualResourcePath, restReqParamsFile, restReqBodyFile,
+                SC_OK,                 restResBodyFile, "Update individual resource" },
+            { "PATCH",  individualResourcePath, restReqParamsFile, restReqBodyFile,
+                SC_OK,                 restResBodyFile, "Patch individual resource" },
+            { "DELETE", individualResourcePath, restReqParamsFile, null,
+                SC_OK,                 restResBodyFile, "Delete individual resource" },
 
-            { "POST",   customRestActionPath,   restReqParamsFile, null,            SC_METHOD_NOT_ALLOWED, null,            "Method unsupported by Custom REST action" },
-            { "GET",    customRestActionPath,   restReqParamsFile, null,            SC_METHOD_NOT_ALLOWED, null,            "Method unsupported by Custom REST action" },
-            { "PUT",    customRestActionPath,   restReqParamsFile, restReqBodyFile, SC_OK,                 restResBodyFile, "Run Custom REST action" },
-            { "PATCH",  customRestActionPath,   restReqParamsFile, null,            SC_METHOD_NOT_ALLOWED, null,            "Method unsupported by Custom REST action" },
-            { "DELETE", customRestActionPath,   restReqParamsFile, null,            SC_METHOD_NOT_ALLOWED, null,            "Method unsupported by Custom REST action" }
+            { "POST",   customRestActionPath,   restReqParamsFile, null,
+                SC_METHOD_NOT_ALLOWED, null,            "Method unsupported by Custom REST action" },
+            { "GET",    customRestActionPath,   restReqParamsFile, null,
+                SC_METHOD_NOT_ALLOWED, null,            "Method unsupported by Custom REST action" },
+            { "PUT",    customRestActionPath,   restReqParamsFile, restReqBodyFile,
+                SC_OK,                 restResBodyFile, "Run Custom REST action" },
+            { "PATCH",  customRestActionPath,   restReqParamsFile, null,
+                SC_METHOD_NOT_ALLOWED, null,            "Method unsupported by Custom REST action" },
+            { "DELETE", customRestActionPath,   restReqParamsFile, null,
+                SC_METHOD_NOT_ALLOWED, null,            "Method unsupported by Custom REST action" }
         }));
     }
 

@@ -14,6 +14,7 @@ public class ParameterSubstitutor {
 
     /**
      * Makes parameter substitutions on data store
+     * 
      * @param substitutions - set of substitutions to make
      * @param dataStore - data storage
      */
@@ -28,8 +29,8 @@ public class ParameterSubstitutor {
     }
 
     /**
-     * Makes parameter substitutions on data store
-     * Note that source and target are swapped to reverse substitution
+     * Makes parameter substitutions on data store Note that source and target are swapped to reverse substitution
+     * 
      * @param substitutions - set of substitutions to make
      * @param dataStore - data storage
      */
@@ -43,7 +44,8 @@ public class ParameterSubstitutor {
         appendCreatedSubstitutions(dataStore, tmpStore);
     }
 
-    private static Map<String, Data> substitute(DataStore store, Map<String, Data> tmp, Parameter target, Parameter source) {
+    private static Map<String, Data> substitute(DataStore store, Map<String, Data> tmp, Parameter target,
+            Parameter source) {
         if (store.contains(source.getName())) {
             if (tmp.isEmpty()) {
                 tmp = new HashMap<>();
@@ -52,14 +54,15 @@ public class ParameterSubstitutor {
         }
         return tmp;
     }
-    
+
     private static void appendCreatedSubstitutions(DataStore dataStore, Map<String, Data> substitutedDataStore) {
         for (Entry<String, Data> substitutedData : substitutedDataStore.entrySet()) {
             dataStore.addData(substitutedData.getKey(), substitutedData.getValue());
         }
     }
 
-    private static void substitute(Parameter source, Parameter target, DataStore dataStore, Map<String, Data> substitutedDataStore) {
+    private static void substitute(Parameter source, Parameter target, DataStore dataStore,
+            Map<String, Data> substitutedDataStore) {
         Data data = dataStore.getData(source.getName());
         data.setParam(target);
         dataStore.remove(source.getName());

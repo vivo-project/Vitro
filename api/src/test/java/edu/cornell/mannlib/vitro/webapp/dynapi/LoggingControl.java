@@ -3,10 +3,9 @@ package edu.cornell.mannlib.vitro.webapp.dynapi;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
-import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
 
 public class LoggingControl {
 

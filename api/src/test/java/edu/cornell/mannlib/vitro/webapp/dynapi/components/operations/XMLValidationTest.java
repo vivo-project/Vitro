@@ -7,13 +7,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.tika.utils.StringUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
@@ -21,6 +14,12 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.BooleanParam;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.StringParam;
+import org.apache.tika.utils.StringUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class XMLValidationTest {
@@ -42,21 +41,21 @@ public class XMLValidationTest {
 
     @org.junit.runners.Parameterized.Parameter(1)
     public String xsd;
-    
+
     @org.junit.runners.Parameterized.Parameter(2)
     public String expectedResult;
-    
+
     private DataStore ds;
-    
+
     @Before
     public void init() {
         LoggingControl.offLog(XMLTransformation.class);
         xmlt = new XMLValidation();
         ds = new DataStore();
-        inputParam = new StringParam(INPUT_XML_PARAM_NAME); 
+        inputParam = new StringParam(INPUT_XML_PARAM_NAME);
         outputParam = new BooleanParam(OUTPUT_PARAM_NAME);
         errorMessageParam = new StringParam(ERROR_PARAM_NAME);
-        xsdParam = new StringParam(XSD_PARAM_NAME); 
+        xsdParam = new StringParam(XSD_PARAM_NAME);
         inputData = new Data(inputParam);
         inputData.setRawString(inputValue);
         inputData.initialization();
@@ -64,11 +63,12 @@ public class XMLValidationTest {
         xsdData.setRawString(xsd);
         xsdData.initialization();
     }
+
     @After
     public void reset() {
         LoggingControl.restoreLog(XMLTransformation.class);
     }
-    
+
     @Test
     public void testUnconfiguredOperation() throws Exception {
         xmlt.setInputXmlParam(inputParam);
@@ -88,59 +88,60 @@ public class XMLValidationTest {
         if (StringUtils.isBlank(expectedResult)) {
             expectSuccess = true;
         }
-        assertEquals(Boolean.toString(expectSuccess),outputString);
+        assertEquals(Boolean.toString(expectSuccess), outputString);
         Data errorData = ds.getData(ERROR_PARAM_NAME);
         String errorString = errorData.getSerializedValue();
         assertEquals(expectedResult, errorString);
     }
-    
+
     @Parameterized.Parameters
     public static Collection<Object[]> requests() {
         return Arrays.asList(new Object[][] {
-            { "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
-                    + "<individual>\n"
-                    + "    <name>Bob</name>\n"
-                    + "</individual>", 
-              "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
-              + "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\">\n"
-              + "    <xs:element name=\"individual\">\n"
-              + "        <xs:complexType>\n"
-              + "            <xs:sequence>\n"
-              + "                <xs:element name=\"name\">\n"
-              + "                    <xs:simpleType>\n"
-              + "                        <xs:restriction base=\"xs:string\">\n"
-              + "                            <xs:maxLength value=\"3\" />\n"
-              + "                        </xs:restriction>\n"
-              + "                    </xs:simpleType>\n"
-              + "                </xs:element>"
-              + "            </xs:sequence>\n"
-              + "        </xs:complexType>\n"
-              + "    </xs:element>\n"
-              + "</xs:schema>",
-              ""
-            },
-            { "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
-                    + "<individual>\n"
-                    + "    <name>Alice</name>\n"
-                    + "</individual>", 
-              "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
-              + "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\">\n"
-              + "    <xs:element name=\"individual\">\n"
-              + "        <xs:complexType>\n"
-              + "            <xs:sequence>\n"
-              + "                <xs:element name=\"name\">\n"
-              + "                    <xs:simpleType>\n"
-              + "                        <xs:restriction base=\"xs:string\">\n"
-              + "                            <xs:maxLength value=\"3\" />\n"
-              + "                        </xs:restriction>\n"
-              + "                    </xs:simpleType>\n"
-              + "                </xs:element>"
-              + "            </xs:sequence>\n"
-              + "        </xs:complexType>\n"
-              + "    </xs:element>\n"
-              + "</xs:schema>",
-              "cvc-maxLength-valid: Value 'Alice' with length = '5' is not facet-valid with respect to maxLength '3' for type '#AnonType_nameindividual'."
-            }
-        });
+                {
+                "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
+                    "<individual>\n" +
+                    "    <name>Bob</name>\n" +
+                    "</individual>",
+                "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
+                    "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\">\n" +
+                    "    <xs:element name=\"individual\">\n" +
+                    "        <xs:complexType>\n" +
+                    "            <xs:sequence>\n" +
+                    "                <xs:element name=\"name\">\n" +
+                    "                    <xs:simpleType>\n" +
+                    "                        <xs:restriction base=\"xs:string\">\n" +
+                    "                            <xs:maxLength value=\"3\" />\n" +
+                    "                        </xs:restriction>\n" +
+                    "                    </xs:simpleType>\n" +
+                    "                </xs:element>" +
+                    "            </xs:sequence>\n" +
+                    "        </xs:complexType>\n" +
+                    "    </xs:element>\n" +
+                    "</xs:schema>",
+                "" },
+                {
+                "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
+                    "<individual>\n" +
+                    "    <name>Alice</name>\n" +
+                    "</individual>",
+                "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
+                    "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\">\n" +
+                    "    <xs:element name=\"individual\">\n" +
+                    "        <xs:complexType>\n" +
+                    "            <xs:sequence>\n" +
+                    "                <xs:element name=\"name\">\n" +
+                    "                    <xs:simpleType>\n" +
+                    "                        <xs:restriction base=\"xs:string\">\n" +
+                    "                            <xs:maxLength value=\"3\" />\n" +
+                    "                        </xs:restriction>\n" +
+                    "                    </xs:simpleType>\n" +
+                    "                </xs:element>" +
+                    "            </xs:sequence>\n" +
+                    "        </xs:complexType>\n" +
+                    "    </xs:element>\n" +
+                    "</xs:schema>",
+                "cvc-maxLength-valid: Value 'Alice' with length = '5' is not facet-valid with respect " +
+                        "to maxLength '3' for type '#AnonType_nameindividual'."
+                } });
     }
 }

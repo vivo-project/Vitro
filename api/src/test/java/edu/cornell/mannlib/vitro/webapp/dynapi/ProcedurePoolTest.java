@@ -9,19 +9,17 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullProcedure;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 public class ProcedurePoolTest extends ServletContextTest {
 
-    protected final static String TEST_PERSON_ACTION_URI = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testPersonProcedure1";
+    protected final static String TEST_PERSON_ACTION_URI =
+            "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testPersonProcedure1";
 
     @After
     public void reset() {
@@ -35,8 +33,8 @@ public class ProcedurePoolTest extends ServletContextTest {
         assertEquals(0, procedurePool.obsoleteCount());
         LoggingControl.restoreLogs();
     }
-    
-    @Before 
+
+    @Before
     public void before() {
         LoggingControl.offLogs();
     }
@@ -94,7 +92,7 @@ public class ProcedurePoolTest extends ServletContextTest {
         loadTestModel();
 
         Procedure procedure = loader.loadInstance(TEST_PERSON_ACTION_URI, Procedure.class);
-        
+
         procedure.setUri(TEST_PERSON_ACTION_URI);
 
         procedurePool.add(TEST_PERSON_ACTION_URI, procedure);
@@ -229,7 +227,7 @@ public class ProcedurePoolTest extends ServletContextTest {
 
         assertProcedure(TEST_PERSON_ACTION_URI, procedurePool.get(TEST_PERSON_ACTION_URI));
     }
-    
+
     @Test
     public void testUnload() throws IOException {
         ProcedurePool procedurePool = initWithDefaultModel();
@@ -240,20 +238,19 @@ public class ProcedurePoolTest extends ServletContextTest {
 
         assertEquals(0, procedurePool.count());
     }
-    
+
     @Test
     public void testUnloadUri() throws IOException {
         ProcedurePool procedurePool = initWithDefaultModel();
 
         long procedureCount = procedurePool.count();
-        
+
         assertProcedure(TEST_PROCEDURE_URI, procedurePool.get(TEST_PROCEDURE_URI));
 
         procedurePool.unload("https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testProcedure1");
 
         assertEquals(procedureCount - 1, procedurePool.count());
     }
-
 
     @Test
     public void testReloadThreadSafety() throws IOException {

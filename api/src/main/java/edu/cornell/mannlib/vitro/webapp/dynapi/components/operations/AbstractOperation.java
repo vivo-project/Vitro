@@ -3,22 +3,21 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components.operations;
 import java.util.Collections;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ProcedureDescriptor;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public abstract class AbstractOperation implements Operation {
 
     private static final Log log = LogFactory.getLog(AbstractOperation.class);
     protected Parameters inputParams = new Parameters();
     protected Parameters outputParams = new Parameters();
-    
+
     public Parameters getInputParams() {
         return inputParams;
     }
@@ -26,16 +25,16 @@ public abstract class AbstractOperation implements Operation {
     public Parameters getOutputParams() {
         return outputParams;
     }
-    
+
     public OperationResult run(DataStore dataStore) {
         OperationResult result = OperationResult.ok();
         if (!isInputValid(dataStore)) {
             return OperationResult.internalServerError();
         }
         try {
-            result = runOperation(dataStore);    
-        } catch(Exception t) {
-            log.error(t,t);
+            result = runOperation(dataStore);
+        } catch (Exception t) {
+            log.error(t, t);
             return OperationResult.internalServerError();
         }
         if (!isOutputValid(dataStore)) {
@@ -69,7 +68,7 @@ public abstract class AbstractOperation implements Operation {
         }
         return true;
     }
-    
+
     public boolean isOutputValid(DataStore dataStore) {
         Parameters providedParams = getOutputParams();
         if (providedParams != null) {
@@ -82,10 +81,11 @@ public abstract class AbstractOperation implements Operation {
         }
         return true;
     }
-    
-    public Map<String, ProcedureDescriptor> getDependencies(){
+
+    public Map<String, ProcedureDescriptor> getDependencies() {
         return Collections.emptyMap();
     }
-    
-    public void dereference() {}
+
+    public void dereference() {
+    }
 }

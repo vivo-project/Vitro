@@ -15,9 +15,9 @@ public interface Poolable<K> extends Removable {
     public void removeDeadClients();
 
     public boolean hasClients();
-    
+
     public void setUri(String uri);
-    
+
     public String getUri();
 
     public List<String> getClients();

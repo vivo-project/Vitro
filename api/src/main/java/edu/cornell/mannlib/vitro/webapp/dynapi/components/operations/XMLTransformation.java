@@ -88,32 +88,34 @@ public class XMLTransformation extends AbstractOperation {
         transformer.transform(new DOMSource(doc), new StreamResult(output));
         return output;
     }
-    
-    private void prepareTransformTemplates() throws InitializationException{
+
+    private void prepareTransformTemplates() throws InitializationException {
         try {
-          if (xsltParam.isInternal() && !xsltParam.isOptional()) {
-              String defaultValue = xsltParam.getDefaultValue();
-              if (defaultValue != null) {
-                  InputStream styleInputStream = IOUtils.toInputStream(defaultValue, StandardCharsets.UTF_8);
-                  Source stylesource = new StreamSource(styleInputStream);
-                  TransformerFactory transformerFactory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null);
-                  transformerFactory.setErrorListener(errorListener);
-                  transformTemplates = transformerFactory.newTemplates(stylesource);
-              }
-          }
-        } catch (Exception e){
+            if (xsltParam.isInternal() && !xsltParam.isOptional()) {
+                String defaultValue = xsltParam.getDefaultValue();
+                if (defaultValue != null) {
+                    InputStream styleInputStream = IOUtils.toInputStream(defaultValue, StandardCharsets.UTF_8);
+                    Source stylesource = new StreamSource(styleInputStream);
+                    TransformerFactory transformerFactory = TransformerFactory.newInstance(
+                            "net.sf.saxon.TransformerFactoryImpl", null);
+                    transformerFactory.setErrorListener(errorListener);
+                    transformTemplates = transformerFactory.newTemplates(stylesource);
+                }
+            }
+        } catch (Exception e) {
             throw new InitializationException(e.getMessage());
         }
     }
-    
-    private Transformer getTransformer(String styles)
-            throws TransformerFactoryConfigurationError, TransformerConfigurationException, Exception {
+
+    private Transformer getTransformer(String styles) throws TransformerFactoryConfigurationError,
+            TransformerConfigurationException, Exception {
         if (transformTemplates != null) {
             return transformTemplates.newTransformer();
         }
         InputStream styleInputStream = IOUtils.toInputStream(styles, StandardCharsets.UTF_8);
         Source stylesource = new StreamSource(styleInputStream);
-        TransformerFactory transformerFactory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null);
+        TransformerFactory transformerFactory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl",
+                null);
         transformerFactory.setErrorListener(errorListener);
         Transformer transformer = transformerFactory.newTransformer(stylesource);
         if (transformer == null) {
@@ -121,26 +123,26 @@ public class XMLTransformation extends AbstractOperation {
         }
         return transformer;
     }
-    
+
     @Override
-    public boolean isInputValid(DataStore dataStore){
+    public boolean isInputValid(DataStore dataStore) {
         if (!super.isInputValid(dataStore)) {
             return false;
         }
         return true;
-    }  
-    
+    }
+
     @Override
-    public boolean isOutputValid(DataStore dataStore){
+    public boolean isOutputValid(DataStore dataStore) {
         if (!super.isOutputValid(dataStore)) {
             return false;
         }
         return true;
-    } 
-    
+    }
+
     public boolean isValid() {
         boolean result = true;
-        if (xsltParam == null ) {
+        if (xsltParam == null) {
             log.error("xsltParam param is not defined in the configuration");
             result = false;
         }
@@ -157,7 +159,7 @@ public class XMLTransformation extends AbstractOperation {
 
         return result;
     }
-    
+
     private static ErrorListener createXMLErrorListener() {
         return new ErrorListener() {
             @Override

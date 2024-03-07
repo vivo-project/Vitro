@@ -11,6 +11,19 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
+import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
+import edu.cornell.mannlib.vitro.webapp.dynapi.ShapesGraphPool;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.ShapeValidation;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.Converter;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.BooleanParam;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.ModelParam;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.StringParam;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
@@ -26,37 +39,24 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.MockedStatic;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
-import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
-import edu.cornell.mannlib.vitro.webapp.dynapi.ShapesGraphPool;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.ShapeValidation;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.Converter;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.BooleanParam;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.ModelParam;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.StringParam;
-
 @RunWith(Parameterized.class)
 public class ShapeValidationTest extends ServletContextTest {
 
     private static final String RESULT_PARAM_NAME = "result";
     private static final String REPORT_PARAM_NAME = "report";
     private static final String PROCEDURE_PROVIDES_SHAPES_URI = "test:procedure-provides-shapes";
-    
-    //private static final String TEST_RESOURCES_PATH = "src/test/resources/edu/cornell/mannlib/vitro/webapp/dynapi/components/";
-    
+
+    // private static final String TEST_RESOURCES_PATH =
+    // "src/test/resources/edu/cornell/mannlib/vitro/webapp/dynapi/components/";
+
     private static final String DYNAPI_ABOX_URI = "http://vitro.mannlib.cornell.edu/default/dynamic-api-abox";
     private static final String SHAPES_MODEL_URI = "http://vitro.mannlib.cornell.edu/default/shapes";
     public static final String SHAPES_PREFIX = "../home/src/main/resources/rdf/shapes/everytime/";
     private static final String SHAPES_MODEL_FILE = SHAPES_PREFIX + "dynamic_api_shapes.n3";
-    private static final List<String> shapeFile = Arrays.asList(new String[] {SHAPES_MODEL_FILE});
+    private static final List<String> shapeFile = Arrays.asList(new String[] { SHAPES_MODEL_FILE });
 
     @org.junit.runners.Parameterized.Parameter(0)
-    public  List<String> shapeFiles;
+    public List<String> shapeFiles;
 
     @org.junit.runners.Parameterized.Parameter(1)
     public List<String> modelFiles;
@@ -70,14 +70,8 @@ public class ShapeValidationTest extends ServletContextTest {
     @org.junit.runners.Parameterized.Parameter(4)
     public boolean details;
 
-    static List<String> dynapiFiles = Arrays.asList(
-            ArrayUtils.addAll(
-                    ArrayUtils.addAll(getFileList(ABOX_PREFIX), getFileList(TBOX_PREFIX)),
-                    new String[] { 
-                            IMPLEMENTATION_FILE_PATH, 
-                            ONTOLOGY_FILE_PATH }
-                    )
-            );
+    static List<String> dynapiFiles = Arrays.asList(ArrayUtils.addAll(ArrayUtils.addAll(getFileList(ABOX_PREFIX),
+            getFileList(TBOX_PREFIX)), new String[] { IMPLEMENTATION_FILE_PATH, ONTOLOGY_FILE_PATH }));
 
     boolean manualDebugging = false;
 
@@ -88,7 +82,7 @@ public class ShapeValidationTest extends ServletContextTest {
     public void reset() {
         LoggingControl.restoreLogs();
     }
-    
+
     @AfterClass
     public static void after() {
         dynapiModelFactory.close();
@@ -201,14 +195,13 @@ public class ShapeValidationTest extends ServletContextTest {
 
     @Parameterized.Parameters
     public static Collection<Object[]> requests() {
-        return Arrays.asList(new Object[][] { 
-            //Shape files, data files, cache, shape validation, details
+        return Arrays.asList(new Object[][] {
+                // Shape files, data files, cache, shape validation, details
                 { shapeFile, dynapiFiles, true, true, true },
-                { shapeFile, dynapiFiles, false, true, true }, 
+                { shapeFile, dynapiFiles, false, true, true },
                 { shapeFile, dynapiFiles, true, false, true },
-                { shapeFile, dynapiFiles, false, false, true }, 
+                { shapeFile, dynapiFiles, false, false, true },
                 { shapeFile, dynapiFiles, true, false, false },
-                { shapeFile, dynapiFiles, false, false, false }, 
-        });
+                { shapeFile, dynapiFiles, false, false, false }, });
     }
 }

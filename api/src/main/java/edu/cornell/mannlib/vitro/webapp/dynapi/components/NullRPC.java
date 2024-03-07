@@ -7,6 +7,7 @@ public class NullRPC extends RPC {
     public static NullRPC getInstance() {
         return INSTANCE;
     }
-    
-    private NullRPC() {}
+
+    private NullRPC() {
+    }
 }

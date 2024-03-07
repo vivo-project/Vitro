@@ -31,16 +31,12 @@ public class ApiRequestPath {
     private final String resourceId;
 
     private final String rpcKey;
-    
+
     private final String customRestActionName;
 
     private ApiRequestPath(HttpServletRequest request) {
-        servletPath = request != null && request.getServletPath() != null
-                ? request.getServletPath()
-                : EMPTY;
-        pathInfo = request != null && request.getPathInfo() != null
-                ? request.getPathInfo()
-                : EMPTY;
+        servletPath = request != null && request.getServletPath() != null ? request.getServletPath() : EMPTY;
+        pathInfo = request != null && request.getPathInfo() != null ? request.getPathInfo() : EMPTY;
 
         pathParts = pathInfo.split("/");
 
@@ -177,7 +173,9 @@ public class ApiRequestPath {
     }
 
     public enum RequestType {
-        RPC, REST, UNKNOWN
+        RPC,
+        REST,
+        UNKNOWN
     }
 
 }

@@ -5,15 +5,16 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 public class NullProcedure extends Procedure {
 
     private static NullProcedure instance = new NullProcedure();
-    
+
     @Override
     public OperationResult run(DataStore input) {
         return OperationResult.badRequest();
     }
-    
+
     public static NullProcedure getInstance() {
         return instance;
     }
-    
-    private NullProcedure() {}
+
+    private NullProcedure() {
+    }
 }

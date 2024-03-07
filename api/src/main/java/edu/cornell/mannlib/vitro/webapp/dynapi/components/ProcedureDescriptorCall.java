@@ -10,7 +10,8 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationExc
 
 public class ProcedureDescriptorCall {
 
-    public static void execute(ProcedureDescriptor procedureDescriptor, DataStore dataStore) throws ConversionException, InitializationException {
+    public static void execute(ProcedureDescriptor procedureDescriptor, DataStore dataStore) throws ConversionException,
+            InitializationException {
         if (procedureDescriptor.hasUriParam()) {
             unsafeCall(procedureDescriptor, dataStore);
         } else {
@@ -33,9 +34,9 @@ public class ProcedureDescriptorCall {
         String uri = procedureDescriptor.getUri(dataStore);
         inputParams.remove(procedureDescriptor.getUriParam());
         ProcedurePool procedurePool = ProcedurePool.getInstance();
-        try(Procedure procedure = procedurePool.getByUri(uri);){
+        try (Procedure procedure = procedurePool.getByUri(uri);) {
             Endpoint.collectDependencies(procedure, dataStore, procedurePool);
-            execute(procedureDescriptor, dataStore, uri, procedure, inputParams);    
+            execute(procedureDescriptor, dataStore, uri, procedure, inputParams);
         } finally {
             dataStore.removeDependencies();
         }
@@ -57,13 +58,13 @@ public class ProcedureDescriptorCall {
     }
 
     protected static String formatNotAuthorizedErrorMessage(ProcedureDescriptor procedureDescriptor, String uri) {
-        return String.format("User not authorized to access procedure %s, defined by descriptor %s",
-                uri, procedureDescriptor.toString());
+        return String.format("User not authorized to access procedure %s, defined by descriptor %s", uri,
+                procedureDescriptor.toString());
     }
-    
+
     protected static String formatErrorMessage(ProcedureDescriptor procedureDescriptor, String uri) {
-        return String.format("Procedure '%s' described by descriptor '%s' returned error",
-                uri, procedureDescriptor.toString());
+        return String.format("Procedure '%s' described by descriptor '%s' returned error", uri, procedureDescriptor
+                .toString());
     }
 
     public static void initilaizeLocalStore(DataStore externalStore, DataStore localStore, Parameters paramsToCopy,

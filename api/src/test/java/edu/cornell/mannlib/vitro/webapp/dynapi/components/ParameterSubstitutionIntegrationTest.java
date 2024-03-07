@@ -11,6 +11,18 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collection;
 
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.dynapi.Endpoint;
+import edu.cornell.mannlib.vitro.webapp.dynapi.ProcedurePool;
+import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.Converter;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.Model;
 import org.junit.After;
@@ -22,29 +34,16 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.MockedStatic;
 
-import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
-import edu.cornell.mannlib.vitro.webapp.dynapi.Endpoint;
-import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
-import edu.cornell.mannlib.vitro.webapp.dynapi.ProcedurePool;
-import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.Converter;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory;
-import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
-
 @RunWith(Parameterized.class)
 public class ParameterSubstitutionIntegrationTest extends ServletContextTest {
-	private static final String RESULT = "result";
-	private static final String RESOURCES_PATH = "src/test/resources/edu/cornell/mannlib/vitro/webapp/dynapi/components/ParameterSubstitution/";
+    private static final String RESULT = "result";
+    private static final String RESOURCES_PATH =
+            "src/test/resources/edu/cornell/mannlib/vitro/webapp/dynapi/components/ParameterSubstitution/";
     private static MockedStatic<DynapiModelFactory> dynapiModelFactory;
 
-	@org.junit.runners.Parameterized.Parameter(0)
-	public String procedureConfiguration;
-	 
+    @org.junit.runners.Parameterized.Parameter(0)
+    public String procedureConfiguration;
+
     @org.junit.runners.Parameterized.Parameter(1)
     public String expectedValue;
 
@@ -52,27 +51,28 @@ public class ParameterSubstitutionIntegrationTest extends ServletContextTest {
     public static void before() {
         dynapiModelFactory = mockStatic(DynapiModelFactory.class);
     }
-    
+
     @AfterClass
     public static void after() {
         dynapiModelFactory.close();
     }
-    
-	@Before
-	public void beforeEach() {
-        //LoggingControl.offLogs();
-        dynapiModelFactory.when(() -> DynapiModelFactory.getModel(eq("http://vitro.mannlib.cornell.edu/default/dynamic-api-abox"))).thenReturn(ontModel);
+
+    @Before
+    public void beforeEach() {
+        // LoggingControl.offLogs();
+        dynapiModelFactory.when(() -> DynapiModelFactory.getModel(eq(
+                "http://vitro.mannlib.cornell.edu/default/dynamic-api-abox"))).thenReturn(ontModel);
     }
-	
-	@After
-	public void reset() {
-	    //LoggingControl.restoreLogs();
+
+    @After
+    public void reset() {
+        // LoggingControl.restoreLogs();
         setup();
         ProcedurePool procedurePool = ProcedurePool.getInstance();
         procedurePool.init(servletContext);
         procedurePool.reload();
         assertEquals(0, procedurePool.count());
-	}
+    }
 
     private ProcedurePool initWithDefaultModel() throws IOException {
         loadOntology(ontModel);
@@ -81,9 +81,10 @@ public class ParameterSubstitutionIntegrationTest extends ServletContextTest {
         procedurePool.init(servletContext);
         return procedurePool;
     }
-    
-	@Test
-    public void test() throws ConfigurationBeanLoaderException, IOException, ConversionException, InitializationException {
+
+    @Test
+    public void test() throws ConfigurationBeanLoaderException, IOException, ConversionException,
+            InitializationException {
         ProcedurePool procedurePool = initWithDefaultModel();
         DataStore store = new DataStore();
         UserAccount user = new UserAccount();
@@ -107,21 +108,20 @@ public class ParameterSubstitutionIntegrationTest extends ServletContextTest {
         }
     }
 
-	@Parameterized.Parameters
-	public static Collection<Object[]> requests() {
-		return Arrays.asList(new Object[][] { 
-			{ "parameter-substitution-procedure.n3", "test string" },
-	        { "parameter-substitution-call-exteranal-procedure.n3", "test string" },
-	        { "parameter-substitution-call-exteranal-procedure-mirror-params.n3", "1" },
-		});
-	}
+    @Parameterized.Parameters
+    public static Collection<Object[]> requests() {
+        return Arrays.asList(new Object[][] {
+                { "parameter-substitution-procedure.n3", "test string" },
+                { "parameter-substitution-call-exteranal-procedure.n3", "test string" },
+                { "parameter-substitution-call-exteranal-procedure-mirror-params.n3", "1" }, });
+    }
 
-	protected void loadModel(Model model, String... files) throws IOException {
-		for (String file : files) {
-			String rdf = readFile(file);
-			model.read(new StringReader(rdf), null, "n3");
-		}
-	}
+    protected void loadModel(Model model, String... files) throws IOException {
+        for (String file : files) {
+            String rdf = readFile(file);
+            model.read(new StringReader(rdf), null, "n3");
+        }
+    }
 
     public void loadOntology(OntModel ontModel) throws IOException {
         loadModel(ontModel, IMPLEMENTATION_FILE_PATH);

@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.dynapi.access.AccessWhitelist;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.Operation;
@@ -16,12 +13,14 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.steps.NullStep;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.steps.Step;
 import edu.cornell.mannlib.vitro.webapp.dynapi.computation.AutoConfiguration;
 import edu.cornell.mannlib.vitro.webapp.dynapi.computation.StepInfo;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class Procedure extends AbstractPoolComponent implements Operation, Poolable<String>, StepInfo {
-    
+
     private static final Log log = LogFactory.getLog(Procedure.class);
 
     private Step firstStep = NullStep.getInstance();
@@ -44,7 +43,7 @@ public class Procedure extends AbstractPoolComponent implements Operation, Poola
     public void addAccessFilter(AccessWhitelist whiteList) {
         accessWhitelists.add(whiteList);
     }
-    
+
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasFirstStep", maxOccurs = 1)
     public void setStep(Step step) {
         this.firstStep = step;
@@ -59,7 +58,7 @@ public class Procedure extends AbstractPoolComponent implements Operation, Poola
     public void setPublicAccess(boolean access) {
         publicAcess = access;
     }
-    
+
     @Override
     public String getKey() {
         return getUri();
@@ -72,7 +71,7 @@ public class Procedure extends AbstractPoolComponent implements Operation, Poola
             computeParams();
             result = true;
         } catch (Exception e) {
-           log.error(e,e);
+            log.error(e, e);
         }
         return result;
     }
@@ -80,7 +79,7 @@ public class Procedure extends AbstractPoolComponent implements Operation, Poola
     public Parameters getInternalParams() {
         return internalParams;
     }
-    
+
     public Parameters getOptionalParams() {
         Parameters optionalParams = new Parameters();
         for (String name : internalParams.getNames()) {
@@ -91,12 +90,12 @@ public class Procedure extends AbstractPoolComponent implements Operation, Poola
         }
         return optionalParams;
     }
-    
+
     @Override
     public Parameters getInputParams() {
         return inputParams;
     }
-    
+
     @Override
     public Parameters getOutputParams() {
         return outputParams;
@@ -125,7 +124,7 @@ public class Procedure extends AbstractPoolComponent implements Operation, Poola
 
         return true;
     }
-    
+
     private void computeParams() {
         AutoConfiguration.computeParams(this);
     }
@@ -142,58 +141,58 @@ public class Procedure extends AbstractPoolComponent implements Operation, Poola
 
     @Override
     public boolean isOptional() {
-		// TODO Auto-generated method stub
-    	return false;
+        // TODO Auto-generated method stub
+        return false;
     }
 
-	public String getInputSerializedSchema() {
-		// TODO Auto-generated method stub
-		return "";
-	}
+    public String getInputSerializedSchema() {
+        // TODO Auto-generated method stub
+        return "";
+    }
 
-	public String getOutputTemplate() {
-		// TODO Auto-generated method stub
-		return "";
-	}
+    public String getOutputTemplate() {
+        // TODO Auto-generated method stub
+        return "";
+    }
 
-	public String getInputPath() {
-		// TODO Auto-generated method stub
-		return "";
-	}
+    public String getInputPath() {
+        // TODO Auto-generated method stub
+        return "";
+    }
 
-	public String getOutputPath() {
-		// TODO Auto-generated method stub
-		return "";
-	}
+    public String getOutputPath() {
+        // TODO Auto-generated method stub
+        return "";
+    }
 
-	public boolean hasPermissions(UserAccount user) {
-		if (isPublicAccessible()) {
-			return true;
-		}
-		if (user == null) {
-			return false;
-		}
-		if (user.isRootUser()) {
-			return true;
-		}
-		for (AccessWhitelist filter : accessWhitelists) {
-			if (filter.isAuthorized(user, getUri())) {
-				return true;
-			}
-		}
-		return false;
-	}
+    public boolean hasPermissions(UserAccount user) {
+        if (isPublicAccessible()) {
+            return true;
+        }
+        if (user == null) {
+            return false;
+        }
+        if (user.isRootUser()) {
+            return true;
+        }
+        for (AccessWhitelist filter : accessWhitelists) {
+            if (filter.isAuthorized(user, getUri())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	private boolean isPublicAccessible() {
-		return publicAcess;
-	}
-	
-	@Override
-	public Map<String, ProcedureDescriptor> getDependencies() {
-	    return firstStep.getDependencies();
-	}
-	
-	public boolean isInputValid(DataStore dataStore) {
+    private boolean isPublicAccessible() {
+        return publicAcess;
+    }
+
+    @Override
+    public Map<String, ProcedureDescriptor> getDependencies() {
+        return firstStep.getDependencies();
+    }
+
+    public boolean isInputValid(DataStore dataStore) {
         Parameters inputParams = getInputParams();
         for (String name : inputParams.getNames()) {
             if (!dataStore.contains(name)) {

@@ -1,8 +1,8 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.request;
 
+import static edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath.API_SERVLET_PATH;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-import static edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath.API_SERVLET_PATH;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -27,16 +27,12 @@ public class DocsRequestPath {
     private final String resourceName;
 
     private final String rpcName;
-    
+
     private final String serverUrl;
 
     private DocsRequestPath(HttpServletRequest request) {
-        servletPath = request != null && request.getServletPath() != null
-                ? request.getServletPath()
-                : EMPTY;
-        pathInfo = request != null && request.getPathInfo() != null
-                ? request.getPathInfo()
-                : EMPTY;
+        servletPath = request != null && request.getServletPath() != null ? request.getServletPath() : EMPTY;
+        pathInfo = request != null && request.getPathInfo() != null ? request.getPathInfo() : EMPTY;
 
         pathParts = pathInfo.split("/");
 
@@ -56,23 +52,22 @@ public class DocsRequestPath {
             resourceName = null;
             rpcName = null;
         }
-        
+
         serverUrl = getServerUrl(request);
     }
 
     private String getServerUrl(HttpServletRequest request) {
         String scheme = request.getHeader("x-forwarded-proto");
         if (scheme == null) {
-            scheme = request.getScheme();    
+            scheme = request.getScheme();
         }
         String serverName = request.getServerName();
         int port = request.getServerPort();
-        String portPart; 
-        if ((scheme.equals("https") && port == 443) ||
-            (scheme.equals("http") && port == 80)){
+        String portPart;
+        if ((scheme.equals("https") && port == 443) || (scheme.equals("http") && port == 80)) {
             portPart = "";
         } else {
-            portPart = ":" + port ;
+            portPart = ":" + port;
         }
         String servletPart = request.getContextPath();
         return scheme + "://" + serverName + portPart + servletPart;

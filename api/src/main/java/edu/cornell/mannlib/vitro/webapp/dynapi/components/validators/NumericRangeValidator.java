@@ -42,24 +42,34 @@ public class NumericRangeValidator extends IsNotBlank {
         if (!super.isValid(name, data)) {
             return false;
         }
-        
+
         if (JsonContainerView.isJsonArray(data.getParam())) {
-    		List array = ArrayView.getArray(data);
-			for (Object value : array) {
-				if (!isInRange(value.toString())) {
-	                log.debug("Length of " + name + " is not in range [" + ((minValue != null) ? minValue : " ") + "-"
-	                        + ((maxValue != null) ? maxValue : " ") + "].");
-	                return false;
-	            }
-			}
-    	} else {
-    		if (!isInRange(SimpleDataView.getStringRepresentation(data))) {
-    			log.debug("Length of " + name + " is not in range [" + ((minValue != null) ? minValue : " ") + "-"
-                        + ((maxValue != null) ? maxValue : " ") + "].");
+            List array = ArrayView.getArray(data);
+            for (Object value : array) {
+                if (!isInRange(value.toString())) {
+                    log.debug("Length of " +
+                            name +
+                            " is not in range [" +
+                            ((minValue != null) ? minValue : " ") +
+                            "-" +
+                            ((maxValue != null) ? maxValue : " ") +
+                            "].");
+                    return false;
+                }
+            }
+        } else {
+            if (!isInRange(SimpleDataView.getStringRepresentation(data))) {
+                log.debug("Length of " +
+                        name +
+                        " is not in range [" +
+                        ((minValue != null) ? minValue : " ") +
+                        "-" +
+                        ((maxValue != null) ? maxValue : " ") +
+                        "].");
                 return false;
-    		}
-    		
-    	}
+            }
+
+        }
         return true;
     }
 

@@ -1,7 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullProcedure;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
 
 public class ProcedurePool extends AbstractPool<String, Procedure, ProcedurePool> {
 

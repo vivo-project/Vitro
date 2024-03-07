@@ -10,6 +10,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.servlet.ServletContext;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Poolable;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jena.rdf.model.Model;
@@ -17,10 +20,6 @@ import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Poolable;
-import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
-import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
 
 public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C>> implements Pool<K, C> {
 
@@ -61,7 +60,7 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
         component.addClient();
         return component;
     }
-    
+
     public C getByUri(String uri) {
         if (uri == null) {
             return getDefault();
@@ -73,7 +72,7 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
         component.addClient();
         return component;
     }
-    
+
     public String getUri(K key) {
         return components.getUri(key);
     }
@@ -91,16 +90,16 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
         K key = component.getKey();
         log.info(format("Adding component %s with URI %s", key, uri));
         if (!component.isValid()) {
-            throw new RuntimeException(format("%s %s with URI %s is not valid. Not adding to pool.",
-                    getType().getName(), key, uri));
+            throw new RuntimeException(format("%s %s with URI %s is not valid. Not adding to pool.", getType()
+                    .getName(), key, uri));
         }
-        
+
         if (isInModel(uri)) {
             synchronized (mutex) {
                 K oldKey = components.putUriMapping(uri, key);
                 if (oldKey != null && !oldKey.equals(key)) {
-                	C oldComponent = components.get(oldKey);
-                	if (oldComponent != null) {
+                    C oldComponent = components.get(oldKey);
+                    if (oldComponent != null) {
                         obsoleteComponents.add(oldComponent);
                         unloadObsoleteComponents();
                     }
@@ -112,33 +111,33 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
                 }
             }
         } else {
-            throw new RuntimeException(format("%s %s with URI %s not found in model. Not adding to pool.",
-                    getType().getName(), key, uri));
+            throw new RuntimeException(format("%s %s with URI %s not found in model. Not adding to pool.", getType()
+                    .getName(), key, uri));
         }
     }
 
     public void remove(K key) {
         log.info(format("Removing component with key %s", key));
-		synchronized (mutex) {
-			C oldComponent = components.remove(key);
-			if (oldComponent != null) {
-				obsoleteComponents.add(oldComponent);
-				unloadObsoleteComponents();
-			}
-		}
+        synchronized (mutex) {
+            C oldComponent = components.remove(key);
+            if (oldComponent != null) {
+                obsoleteComponents.add(oldComponent);
+                unloadObsoleteComponents();
+            }
+        }
     }
-    
-	public void unload(String uri) {
-		log.info(format("Removing component with URI %s", uri));
-		synchronized (mutex) {
-			C oldComponent = components.removeByUri(uri);
-			if (oldComponent != null) {
-				obsoleteComponents.add(oldComponent);
-				unloadObsoleteComponents();
-			}
-		}
-	}
-	
+
+    public void unload(String uri) {
+        log.info(format("Removing component with URI %s", uri));
+        synchronized (mutex) {
+            C oldComponent = components.removeByUri(uri);
+            if (oldComponent != null) {
+                obsoleteComponents.add(oldComponent);
+                unloadObsoleteComponents();
+            }
+        }
+    }
+
     public void unload() {
         List<String> uris = getLoadedUris();
         for (String uri : uris) {
@@ -147,7 +146,7 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
     }
 
     private boolean isInModel(String uri) {
-    	Model dynamicAPIModel = DynapiModelProvider.getInstance().getModel();
+        Model dynamicAPIModel = DynapiModelProvider.getInstance().getModel();
         Resource s = dynamicAPIModel.getResource(uri);
         Property p = dynamicAPIModel.getProperty(RDF_TYPE);
 
@@ -163,7 +162,7 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
 
         return false;
     }
-    
+
     public void load(String uri) {
         try {
             add(uri, loader.loadInstance(uri, getType()));
@@ -191,13 +190,13 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
         }
         unloadObsoleteComponents();
     }
-    
+
     public boolean isInPool(String uri) {
-    	return components.containsUri(uri);
+        return components.containsUri(uri);
     }
-    
-    public List<String> getLoadedUris(){
-    	return components.getUris();
+
+    public List<String> getLoadedUris() {
+        return components.getUris();
     }
 
     public void init(ServletContext ctx) {
@@ -211,30 +210,34 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
         Map<String, C> uriToCompMap = loader.loadEach(getType());
         log.debug(format("Context Initialization. %s %s(s) currently loaded.", components.size(), getType().getName()));
         for (Map.Entry<String, C> entry : uriToCompMap.entrySet()) {
-        	String uri = entry.getKey();
-        	C component = entry.getValue();
-        	component.setUri(uri);
-			K key = component.getKey();
-			if (component.isValid()) {
-                if (components.containsKey(key)){
+            String uri = entry.getKey();
+            C component = entry.getValue();
+            component.setUri(uri);
+            K key = component.getKey();
+            if (component.isValid()) {
+                if (components.containsKey(key)) {
                     String oldUri = components.getUri(key);
-                    log.info(format("Replaced %s component, uri:'%s' with uri:'%s', as they have the same key:'%s'.", getType().getSimpleName(),oldUri, uri , key));
+                    log.info(format("Replaced %s component, uri:'%s' with uri:'%s', as they have the same key:'%s'.",
+                            getType().getSimpleName(), oldUri, uri, key));
                 }
                 components.put(key, component);
                 components.putUriMapping(uri, key);
-                log.info(format("Loaded %s component, uri:'%s', key:'%s'.", getType().getSimpleName(), uri , key));
+                log.info(format("Loaded %s component, uri:'%s', key:'%s'.", getType().getSimpleName(), uri, key));
             } else {
-                log.error(format("%s component, uri: '%s',  key:'%s' is invalid.", getType().getSimpleName(), uri , key));
+                log.error(format("%s component, uri: '%s',  key:'%s' is invalid.", getType().getSimpleName(), uri,
+                        key));
             }
         }
-        log.info(format("Context Initialization finished. %s %s(s) loaded.", components.size(), getType().getSimpleName()));
+        log.info(format("Context Initialization finished. %s %s(s) loaded.", components.size(), getType()
+                .getSimpleName()));
     }
 
     private void unloadObsoleteComponents() {
         for (C component : obsoleteComponents) {
             if (isComponentInUse(component)) {
                 List<String> clients = component.getClients();
-                log.debug(String.format("Obsolete component %s is in use by %s, can't unload.", component.getUri(), String.join(", ", clients) ));
+                log.debug(String.format("Obsolete component %s is in use by %s, can't unload.", component.getUri(),
+                        String.join(", ", clients)));
             } else {
                 component.dereference();
                 obsoleteComponents.remove(component);

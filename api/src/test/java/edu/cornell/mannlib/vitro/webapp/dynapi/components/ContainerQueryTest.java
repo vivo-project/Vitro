@@ -7,10 +7,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.ContainerQuery;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
@@ -20,6 +16,9 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer.Type;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.JsonContainerObjectParam;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.StringParam;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class ContainerQueryTest {
@@ -29,14 +28,12 @@ public class ContainerQueryTest {
 
     @org.junit.runners.Parameterized.Parameter(1)
     public Type containerType;
-    
+
     @org.junit.runners.Parameterized.Parameter(2)
     public String value;
-    
-    
 
     private String outputName;
-    
+
     @Test
     public void test() throws InitializationException {
         ContainerQuery cq = new ContainerQuery();
@@ -57,7 +54,7 @@ public class ContainerQueryTest {
         Data data = new Data(outputParam1);
         TestView.setObject(data, value);
         if (containerType.equals(Type.ARRAY)) {
-            containerObject.addValue(data);            
+            containerObject.addValue(data);
         } else {
             containerObject.addKeyValue(keyValue, data);
         }
@@ -68,11 +65,11 @@ public class ContainerQueryTest {
         Data keyData = new Data(keyParam);
         TestView.setObject(keyData, keyValue);
         store.addData(keyParam.getName(), keyData);
-        
+
         assertFalse(store.contains(outputName));
-        
+
         assertEquals(OperationResult.ok(), cq.run(store));
-        
+
         assertTrue(store.contains(outputName));
         Data output = store.getData(outputName);
         assertEquals(value, output.getSerializedValue());
@@ -81,16 +78,16 @@ public class ContainerQueryTest {
     @Parameterized.Parameters
     public static Collection<Object[]> requests() {
         return Arrays.asList(new Object[][] {
-            {"0", Type.ARRAY, "test value"},
-            {"0", Type.OBJECT, "0"},
-            {"key", Type.OBJECT, "test value"},
-            {"key", Type.OBJECT, ""},
-            {"key$", Type.OBJECT, "test value"},
-            {"key\\ value", Type.OBJECT, "test value"},
-            {"key'", Type.OBJECT, "test value"},
-            {"key.", Type.OBJECT, "test value"},
-            {"key\n", Type.OBJECT, "test value"},
-            {"key\t", Type.OBJECT, "test value"},
+                { "0", Type.ARRAY, "test value" },
+                { "0", Type.OBJECT, "0" },
+                { "key", Type.OBJECT, "test value" },
+                { "key", Type.OBJECT, "" },
+                { "key$", Type.OBJECT, "test value" },
+                { "key\\ value", Type.OBJECT, "test value" },
+                { "key'", Type.OBJECT, "test value" },
+                { "key.", Type.OBJECT, "test value" },
+                { "key\n", Type.OBJECT, "test value" },
+                { "key\t", Type.OBJECT, "test value" },
 
         });
     }

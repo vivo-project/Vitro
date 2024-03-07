@@ -17,9 +17,10 @@ public class NullStep implements Step {
     public static NullStep getInstance() {
         return instance;
     }
-    
-    private NullStep() {}
-    
+
+    private NullStep() {
+    }
+
     @Override
     public OperationResult run(DataStore input) {
         return OperationResult.ok();
@@ -31,7 +32,7 @@ public class NullStep implements Step {
 
     @Override
     public Set<StepInfo> getNextNodes() {
-        return Collections.emptySet(); 
+        return Collections.emptySet();
     }
 
     @Override

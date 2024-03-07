@@ -5,18 +5,17 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 
-import org.mockito.ArgumentMatcher;
-
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.models.OpenAPI;
+import org.mockito.ArgumentMatcher;
 
-public class APIResponseMatcher implements ArgumentMatcher<String>{
+public class APIResponseMatcher implements ArgumentMatcher<String> {
 
     private Boolean json;
 
     private String path;
-    
+
     private boolean update = false;
 
     public APIResponseMatcher(Boolean json, String path) {

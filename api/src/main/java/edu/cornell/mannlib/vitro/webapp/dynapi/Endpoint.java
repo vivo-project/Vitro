@@ -5,9 +5,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
@@ -22,14 +19,16 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionExcepti
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.Converter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public abstract class Endpoint extends VitroHttpServlet {
 
     private ProcedurePool procedurePool = ProcedurePool.getInstance();
     public static final Log log = LogFactory.getLog(Endpoint.class);
 
-    public void processRequest(HttpServletRequest request, HttpServletResponse response,
-            ApiRequestPath requestPath, String procedureUri) {
+    public void processRequest(HttpServletRequest request, HttpServletResponse response, ApiRequestPath requestPath,
+            String procedureUri) {
         if (log.isDebugEnabled()) {
             procedurePool.printKeys();
         }
@@ -85,7 +84,8 @@ public abstract class Endpoint extends VitroHttpServlet {
         return user;
     }
 
-    public static void collectDependencies(Procedure procedure, DataStore dataStore, ProcedurePool procedurePool) throws InitializationException {
+    public static void collectDependencies(Procedure procedure, DataStore dataStore, ProcedurePool procedurePool)
+            throws InitializationException {
         Map<String, ProcedureDescriptor> dependencies = procedure.getDependencies();
         for (String uri : dependencies.keySet()) {
             if (dataStore.containsDependency(uri)) {
@@ -106,7 +106,8 @@ public abstract class Endpoint extends VitroHttpServlet {
         }
     }
 
-    private static void validateDependency(ProcedureDescriptor descriptor, Procedure procedure) throws InitializationException {
+    private static void validateDependency(ProcedureDescriptor descriptor, Procedure procedure)
+            throws InitializationException {
         validateInputParameters(descriptor, procedure);
         validateOutputParameters(descriptor, procedure);
     }
@@ -115,7 +116,9 @@ public abstract class Endpoint extends VitroHttpServlet {
             throws InitializationException {
         Parameters providedInput = descriptor.getInputParams();
         Parameters requiredInput = procedure.getInputParams();
-        String errorMessage = "Input parameter with name %s required by procedure with uri:'" + procedure.getUri() + "' is not provided by descriptor.";
+        String errorMessage = "Input parameter with name %s required by procedure with uri:'" +
+                procedure.getUri() +
+                "' is not provided by descriptor.";
 
         validateParameters(providedInput, requiredInput, errorMessage);
     }
@@ -124,7 +127,10 @@ public abstract class Endpoint extends VitroHttpServlet {
             throws InitializationException {
         Parameters providedOutput = procedure.getOutputParams();
         Parameters requiredOutput = descriptor.getOutputParams();
-        String errorMessage = "Output parameter with name '%s' required by descriptor is not provided by procedure with uri:'" + procedure.getUri() + "'.";
+        String errorMessage =
+                "Output parameter with name '%s' required by descriptor is not provided by procedure with uri:'" +
+                        procedure.getUri() +
+                        "'.";
 
         validateParameters(providedOutput, requiredOutput, errorMessage);
     }
@@ -138,5 +144,5 @@ public abstract class Endpoint extends VitroHttpServlet {
             }
         }
     }
-    
+
 }

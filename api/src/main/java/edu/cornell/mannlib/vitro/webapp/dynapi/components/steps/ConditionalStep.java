@@ -74,7 +74,8 @@ public class ConditionalStep implements Step {
         nextIfSatisfied = step;
     }
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#allConditionsRequired", minOccurs = 0, maxOccurs = 1)
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#allConditionsRequired", minOccurs = 0,
+            maxOccurs = 1)
     public void setAllConditionsRequired(boolean allConditionsRequired) {
         this.allConditionsRequired = allConditionsRequired;
     }
@@ -112,10 +113,11 @@ public class ConditionalStep implements Step {
     }
 
     @Override
-    public void dereference() {}
+    public void dereference() {
+    }
 
     @Override
-    public Map<String,ProcedureDescriptor> getDependencies() {
+    public Map<String, ProcedureDescriptor> getDependencies() {
         Map<String, ProcedureDescriptor> current = new HashMap<>();
         current.putAll(nextIfSatisfied.getDependencies());
         current.putAll(nextIfNotSatisfied.getDependencies());

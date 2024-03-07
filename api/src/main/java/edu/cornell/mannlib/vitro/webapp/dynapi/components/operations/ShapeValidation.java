@@ -6,22 +6,6 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Resource;
-import org.topbraid.jenax.util.ARQFactory;
-import org.topbraid.shacl.arq.SHACLFunctions;
-import org.topbraid.shacl.engine.ShapesGraph;
-import org.topbraid.shacl.util.ModelPrinter;
-import org.topbraid.shacl.util.SHACLUtil;
-import org.topbraid.shacl.validation.ValidationEngine;
-import org.topbraid.shacl.validation.ValidationEngineConfiguration;
-import org.topbraid.shacl.validation.ValidationEngineFactory;
-import org.topbraid.shacl.validation.ValidationUtil;
-import org.topbraid.shacl.vocabulary.SH;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.ShapesGraphComponent;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ShapesGraphPool;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullProcedure;
@@ -39,12 +23,27 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.StringView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
+import org.topbraid.jenax.util.ARQFactory;
+import org.topbraid.shacl.arq.SHACLFunctions;
+import org.topbraid.shacl.engine.ShapesGraph;
+import org.topbraid.shacl.util.ModelPrinter;
+import org.topbraid.shacl.util.SHACLUtil;
+import org.topbraid.shacl.validation.ValidationEngine;
+import org.topbraid.shacl.validation.ValidationEngineConfiguration;
+import org.topbraid.shacl.validation.ValidationEngineFactory;
+import org.topbraid.shacl.validation.ValidationUtil;
+import org.topbraid.shacl.vocabulary.SH;
 
 public class ShapeValidation extends AbstractOperation {
 
     private final Log log = LogFactory.getLog(this.getClass());
-    private static ShapesGraphPool shapesGraphPool= ShapesGraphPool.getInstance();
-    
+    private static ShapesGraphPool shapesGraphPool = ShapesGraphPool.getInstance();
+
     private Parameter dataModelParam;
     private Parameter shapesModelParam;
     private boolean inputCalculated;
@@ -64,34 +63,34 @@ public class ShapeValidation extends AbstractOperation {
         dataModelParam = model;
         inputParams.add(model);
     }
-    
+
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter", minOccurs = 1, maxOccurs = 1)
     public void addOutputParam(Parameter param) throws InitializationException {
         outputParams.add(param);
     }
-    
+
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#setCache", maxOccurs = 1)
     public void setCache(Boolean cache) throws InitializationException {
         this.cache = cache;
     }
-    
+
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#details", maxOccurs = 1)
     public void setDetails(Boolean details) throws InitializationException {
         this.details = details;
     }
-    
+
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#validateShapes", maxOccurs = 1)
     public void setValidateShapes(Boolean validateShapes) throws InitializationException {
         this.validateShapes = validateShapes;
     }
-    
-    //Procedure should return a model contains SHACL rules
+
+    // Procedure should return a model contains SHACL rules
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#ShapesProcecedureDescriptor", maxOccurs = 1)
     public void setShapesProcedureDescriptor(ProcedureDescriptor pd) {
         shapesProcedureDescriptor = pd;
         dependencies.put(pd.getUri(), pd);
     }
-    
+
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#shapesModel", maxOccurs = 1)
     public void setShapesModel(Parameter model) throws InitializationException {
         if (!ModelView.isModel(model)) {
@@ -122,9 +121,9 @@ public class ShapeValidation extends AbstractOperation {
             reportResource = engine.validateAll();
             result = isValidationSuccessfull(reportResource);
             if (reportResource != null) {
-                report = ModelPrinter.get().print(reportResource.getModel());    
+                report = ModelPrinter.get().print(reportResource.getModel());
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             log.error(e, e);
             if (report == null) {
                 report = e.getLocalizedMessage();
@@ -160,7 +159,7 @@ public class ShapeValidation extends AbstractOperation {
             Model shapesModel = null;
             if (isShapesFromInput()) {
                 shapesModel = ModelView.getModel(dataStore, shapesModelParam);
-                
+
             } else {
                 shapesModel = getShapesModel(dataStore);
             }
@@ -168,7 +167,7 @@ public class ShapeValidation extends AbstractOperation {
             SHACLFunctions.registerFunctions(shapesModel);
             shapesGraph = new ShapesGraph(shapesModel);
             if (cache) {
-                addShapesGraphToCache(shapesGraphName,shapesGraph);
+                addShapesGraphToCache(shapesGraphName, shapesGraph);
             }
         }
         Model dataModel = ModelView.getModel(dataStore, dataModelParam);
@@ -182,8 +181,8 @@ public class ShapeValidation extends AbstractOperation {
         configuration.setValidateShapes(validateShapes);
         return engine;
     }
-    
-    public boolean isValidationSuccessfull(Resource report){
+
+    public boolean isValidationSuccessfull(Resource report) {
         if (report == null) {
             return false;
         } else if (report.getModel().listStatements(null, SH.resultSeverity, SH.Violation).toList().size() != 0) {
@@ -206,11 +205,11 @@ public class ShapeValidation extends AbstractOperation {
         shapesGraph = shapesGraphComponent.getShapesGraph();
         return shapesGraph;
     }
-    
+
     private boolean isShapesFromInput() {
         return shapesModelParam != null;
     }
-    
+
     private String getShapesGraphName() {
         if (isShapesFromInput()) {
             return shapesModelParam.getName();
@@ -221,10 +220,10 @@ public class ShapeValidation extends AbstractOperation {
         }
     }
 
-
     private Model getShapesModel(DataStore dataStore) throws ConversionException, InitializationException {
         DataStore localStore = new DataStore();
-        ProcedureDescriptorCall.initilaizeLocalStore(dataStore, localStore, shapesProcedureDescriptor.getInputParams(), internalParams);
+        ProcedureDescriptorCall.initilaizeLocalStore(dataStore, localStore, shapesProcedureDescriptor.getInputParams(),
+                internalParams);
         ProcedureDescriptorCall.execute(shapesProcedureDescriptor, localStore);
         return getModel(localStore, shapesProcedureDescriptor.getOutputParams());
     }
@@ -237,7 +236,7 @@ public class ShapeValidation extends AbstractOperation {
                 if (data == null) {
                     throw new RuntimeException(String.format("Data '%s' not null", name));
                 }
-                return ModelView.getModel(dataStore, model);    
+                return ModelView.getModel(dataStore, model);
             }
         }
         throw new RuntimeException("Model is not returned");
@@ -245,7 +244,7 @@ public class ShapeValidation extends AbstractOperation {
 
     protected void calculateInputParams() {
         if (shapesProcedureDescriptor != null) {
-            inputParams.addAll(shapesProcedureDescriptor.getInputParams());    
+            inputParams.addAll(shapesProcedureDescriptor.getInputParams());
         }
         inputParams.removeAll(internalParams);
         inputCalculated = true;
@@ -275,7 +274,7 @@ public class ShapeValidation extends AbstractOperation {
         }
         return true;
     }
-    
+
     private boolean isValidDescriptor(ProcedureDescriptor descriptor, DataStore dataStore) {
         Parameter uriParam = descriptor.getUriParam();
         if (uriParam != null) {
@@ -309,18 +308,21 @@ public class ShapeValidation extends AbstractOperation {
         }
         return true;
     }
-    
+
     public boolean isValid() {
-        if (dataModelParam == null ) {
+        if (dataModelParam == null) {
             log.error("Data model parameter is required, but not provided.");
             return false;
         }
-        if (shapesModelParam == null && shapesProcedureDescriptor == null ) {
-            log.error("Either shapes model parameter or shapes procedure descriptor is required, but neither provided.");
+        if (shapesModelParam == null && shapesProcedureDescriptor == null) {
+            log.error(
+                    "Either shapes model parameter or shapes procedure descriptor is required, but neither provided.");
             return false;
         }
-        if (shapesModelParam != null && shapesProcedureDescriptor != null ) {
-            log.error("Either shapes model parameter or shapes procedure descriptor is required, but both were provided.");
+        if (shapesModelParam != null && shapesProcedureDescriptor != null) {
+            log.error(
+                    "Either shapes model parameter or shapes procedure descriptor is required, " +
+                    "but both were provided.");
             return false;
         }
         if (shapesProcedureDescriptor != null) {
@@ -337,22 +339,22 @@ public class ShapeValidation extends AbstractOperation {
         for (String name : pdOutputParams.getNames()) {
             Parameter model = pdOutputParams.get(name);
             if (ModelView.isModel(model)) {
-                count++;    
+                count++;
             }
         }
         return count == 1;
     }
-    
+
     private Parameter getModelParam(Parameters params) {
         for (String name : params.getNames()) {
             Parameter model = params.get(name);
             if (ModelView.isModel(model)) {
-                return model;   
+                return model;
             }
         }
         throw new RuntimeException("Model parameter not found");
     }
-    
+
     @Override
     public Parameters getInputParams() {
         if (!inputCalculated) {

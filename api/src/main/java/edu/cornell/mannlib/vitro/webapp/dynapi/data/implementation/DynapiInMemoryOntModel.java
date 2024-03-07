@@ -14,11 +14,11 @@ public class DynapiInMemoryOntModel {
     public static String serializeXML(Model input) {
         return serialize(input, "RDF/XML");
     }
-    
+
     public static String serializeN3(Model input) {
         return serialize(input, "n3");
     }
-    
+
     public static String serialize(Model input, String lang) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         RDFDataMgr.write(baos, input, RDFLanguages.nameToLang(lang));

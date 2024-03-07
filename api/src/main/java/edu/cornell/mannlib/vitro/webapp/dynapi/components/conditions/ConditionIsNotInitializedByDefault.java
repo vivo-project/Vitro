@@ -13,7 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 public class ConditionIsNotInitializedByDefault implements Condition {
 
     private Parameters inputParams = new Parameters();
-    
+
     @Override
     public boolean isSatisfied(DataStore dataStore) {
         for (String name : inputParams.getNames()) {
@@ -29,7 +29,7 @@ public class ConditionIsNotInitializedByDefault implements Condition {
     public Parameters getInputParams() {
         return inputParams;
     }
-    
+
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter", minOccurs = 1)
     public void addInputParameter(Parameter param) {
         inputParams.add(param);

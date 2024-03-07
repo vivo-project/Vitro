@@ -6,16 +6,9 @@ import java.nio.charset.StandardCharsets;
 import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
-
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.xml.sax.SAXException;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
@@ -25,6 +18,11 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.StringView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.xml.sax.SAXException;
 
 public class XMLValidation extends AbstractOperation {
 
@@ -53,7 +51,7 @@ public class XMLValidation extends AbstractOperation {
         this.validationResult = validationResult;
         outputParams.add(validationResult);
     }
-    
+
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#errorMessage", minOccurs = 0, maxOccurs = 1)
     public void setErrorMessage(Parameter errorMessage) throws InitializationException {
         if (!StringView.isPlainString(errorMessage)) {
@@ -62,7 +60,7 @@ public class XMLValidation extends AbstractOperation {
         this.errorMessage = errorMessage;
         outputParams.add(errorMessage);
     }
-    
+
     @Override
     public OperationResult runOperation(DataStore dataStore) throws Exception {
         String input = SimpleDataView.getStringRepresentation(inputXmlParam.getName(), dataStore);
@@ -97,16 +95,16 @@ public class XMLValidation extends AbstractOperation {
         }
         return "";
     }
-    
-    private void prepareSchema() throws InitializationException{
+
+    private void prepareSchema() throws InitializationException {
         try {
-          if (schemaParam.isInternal() && !schemaParam.isOptional()) {
-              String defaultValue = schemaParam.getDefaultValue();
-              if (defaultValue != null) {
-                  defaultSchema = getSchema(defaultValue);    
-              }
-          }
-        } catch (Exception e){
+            if (schemaParam.isInternal() && !schemaParam.isOptional()) {
+                String defaultValue = schemaParam.getDefaultValue();
+                if (defaultValue != null) {
+                    defaultSchema = getSchema(defaultValue);
+                }
+            }
+        } catch (Exception e) {
             throw new InitializationException(e.getMessage());
         }
     }
@@ -121,26 +119,26 @@ public class XMLValidation extends AbstractOperation {
         Schema schema = factory.newSchema(schemaSource);
         return schema;
     }
-    
+
     @Override
-    public boolean isInputValid(DataStore dataStore){
+    public boolean isInputValid(DataStore dataStore) {
         if (!super.isInputValid(dataStore)) {
             return false;
         }
         return true;
-    }  
-    
+    }
+
     @Override
-    public boolean isOutputValid(DataStore dataStore){
+    public boolean isOutputValid(DataStore dataStore) {
         if (!super.isOutputValid(dataStore)) {
             return false;
         }
         return true;
-    } 
-    
+    }
+
     public boolean isValid() {
         boolean result = true;
-        if (schemaParam == null ) {
+        if (schemaParam == null) {
             log.error("schema param is not defined in the configuration");
             result = false;
         }

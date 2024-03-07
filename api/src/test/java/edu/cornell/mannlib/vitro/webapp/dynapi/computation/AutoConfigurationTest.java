@@ -3,10 +3,8 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.computation;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.Test;
-
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.SparqlSelectQuery;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.steps.ConditionalStep;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.steps.OperationalStep;
@@ -15,6 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.RDFType;
+import org.junit.Test;
 
 public class AutoConfigurationTest {
     @Test
@@ -27,10 +26,10 @@ public class AutoConfigurationTest {
         action.setStep(step1);
         step1.setNextStep(step2);
         step2.setNextStep(step3);
-        
-        step1.setOperation(query(arr("A","B"), arr("C")));
-        step2.setOperation(query(arr("B","C","E"), arr("D")));
-        step3.setOperation(query(arr("D","F","G"), arr("D")));
+
+        step1.setOperation(query(arr("A", "B"), arr("C")));
+        step2.setOperation(query(arr("B", "C", "E"), arr("D")));
+        step3.setOperation(query(arr("D", "F", "G"), arr("D")));
 
         assertEquals(0, action.getInputParams().size());
         AutoConfiguration.computeParams(action);
@@ -58,7 +57,7 @@ public class AutoConfigurationTest {
         AutoConfiguration.computeParams(action);
         assertEquals(0, action.getInputParams().size());
     }
-    
+
     @Test
     public void testConditionalInActionRequirements() throws InitializationException {
         Procedure action = new Procedure();
@@ -67,7 +66,7 @@ public class AutoConfigurationTest {
         OperationalStep step3 = new OperationalStep();
 
         action.setStep(step1);
-        
+
         step1.setNextIfSatisfied(step2);
         step1.setNextIfNotSatisfied(step3);
         step2.setOperation(query(arr("B"), arr("A")));
@@ -80,7 +79,7 @@ public class AutoConfigurationTest {
         assertTrue(action.getInputParams().contains("B"));
 
     }
-    
+
     @Test
     public void testConditionalWithNullStepInActionRequirements() throws InitializationException {
         Procedure action = new Procedure();
@@ -99,13 +98,12 @@ public class AutoConfigurationTest {
         assertTrue(action.getInputParams().contains("B"));
 
     }
-    
-    
+
     private String[] arr(String... str) {
         return str;
-        
+
     }
-    
+
     private SparqlSelectQuery query(String[] required, String[] provided) throws InitializationException {
         SparqlSelectQuery query = new SparqlSelectQuery();
         for (int i = 0; i < required.length; i++) {
@@ -121,29 +119,29 @@ public class AutoConfigurationTest {
         Parameter param = new Parameter();
         ParameterType uri1ParamType = new ParameterType();
         ImplementationType uri1ImplType = new ImplementationType();
-        
-        ImplementationConfig config = new ImplementationConfig();
-		
-		try {
-			config.setClassName("java.lang.String");
-			config.setMethodArguments("");
-			config.setMethodName("toString");
-			config.setStaticMethod(false);
-			uri1ImplType.setDeserializationConfig(config);
-			uri1ImplType.setSerializationConfig(config);
-			uri1ImplType.setClassName("java.lang.String");
 
-			RDFType rdfType = new RDFType();
-			rdfType.setName("anyURI");
-			uri1ParamType.setRdfType(rdfType);
-			
-			uri1ParamType.setImplementationType(uri1ImplType );
-			param.setType(uri1ParamType);
-	        param.setName(name);
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        ImplementationConfig config = new ImplementationConfig();
+
+        try {
+            config.setClassName("java.lang.String");
+            config.setMethodArguments("");
+            config.setMethodName("toString");
+            config.setStaticMethod(false);
+            uri1ImplType.setDeserializationConfig(config);
+            uri1ImplType.setSerializationConfig(config);
+            uri1ImplType.setClassName("java.lang.String");
+
+            RDFType rdfType = new RDFType();
+            rdfType.setName("anyURI");
+            uri1ParamType.setRdfType(rdfType);
+
+            uri1ParamType.setImplementationType(uri1ImplType);
+            param.setType(uri1ParamType);
+            param.setName(name);
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         return param;
 
     }

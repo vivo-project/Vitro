@@ -5,5 +5,5 @@ public interface ParameterInfo {
     public Parameters getInputParams();
 
     public Parameters getOutputParams();
-    
+
 }

@@ -1,6 +1,5 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -11,13 +10,12 @@ import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.shared.Lock;
 import org.junit.Before;
-
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
-import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
 import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccessStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccessFactoryStub;
 import stubs.javax.servlet.ServletContextStub;
@@ -28,13 +26,15 @@ public abstract class ServletContextTest {
     public static final String TBOX_PREFIX = "../home/src/main/resources/rdf/dynapiTbox/everytime/";
     public static final String TEST_PREFIX = "src/test/resources/rdf/abox/filegraph/";
 
-    //public static final String INDIVIDUALS_FILE_PATH = ABOX_PREFIX + "dynamic-api-individuals.n3";
+    // public static final String INDIVIDUALS_FILE_PATH = ABOX_PREFIX + "dynamic-api-individuals.n3";
     public static final String IMPLEMENTATION_FILE_PATH = TBOX_PREFIX + "dynamic-api-implementation.n3";
     public static final String ONTOLOGY_FILE_PATH = TBOX_PREFIX + "vitro-dynamic-api.n3";
-	protected final static String TEST_PROCEDURE_URI = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testProcedure1";
+    protected final static String TEST_PROCEDURE_URI =
+            "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testProcedure1";
     protected final static ResourceAPIKey TEST_RESOURCE_KEY = ResourceAPIKey.of("test_resource", "0.1.0");
 
-    protected final static String TEST_PERSON_PROCEDURE_URI_1 = "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testPersonProcedure1";
+    protected final static String TEST_PERSON_PROCEDURE_URI_1 =
+            "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testPersonProcedure1";
 
     protected final static ResourceAPIKey TEST_PERSON_RESOURCE_KEY = ResourceAPIKey.of("test_person_resource", "1.0.0");
 
@@ -47,7 +47,7 @@ public abstract class ServletContextTest {
 
     @Before
     public void setup() {
-        //Do not print information about loaded actions and resources
+        // Do not print information about loaded actions and resources
         servletContext = new ServletContextStub();
         modelAccessFactory = new ModelAccessFactoryStub();
 
@@ -62,39 +62,26 @@ public abstract class ServletContextTest {
 
     protected void loadTestModel() throws IOException {
         // all actions reuse testSparqlQuery1 from testing action
-        loadModel(
-            new RDFFile("N3", TEST_PREFIX + "dynamic-api-individuals-collection.n3"),
-            new RDFFile("N3", TEST_PREFIX + "dynamic-api-individuals-concept.n3"),
-            new RDFFile("N3", TEST_PREFIX + "dynamic-api-individuals-document.n3"),
-            new RDFFile("N3", TEST_PREFIX + "dynamic-api-individuals-organization.n3"),
-            new RDFFile("N3", TEST_PREFIX + "dynamic-api-individuals-person.n3"),
-            new RDFFile("N3", TEST_PREFIX + "dynamic-api-individuals-process.n3"),
-            new RDFFile("N3", TEST_PREFIX + "dynamic-api-individuals-relationship.n3")
-        );
+        loadModel(new RDFFile("N3", TEST_PREFIX + "dynamic-api-individuals-collection.n3"),
+                new RDFFile("N3", TEST_PREFIX + "dynamic-api-individuals-concept.n3"),
+                new RDFFile("N3", TEST_PREFIX + "dynamic-api-individuals-document.n3"),
+                new RDFFile("N3", TEST_PREFIX + "dynamic-api-individuals-organization.n3"),
+                new RDFFile("N3", TEST_PREFIX + "dynamic-api-individuals-person.n3"),
+                new RDFFile("N3", TEST_PREFIX + "dynamic-api-individuals-process.n3"),
+                new RDFFile("N3", TEST_PREFIX + "dynamic-api-individuals-relationship.n3"));
     }
-    
+
     protected void loadDefaultModel() throws IOException {
-        loadModel(
-            new RDFFile("N3", IMPLEMENTATION_FILE_PATH),
-            new RDFFile("N3", ONTOLOGY_FILE_PATH),
-            new RDFFile("N3", TEST_PREFIX + "dynamic-api-individuals-testing.n3")
-        );
+        loadModel(new RDFFile("N3", IMPLEMENTATION_FILE_PATH), new RDFFile("N3", ONTOLOGY_FILE_PATH),
+                new RDFFile("N3", TEST_PREFIX + "dynamic-api-individuals-testing.n3"));
         loadModels("N3", getBaseIndividuals());
     }
-    
 
     private String[] getBaseIndividuals() {
-        return new String[]{
-                ABOX_PREFIX + "http_methods.n3", 
-                ABOX_PREFIX + "paramerter_types.n3", 
-                ABOX_PREFIX + "validators.n3",
-                ABOX_PREFIX + "user_groups.n3",
-                ABOX_PREFIX + "implementation_types.n3",
-                ABOX_PREFIX + "rdf_types.n3",
-                ABOX_PREFIX + "validators.n3",
-                ABOX_PREFIX + "model_parameters.n3",
-                ABOX_PREFIX + "serialization_types.n3"
-        };
+        return new String[] { ABOX_PREFIX + "http_methods.n3", ABOX_PREFIX + "paramerter_types.n3",
+            ABOX_PREFIX + "validators.n3", ABOX_PREFIX + "user_groups.n3", ABOX_PREFIX + "implementation_types.n3",
+            ABOX_PREFIX + "rdf_types.n3", ABOX_PREFIX + "validators.n3", ABOX_PREFIX + "model_parameters.n3",
+            ABOX_PREFIX + "serialization_types.n3" };
     }
 
     protected static String[] getFileList(String path) {
@@ -132,23 +119,17 @@ public abstract class ServletContextTest {
 
     protected void loadPersonVersion1_1Model() throws IOException {
         // versioning action reuses testSparqlQuery1 from testing action
-        loadModel(
-            new RDFFile("N3", TEST_PREFIX + "dynamic-api-individuals-person1_1.n3")
-        );
+        loadModel(new RDFFile("N3", TEST_PREFIX + "dynamic-api-individuals-person1_1.n3"));
     }
 
     protected void loadPersonVersion2Model() throws IOException {
         // versioning action reuses testSparqlQuery1 from testing action
-        loadModel(
-            new RDFFile("N3", TEST_PREFIX + "dynamic-api-individuals-person2.n3")
-        );
+        loadModel(new RDFFile("N3", TEST_PREFIX + "dynamic-api-individuals-person2.n3"));
     }
 
     protected void loadPersonVersion4_3_7Model() throws IOException {
         // versioning action reuses testSparqlQuery1 from testing action
-        loadModel(
-            new RDFFile("N3", TEST_PREFIX + "dynamic-api-individuals-person4_3_7.n3")
-        );
+        loadModel(new RDFFile("N3", TEST_PREFIX + "dynamic-api-individuals-person4_3_7.n3"));
     }
 
     protected String readFile(String path) throws IOException {

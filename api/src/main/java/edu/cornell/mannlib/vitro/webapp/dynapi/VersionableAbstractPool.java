@@ -13,25 +13,17 @@ public abstract class VersionableAbstractPool<K extends Versioned, C extends Ver
         extends AbstractPool<K, C, P> {
 
     public Collection<C> getComponents(Version version) {
-        return getComponents()
-                .values()
-                .stream()
-                .filter(component -> nearestVersion(component, version))
-                .collect(Collectors.toMap(
-                    component -> component.getKey().getName(),
-                    component -> component,
-                    (l, r) -> {
-                        Version left = l.getKey().getVersion();
-                        Version right = r.getKey().getVersion();
+        return getComponents().values().stream().filter(component -> nearestVersion(component, version)).collect(
+                Collectors.toMap(component -> component.getKey().getName(), component -> component, (l, r) -> {
+                    Version left = l.getKey().getVersion();
+                    Version right = r.getKey().getVersion();
 
-                        if (left.compareTo(right) >= 0) {
-                            return l;
-                        }
+                    if (left.compareTo(right) >= 0) {
+                        return l;
+                    }
 
-                        return r;
-                    },
-                    ConcurrentSkipListMap::new)
-                ).values();
+                    return r;
+                }, ConcurrentSkipListMap::new)).values();
     }
 
     public C get(K key) {
@@ -86,11 +78,11 @@ public abstract class VersionableAbstractPool<K extends Versioned, C extends Ver
         Version componentVersionMax = Version.of(component.getVersionMax());
         boolean majorVersionGreater = keyVersion.getMajor().compareTo(componentVersionMax.getMajor()) > 0;
 
-        boolean minorVersionGreater = minorVersionSpecific(keyVersion)
-                && keyVersion.getMinor().compareTo(componentVersionMax.getMinor()) > 0;
+        boolean minorVersionGreater = minorVersionSpecific(keyVersion) && keyVersion.getMinor().compareTo(
+                componentVersionMax.getMinor()) > 0;
 
-        boolean patchVersionGreater = patchVersionSpecific(keyVersion)
-                && keyVersion.getPatch().compareTo(componentVersionMax.getPatch()) > 0;
+        boolean patchVersionGreater = patchVersionSpecific(keyVersion) && keyVersion.getPatch().compareTo(
+                componentVersionMax.getPatch()) > 0;
 
         return majorVersionGreater || minorVersionGreater || patchVersionGreater;
     }
@@ -98,11 +90,11 @@ public abstract class VersionableAbstractPool<K extends Versioned, C extends Ver
     private boolean mismatchSpecificVersion(C component, Version keyVersion) {
         Version componentVersionMin = Version.of(component.getVersionMin());
 
-        boolean mismatchMinorVersion = minorVersionSpecific(keyVersion)
-                && !keyVersion.getMinor().equals(componentVersionMin.getMinor());
+        boolean mismatchMinorVersion = minorVersionSpecific(keyVersion) && !keyVersion.getMinor().equals(
+                componentVersionMin.getMinor());
 
-        boolean mismatchPatchVersion = patchVersionSpecific(keyVersion)
-                && !keyVersion.getPatch().equals(componentVersionMin.getPatch());
+        boolean mismatchPatchVersion = patchVersionSpecific(keyVersion) && !keyVersion.getPatch().equals(
+                componentVersionMin.getPatch());
 
         return mismatchMinorVersion || mismatchPatchVersion;
     }

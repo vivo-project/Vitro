@@ -4,12 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ResourceAPIPool;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
@@ -20,19 +14,23 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.StringParam;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class ResourceAPIPoolAtomicOperationTest extends ServletContextTest{
+public class ResourceAPIPoolAtomicOperationTest extends ServletContextTest {
 
     private static final String STRING_PARAM_NAME = "stringParam";
-    private final static String TEST_ACTION_URI = "https://vivoweb.org/ontology/vitro-dynamic-api/resourceAPI/testResource1";
+    private final static String TEST_ACTION_URI =
+            "https://vivoweb.org/ontology/vitro-dynamic-api/resourceAPI/testResource1";
     private ResourceAPIPool resourcePool;
-    
+
     @Before
     public void preparePool() {
         LoggingControl.offLogs();
         resourcePool = initWithDefaultModel();
     }
-    
+
     @After
     public void reset() {
         setup();
@@ -40,7 +38,7 @@ public class ResourceAPIPoolAtomicOperationTest extends ServletContextTest{
         assertEquals(0, resourcePool.count());
         LoggingControl.restoreLogs();
     }
-    
+
     @Test
     public void componentLoadUnloadTest() throws InitializationException {
         ResourceAPIPoolAtomicOperation apao = new ResourceAPIPoolAtomicOperation();
@@ -48,15 +46,15 @@ public class ResourceAPIPoolAtomicOperationTest extends ServletContextTest{
         DataStore dataStore = new DataStore();
         addStringParam(dataStore, apao);
         OperationResult result = apao.run(dataStore);
-        assertEquals(OperationResult.ok().toString(),result.toString());
+        assertEquals(OperationResult.ok().toString(), result.toString());
         assertEquals(1, resourcePool.count());
-        
+
         apao.setOperationType(PoolOperation.OperationType.UNLOAD.toString());
         result = apao.run(dataStore);
-        assertEquals(OperationResult.ok().toString(),result.toString());
+        assertEquals(OperationResult.ok().toString(), result.toString());
         assertEquals(0, resourcePool.count());
     }
-    
+
     @Test
     public void componentReloadTest() throws InitializationException {
         assertEquals(0, resourcePool.count());
@@ -65,7 +63,7 @@ public class ResourceAPIPoolAtomicOperationTest extends ServletContextTest{
         DataStore dataStore = new DataStore();
         addStringParam(dataStore, apao);
         OperationResult result = apao.run(dataStore);
-        assertEquals(OperationResult.ok().toString(),result.toString());
+        assertEquals(OperationResult.ok().toString(), result.toString());
         assertEquals(1, resourcePool.count());
     }
 
@@ -76,7 +74,7 @@ public class ResourceAPIPoolAtomicOperationTest extends ServletContextTest{
         TestView.setObject(plainStringData, TEST_ACTION_URI);
         dataStore.addData(STRING_PARAM_NAME, plainStringData);
     }
-    
+
     private ResourceAPIPool initWithDefaultModel() {
         try {
             loadDefaultModel();

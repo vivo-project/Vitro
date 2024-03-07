@@ -4,6 +4,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 
 public interface AccessWhitelist {
 
-	public boolean isAuthorized(UserAccount user, String procedureUri);
+    public boolean isAuthorized(UserAccount user, String procedureUri);
 
 }

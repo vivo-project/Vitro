@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dynapi.request.DocsRequestPath;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
@@ -59,15 +58,16 @@ public abstract class DocumentationAbstractServlet extends VitroHttpServlet {
                 // new File("src/test/resources/dynapi/mock/docs/response/rest/4").mkdirs();
                 // String next = requestPath.getPathInfo();
                 // if (requestPath.getPathInfo().equals("")) {
-                //     next = type + "/all";
+                // next = type + "/all";
                 // } else if (requestPath.getPathInfo().equals("/1")) {
-                //     next = type + "/1/all";
+                // next = type + "/1/all";
                 // } else if (requestPath.getPathInfo().equals("/2")) {
-                //     next = type + "/2/all";
+                // next = type + "/2/all";
                 // } else if (requestPath.getPathInfo().equals("/4")) {
-                //     next = type + "/4/all";
+                // next = type + "/4/all";
                 // }
-                // FileWriter fileWriter = new FileWriter("src/test/resources/dynapi/mock/docs/response" + next + ".json");
+                // FileWriter fileWriter = new FileWriter("src/test/resources/dynapi/mock/docs/response" + next +
+                // ".json");
                 // PrintWriter printWriter = new PrintWriter(fileWriter);
                 // printWriter.print(content + "\n");
                 // printWriter.close();
@@ -89,8 +89,8 @@ public abstract class DocumentationAbstractServlet extends VitroHttpServlet {
     /**
      * Determine the mime-type from the ACCEPT HTTP header.
      * 
-     * This needs to be improved to handle the priorities (ie: q=0.1).
-     * This might also need to be improved to handle wildcards.
+     * This needs to be improved to handle the priorities (ie: q=0.1). This might also need to be improved to handle
+     * wildcards.
      *
      * @param request HTTP Servlet Request.
      */

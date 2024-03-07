@@ -6,7 +6,6 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.RDFType;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

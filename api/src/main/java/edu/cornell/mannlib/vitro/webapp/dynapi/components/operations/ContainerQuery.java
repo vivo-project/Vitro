@@ -1,8 +1,5 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components.operations;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
@@ -13,8 +10,10 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-public class ContainerQuery extends AbstractOperation{
+public class ContainerQuery extends AbstractOperation {
 
     private static final Log log = LogFactory.getLog(ContainerQuery.class);
 
@@ -23,39 +22,39 @@ public class ContainerQuery extends AbstractOperation{
     private Parameter outputParam;
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#providesParameter", minOccurs = 1, maxOccurs = 1)
-    public void addOutputParameter(Parameter param){
+    public void addOutputParameter(Parameter param) {
         outputParams.add(param);
         outputParam = param;
     }
-    
+
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter", minOccurs = 1, maxOccurs = 1)
-    public void addInputParameter(Parameter param){
+    public void addInputParameter(Parameter param) {
         inputParams.add(param);
         keys.add(param);
     }
-    
+
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#targetContainer", minOccurs = 1, maxOccurs = 1)
-    public void setContainer(Parameter param) throws InitializationException{
+    public void setContainer(Parameter param) throws InitializationException {
         if (!param.isJsonContainer()) {
             throw new InitializationException("only JsonContainer parameter is allowed as a target");
         }
         inputParams.add(param);
         containerParam = param;
     }
-    
+
     @Override
     public OperationResult runOperation(DataStore dataStore) {
         JsonContainer container = JsonContainerView.getJsonContainer(dataStore, containerParam);
         String key = SimpleDataView.getStringRepresentation(firstKeyData(dataStore));
         Data item = container.getItem(key, outputParam);
         if (!item.isInitialized()) {
-            log.error(String.format("Key '%s' not found in container %s",key,JsonContainer.serialize(container)));
+            log.error(String.format("Key '%s' not found in container %s", key, JsonContainer.serialize(container)));
             return OperationResult.internalServerError();
         }
         Parameter itemParam = item.getParam();
-        if (!outputParam.equals(itemParam)){
+        if (!outputParam.equals(itemParam)) {
             log.error("returned result has different parameter");
-            return OperationResult.internalServerError();    
+            return OperationResult.internalServerError();
         }
         dataStore.addData(itemParam.getName(), item);
         return OperationResult.ok();
@@ -88,7 +87,7 @@ public class ContainerQuery extends AbstractOperation{
         }
         return true;
     }
-    
+
     public boolean isInputValid(DataStore dataStore) {
         if (!super.isInputValid(dataStore)) {
             return false;
@@ -98,7 +97,7 @@ public class ContainerQuery extends AbstractOperation{
             log.error("container data is not provided in data store");
             return false;
         }
-        if(container.getParam() == null) {
+        if (container.getParam() == null) {
             log.error("container data param is null");
             return false;
         }

@@ -13,6 +13,7 @@ import java.util.Collection;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.matcher.APIResponseMatcher;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,8 +22,6 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import edu.cornell.mannlib.vitro.webapp.dynapi.matcher.APIResponseMatcher;
 
 @RunWith(Parameterized.class)
 public class RESTDocumentationEndpointIntegrationTest extends ServletContextIntegrationTest {
@@ -82,7 +81,7 @@ public class RESTDocumentationEndpointIntegrationTest extends ServletContextInte
     public void reset() {
         LoggingControl.restoreLogs();
     }
-    
+
     @Test
     public void doTest() throws IOException {
         String pathInfo = "/" + testVersion;
@@ -109,7 +108,7 @@ public class RESTDocumentationEndpointIntegrationTest extends ServletContextInte
         System.out.println("Running Test against: '/api/docs/rest" + pathInfo + "'.");
 
         restEndpoint.doGet(request, response);
-        
+
         verify(response, times(1)).setContentType(mimeType);
         verify(responsePrintWriter, times(1)).print(argThat(new APIResponseMatcher(testJson, testExpectedResponse)));
         verify(responsePrintWriter, times(1)).flush();

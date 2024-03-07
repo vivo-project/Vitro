@@ -2,7 +2,6 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.request;
 
 import static edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath.REST_SERVLET_PATH;
 import static edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath.RPC_SERVLET_PATH;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -12,12 +11,11 @@ import java.util.Base64;
 
 import javax.servlet.http.HttpServletRequest;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath.RequestType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath.RequestType;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RequestPathTest {

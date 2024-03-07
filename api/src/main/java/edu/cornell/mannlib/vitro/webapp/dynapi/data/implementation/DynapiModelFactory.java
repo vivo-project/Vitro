@@ -2,12 +2,11 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation;
 
 import javax.servlet.ServletContext;
 
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jena.rdf.model.Model;
-
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
 public class DynapiModelFactory {
 

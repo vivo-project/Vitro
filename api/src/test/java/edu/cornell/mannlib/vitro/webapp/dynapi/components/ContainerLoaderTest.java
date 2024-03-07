@@ -5,10 +5,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.ContainerLoader;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
@@ -18,10 +14,13 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer.Type;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.JsonContainerObjectParam;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.StringParam;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class ContainerLoaderTest {
-    
+
     @org.junit.runners.Parameterized.Parameter(0)
     public String key;
 
@@ -40,17 +39,17 @@ public class ContainerLoaderTest {
         if (!key.isEmpty()) {
             cl.setKey(key + "1");
         }
-        
+
         DataStore store = new DataStore();
         Data inputData = new Data(input);
         TestView.setObject(inputData, "value1");
         store.addData(input.getName(), inputData);
-        
+
         Data containerData = new Data(container);
         JsonContainer containerObject = new JsonContainer(containerType);
         TestView.setObject(containerData, containerObject);
         store.addData(container.getName(), containerData);
-        
+
         assertEquals(OperationResult.ok(), cl.run(store));
 
         inputData = new Data(input);
@@ -61,14 +60,13 @@ public class ContainerLoaderTest {
         }
         assertEquals(OperationResult.ok(), cl.run(store));
     }
-    
+
     @Parameterized.Parameters
     public static Collection<Object[]> requests() {
         return Arrays.asList(new Object[][] {
-            {"", Type.ARRAY},
-            {"", Type.OBJECT},
-            {"key", Type.ARRAY},
-            {"key", Type.OBJECT},
-        });
+                { "", Type.ARRAY },
+                { "", Type.OBJECT },
+                { "key", Type.ARRAY },
+                { "key", Type.OBJECT }, });
     }
 }

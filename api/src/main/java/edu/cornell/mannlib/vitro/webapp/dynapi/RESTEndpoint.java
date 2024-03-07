@@ -10,14 +10,13 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
 import edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 @WebServlet(name = "RESTEndpoint", urlPatterns = { REST_SERVLET_PATH + "/*" })
 public class RESTEndpoint extends Endpoint {
@@ -77,8 +76,8 @@ public class RESTEndpoint extends Endpoint {
             return;
         }
 
-        ResourceAPIKey resourceAPIKey = ResourceAPIKey.of(requestPath.getResourceName(),
-                requestPath.getResourceVersion());
+        ResourceAPIKey resourceAPIKey = ResourceAPIKey.of(requestPath.getResourceName(), requestPath
+                .getResourceVersion());
 
         if (log.isDebugEnabled()) {
             resourceAPIPool.printKeys();
@@ -100,7 +99,8 @@ public class RESTEndpoint extends Endpoint {
             try {
                 procedureUri = resourceAPI.getProcedureUriByActionName(method, actionName);
             } catch (UnsupportedOperationException e) {
-                log.error(format("Custom REST action %s not implemented for resource %s and method %s", actionName, key, method), e);
+                log.error(format("Custom REST action %s not implemented for resource %s and method %s", actionName, key,
+                        method), e);
                 OperationResult.methodNotAllowed().prepareResponse(response);
                 return;
             } finally {

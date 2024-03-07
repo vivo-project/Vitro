@@ -5,5 +5,5 @@ import java.util.Map;
 public interface DependencyInfo {
 
     public Map<String, ProcedureDescriptor> getDependencies();
-    
+
 }

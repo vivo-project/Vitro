@@ -66,16 +66,18 @@ public class ResourceAPI extends AbstractPoolComponent implements Versionable<Re
         return procedureUriOnGet;
     }
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onGet", minOccurs = 0, maxOccurs = 1, asString = true)
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onGet", minOccurs = 0, maxOccurs = 1,
+            asString = true)
     public void setProcedureUrionGet(String procedureOnGet) {
         this.procedureUriOnGet = procedureOnGet;
     }
-    
+
     public String getProcedureUriOnGetAll() {
         return procedureUriOnGetAll;
     }
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onGetAll", minOccurs = 0, maxOccurs = 1, asString = true)
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onGetAll", minOccurs = 0, maxOccurs = 1,
+            asString = true)
     public void setProcedureUriOnGetAll(String procedureOnGetAll) {
         this.procedureUriOnGetAll = procedureOnGetAll;
     }
@@ -84,7 +86,8 @@ public class ResourceAPI extends AbstractPoolComponent implements Versionable<Re
         return procedureUriOnPost;
     }
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onPost", minOccurs = 0, maxOccurs = 1, asString = true)
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onPost", minOccurs = 0, maxOccurs = 1,
+            asString = true)
     public void setProcedureUriOnPost(String procedureOnPost) {
         this.procedureUriOnPost = procedureOnPost;
     }
@@ -93,7 +96,8 @@ public class ResourceAPI extends AbstractPoolComponent implements Versionable<Re
         return procedureUriOnDelete;
     }
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onDelete", minOccurs = 0, maxOccurs = 1, asString = true)
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onDelete", minOccurs = 0, maxOccurs = 1,
+            asString = true)
     public void setProcedureUriOnDelete(String procedureOnDelete) {
         this.procedureUriOnDelete = procedureOnDelete;
     }
@@ -102,7 +106,8 @@ public class ResourceAPI extends AbstractPoolComponent implements Versionable<Re
         return procedureUriOnPut;
     }
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onPut", minOccurs = 0, maxOccurs = 1, asString = true)
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onPut", minOccurs = 0, maxOccurs = 1,
+            asString = true)
     public void setProcedureUriOnPut(String procedureOnPut) {
         this.procedureUriOnPut = procedureOnPut;
     }
@@ -111,7 +116,8 @@ public class ResourceAPI extends AbstractPoolComponent implements Versionable<Re
         return procedureUriOnPatch;
     }
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onPatch", minOccurs = 0, maxOccurs = 1, asString = true)
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#onPatch", minOccurs = 0, maxOccurs = 1,
+            asString = true)
     public void setProcedureUriOnPatch(String procedureOnPatch) {
         this.procedureUriOnPatch = procedureOnPatch;
     }

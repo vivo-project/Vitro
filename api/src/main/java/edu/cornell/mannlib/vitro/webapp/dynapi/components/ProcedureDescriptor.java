@@ -1,11 +1,10 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
-import org.apache.commons.lang3.StringUtils;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
+import org.apache.commons.lang3.StringUtils;
 
 public class ProcedureDescriptor implements ParameterInfo {
 
@@ -29,7 +28,7 @@ public class ProcedureDescriptor implements ParameterInfo {
     public void addInputParameter(Parameter param) {
         inputParams.add(param);
     }
-    
+
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#optionalParameter")
     public void addOptionalParameter(Parameter param) {
         optionalParams.add(param);
@@ -42,7 +41,8 @@ public class ProcedureDescriptor implements ParameterInfo {
         outputParams.add(param);
     }
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#call", minOccurs = 0, maxOccurs = 1, asString = true)
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#call", minOccurs = 0, maxOccurs = 1,
+            asString = true)
     public void setCallUri(String uri) {
         this.uri = uri;
     }
@@ -56,7 +56,7 @@ public class ProcedureDescriptor implements ParameterInfo {
     public Parameters getOutputParams() {
         return outputParams;
     }
-    
+
     public Parameters getOptionalParams() {
         return optionalParams;
     }
@@ -77,13 +77,19 @@ public class ProcedureDescriptor implements ParameterInfo {
 
     public String toString() {
         if (uri == null) {
-            return "Described procedure uri parameter:" + uriParam.getName() 
-                    + " input parameters:" + String.join(",", inputParams.getNames())
-                    + " output parameters:" + String.join(",", outputParams.getNames());
+            return "Described procedure uri parameter:" +
+                    uriParam.getName() +
+                    " input parameters:" +
+                    String.join(",", inputParams.getNames()) +
+                    " output parameters:" +
+                    String.join(",", outputParams.getNames());
         }
-        return "Described procedure uri:" + uri 
-                + " input parameters:" + String.join(",", inputParams.getNames())
-                + " output parameters:" + String.join(",", outputParams.getNames());
+        return "Described procedure uri:" +
+                uri +
+                " input parameters:" +
+                String.join(",", inputParams.getNames()) +
+                " output parameters:" +
+                String.join(",", outputParams.getNames());
     }
 
     public boolean hasUriParam() {
@@ -96,6 +102,6 @@ public class ProcedureDescriptor implements ParameterInfo {
         if (uriData == null) {
             throw new ConversionException("Uri parameter is not found in DataStore.");
         }
-        return uriData.getSerializedValue();      
+        return uriData.getSerializedValue();
     }
 }

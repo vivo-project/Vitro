@@ -5,9 +5,6 @@ import static java.lang.String.format;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullProcedure;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
@@ -17,6 +14,8 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.ProcedureDescriptor;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ProcedureDescriptorCall;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class ProcedureCallOperation extends AbstractOperation {
 

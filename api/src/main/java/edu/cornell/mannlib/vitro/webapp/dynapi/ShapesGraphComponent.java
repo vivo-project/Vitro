@@ -5,7 +5,7 @@ import org.topbraid.shacl.engine.ShapesGraph;
 public class ShapesGraphComponent {
 
     ShapesGraph graph;
-   
+
     public ShapesGraph getGraph() {
         return graph;
     }
@@ -17,5 +17,5 @@ public class ShapesGraphComponent {
     public ShapesGraph getShapesGraph() {
         return graph;
     }
-    
+
 }

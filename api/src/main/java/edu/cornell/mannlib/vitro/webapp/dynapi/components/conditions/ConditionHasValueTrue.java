@@ -14,14 +14,14 @@ public class ConditionHasValueTrue implements Condition {
 
     private static final String TRUE_STRING_REPRESENTATION = "true";
     private Parameters inputParams = new Parameters();
-    
+
     @Override
     public boolean isSatisfied(DataStore data) {
         for (String name : SimpleDataView.getNames(inputParams)) {
-        	String value = SimpleDataView.getStringRepresentation(name, data);
-			if (!TRUE_STRING_REPRESENTATION.equals(value)) {
-				return false;
-			}
+            String value = SimpleDataView.getStringRepresentation(name, data);
+            if (!TRUE_STRING_REPRESENTATION.equals(value)) {
+                return false;
+            }
         }
         return true;
     }
@@ -30,7 +30,7 @@ public class ConditionHasValueTrue implements Condition {
     public Parameters getInputParams() {
         return inputParams;
     }
-    
+
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#requiresParameter", minOccurs = 1)
     public void addInputParameter(Parameter param) {
         inputParams.add(param);

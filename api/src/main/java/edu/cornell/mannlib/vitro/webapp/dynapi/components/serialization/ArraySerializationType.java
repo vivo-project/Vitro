@@ -1,9 +1,8 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization;
 
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-
-import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class ArraySerializationType extends SerializationType {
 
@@ -28,17 +27,12 @@ public class ArraySerializationType extends SerializationType {
         }
         ArraySerializationType compared = (ArraySerializationType) object;
 
-        return new EqualsBuilder()
-                .append(getName(), compared.getName())
-                .append(getElementsType(), compared.getElementsType())
-                .isEquals();
+        return new EqualsBuilder().append(getName(), compared.getName()).append(getElementsType(), compared
+                .getElementsType()).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(19, 105)
-                .append(getName())
-                .append(getElementsType())
-                .toHashCode();
+        return new HashCodeBuilder(19, 105).append(getName()).append(getElementsType()).toHashCode();
     }
 }

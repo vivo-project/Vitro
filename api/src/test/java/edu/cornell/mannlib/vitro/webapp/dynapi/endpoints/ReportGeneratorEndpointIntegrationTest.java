@@ -16,26 +16,8 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
 
-import org.apache.jena.ontology.OntModel;
-import org.apache.jena.ontology.OntModelSpec;
-import org.apache.jena.ontology.impl.OntModelImpl;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.docx4j.openpackaging.io.SaveToZipFile;
-import org.docx4j.openpackaging.packages.SpreadsheetMLPackage;
-import org.docx4j.openpackaging.parts.DocPropsCustomPart;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mockito.MockedStatic;
-
 import com.haulmont.yarg.formatters.impl.XlsxFormatter;
 import com.haulmont.yarg.reporting.Reporting;
-
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.dynapi.Endpoint;
 import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
@@ -53,58 +35,79 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.Converter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.ontology.impl.OntModelImpl;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.docx4j.openpackaging.io.SaveToZipFile;
+import org.docx4j.openpackaging.packages.SpreadsheetMLPackage;
+import org.docx4j.openpackaging.parts.DocPropsCustomPart;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.mockito.MockedStatic;
 
 @RunWith(Parameterized.class)
 public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
 
     private static final String REPORT_GENERATOR_URI = "resource_id";
-    private static final String RESOURCES_PATH = "src/test/resources/edu/cornell/mannlib/vitro/webapp/dynapi/components/";
-	private static final String CREATE_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_create_report_generator.n3";
-	private static final String EXECUTE_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_execute_report_generator.n3";
+    private static final String RESOURCES_PATH =
+            "src/test/resources/edu/cornell/mannlib/vitro/webapp/dynapi/components/";
+    private static final String CREATE_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_create_report_generator.n3";
+    private static final String EXECUTE_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_execute_report_generator.n3";
     private static final String DELETE_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_delete_report_generator.n3";
     private static final String LIST_REPORT_GENERATORS_PROCEDURE = "endpoint_procedure_list_report_generators.n3";
     private static final String GET_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_get_report_generator.n3";
-    private static final String EXPORT_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_export_report_generator.n3"; 
-    private static final String IMPORT_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_import_report_generator.n3"; 
-	private static final String REPORT_ENDPOINT_INPUT = RESOURCES_PATH + "endpoint_procedure_create_report_generator_input1.n3";
-    private static final String REPORT_ENDPOINT_INPUT2 = RESOURCES_PATH + "endpoint_procedure_create_report_generator_input2.n3";
+    private static final String EXPORT_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_export_report_generator.n3";
+    private static final String IMPORT_REPORT_GENERATOR_PROCEDURE = "endpoint_procedure_import_report_generator.n3";
+    private static final String REPORT_ENDPOINT_INPUT = RESOURCES_PATH +
+            "endpoint_procedure_create_report_generator_input1.n3";
+    private static final String REPORT_ENDPOINT_INPUT2 = RESOURCES_PATH +
+            "endpoint_procedure_create_report_generator_input2.n3";
 
-	private static final String REPORT_ENDPOINT_DATA = RESOURCES_PATH + "endpoint_procedure_create_report_generator_demo_data.n3" ; 
+    private static final String REPORT_ENDPOINT_DATA = RESOURCES_PATH +
+            "endpoint_procedure_create_report_generator_demo_data.n3";
 
-	private static MockedStatic<DynapiModelFactory> dynapiModelFactory;
+    private static MockedStatic<DynapiModelFactory> dynapiModelFactory;
 
-	OntModel storeModel = ModelFactory.createOntologyModel();
+    OntModel storeModel = ModelFactory.createOntologyModel();
 
     @org.junit.runners.Parameterized.Parameter(0)
     public String inputFileName;
-    
+
     @org.junit.runners.Parameterized.Parameter(1)
     public String dataFileName;
-	
+
     @AfterClass
     public static void after() {
         dynapiModelFactory.close();
     }
-    
+
     @BeforeClass
     public static void before() {
         dynapiModelFactory = mockStatic(DynapiModelFactory.class);
     }
 
-	@Before
-	public void beforeEach() {
+    @Before
+    public void beforeEach() {
         LoggingControl.offLog(Reporting.class);
         LoggingControl.offLog(XlsxFormatter.class);
         LoggingControl.offLog(SpreadsheetMLPackage.class);
         LoggingControl.offLog(DocPropsCustomPart.class);
         LoggingControl.offLog(SaveToZipFile.class);
         LoggingControl.offLogs();
-		storeModel = new OntModelImpl(OntModelSpec.OWL_MEM);
-        dynapiModelFactory.when(() -> DynapiModelFactory.getModel(eq("http://vitro.mannlib.cornell.edu/default/dynamic-api-abox"))).thenReturn(ontModel);
+        storeModel = new OntModelImpl(OntModelSpec.OWL_MEM);
+        dynapiModelFactory.when(() -> DynapiModelFactory.getModel(eq(
+                "http://vitro.mannlib.cornell.edu/default/dynamic-api-abox"))).thenReturn(ontModel);
         dynapiModelFactory.when(() -> DynapiModelFactory.getModel(eq("vitro:jenaOntModel"))).thenReturn(storeModel);
 
-	}
-	
+    }
+
     @After
     public void reset() {
         setup();
@@ -126,25 +129,27 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
         procedurePool.init(servletContext);
         return procedurePool;
     }
-    
+
     @Test
-    public void test() throws ConfigurationBeanLoaderException, IOException, ConversionException, InitializationException {
+    public void test() throws ConfigurationBeanLoaderException, IOException, ConversionException,
+            InitializationException {
         ProcedurePool procedurePool = initWithDefaultModel();
         DataStore store = null;
-        long initialModelSize ;
-        long initialProcedureCount ;
-        Model generatorConfiguration ;
+        long initialModelSize;
+        long initialProcedureCount;
+        Model generatorConfiguration;
         UserAccount user = new UserAccount();
         user.setRootUser(true);
         boolean manualDebugging = false;
-        
+
         long modelSizeWithReportGenerator;
         long procedureCountWithReportGenerator;
-        try(Procedure procedure = procedurePool.getByUri("https://vivoweb.org/procedure/create_report_generator")) { 
+        try (Procedure procedure = procedurePool.getByUri("https://vivoweb.org/procedure/create_report_generator")) {
             assertFalse(procedure instanceof NullProcedure);
             assertTrue(procedure.isValid());
             initialModelSize = ontModel.size();
-            initialProcedureCount = procedurePool.count();;
+            initialProcedureCount = procedurePool.count();
+            ;
             Parameters internal = procedure.getInternalParams();
             store = new DataStore();
             store.setUser(user);
@@ -155,7 +160,7 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
             procedureCountWithReportGenerator = procedurePool.count();
             assertTrue(modelSizeWithReportGenerator > initialModelSize);
             assertTrue(procedureCountWithReportGenerator > initialProcedureCount);
-            
+
             Data modelData = store.getData("report_generator_configuration_graph");
             generatorConfiguration = (Model) TestView.getObject(modelData);
             assertFalse(generatorConfiguration.isEmpty());
@@ -166,16 +171,17 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
             }
         } finally {
             if (store != null) {
-                store.removeDependencies();    
+                store.removeDependencies();
             }
         }
-        
+
         DataStore reportStore = new DataStore();
         reportStore.setUser(user);
         Data uriData = store.getData(REPORT_GENERATOR_URI);
         assertTrue(uriData != null);
         reportStore.addData(uriData.getParam().getName(), uriData);
-        try(Procedure reportGenerator = procedurePool.getByUri("https://vivoweb.org/procedure/execute_report_generator");){
+        try (Procedure reportGenerator = procedurePool.getByUri(
+                "https://vivoweb.org/procedure/execute_report_generator");) {
             Parameters reportInternalParams = reportGenerator.getInternalParams();
             Converter.convertInternalParams(reportInternalParams, reportStore);
             assertTrue(OperationResult.ok().equals(reportGenerator.run(reportStore)));
@@ -187,14 +193,15 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
                 File file = new File(RESOURCES_PATH + "create-report-generator-integration-test-report.xlsx");
                 try (OutputStream os = new FileOutputStream(file)) {
                     os.write(reportBytes);
-                }   
+                }
             }
         }
         DataStore listReportStore = new DataStore();
         listReportStore.setUser(user);
         listReportStore.addData(uriData.getParam().getName(), uriData);
 
-        try(Procedure listReportGenerators = procedurePool.getByUri("https://vivoweb.org/procedure/list_report_generators");){
+        try (Procedure listReportGenerators = procedurePool.getByUri(
+                "https://vivoweb.org/procedure/list_report_generators");) {
             Parameters internalParams = listReportGenerators.getInternalParams();
             Converter.convertInternalParams(internalParams, listReportStore);
             assertTrue(OperationResult.ok().equals(listReportGenerators.run(listReportStore)));
@@ -205,12 +212,13 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
                 System.out.println(reports);
             }
         }
-        
+
         DataStore getReportStore = new DataStore();
         getReportStore.setUser(user);
         getReportStore.addData(uriData.getParam().getName(), uriData);
 
-        try(Procedure getReportGenerator = procedurePool.getByUri("https://vivoweb.org/procedure/get_report_generator");){
+        try (Procedure getReportGenerator = procedurePool.getByUri(
+                "https://vivoweb.org/procedure/get_report_generator");) {
             Parameters internalParams = getReportGenerator.getInternalParams();
             Converter.convertInternalParams(internalParams, getReportStore);
             assertTrue(OperationResult.ok().equals(getReportGenerator.run(getReportStore)));
@@ -224,12 +232,13 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
                 System.out.println(report);
             }
         }
-        
-        DataStore exportReportStore = new DataStore() ;
+
+        DataStore exportReportStore = new DataStore();
         exportReportStore.setUser(user);
         Data exportedData;
         exportReportStore.addData(uriData.getParam().getName(), uriData);
-        try(Procedure exportReportGenerator = procedurePool.getByUri("https://vivoweb.org/procedure/export_report_generator");){
+        try (Procedure exportReportGenerator = procedurePool.getByUri(
+                "https://vivoweb.org/procedure/export_report_generator");) {
             Parameters internalParams = exportReportGenerator.getInternalParams();
             Converter.convertInternalParams(internalParams, exportReportStore);
             assertTrue(OperationResult.ok().equals(exportReportGenerator.run(exportReportStore)));
@@ -238,19 +247,22 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
             Model notAddedData = generatorConfiguration.difference(exportedModel);
             Model excessivelyAddedData = exportedModel.difference(generatorConfiguration);
             if (manualDebugging) {
-                System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" + excessivelyAddedData.size());
-                excessivelyAddedData.write(System.out,"n3");
-                System.out.println("------------------------------------------------------------" + notAddedData.size());
-                notAddedData.write(System.out,"n3");
+                System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" +
+                        excessivelyAddedData.size());
+                excessivelyAddedData.write(System.out, "n3");
+                System.out.println("------------------------------------------------------------" +
+                        notAddedData.size());
+                notAddedData.write(System.out, "n3");
             }
             assertTrue(notAddedData.isEmpty());
             assertTrue(excessivelyAddedData.isEmpty());
         }
-        
+
         DataStore deleteReportStore = new DataStore();
         deleteReportStore.setUser(user);
         deleteReportStore.addData(uriData.getParam().getName(), uriData);
-        try(Procedure deleteReportGenerator = procedurePool.getByUri("https://vivoweb.org/procedure/delete_report_generator");){
+        try (Procedure deleteReportGenerator = procedurePool.getByUri(
+                "https://vivoweb.org/procedure/delete_report_generator");) {
             Parameters internalParams = deleteReportGenerator.getInternalParams();
             Converter.convertInternalParams(internalParams, deleteReportStore);
             assertTrue(OperationResult.ok().equals(deleteReportGenerator.run(deleteReportStore)));
@@ -259,31 +271,34 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
             Model notRemoved = generatorConfiguration.difference(removeModel);
             Model excessivelyRemoved = removeModel.difference(generatorConfiguration);
             if (manualDebugging) {
-                System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" + excessivelyRemoved.size());
-                excessivelyRemoved.write(System.out,"n3");
+                System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" +
+                        excessivelyRemoved.size());
+                excessivelyRemoved.write(System.out, "n3");
                 System.out.println("------------------------------------------------------------" + notRemoved.size());
-                notRemoved.write(System.out,"n3");
+                notRemoved.write(System.out, "n3");
             }
             assertTrue(notRemoved.isEmpty());
             assertTrue(excessivelyRemoved.isEmpty());
             assertTrue(ontModel.size() == initialModelSize);
             assertTrue(procedurePool.count() == initialProcedureCount);
         }
-        
+
         reportStore = new DataStore();
         reportStore.setUser(user);
         assertTrue(uriData != null);
         reportStore.addData(uriData.getParam().getName(), uriData);
-        try(Procedure reportGenerator = procedurePool.getByUri("https://vivoweb.org/procedure/execute_report_generator");){
+        try (Procedure reportGenerator = procedurePool.getByUri(
+                "https://vivoweb.org/procedure/execute_report_generator");) {
             Parameters reportInternalParams = reportGenerator.getInternalParams();
             Converter.convertInternalParams(reportInternalParams, reportStore);
             OperationResult result = reportGenerator.run(reportStore);
             assertTrue((new OperationResult(404)).equals(result));
         }
-        
-        DataStore importReportStore = new DataStore() ;
+
+        DataStore importReportStore = new DataStore();
         importReportStore.addData(exportedData.getParam().getName(), exportedData);
-        try(Procedure importReportGenerator = procedurePool.getByUri("https://vivoweb.org/procedure/import_report_generator");){
+        try (Procedure importReportGenerator = procedurePool.getByUri(
+                "https://vivoweb.org/procedure/import_report_generator");) {
             Parameters internalParams = importReportGenerator.getInternalParams();
             Converter.convertInternalParams(internalParams, importReportStore);
             assertTrue(OperationResult.ok().equals(importReportGenerator.run(importReportStore)));
@@ -294,14 +309,14 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
         }
     }
 
-	protected void loadModel(Model model, String... files) throws IOException {
-		for (String file : files) {
-			String rdf = readFile(file);
-			model.read(new StringReader(rdf), null, "n3");
-		}
-	}
+    protected void loadModel(Model model, String... files) throws IOException {
+        for (String file : files) {
+            String rdf = readFile(file);
+            model.read(new StringReader(rdf), null, "n3");
+        }
+    }
 
-	public void loadOntology(OntModel ontModel) throws IOException {
+    public void loadOntology(OntModel ontModel) throws IOException {
         loadModel(ontModel, IMPLEMENTATION_FILE_PATH);
         loadModel(ontModel, ONTOLOGY_FILE_PATH);
         loadModel(ontModel, getFileList(ABOX_PREFIX));
@@ -315,13 +330,12 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
 
         loadModel(ontModel, inputFileName);
         loadModel(storeModel, dataFileName);
-	}
-	
-	@Parameterized.Parameters
+    }
+
+    @Parameterized.Parameters
     public static Collection<Object[]> requests() {
         return Arrays.asList(new Object[][] {
-            {REPORT_ENDPOINT_INPUT, REPORT_ENDPOINT_DATA},
-            {REPORT_ENDPOINT_INPUT2, REPORT_ENDPOINT_DATA},
-        });
+                { REPORT_ENDPOINT_INPUT, REPORT_ENDPOINT_DATA },
+                { REPORT_ENDPOINT_INPUT2, REPORT_ENDPOINT_DATA }, });
     }
 }

@@ -7,19 +7,18 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-
 public class ShapesGraphPool {
-    
+
     private final Log log = LogFactory.getLog(this.getClass());
     private static ShapesGraphPool INSTANCE = new ShapesGraphPool();
     private static final Object mutex = new Object();
-    
+
     public static ShapesGraphPool getInstance() {
         return INSTANCE;
     }
-    
-    private ConcurrentSkipListMap<String,ShapesGraphComponent> components = new ConcurrentSkipListMap<>();
-    
+
+    private ConcurrentSkipListMap<String, ShapesGraphComponent> components = new ConcurrentSkipListMap<>();
+
     public ShapesGraphComponent get(String key) {
         if (key == null) {
             return null;
@@ -30,7 +29,7 @@ public class ShapesGraphPool {
         }
         return component;
     }
-    
+
     public void add(String name, ShapesGraphComponent component) {
         log.info(format("Adding ShapesGraph with name %s", name));
         synchronized (mutex) {
@@ -47,13 +46,13 @@ public class ShapesGraphPool {
             components.remove(name);
         }
     }
-    
+
     public void clear() {
         synchronized (mutex) {
             components.clear();
         }
     }
-    
+
     public int count() {
         return components.size();
     }

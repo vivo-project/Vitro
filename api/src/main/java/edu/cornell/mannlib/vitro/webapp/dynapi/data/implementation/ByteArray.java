@@ -4,25 +4,25 @@ import java.util.Base64;
 
 public class ByteArray {
 
-	private byte[] array;
+    private byte[] array;
 
-	public ByteArray(byte[] array) {
-		this.array = array;
-	}
+    public ByteArray(byte[] array) {
+        this.array = array;
+    }
 
-	public byte[] get() {
-		return array;
-	}
+    public byte[] get() {
+        return array;
+    }
 
-	public String serialize() {
-		byte[] bytes = Base64.getEncoder().encode(array);
-		String result = new String(bytes);
-		return result;
-	}
+    public String serialize() {
+        byte[] bytes = Base64.getEncoder().encode(array);
+        String result = new String(bytes);
+        return result;
+    }
 
-	public static ByteArray deserialize(String input) {
-		byte[] array = Base64.getDecoder().decode(input);
-		ByteArray byteArray = new ByteArray(array);
-		return byteArray;
-	}
+    public static ByteArray deserialize(String input) {
+        byte[] array = Base64.getDecoder().decode(input);
+        ByteArray byteArray = new ByteArray(array);
+        return byteArray;
+    }
 }

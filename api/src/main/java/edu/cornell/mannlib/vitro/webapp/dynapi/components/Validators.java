@@ -3,11 +3,10 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.Validator;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class Validators implements Removable {
 

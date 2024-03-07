@@ -17,6 +17,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
 import org.junit.After;
@@ -28,25 +33,18 @@ import org.mockito.MockedStatic;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
-
 @RunWith(MockitoJUnitRunner.class)
 public class RPCEndpointTest {
 
     private final static String PATH_INFO = "/test";
 
     private Map<String, String[]> params;
-    
+
     private ByteArrayOutputStream baos;
 
     private MockedStatic<ProcedurePool> actionPoolStatic;
-    
-    private MockedStatic<RPCPool> rpcPoolStatic;
 
+    private MockedStatic<RPCPool> rpcPoolStatic;
 
     private RPCEndpoint rpcEndpoint;
 
@@ -55,13 +53,13 @@ public class RPCEndpointTest {
 
     @Mock
     private UserAccount user;
-    
+
     @Mock
     private ProcedurePool procedurePool;
-    
+
     @Mock
     private RPCPool rpcApiPool;
-    
+
     @Mock
     private RPC rpc;
 
@@ -84,10 +82,9 @@ public class RPCEndpointTest {
         when(RPCPool.getInstance()).thenReturn(rpcApiPool);
 
         when(procedurePool.get(any(String.class))).thenReturn(procedure);
-        
+
         when(rpcApiPool.get(any(String.class))).thenReturn(rpc);
         when(rpc.getProcedureUri()).thenReturn("procedure_uri");
-
 
         when(request.getParameterMap()).thenReturn(params);
         when(request.getSession(false)).thenReturn(session);
@@ -95,7 +92,7 @@ public class RPCEndpointTest {
         when(user.isRootUser()).thenReturn(true);
 
         rpcEndpoint = new RPCEndpoint();
-        
+
     }
 
     @After

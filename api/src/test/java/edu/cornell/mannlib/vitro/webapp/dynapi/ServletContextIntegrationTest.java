@@ -31,9 +31,9 @@ public abstract class ServletContextIntegrationTest extends ServletContextTest {
         return readFile(getTestFilePath(path));
     }
 
-	protected String getTestFilePath(String path) {
-		return "src/test/resources/dynapi/mock/" + path;
-	}
+    protected String getTestFilePath(String path) {
+        return "src/test/resources/dynapi/mock/" + path;
+    }
 
     protected InputStream readMockFileAsInputStream(String path) throws IOException {
         return readFileAsInputStream(getTestFilePath(path));
@@ -41,7 +41,7 @@ public abstract class ServletContextIntegrationTest extends ServletContextTest {
 
     protected void mockParameterIntoMap(String name, String value) {
         if (value == null) {
-            parameterMap.put(name, new String[] { });
+            parameterMap.put(name, new String[] {});
         } else {
             parameterMap.put(name, new String[] { value });
         }
@@ -61,7 +61,8 @@ public abstract class ServletContextIntegrationTest extends ServletContextTest {
         });
     }
 
-    protected void runCallback(Method callback) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    protected void runCallback(Method callback)
+            throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         if (callback != null) {
             callback.invoke(this);
         }

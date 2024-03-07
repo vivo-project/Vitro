@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.InputMismatchException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
@@ -18,6 +15,8 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineExcepti
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class SolrQuery extends AbstractOperation {
     private static final Log log = LogFactory.getLog(SolrQuery.class);
@@ -133,13 +132,12 @@ public class SolrQuery extends AbstractOperation {
 
         return OperationResult.ok();
     }
-    
+
     public boolean isValid() {
         return true;
     }
 
-    private SearchQuery createSearchQuery(DataStore dataStore)
-            throws InputMismatchException, IllegalArgumentException {
+    private SearchQuery createSearchQuery(DataStore dataStore) throws InputMismatchException, IllegalArgumentException {
         SearchQuery searchQuery = ApplicationUtils.instance().getSearchEngine().createQuery();
 
         if (queryText != null) {
@@ -160,25 +158,23 @@ public class SolrQuery extends AbstractOperation {
         for (String sort : sorts) {
             sort = replaceVariablesWithInput(sort, dataStore);
             String[] sortTokens = sort.trim().split(" ");
-            searchQuery = searchQuery.addSortField(sortTokens[0], SearchQuery.Order.valueOf(sortTokens[sortTokens.length - 1].toUpperCase()));
+            searchQuery = searchQuery.addSortField(sortTokens[0], SearchQuery.Order.valueOf(sortTokens[sortTokens.length
+                    - 1].toUpperCase()));
         }
         return searchQuery;
     }
 
-    private String replaceVariablesWithInput(String property, DataStore dataStore)
-            throws InputMismatchException {
+    private String replaceVariablesWithInput(String property, DataStore dataStore) throws InputMismatchException {
 
-        String[] propertyVariables = Arrays.stream(property.split(":| |,"))
-                .filter(propertySegment -> propertySegment.startsWith("?"))
-                .map(propertyVariable -> propertyVariable.substring(1))
-                .toArray(String[]::new);
+        String[] propertyVariables = Arrays.stream(property.split(":| |,")).filter(propertySegment -> propertySegment
+                .startsWith("?")).map(propertyVariable -> propertyVariable.substring(1)).toArray(String[]::new);
 
         for (String propertyVar : propertyVariables) {
-            if (!dataStore.contains(propertyVar) ) {
+            if (!dataStore.contains(propertyVar)) {
                 throw new InputMismatchException("Data store doesn't contain value " + propertyVar);
             }
-            if ( ArrayView.isMultiValuedArray(dataStore, propertyVar)) {
-            	throw new InputMismatchException(propertyVar + " is multivalued array");
+            if (ArrayView.isMultiValuedArray(dataStore, propertyVar)) {
+                throw new InputMismatchException(propertyVar + " is multivalued array");
             }
             property = property.replace("?" + propertyVar, StringView.getFirstStringValue(dataStore, propertyVar));
         }

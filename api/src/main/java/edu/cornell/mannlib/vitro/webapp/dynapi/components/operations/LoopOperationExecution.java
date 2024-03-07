@@ -4,9 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
@@ -16,6 +13,8 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.Converter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class LoopOperationExecution extends ProcedureDescriptorCall {
 
@@ -72,12 +71,13 @@ public class LoopOperationExecution extends ProcedureDescriptorCall {
         return true;
     }
 
-    private boolean isConditionSatisfied(ProcedureDescriptor conditionDescriptor, DataStore loopStore) throws ConversionException {
+    private boolean isConditionSatisfied(ProcedureDescriptor conditionDescriptor, DataStore loopStore)
+            throws ConversionException {
         DataStore localStore = new DataStore();
         String uri = conditionDescriptor.getUri();
         Procedure conditionCheck = loopStore.getDependency(uri);
-        initilaizeLocalStore(loopStore, localStore, conditionDescriptor.getInputParams(),
-                conditionCheck.getInternalParams());
+        initilaizeLocalStore(loopStore, localStore, conditionDescriptor.getInputParams(), conditionCheck
+                .getInternalParams());
         OperationResult result = conditionCheck.run(localStore);
         if (result.hasError()) {
             throw new RuntimeException(formatErrorMessage(conditionDescriptor, uri));
@@ -88,6 +88,5 @@ public class LoopOperationExecution extends ProcedureDescriptorCall {
         }
         return false;
     }
-
 
 }

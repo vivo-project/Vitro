@@ -3,11 +3,6 @@ package edu.cornell.mannlib.vitro.webapp.dynapi;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import org.junit.Test;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.IsInteger;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.IsNotBlank;
@@ -19,11 +14,9 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer.Type;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.JsonContainerArrayParam;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.StringParam;
+import org.junit.Test;
 
 public class ValidatorsTest {
 
@@ -133,25 +126,25 @@ public class ValidatorsTest {
         String[] values3 = { "uns.ac.rs" };
         assertFalse(validator1.isValid(fieldName, createData(values3)));
     }
-    
+
     public Data createData(Object input) throws Exception {
-    	if (input instanceof String[]) {
+        if (input instanceof String[]) {
             Parameter param = new JsonContainerArrayParam("no-name");
             Data data = new Data(param);
-			JsonContainer array = new JsonContainer(Type.ARRAY);
-			String[] inputArray = (String[]) input;
-			for (String element : inputArray) {
-			    Data elementData = createStringData(element);
+            JsonContainer array = new JsonContainer(Type.ARRAY);
+            String[] inputArray = (String[]) input;
+            for (String element : inputArray) {
+                Data elementData = createStringData(element);
                 array.addValue(elementData);
             }
-			TestView.setObject(data, array);
-			return data;
-    	} else {
-    	    Parameter param = new StringParam("no-name");
+            TestView.setObject(data, array);
+            return data;
+        } else {
+            Parameter param = new StringParam("no-name");
             Data data = new Data(param);
-			TestView.setObject(data,input);
-			return data;
-    	}
+            TestView.setObject(data, input);
+            return data;
+        }
     }
 
     private Data createStringData(String element) throws Exception {

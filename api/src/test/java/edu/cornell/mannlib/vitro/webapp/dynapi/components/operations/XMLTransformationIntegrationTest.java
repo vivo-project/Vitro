@@ -9,19 +9,9 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.jena.ontology.OntModel;
-import org.apache.jena.ontology.OntModelSpec;
-import org.apache.jena.ontology.impl.OntModelImpl;
-import org.apache.jena.rdf.model.Model;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ProcedurePool;
-import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullProcedure;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
@@ -32,13 +22,23 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionExcepti
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.StringParam;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.ontology.impl.OntModelImpl;
+import org.apache.jena.rdf.model.Model;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class XMLTransformationIntegrationTest extends ServletContextTest {
 
     private static final String TEST_PROCEDURE_URI = "test:xml-transformation-procedure";
     private static final String OUTPUT = "output";
-    private static final String RESOURCES_PATH = "src/test/resources/edu/cornell/mannlib/vitro/webapp/dynapi/components/operations/";
+    private static final String RESOURCES_PATH =
+            "src/test/resources/edu/cornell/mannlib/vitro/webapp/dynapi/components/operations/";
     private static final String TEST_PROCEDURE_FILE_PATH = RESOURCES_PATH + "xml-transformation-test-procedure.n3";
 
     Model storeModel;
@@ -76,8 +76,8 @@ public class XMLTransformationIntegrationTest extends ServletContextTest {
     }
 
     @Test
-    public void test()
-            throws ConfigurationBeanLoaderException, IOException, ConversionException, InitializationException {
+    public void test() throws ConfigurationBeanLoaderException, IOException, ConversionException,
+            InitializationException {
         loadModel(ontModel, TEST_PROCEDURE_FILE_PATH);
         ProcedurePool procedurePool = initWithDefaultModel();
         Procedure procedure = null;
@@ -116,12 +116,14 @@ public class XMLTransformationIntegrationTest extends ServletContextTest {
 
     @Parameterized.Parameters
     public static Collection<Object[]> requests() {
-        return Arrays
-                .asList(new Object[][] { { "<?xml version=\"1.0\" encoding=\"utf-8\"?><test><name>dynapi</name></test>",
-                        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-                                + "<xml xsl:version=\"2.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\">"
-                                + " <xsl:value-of select=\"concat(test/name/text(),' works')\"/>" + "</xml>",
-                        "<?xml version=\"1.0\" encoding=\"UTF-8\"?><xml>dynapi works</xml>" }, });
+        return Arrays.asList(new Object[][] {
+                {
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?><test><name>dynapi</name></test>",
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                    "<xml xsl:version=\"2.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\">" +
+                    " <xsl:value-of select=\"concat(test/name/text(),' works')\"/>" +
+                    "</xml>",
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?><xml>dynapi works</xml>" }, });
     }
 
     protected void loadModel(Model model, String... files) throws IOException {

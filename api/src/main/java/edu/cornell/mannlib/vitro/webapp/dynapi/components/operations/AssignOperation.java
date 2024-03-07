@@ -1,14 +1,13 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components.operations;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class AssignOperation extends AbstractOperation {
     private static final Log log = LogFactory.getLog(AssignOperation.class);
@@ -32,13 +31,13 @@ public class AssignOperation extends AbstractOperation {
     public OperationResult runOperation(DataStore dataStore) {
         Data targetData;
         if (dataStore.contains(targetParam.getName())) {
-            targetData = dataStore.getData(targetParam.getName());    
+            targetData = dataStore.getData(targetParam.getName());
         } else {
             targetData = new Data(targetParam);
         }
         Data assignableData = dataStore.getData(assignableParam.getName());
         targetData.copyObject(assignableData);
-        if (!dataStore.contains(targetParam.getName())){
+        if (!dataStore.contains(targetParam.getName())) {
             dataStore.addData(targetParam.getName(), targetData);
         }
         return OperationResult.ok();
@@ -60,8 +59,8 @@ public class AssignOperation extends AbstractOperation {
         ParameterType assignableType = assignableParam.getType();
         ParameterType targetType = targetParam.getType();
         if (!assignableType.equals(targetType)) {
-            log.error(String.format("assignable '%s' and target '%s' parameters are not compatible",
-                    assignableParam.getName(), targetParam.getName()));
+            log.error(String.format("assignable '%s' and target '%s' parameters are not compatible", assignableParam
+                    .getName(), targetParam.getName()));
             return false;
         }
         return true;
