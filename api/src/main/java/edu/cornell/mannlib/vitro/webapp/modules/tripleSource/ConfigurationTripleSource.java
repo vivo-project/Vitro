@@ -15,8 +15,6 @@ import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_TB
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_DISPLAY_FIRSTTIME_BACKUP;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.INTERFACE_I18N ;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.INTERFACE_I18N_FIRSTTIME_BACKUP;
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.ACCESS_CONTROL;
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.ACCESS_CONTROL_FIRSTTIME_BACKUP;
 
 
 
@@ -44,8 +42,6 @@ public abstract class ConfigurationTripleSource implements TripleSource {
 			DISPLAY_DISPLAY_FIRSTTIME_BACKUP, 
 			INTERFACE_I18N,
 			INTERFACE_I18N_FIRSTTIME_BACKUP,
-			ACCESS_CONTROL, 
-			ACCESS_CONTROL_FIRSTTIME_BACKUP,
 	};
 
 	/**
