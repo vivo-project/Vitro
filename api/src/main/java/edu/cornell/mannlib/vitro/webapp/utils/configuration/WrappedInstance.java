@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
@@ -43,16 +42,11 @@ public class WrappedInstance<T> {
 	 * null. If the instance expects request models, an exception will be
 	 * thrown.
 	 */
-	public void satisfyInterfaces(ServletContext ctx, HttpServletRequest req)
+	public void satisfyInterfaces(HttpServletRequest req)
 			throws ResourceUnavailableException {
 		if (instance instanceof ContextModelsUser) {
-			if (ctx == null) {
-				throw new ResourceUnavailableException("Cannot satisfy "
-						+ "ContextModelsUser interface: context not available.");
-			} else {
-				ContextModelsUser cmu = (ContextModelsUser) instance;
-				cmu.setContextModels(ModelAccess.on(ctx));
-			}
+			ContextModelsUser cmu = (ContextModelsUser) instance;
+			cmu.setContextModels(ModelAccess.getInstance());
 		}
 		if (instance instanceof RequestModelsUser) {
 			if (req == null) {
@@ -64,13 +58,8 @@ public class WrappedInstance<T> {
 			}
 		}
 		if (instance instanceof ConfigurationReader) {
-			if (ctx == null) {
-				throw new ResourceUnavailableException("Cannot satisfy "
-						+ "ConfigurationReader interface: context not available.");
-			} else {
-				ConfigurationReader cr = (ConfigurationReader) instance;
-				cr.setConfigurationProperties(ConfigurationProperties.getBean(ctx));
-			}
+			ConfigurationReader cr = (ConfigurationReader) instance;
+			cr.setConfigurationProperties(ConfigurationProperties.getInstance());
 		}
 	}
 

@@ -268,31 +268,6 @@ public class ConfigurationBeanLoaderTest extends
 	// --------------------------------------------
 
 	@Test
-	public void loaderCantSatisfyContextModelsUser_throwsException()
-			throws ConfigurationBeanLoaderException {
-		model.add(typeStatement(GENERIC_INSTANCE_URI,
-				toJavaUri(NeedsContextModels.class)));
-
-		loader = noContextLoader;
-
-		expectSimpleFailure(
-				NeedsContextModels.class,
-				throwable(ConfigurationBeanLoaderException.class,
-						"Failed to load"),
-				throwable(ResourceUnavailableException.class,
-						"Cannot satisfy ContextModelsUser"));
-	}
-
-	public static class NeedsContextModels implements ContextModelsUser {
-		@Override
-		public void setContextModels(ContextModelAccess models) {
-			// Nothing to do
-		}
-	}
-
-	// --------------------------------------------
-
-	@Test
 	public void loaderCantSatisfyRequestModelsUser_throwsException()
 			throws ConfigurationBeanLoaderException {
 		model.add(typeStatement(GENERIC_INSTANCE_URI,
