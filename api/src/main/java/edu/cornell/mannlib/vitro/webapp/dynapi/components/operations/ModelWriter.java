@@ -12,6 +12,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.ModelView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.AdditionsAndRetractions;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.ProcessRdfForm;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 public class ModelWriter extends AbstractOperation{
@@ -53,7 +54,8 @@ public class ModelWriter extends AbstractOperation{
 		List<Model> retractions = ModelView.getExistingModels(retractionModelParams, dataStore);
 		Model target = ModelView.getModel(dataStore, targetModelParam);
 		AdditionsAndRetractions changes = new AdditionsAndRetractions(additions, retractions);
-		ProcessRdfForm.applyChangesToWriteModel(changes, null, target, dataStore.getUserUri());
+		RDFServiceModel rdfService = new RDFServiceModel(target);
+		ProcessRdfForm.applyChangesToWriteModel(changes, rdfService, "", dataStore.getUserUri());
 		return OperationResult.ok();
 	}
 
