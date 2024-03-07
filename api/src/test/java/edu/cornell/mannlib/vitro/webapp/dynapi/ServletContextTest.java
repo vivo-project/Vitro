@@ -57,7 +57,7 @@ public abstract class ServletContextTest {
 
         DynapiModelProvider.getInstance().setModel(ontModel);
 
-        loader = new ConfigurationBeanLoader(ontModel, servletContext);
+        loader = new ConfigurationBeanLoader(ontModel);
     }
 
     protected void loadTestModel() throws IOException {

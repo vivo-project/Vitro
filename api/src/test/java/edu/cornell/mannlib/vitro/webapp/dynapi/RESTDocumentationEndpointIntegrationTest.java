@@ -75,10 +75,6 @@ public class RESTDocumentationEndpointIntegrationTest extends ServletContextInte
         resourceAPIPool.init(servletContext);
         resourceAPIPool.reload();
 
-        DynamicAPIDocumentation dynamicAPIDocumentation = DynamicAPIDocumentation.getInstance();
-
-        dynamicAPIDocumentation.init(servletContext);
-
         MockitoAnnotations.openMocks(this);
     }
 

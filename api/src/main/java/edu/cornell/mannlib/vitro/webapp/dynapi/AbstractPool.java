@@ -202,7 +202,7 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
 
     public void init(ServletContext ctx) {
         this.ctx = ctx;
-        loader = new ConfigurationBeanLoader(DynapiModelProvider.getInstance().getModel(), ctx);
+        loader = new ConfigurationBeanLoader(DynapiModelProvider.getInstance().getModel());
         log.debug("Context Initialization ...");
         loadComponents(components);
     }

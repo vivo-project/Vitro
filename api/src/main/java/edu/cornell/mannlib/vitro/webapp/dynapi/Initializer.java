@@ -17,11 +17,6 @@ public class Initializer implements ServletContextListener {
 
     }
 
-    private void initializeDynamicAPIDocumentation(ServletContext ctx) {
-        DynamicAPIDocumentation dynamicAPIDocumentation = DynamicAPIDocumentation.getInstance();
-        dynamicAPIDocumentation.init(ctx);
-    }
-
     private void initializeResourcePool(ServletContext ctx) {
         ResourceAPIPool resourceAPIPool = ResourceAPIPool.getInstance();
         resourceAPIPool.init(ctx);
@@ -45,7 +40,6 @@ public class Initializer implements ServletContextListener {
         initializeProcedurePool(ctx);
         initializeRPCPool(ctx);
         initializeResourcePool(ctx);
-        initializeDynamicAPIDocumentation(ctx);
         initializeDynamicAPIModelFactory(ctx);
     }
 

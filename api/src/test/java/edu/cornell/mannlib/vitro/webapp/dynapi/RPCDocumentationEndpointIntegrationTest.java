@@ -72,10 +72,6 @@ public class RPCDocumentationEndpointIntegrationTest extends ServletContextInteg
         rpcPool.init(servletContext);
         rpcPool.reload();
 
-        DynamicAPIDocumentation dynamicAPIDocumentation = DynamicAPIDocumentation.getInstance();
-
-        dynamicAPIDocumentation.init(servletContext);
-
         MockitoAnnotations.openMocks(this);
     }
 

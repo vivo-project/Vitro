@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -60,14 +58,10 @@ public class DynamicAPIDocumentation {
 
     private final static DynamicAPIDocumentation INSTANCE = new DynamicAPIDocumentation();
 
-    private ConfigurationBeanLoader loader;
+    private ConfigurationBeanLoader loader = new ConfigurationBeanLoader(DynapiModelProvider.getInstance().getModel());;
 
     public static DynamicAPIDocumentation getInstance() {
         return INSTANCE;
-    }
-
-    public void init(ServletContext ctx) {
-        loader = new ConfigurationBeanLoader(DynapiModelProvider.getInstance().getModel(), ctx);
     }
 
     public OpenAPI generate(DocsRequestPath requestPath) throws ConfigurationBeanLoaderException {
