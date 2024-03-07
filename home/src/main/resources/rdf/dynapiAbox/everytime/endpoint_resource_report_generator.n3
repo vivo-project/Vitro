@@ -23,19 +23,19 @@
         a                                   dynapi:CustomRESTAction ;
         rdfs:label                          "Execute report generator"@en-US ;
         dynapi:name                         "execute_report_generator" ;
-        dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put> ;
+        dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
         dynapi:forwardsTo                   <https://vivoweb.org/procedure/execute_report_generator> .
         
 <https://vivoweb.org/custom_actions/export_report_generator>
         a                                   dynapi:CustomRESTAction ;
         rdfs:label                          "Export report generator"@en-US ;
         dynapi:name                         "export_report_generator" ;
-        dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put> ;
+        dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
         dynapi:forwardsTo                   <https://vivoweb.org/procedure/export_report_generator> .
 
 <https://vivoweb.org/custom_actions/import_report_generator>
         a                                   dynapi:CustomRESTAction ;
         rdfs:label                          "Import report generator"@en-US ;
         dynapi:name                         "import_report_generator" ;
-        dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put> ;
+        dynapi:hasDefaultMethod             <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
         dynapi:forwardsTo                   <https://vivoweb.org/procedure/import_report_generator> .
