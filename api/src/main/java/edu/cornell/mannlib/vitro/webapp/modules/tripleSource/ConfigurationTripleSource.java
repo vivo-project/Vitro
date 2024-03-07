@@ -2,8 +2,27 @@
 
 package edu.cornell.mannlib.vitro.webapp.modules.tripleSource;
 
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.*;
-
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_DISPLAY;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_TBOX;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.USER_ACCOUNTS;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.ABOX_ASSERTIONS_FIRSTTIME_BACKUP;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_ASSERTIONS_FIRSTTIME_BACKUP;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.APPLICATION_METADATA_FIRSTTIME_BACKUP;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.USER_ACCOUNTS_FIRSTTIME_BACKUP;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_FIRSTTIME_BACKUP;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_TBOX_FIRSTTIME_BACKUP;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_DISPLAY_FIRSTTIME_BACKUP;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.INTERFACE_I18N ;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.INTERFACE_I18N_FIRSTTIME_BACKUP;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.ACCESS_CONTROL;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.ACCESS_CONTROL_FIRSTTIME_BACKUP;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DYNAMIC_API_ABOX;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DYNAMIC_API_ABOX_FIRSTTIME_BACKUP;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DYNAMIC_API_TBOX;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DYNAMIC_API_TBOX_FIRSTTIME_BACKUP;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.SHAPES;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.SHAPES_FIRSTTIME_BACKUP;
 
 
 import org.apache.jena.rdf.model.ModelMaker;
@@ -36,6 +55,8 @@ public abstract class ConfigurationTripleSource implements TripleSource {
 	        SHAPES_FIRSTTIME_BACKUP,
 			INTERFACE_I18N,
 			INTERFACE_I18N_FIRSTTIME_BACKUP,
+			ACCESS_CONTROL, 
+			ACCESS_CONTROL_FIRSTTIME_BACKUP,
 	};
 
 	/**

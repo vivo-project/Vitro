@@ -35,17 +35,13 @@ edu.cornell.mannlib.vitro.webapp.servlet.setup.SimpleReasonerSetup
 # Must run after JenaDataSourceSetup
 edu.cornell.mannlib.vitro.webapp.servlet.setup.ThemeInfoSetup
 
-edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionRegistry$Setup
-
 edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSetsSmokeTest
-
-edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionBean$Setup
 
 edu.cornell.mannlib.vitro.webapp.auth.policy.setup.CommonPolicyFamilySetup
 
-edu.cornell.mannlib.vitro.webapp.auth.policy.RootUserPolicy$Setup
+edu.cornell.mannlib.vitro.webapp.migration.auth.AuthMigrator
 
-edu.cornell.mannlib.vitro.webapp.auth.policy.RestrictHomeMenuItemEditingPolicy$Setup
+edu.cornell.mannlib.vitro.webapp.auth.RootUserSetup
 
 edu.cornell.mannlib.vitro.webapp.services.shortview.ShortViewServiceSetup
 
@@ -70,5 +66,7 @@ edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache$Setup
 
 # This should be near the end, because it will issue a warning if the connection to Solr or ElasticSearch times out.
 edu.cornell.mannlib.vitro.webapp.servlet.setup.SearchEngineSmokeTest
+
+edu.cornell.mannlib.vitro.webapp.audit.AuditSetup
 
 edu.cornell.mannlib.vitro.webapp.dynapi.Initializer
