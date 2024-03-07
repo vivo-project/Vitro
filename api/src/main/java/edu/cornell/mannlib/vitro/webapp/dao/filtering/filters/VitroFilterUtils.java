@@ -6,8 +6,6 @@ import java.text.Collator;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.servlet.ServletContext;
-
 import net.sf.jga.fn.UnaryFunctor;
 import net.sf.jga.fn.adaptor.ChainUnary;
 import net.sf.jga.fn.property.GetProperty;
@@ -16,12 +14,12 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 /**
  * Static methods to help create commonly used filters.
  */
-public class VitroFilterUtils {
+public class VitroFilterUtils { 
 	/**
 	 * Gets a filter that hides any property or resource that is restricted from
 	 * public view.
 	 */
-	public static VitroFilters getPublicFilter(ServletContext ctx) {
+	public static VitroFilters getPublicFilter() {
 		return new FilterByDisplayPermission();
 	}
 

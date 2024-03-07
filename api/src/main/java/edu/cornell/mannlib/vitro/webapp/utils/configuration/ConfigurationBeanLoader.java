@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
@@ -92,50 +91,26 @@ public class ConfigurationBeanLoader {
 
 	/**
 	 * May be null, but the loader will be unable to satisfy instances of
-	 * ContextModelUser.
-	 */
-	private final ServletContext ctx;
-
-	/**
-	 * May be null, but the loader will be unable to satisfy instances of
 	 * RequestModelUser.
 	 */
 	private final HttpServletRequest req;
 
 	public ConfigurationBeanLoader(Model model) {
-		this(new LockableModel(model), null, null);
+		this(new LockableModel(model), null);
 	}
 
 	public ConfigurationBeanLoader(LockableModel locking) {
-		this(locking, null, null);
-	}
-
-	public ConfigurationBeanLoader(Model model, ServletContext ctx) {
-		this(new LockableModel(model), ctx, null);
-	}
-
-	public ConfigurationBeanLoader(LockableModel locking, ServletContext ctx) {
-		this(locking, ctx, null);
+		this(locking, null);
 	}
 
 	public ConfigurationBeanLoader(Model model, HttpServletRequest req) {
 		this(new LockableModel(model), req);
 	}
 
-	public ConfigurationBeanLoader(LockableModel locking,
-			HttpServletRequest req) {
-		this(locking,
-				(req == null) ? null : req.getSession().getServletContext(),
-				req);
-	}
-
-	private ConfigurationBeanLoader(LockableModel locking, ServletContext ctx,
-			HttpServletRequest req) {
-		this.locking = Objects.requireNonNull(locking,
-				"locking may not be null.");
-		this.req = req;
-		this.ctx = ctx;
-	}
+    public ConfigurationBeanLoader(LockableModel locking, HttpServletRequest req) {
+        this.locking = Objects.requireNonNull(locking, "locking may not be null.");
+        this.req = req;
+    }
 
 	/**
 	 * Load the instance with this URI, if it is assignable to this class.
@@ -168,7 +143,7 @@ public class ConfigurationBeanLoader {
 					.parse(locking, uri, resultClass);
 			WrappedInstance<T> wrapper = InstanceWrapper
 					.wrap(parsedRdf.getConcreteClass());
-			wrapper.satisfyInterfaces(ctx, req);
+			wrapper.satisfyInterfaces(req);
 			wrapper.checkCardinality(parsedRdf.getPropertyStatements());
 			instancesMap.put(uri, wrapper.getInstance());
 			wrapper.setProperties(this, parsedRdf.getPropertyStatements());

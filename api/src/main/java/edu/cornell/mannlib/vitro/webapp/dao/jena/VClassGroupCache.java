@@ -89,14 +89,7 @@ public class VClassGroupCache implements SearchIndexer.Listener {
 
     private final RebuildGroupCacheThread _cacheRebuildThread;
 
-    /**
-     * Need a pointer to the context to get DAOs and models.
-     */
-    private final ServletContext context;
-
-
     private VClassGroupCache(ServletContext context) {
-        this.context = context;
         this._groupList = null;
 
         if (StartupStatus.getBean(context).isStartupAborted()) {
@@ -199,7 +192,7 @@ public class VClassGroupCache implements SearchIndexer.Listener {
     }
 
     protected VClassGroupDao getVCGDao() {
-		return ModelAccess.on(context).getWebappDaoFactory().getVClassGroupDao();
+		return ModelAccess.getInstance().getWebappDaoFactory().getVClassGroupDao();
     }
 
     public void doSynchronousRebuild(){
@@ -263,11 +256,11 @@ public class VClassGroupCache implements SearchIndexer.Listener {
      */
     protected static void rebuildCacheUsingSearch( VClassGroupCache cache ) throws SearchEngineException{
         long start = System.currentTimeMillis();
-		WebappDaoFactory wdFactory = ModelAccess.on(cache.context).getWebappDaoFactory();
+		WebappDaoFactory wdFactory = ModelAccess.getInstance().getWebappDaoFactory();
 
 		SearchEngine searchEngine = ApplicationUtils.instance().getSearchEngine();
 
-        VitroFilters vFilters = VitroFilterUtils.getPublicFilter(cache.context);
+        VitroFilters vFilters = VitroFilterUtils.getPublicFilter();
         VClassGroupDao vcgDao = new WebappDaoFactoryFiltering(wdFactory, vFilters).getVClassGroupDao();
 
         List<VClassGroup> groups = vcgDao.getPublicGroupsWithVClasses(ORDER_BY_DISPLAYRANK,
@@ -488,7 +481,7 @@ public class VClassGroupCache implements SearchIndexer.Listener {
             } else if(VitroVocabulary.DISPLAY_RANK.equals(stmt.getPredicate().getURI())){
             	requestCacheUpdate();
             } else if (RDFS.label.equals(stmt.getPredicate())){
-                OntModel jenaOntModel = ModelAccess.on(context).getOntModelSelector().getTBoxModel();
+                OntModel jenaOntModel = ModelAccess.getInstance().getOntModelSelector().getTBoxModel();
                 if( isClassNameChange(stmt, jenaOntModel) ) {
                     requestCacheUpdate();
                 }

@@ -55,7 +55,7 @@ public class ConfigurationBeanLoaderTestBase extends AbstractTestClass {
 		model = model();
 
 		loader = new ConfigurationBeanLoader(model, req);
-		noRequestLoader = new ConfigurationBeanLoader(model, ctx);
+		noRequestLoader = new ConfigurationBeanLoader(model);
 		noContextLoader = new ConfigurationBeanLoader(model);
 	}
 
