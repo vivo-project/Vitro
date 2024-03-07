@@ -9,6 +9,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationExc
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.AdditionsAndRetractions;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditN3GeneratorVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.ProcessRdfForm;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 import org.apache.commons.logging.Log;
@@ -91,7 +92,8 @@ public class N3Template extends AbstractOperation {
 		}
 		Model writeModel = ModelView.getModel(dataStore, modelParam);
 		try {
-			ProcessRdfForm.applyChangesToWriteModel(changes, null, writeModel,"");
+		    RDFServiceModel rdfService = new RDFServiceModel(writeModel);
+			ProcessRdfForm.applyChangesToWriteModel(changes, rdfService, "", "");
 		} catch(Exception e) {
 			log.error(e,e);
 			return OperationResult.internalServerError();
