@@ -36,8 +36,6 @@ public class ModelNames {
 	public static final String DISPLAY_DISPLAY_FIRSTTIME_BACKUP = DISPLAY_DISPLAY + "FirsttimeBackup";
 	public static final String INTERFACE_I18N = "http://vitro.mannlib.cornell.edu/default/interface-i18n";
 	public static final String INTERFACE_I18N_FIRSTTIME_BACKUP = INTERFACE_I18N + "FirsttimeBackup";
-	public static final String ACCESS_CONTROL = "http://vitro.mannlib.cornell.edu/default/access-control";
-	public static final String ACCESS_CONTROL_FIRSTTIME_BACKUP = ACCESS_CONTROL + "FirsttimeBackup";
 
 
 
@@ -72,8 +70,7 @@ public class ModelNames {
 		map.put("DISPLAY_DISPLAY_FIRSTTIME_BACKUP", DISPLAY_DISPLAY_FIRSTTIME_BACKUP);
 		map.put("INTERFACE_I18N", INTERFACE_I18N);
 		map.put("INTERFACE_I18N_FIRSTTIME_BACKUP", INTERFACE_I18N_FIRSTTIME_BACKUP);
-		map.put("INTERFACE_I18N", ACCESS_CONTROL);
-		map.put("INTERFACE_I18N_FIRSTTIME_BACKUP", ACCESS_CONTROL_FIRSTTIME_BACKUP);
+
 		return Collections.unmodifiableMap(map);
 	}
 
