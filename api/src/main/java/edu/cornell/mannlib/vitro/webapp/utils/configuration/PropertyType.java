@@ -297,7 +297,7 @@ public enum PropertyType {
             }
             if (type != psType && !(isSubtype(psType, type))) {
                 throw new PropertyTypeException(
-                        "Can't apply statement of type " + psType + " to a method of type " + type);
+                        "Can't apply statement of type " + psType + " to a method of type " + type + ".\n Class " + method.getDeclaringClass().getCanonicalName() + ". Method:" + method.getName());
             }
         }
 
