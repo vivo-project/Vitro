@@ -2,6 +2,14 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils.configuration;
 
+import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDboolean;
+import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDdateTime;
+import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDdecimal;
+import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDfloat;
+import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDint;
+import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDinteger;
+import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDstring;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -10,8 +18,6 @@ import org.apache.jena.datatypes.xsd.impl.RDFLangString;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
-
-import static org.apache.jena.datatypes.xsd.XSDDatatype.*;
 
 /**
  * An enumeration of the types of properties that the ConfigurationBeanLoader
