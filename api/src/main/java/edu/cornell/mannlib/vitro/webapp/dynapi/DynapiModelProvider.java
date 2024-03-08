@@ -8,39 +8,28 @@ import org.apache.jena.rdf.model.ModelFactory;
 
 public class DynapiModelProvider {
 
-	private static DynapiModelProvider INSTANCE = new DynapiModelProvider();
-	private static final Log log = LogFactory.getLog(DynapiModelProvider.class);
-	private OntModel abox;
-	private OntModel tbox;
-	private OntModel permanentModel;
-    
-	public static DynapiModelProvider getInstance() {
-		return INSTANCE;
-	}
+    private static DynapiModelProvider INSTANCE = new DynapiModelProvider();
+    private static final Log log = LogFactory.getLog(DynapiModelProvider.class);
+    private OntModel permanentModel;
 
-	public void init(OntModel abox, OntModel tbox) {
-		this.abox = abox;
-		this.tbox = tbox;
-	}
-
-	public void setModel(OntModel model) {
-		this.permanentModel = model;
-	}
-
-	public Model getModel() {
-		return constructModelWithSparql();
-	}
-	
-    private Model constructModelWithSparql() {
-        Model memModel;
-        if (permanentModel != null) {
-            memModel = permanentModel;
-        } else {
-            Model union = ModelFactory.createUnion(abox, tbox);
-            memModel = ModelFactory.createDefaultModel();
-            memModel.add(union);
-        }
-        return memModel;
+    public static DynapiModelProvider getInstance() {
+        return INSTANCE;
     }
-	
+
+    public void init(OntModel abox, OntModel tbox) {
+        permanentModel = ModelFactory.createOntologyModel();
+        permanentModel.addSubModel(abox);
+        permanentModel.addSubModel(tbox);
+        log.debug("abox size:" +  abox.size());
+        log.debug("tbox size:" +  tbox.size());
+        log.debug("OntModel size:" +  permanentModel.size());
+    }
+
+    public void setModel(OntModel model) {
+        this.permanentModel = model;
+    }
+
+    public Model getModel() {
+        return permanentModel;
+    }
 }

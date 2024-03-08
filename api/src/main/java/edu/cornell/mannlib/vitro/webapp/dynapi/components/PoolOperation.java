@@ -14,7 +14,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationExc
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public abstract class PoolOperation extends Operation {
+public abstract class PoolOperation extends AbstractOperation {
 
     private static final Log log = LogFactory.getLog(PoolOperation.class);
 	public static enum OperationType {

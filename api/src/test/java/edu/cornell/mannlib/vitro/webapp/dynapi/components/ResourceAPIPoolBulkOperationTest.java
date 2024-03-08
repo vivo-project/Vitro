@@ -6,7 +6,9 @@ import static org.junit.Assert.assertNotEquals;
 import java.io.IOException;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.ResourceAPIPool;
@@ -18,6 +20,16 @@ public class ResourceAPIPoolBulkOperationTest extends ServletContextTest{
 
     private final static String TEST_RESOURCE_URI = "https://vivoweb.org/ontology/vitro-dynamic-api/resourceAPI/testResource1";
     private ResourceAPIPool resourcePool;
+    
+    @BeforeClass
+    public static void before() {
+        offLogs();
+    }
+    
+    @AfterClass
+    public static void after() {
+        restoreLogs();
+    }
     
     @Before
     public void preparePool() {

@@ -14,7 +14,10 @@ import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.ontology.impl.OntModelImpl;
 import org.apache.jena.rdf.model.Model;
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -33,7 +36,7 @@ public class SparqlConstructQueryIntegrationTest extends ServletContextTest {
 	private static final String URI = "uri";
 
 	private static final String RESOURCES_PATH = "src/test/resources/edu/cornell/mannlib/vitro/webapp/dynapi/components/";
-    private static final String TEST_ACTION = RESOURCES_PATH + "sparql-construct-test-action.n3";
+    private static final String TEST_PROCEDURE = RESOURCES_PATH + "sparql-construct-test-action.n3";
     private static final String TEST_STORE = RESOURCES_PATH + "sparql-construct-test-store.n3";
 
     
@@ -45,23 +48,37 @@ public class SparqlConstructQueryIntegrationTest extends ServletContextTest {
     @org.junit.runners.Parameterized.Parameter(1)
     public String size;
     
+    @AfterClass
+    public static void after() {
+        restoreLogs();
+    }
+    
+    @BeforeClass
+    public static void before() {
+        offLogs();
+    }
+    
     @Before
     public void beforeEach() {
         storeModel = new OntModelImpl(OntModelSpec.OWL_MEM);
     }
     
+    @After
+    public void reset() {
+    }
+    
     @Test
     public void test() throws ConfigurationBeanLoaderException, IOException, ConversionException {
         loadOntology(ontModel);
-        loadModel(ontModel, TEST_ACTION);
+        loadModel(ontModel, TEST_PROCEDURE);
         loadModel(storeModel, TEST_STORE);
-        Action action = loader.loadInstance("test:action", Action.class);
-        assertTrue(action.isValid());
-        Parameters inputParameters = action.getInputParams();
+        Procedure procedure = loader.loadInstance("test:procedure", Procedure.class);
+        assertTrue(procedure.isValid());
+        Parameters inputParameters = procedure.getInputParams();
         DataStore store = new DataStore();
         OntModelImpl outputModel = new OntModelImpl(OntModelSpec.OWL_DL_MEM);
         	
-        final Parameters outputParams = action.getOutputParams();
+        final Parameters outputParams = procedure.getOutputParams();
 		Parameter paramOutput = outputParams.get(OUTPUT);
         assertNotNull(paramOutput);
 		Data outputData = new Data(paramOutput);
@@ -81,7 +98,7 @@ public class SparqlConstructQueryIntegrationTest extends ServletContextTest {
 
         for (String uri : uris.split(",")) {
         	TestView.setObject(uriData, uri);
-            OperationResult opResult = action.run(store);
+            OperationResult opResult = procedure.run(store);
             assertFalse(opResult.hasError());	
         }
         assertEquals(Integer.parseInt(size), outputModel.size());

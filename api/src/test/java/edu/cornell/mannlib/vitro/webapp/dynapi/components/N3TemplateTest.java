@@ -23,6 +23,7 @@ import org.apache.jena.ontology.impl.OntModelImpl;
 import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.rdf.model.impl.StatementImpl;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -64,11 +65,13 @@ public class N3TemplateTest extends ServletContextTest {
 
     @AfterClass
     public static void after() {
-    	dynapiModelFactory.close();    		
+    	dynapiModelFactory.close();
+    	restoreLogs();
     }
     
     @BeforeClass
     public static void setupStaticObjects(){
+        offLogs();
         anyURI = new PrimitiveSerializationType();
         anyURI.setName("anyURI");
         stringType = new PrimitiveSerializationType();

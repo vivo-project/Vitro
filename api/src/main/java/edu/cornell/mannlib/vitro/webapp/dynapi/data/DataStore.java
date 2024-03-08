@@ -9,7 +9,7 @@ import java.util.Set;
 
 import org.apache.http.entity.ContentType;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
 
 public class DataStore {
 
@@ -17,7 +17,7 @@ public class DataStore {
 	private ContentType responseType = ContentType.APPLICATION_JSON;
 	private List<String> acceptLangs = new LinkedList<>();
 	private String resourceId = "";
-	private Map<String, Action> dependencyComponents = new HashMap<>();
+	private Map<String, Procedure> dependencyComponents = new HashMap<>();
 
 	public DataStore() {
 	}
@@ -67,19 +67,19 @@ public class DataStore {
 		return dataMap.keySet();
 	}
 	
-    public void putDependency(String uri, Action dependency) {
+    public void putDependency(String uri, Procedure dependency) {
         dependencyComponents.put(uri, dependency);
     }
 
-    public void putDependencies(Map<String, Action> dependencies) {
+    public void putDependencies(Map<String, Procedure> dependencies) {
         dependencyComponents.putAll(dependencies);
     }
     
-    public Map<String, Action> getDependencies() {
+    public Map<String, Procedure> getDependencies() {
         return dependencyComponents;
     }
 
-    public Action getDependency(String uri) {
+    public Procedure getDependency(String uri) {
         return dependencyComponents.get(uri);
     }
     
@@ -88,10 +88,10 @@ public class DataStore {
     }
 
     public void removeDependencies() {
-        for (Action dependencyComponent : dependencyComponents.values()) {
-            dependencyComponents.remove(dependencyComponent.getKey());
+        for (Procedure dependencyComponent : dependencyComponents.values()) {
             dependencyComponent.removeClient();
         }
+        dependencyComponents.clear();
     }
 
     public boolean containsData(DataStore expectedDatas) {

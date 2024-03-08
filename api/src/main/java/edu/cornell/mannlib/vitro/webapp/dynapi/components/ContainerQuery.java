@@ -11,7 +11,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationExc
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class ContainerQuery extends Operation{
+public class ContainerQuery extends AbstractOperation{
 
     private static final Log log = LogFactory.getLog(ContainerQuery.class);
 

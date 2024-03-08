@@ -11,10 +11,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class LoopOperation extends Operation {
+public class LoopOperation extends AbstractOperation {
 
     private static final Log log = LogFactory.getLog(LoopOperation.class.getName());
     private Parameters outputParams = new Parameters();
@@ -208,17 +207,17 @@ public class LoopOperation extends Operation {
             log.error("Uri not provided. Loop descriptor validation failed.");
             return false;
         }
-        Map<String, Action> map = dataStore.getDependencies();
+        Map<String, Procedure> map = dataStore.getDependencies();
         if (!map.containsKey(uri)) {
             log.error(format("Dependency with uri: '%s' expected, but not provided. Loop validation failed.", uri));
             return false;
         }
-        Action dependency = map.get(uri);
+        Procedure dependency = map.get(uri);
         if (dependency == null) {
             log.error(format("Dependency with uri: '%s' expected, but null provided. Loop validation failed.", uri));
             return false;
         }
-        if (NullAction.getInstance().equals(dependency)) {
+        if (NullProcedure.getInstance().equals(dependency)) {
             log.error(format(
                     "Dependency with uri: '%s' expected, but default null object provided. Loop validation failed.",
                     uri));

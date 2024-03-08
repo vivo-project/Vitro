@@ -8,8 +8,10 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -33,10 +35,11 @@ public abstract class ServletContextTest {
     //public static final String INDIVIDUALS_FILE_PATH = ABOX_PREFIX + "dynamic-api-individuals.n3";
     public static final String IMPLEMENTATION_FILE_PATH = TBOX_PREFIX + "dynamic-api-implementation.n3";
     public static final String ONTOLOGY_FILE_PATH = TBOX_PREFIX + "vitro-dynamic-api.n3";
-	protected final static String TEST_ACTION_NAME = "test_action";
+	protected final static String TEST_PROCEDURE_URI = "https://vivoweb.org/ontology/vitro-dynamic-api/action/testAction1";
     protected final static ResourceAPIKey TEST_RESOURCE_KEY = ResourceAPIKey.of("test_resource", "0.1.0");
 
-    protected final static String TEST_PERSON_ACTION_NAME = "test_person";
+    protected final static String TEST_PERSON_PROCEDURE_URI_1 = "https://vivoweb.org/ontology/vitro-dynamic-api/action/testPersonAction1";
+
     protected final static ResourceAPIKey TEST_PERSON_RESOURCE_KEY = ResourceAPIKey.of("test_person_resource", "1.0.0");
 
     protected ServletContextStub servletContext;
@@ -45,11 +48,11 @@ public abstract class ServletContextTest {
     protected OntModel ontModel;
 
     protected ConfigurationBeanLoader loader;
+    private static Map<Class,Level> logLevels = new HashMap<>();
 
     @Before
     public void setup() {
         //Do not print information about loaded actions and resources
-        silenceLoggers();
         servletContext = new ServletContextStub();
         modelAccessFactory = new ModelAccessFactoryStub();
 
@@ -62,9 +65,33 @@ public abstract class ServletContextTest {
         loader = new ConfigurationBeanLoader(ontModel, servletContext);
     }
 
-    public void silenceLoggers() {
-        Logger.getLogger(ResourceAPIPool.class).setLevel(Level.ERROR);
-        Logger.getLogger(ActionPool.class).setLevel(Level.ERROR);
+    public static void offLog(Class clazz) {
+        if (!logLevels.containsKey(clazz)) {
+            final Logger logger = Logger.getLogger(clazz);
+            Level level = logger.getLevel();
+            logLevels.put(clazz, level);
+            logger.setLevel(Level.OFF);
+        }
+    }
+    
+    public static void restoreLog(Class clazz) {
+        if (logLevels.containsKey(clazz)) {
+            Level level = logLevels.get(clazz);
+            Logger.getLogger(clazz).setLevel(level);
+            logLevels.remove(clazz);
+        }
+    }
+    
+    public static void offLogs() {
+        offLog(ResourceAPIPool.class);
+        offLog(RPCPool.class);
+        offLog(ProcedurePool.class);
+    }
+    
+    public static void restoreLogs() {
+        restoreLog(ResourceAPIPool.class);
+        restoreLog(RPCPool.class);
+        restoreLog(ProcedurePool.class);
     }
     
     protected void loadTestModel() throws IOException {
