@@ -163,7 +163,6 @@ public class ConfigurationBeanLoader {
 		    throw new ConfigurationBeanLoaderException(uri, e);
 		  }
 		}
-		
 		try {
 			ConfigurationRdf<T> parsedRdf = ConfigurationRdfParser
 					.parse(locking, uri, resultClass);
