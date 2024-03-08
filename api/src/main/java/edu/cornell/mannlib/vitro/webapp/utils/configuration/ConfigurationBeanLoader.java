@@ -13,6 +13,8 @@ import java.util.TreeSet;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
@@ -24,6 +26,9 @@ import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockedModel;
  * Load one or more Configuration beans from a specified model.
  */
 public class ConfigurationBeanLoader {
+	
+ 	private static final Log log = LogFactory.getLog(ConfigurationBeanLoader.class);
+
 
 	private static final String JAVA_URI_PREFIX = "java:";
 
@@ -161,6 +166,32 @@ public class ConfigurationBeanLoader {
 	public <T> Set<T> loadAll(Class<T> resultClass)
 			throws ConfigurationBeanLoaderException {
 		Set<String> uris = new HashSet<>();
+		findUris(resultClass, uris);
+		Set<T> instances = new HashSet<>();
+		for (String uri : uris) {
+			instances.add(loadInstance(uri, resultClass));
+		}
+		return instances;
+	}
+	
+	/**
+	 * Find all of the resources with the specified class, and instantiate them.
+	 */
+	public <T> Set<T> loadEach(Class<T> resultClass){
+		Set<String> uris = new HashSet<>();
+		findUris(resultClass, uris);
+		Set<T> instances = new HashSet<>();
+		for (String uri : uris) {
+			try {
+				instances.add(loadInstance(uri, resultClass));
+			} catch (ConfigurationBeanLoaderException e) {
+				e.printStackTrace();
+			}
+		}
+		return instances;
+	}
+
+	private <T> void findUris(Class<T> resultClass, Set<String> uris) {
 		try (LockedModel m = locking.read()) {
 			for (String typeUri : toPossibleJavaUris(resultClass)) {
 				List<Resource> resources = m.listResourcesWithProperty(RDF.type,
@@ -172,11 +203,5 @@ public class ConfigurationBeanLoader {
 				}
 			}
 		}
-
-		Set<T> instances = new HashSet<>();
-		for (String uri : uris) {
-			instances.add(loadInstance(uri, resultClass));
-		}
-		return instances;
 	}
 }
