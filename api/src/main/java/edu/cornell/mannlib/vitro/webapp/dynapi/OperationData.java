@@ -7,8 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 
 public class OperationData {
 
-	private Map<String, String[]> params;
-	private ServletContext context;
+	private final Map<String, String[]> params;
+	private final ServletContext context;
 
 	public OperationData(HttpServletRequest request) {
 		params = request.getParameterMap();
@@ -20,10 +20,7 @@ public class OperationData {
 	}
 
 	public boolean has(String paramName) {
-		if (params.containsKey(paramName)) {
-			return true;
-		}
-		return false;
+		return params.containsKey(paramName);
 	}
 
 	public String[] get(String paramName) {

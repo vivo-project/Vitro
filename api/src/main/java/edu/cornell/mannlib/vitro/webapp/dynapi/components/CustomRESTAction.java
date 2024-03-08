@@ -2,7 +2,7 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class CustomAction implements Removable {
+public class CustomRESTAction implements Removable {
 
 	private String name;
 	private RPC targetRPC;
@@ -17,7 +17,7 @@ public class CustomAction implements Removable {
 		return name;
 	}
 
-	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#customActionName", minOccurs = 1, maxOccurs = 1)
+	@Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#customRESTActionName", minOccurs = 1, maxOccurs = 1)
 	public void setName(String name) {
 		this.name = name;
 	}
