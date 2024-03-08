@@ -34,7 +34,7 @@ import com.haulmont.yarg.structure.impl.BandBuilder;
 import com.haulmont.yarg.structure.impl.ReportBuilder;
 import com.haulmont.yarg.structure.impl.ReportTemplateBuilder;
 
-public class ReportGenerator extends Operation {
+public class ReportGenerator extends AbstractOperation {
 
 	private static final String MIME_DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 	private static final String MIME_XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";

@@ -18,7 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceMod
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ContextModelsUser;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public abstract class SparqlQuery extends Operation implements ContextModelsUser {
+public abstract class SparqlQuery extends AbstractOperation implements ContextModelsUser {
 
 	private static final Log log = LogFactory.getLog(SparqlQuery.class);
 	protected String queryText;

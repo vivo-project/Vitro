@@ -13,16 +13,14 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.DefaultResourceAPI;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.HTTPMethod;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
 import edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath;
 
 @WebServlet(name = "RESTEndpoint", urlPatterns = { REST_SERVLET_PATH + "/*" })
-public class RESTEndpoint extends Endpoint{
+public class RESTEndpoint extends Endpoint {
 
     private static final Log log = LogFactory.getLog(RESTEndpoint.class);
 
@@ -87,7 +85,7 @@ public class RESTEndpoint extends Endpoint{
         }
         ResourceAPI resourceAPI = resourceAPIPool.get(resourceAPIKey);
 
-        if (resourceAPI instanceof DefaultResourceAPI) {
+        if (NullResourceAPI.getInstance().equals(resourceAPI)) {
             log.error(format("ResourceAPI %s not found", resourceAPIKey));
             OperationResult.notFound().prepareResponse(response);
             return;
@@ -95,15 +93,19 @@ public class RESTEndpoint extends Endpoint{
 
         ResourceAPIKey key = resourceAPI.getKey();
 
-        RPC rpc = null;
+        String procedureUri = null;
 
         if (requestPath.isCustomRestAction()) {
-            String customRestActionName = requestPath.getActionName();
+            
+            if (!"PUT".equals(method)) {
+                resourceAPI.removeClient();
+                OperationResult.methodNotAllowed().prepareResponse(response); return;
+            }
+            String actionName = requestPath.getCustomRestActionName();
             try {
-                rpc = resourceAPI.getCustomRestActionRPC(customRestActionName);
+                procedureUri = resourceAPI.getProcedureUriByActionName(actionName);
             } catch (UnsupportedOperationException e) {
-                log.error(format("Custom REST action %s not implemented for resource %s", customRestActionName, key),
-                        e);
+                log.error(format("Custom REST action %s not implemented for resource %s", actionName, key), e);
                 OperationResult.methodNotAllowed().prepareResponse(response);
                 return;
             } finally {
@@ -111,7 +113,7 @@ public class RESTEndpoint extends Endpoint{
             }
         } else {
             try {
-                rpc = resourceAPI.getRestRPC(method, requestPath.isResourceRequest());
+                procedureUri = resourceAPI.getProcedureUri(method, requestPath.isResourceRequest());
             } catch (UnsupportedOperationException e) {
                 log.error(format("Method %s not implemented for resource %s", method, key), e);
                 OperationResult.methodNotAllowed().prepareResponse(response);
@@ -120,17 +122,7 @@ public class RESTEndpoint extends Endpoint{
                 resourceAPI.removeClient();
             }
         }
-
-        HTTPMethod rpcMethod = rpc.getHttpMethod();
-
-        if (rpcMethod == null || !rpcMethod.getName().toUpperCase().equals(method)) {
-            log.error(format("Remote Procedure Call not implemented for resource %s with method %s", key, method));
-            OperationResult.methodNotAllowed().prepareResponse(response);
-            return;
-        }
-
-        String actionName = rpc.getName();
-        processActionRequest(request, response, requestPath, actionName);
+        processRequest(request, response, requestPath, procedureUri);
     }
 
 }

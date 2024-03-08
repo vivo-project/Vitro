@@ -1,13 +1,13 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.DefaultResourceAPI;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPI;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.ResourceAPIKey;
 
 public class ResourceAPIPool extends VersionableAbstractPool<ResourceAPIKey, ResourceAPI, ResourceAPIPool> {
 
     private static ResourceAPIPool INSTANCE = new ResourceAPIPool();
-    private static ResourceAPI defaultInstance = new DefaultResourceAPI();
+    private static ResourceAPI defaultInstance = NullResourceAPI.getInstance();
 
 
     public static ResourceAPIPool getInstance() {

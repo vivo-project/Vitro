@@ -17,7 +17,7 @@ import org.apache.jena.rdf.model.Model;
 
 import java.util.*;
 
-public class N3Template extends Operation implements Template {
+public class N3Template extends AbstractOperation implements Template {
 
 	private static final Log log = LogFactory.getLog(N3Template.class);
 

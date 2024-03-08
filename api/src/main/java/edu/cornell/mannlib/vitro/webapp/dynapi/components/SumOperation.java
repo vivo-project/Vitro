@@ -12,7 +12,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.IntegerView;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
-public class SumOperation extends Operation {
+public class SumOperation extends AbstractOperation {
 
     private static final Log log = LogFactory.getLog(SumOperation.class);
 

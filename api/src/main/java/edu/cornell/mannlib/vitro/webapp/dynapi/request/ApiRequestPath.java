@@ -30,7 +30,9 @@ public class ApiRequestPath {
 
     private final String resourceId;
 
-    private final String actionName;
+    private final String rpcKey;
+    
+    private final String customRestActionName;
 
     private ApiRequestPath(HttpServletRequest request) {
         servletPath = request != null && request.getServletPath() != null
@@ -44,10 +46,11 @@ public class ApiRequestPath {
 
         if (servletPath.toLowerCase().contains(RPC_SERVLET_PATH)) {
             type = RequestType.RPC;
-            actionName = pathParts.length > 1 ? pathParts[1] : null;
+            rpcKey = pathParts.length > 1 ? pathParts[1] : null;
             resourceVersion = null;
             resourceName = null;
             resourceId = null;
+            customRestActionName = null;
         } else if (servletPath.toLowerCase().contains(REST_SERVLET_PATH)) {
             type = RequestType.REST;
             resourceVersion = pathParts.length > 1 ? pathParts[1] : null;
@@ -56,21 +59,23 @@ public class ApiRequestPath {
             if (pathParts.length > 3) {
                 if (pathParts[3].toLowerCase().startsWith("resource:")) {
                     resourceId = decode(pathParts[3]);
-                    actionName = pathParts.length > 4 ? pathParts[4] : null;
+                    customRestActionName = pathParts.length > 4 ? pathParts[4] : null;
                 } else {
                     resourceId = null;
-                    actionName = pathParts[3];
+                    customRestActionName = pathParts[3];
                 }
             } else {
                 resourceId = null;
-                actionName = null;
+                customRestActionName = null;
             }
+            rpcKey = null;
         } else {
             type = RequestType.UNKNOWN;
+            customRestActionName = null;
             resourceVersion = null;
             resourceName = null;
             resourceId = null;
-            actionName = null;
+            rpcKey = null;
         }
     }
 
@@ -102,8 +107,8 @@ public class ApiRequestPath {
         return resourceId;
     }
 
-    public String getActionName() {
-        return actionName;
+    public String getRpcKey() {
+        return rpcKey;
     }
 
     public boolean isResourceRequest() {
@@ -118,7 +123,7 @@ public class ApiRequestPath {
                 if (pathParts.length == 3) {
                     isValid = hasVersionAndName;
                 } else if (pathParts.length > 3) {
-                    boolean hasActionName = isNotEmpty(actionName);
+                    boolean hasActionName = isNotEmpty(customRestActionName);
                     boolean hasResourceId = isNotEmpty(resourceId);
 
                     if (pathParts.length == 4) {
@@ -129,7 +134,7 @@ public class ApiRequestPath {
                 }
                 break;
             case RPC:
-                boolean hasActionName = isNotEmpty(actionName);
+                boolean hasActionName = isNotEmpty(rpcKey);
 
                 isValid = hasActionName;
                 break;
@@ -160,11 +165,15 @@ public class ApiRequestPath {
     }
 
     public boolean isCustomRestAction() {
-        return isNotEmpty(resourceVersion) && isNotEmpty(resourceName) && isNotEmpty(actionName);
+        return isNotEmpty(resourceVersion) && isNotEmpty(resourceName) && isNotEmpty(customRestActionName);
     }
 
     public static ApiRequestPath from(HttpServletRequest request) {
         return new ApiRequestPath(request);
+    }
+
+    public String getCustomRestActionName() {
+        return customRestActionName;
     }
 
     public enum RequestType {

@@ -5,31 +5,31 @@
 @prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/action/reload_action>
-        a                                   dynapi:Action ;
-        rdfs:label                          "Reload action"@en-US ;
-        dynapi:hasFirstStep                 <https://vivoweb.org/ontology/vitro-dynamic-api/action/reload_action/step1> ;
-        dynapi:hasAssignedRPC               <https://vivoweb.org/ontology/vitro-dynamic-api/action/reload_action/rpc1> .
+<https://vivoweb.org/ontology/vitro-dynamic-api/procedure/reload_procedure>
+        a                                   dynapi:Procedure ;
+        rdfs:label                          "Reload procedure"@en-US ;
+        dynapi:hasFirstStep                 <https://vivoweb.org/ontology/vitro-dynamic-api/procedure/reload_procedure/step1> .
         
-<https://vivoweb.org/ontology/vitro-dynamic-api/action/reload_action/rpc1>
+<https://vivoweb.org/ontology/vitro-dynamic-api/procedure/reload_procedure/rpc1>
 	a                                   dynapi:Rpc ;
-	rdfs:label                          "Reload action rpc endpoing"@en-US ;
-	dynapi:name                         "reload_action" .
+        dynapi:procedure                    <https://vivoweb.org/ontology/vitro-dynamic-api/procedure/reload_procedure> ;
+	rdfs:label                          "Reload procedure rpc endpoing"@en-US ;
+	dynapi:name                         "reload_procedure" .
 	
-<https://vivoweb.org/ontology/vitro-dynamic-api/action/reload_action/step1>
+<https://vivoweb.org/ontology/vitro-dynamic-api/procedure/reload_procedure/step1>
         a                                   dynapi:OperationalStep ;
         rdfs:label                          "Step 1"@en-US ;
-        dynapi:hasOperation                 <https://vivoweb.org/ontology/vitro-dynamic-api/action/reload_action/operation/reload_action> .
+        dynapi:hasOperation                 <https://vivoweb.org/ontology/vitro-dynamic-api/procedure/reload_procedure/operation/reload_procedure> .
         
-<https://vivoweb.org/ontology/vitro-dynamic-api/action/reload_action/operation/reload_action> 
-        a                                   dynapi:ActionPoolAtomicOperation ;
-        rdfs:label                          "Reload action operation"@en-US ;
-        dynapi:requiresParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/action/reload_action/operation/reload_action/parameter/uri> ;
+<https://vivoweb.org/ontology/vitro-dynamic-api/procedure/reload_procedure/operation/reload_procedure> 
+        a                                   dynapi:ProcedurePoolAtomicOperation ;
+        rdfs:label                          "Reload procedure operation"@en-US ;
+        dynapi:requiresParameter            <https://vivoweb.org/ontology/vitro-dynamic-api/procedure/reload_procedure/operation/reload_procedure/parameter/uri> ;
         dynapi:poolOperationType            "reload" .
         
-<https://vivoweb.org/ontology/vitro-dynamic-api/action/reload_action/operation/reload_action/parameter/uri>
+<https://vivoweb.org/ontology/vitro-dynamic-api/procedure/reload_procedure/operation/reload_procedure/parameter/uri>
         a                                   dynapi:Parameter ;
-        rdfs:label                          "Action uri parameter"@en-US ;
+        rdfs:label                          "Procedure uri parameter"@en-US ;
         dynapi:name                         "uri" ;
         dynapi:hasType                      <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/string> .
 

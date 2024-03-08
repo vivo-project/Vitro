@@ -6,9 +6,9 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/action/solrTestAction>
-        a                           dynapi:Action ;
+        a                           dynapi:Procedure ;
         rdfs:label                  "Solr test action"@en-US ;
-        dynapi:hasAssignedRPC       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/solrTestRPC1> ;
+#        dynapi:hasAssignedRPC       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/solrTestRPC1> ;
         dynapi:hasFirstStep         <https://vivoweb.org/ontology/vitro-dynamic-api/step/solrTestStep1> .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/step/solrTestStep1>
@@ -49,6 +49,7 @@
 <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/solrTestRPC1>
         a                           dynapi:Rpc ;
         dynapi:name                 "solr_test_action"@en-US ;
+        dynapi:procedure            <https://vivoweb.org/ontology/vitro-dynamic-api/action/solrTestAction> ;
         dynapi:hasDefaultMethod     <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post> ;
         dynapi:minAPIVersionMin     "0.1.0" .
 

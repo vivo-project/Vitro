@@ -11,14 +11,17 @@ import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.ontology.impl.OntModelImpl;
 import org.apache.jena.rdf.model.Model;
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.MockitoAnnotations;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.Action;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
@@ -47,10 +50,24 @@ public class ConditionIsNotEmptyIntegrationTest extends ServletContextTest{
     @org.junit.runners.Parameterized.Parameter(1)
     public String result;
     
+    @AfterClass
+    public static void after() {
+        restoreLogs();
+    }
+    
+    @BeforeClass
+    public static void before() {
+        offLogs();
+    }
+    
     @Before
     public void beforeEach() {
         MockitoAnnotations.openMocks(this);
         storeModel = new OntModelImpl(OntModelSpec.OWL_MEM);
+    }
+    
+    @After
+    public void reset() {
     }
     
     @Test
@@ -59,7 +76,7 @@ public class ConditionIsNotEmptyIntegrationTest extends ServletContextTest{
         loadModel(ontModel, TEST_ACTION);
         loadModel(storeModel, TEST_STORE);
         servletContext = new ServletContextStub();
-        Action action = loader.loadInstance("test:action", Action.class);
+        Procedure action = loader.loadInstance("test:action", Procedure.class);
         assertTrue(action.isValid());
         Parameters parameters = action.getInputParams();
         DataStore store = new DataStore();

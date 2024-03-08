@@ -49,6 +49,9 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
     public abstract Class<C> getType();
 
     public C get(K key) {
+        if (key == null) {
+            return getDefault();
+        }
         C component = components.get(key);
 
         if (component == null) {
@@ -60,6 +63,9 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
     }
     
     public C getByUri(String uri) {
+        if (uri == null) {
+            return getDefault();
+        }
         C component = components.getByUri(uri);
         if (component == null) {
             return getDefault();
@@ -79,6 +85,9 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
     }
 
     public void add(String uri, C component) {
+        if (component != null) {
+            component.setUri(uri);
+        }
         K key = component.getKey();
         log.info(format("Adding component %s with URI %s", key, uri));
         if (isInModel(uri)) {
@@ -199,13 +208,13 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
         for (Map.Entry<String, C> entry : uriToCompMap.entrySet()) {
         	String uri = entry.getKey();
         	C component = entry.getValue();
+        	component.setUri(uri);
 			K key = component.getKey();
 			if (component.isValid()) {
                 if (components.containsKey(key)){
                     String oldUri = components.getUri(key);
                     log.info(format("Replaced %s component, uri:'%s' with uri:'%s', as they have the same key:'%s'.", getType().getSimpleName(),oldUri, uri , key));
                 }
-                component.setUri(uri);
                 components.put(key, component);
                 components.putUriMapping(uri, key);
                 log.info(format("Loaded %s component, uri:'%s', key:'%s'.", getType().getSimpleName(), uri , key));
@@ -218,7 +227,10 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
 
     private void unloadObsoleteComponents() {
         for (C component : obsoleteComponents) {
-            if (!isComponentInUse(component)) {
+            if (isComponentInUse(component)) {
+                List<String> clients = component.getClients();
+                log.debug(String.format("Obsolete component %s is in use by %s, can't unload.", component.getUri(), String.join(", ", clients) ));
+            } else {
                 component.dereference();
                 obsoleteComponents.remove(component);
             }

@@ -5,7 +5,9 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.ResourceAPIPool;
@@ -32,6 +34,16 @@ public class ResourceAPIPoolAtomicOperationTest extends ServletContextTest{
         setup();
         resourcePool = initWithDefaultModel();
         assertEquals(0, resourcePool.count());
+    }
+    
+    @AfterClass
+    public static void after() {
+        restoreLogs();
+    }
+    
+    @BeforeClass
+    public static void before() {
+        offLogs();
     }
     
     @Test

@@ -34,7 +34,7 @@
         rdfs:label               "Object for N3 template"@en-US .
 
 <https://vivoweb.org/ontology/vitro-dynamic-api/action/N3TemplateTestAction>
-        a                        dynapi:Action ;
+        a                        dynapi:Procedure ;
         rdfs:label               "N3 template test action"@en-US ;
         dynapi:hasAssignedRPC       <https://vivoweb.org/ontology/vitro-dynamic-api/rpc/N3TestRPC1> ;
         dynapi:hasFirstStep         <https://vivoweb.org/ontology/vitro-dynamic-api/step/N3TemplateTestStep> .

@@ -10,12 +10,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
+import edu.cornell.mannlib.vitro.webapp.dynapi.components.RPC;
 import edu.cornell.mannlib.vitro.webapp.dynapi.request.ApiRequestPath;
 
 @WebServlet(name = "RPCEndpoint", urlPatterns = { RPC_SERVLET_PATH + "/*" })
 public class RPCEndpoint extends Endpoint {
 
     private static final Log log = LogFactory.getLog(RPCEndpoint.class);
+    private RPCPool rpcAPIPool = RPCPool.getInstance();
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
@@ -29,8 +31,14 @@ public class RPCEndpoint extends Endpoint {
             OperationResult.notFound().prepareResponse(response);
             return;
         }
-        String actionName = requestPath.getActionName();
-        processActionRequest(request, response, requestPath, actionName);
+        String rpcKey = requestPath.getRpcKey();
+        
+        try(RPC rpc = rpcAPIPool.get(rpcKey)) {
+            //TODO Implement version negotiations
+            processRequest(request, response, requestPath, rpc.getProcedureUri());
+        } catch (Exception e) {
+           log.error(e, e);
+        } 
     }
 
     @Override

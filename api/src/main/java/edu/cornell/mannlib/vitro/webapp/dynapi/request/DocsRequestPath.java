@@ -26,7 +26,7 @@ public class DocsRequestPath {
 
     private final String resourceName;
 
-    private final String actionName;
+    private final String rpcName;
 
     private DocsRequestPath(HttpServletRequest request) {
         servletPath = request != null && request.getServletPath() != null
@@ -42,17 +42,17 @@ public class DocsRequestPath {
             type = RequestType.RPC;
             apiVersion = null;
             resourceName = null;
-            actionName = pathParts.length > 1 ? pathParts[1] : null;
+            rpcName = pathParts.length > 1 ? pathParts[1] : null;
         } else if (servletPath.toLowerCase().startsWith(REST_DOCS_SERVLET_PATH)) {
             type = RequestType.REST;
             apiVersion = pathParts.length > 1 ? pathParts[1] : null;
             resourceName = pathParts.length > 2 ? pathParts[2] : null;
-            actionName = null;
+            rpcName = null;
         } else {
             type = RequestType.UNKNOWN;
             apiVersion = null;
             resourceName = null;
-            actionName = null;
+            rpcName = null;
         }
     }
 
@@ -80,8 +80,8 @@ public class DocsRequestPath {
         return resourceName;
     }
 
-    public String getActionName() {
-        return actionName;
+    public String getRPCName() {
+        return rpcName;
     }
 
     public boolean isValid() {
