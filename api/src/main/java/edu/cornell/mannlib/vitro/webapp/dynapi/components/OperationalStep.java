@@ -1,5 +1,8 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.components;
 
+import java.util.Collections;
+import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -59,4 +62,24 @@ public class OperationalStep implements Step{
 		}
 		return result;
 	}
+
+  @Override
+  public Set<Link> getNextLinks() {
+    return Collections.singleton(nextStep);
+  }
+
+  @Override
+  public Parameters getRequiredParams() {
+    return operation.getRequiredParams();
+  }
+
+  @Override
+  public Parameters getProvidedParams() {
+    return operation.getProvidedParams();
+  }
+
+  @Override
+  public boolean isRoot() {
+    return false;
+  }
 }
