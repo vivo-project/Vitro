@@ -40,7 +40,7 @@ import static org.junit.Assert.*;
 @RunWith(MockitoJUnitRunner.class)
 public class N3TemplateTest extends ServletContextTest {
 
-    private final static String TEST_DATA_PATH="src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-n3template-test.n3";
+    private final static String TEST_DATA_PATH = TEST_PREFIX + "dynamic-api-individuals-n3template-test.n3";
     private final static String TEST_N3TEMPLATE_URI="https://vivoweb.org/ontology/vitro-dynamic-api/N3Template/testN3Template";
     private final static String MODEL_PATH="https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union";
 

@@ -39,7 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 public class SolrQueryTest extends ServletContextTest {
 
     private static final String JAVA_LANG_STRING = String.class.getCanonicalName();
-	private final static String TEST_DATA_PATH="src/test/resources/rdf/abox/filegraph/dynamic-api-individuals-solr-test.n3";
+    private final static String TEST_DATA_PATH = TEST_PREFIX + "dynamic-api-individuals-solr-test.n3";
     private final static String TEST_SOLR_QUERY_URI="https://vivoweb.org/ontology/vitro-dynamic-api/solrQuery/genericSolrTextQuery";
 
     private static MockedStatic<ApplicationUtils> applicationUtils;

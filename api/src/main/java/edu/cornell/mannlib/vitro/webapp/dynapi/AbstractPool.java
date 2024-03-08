@@ -1,7 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
 import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.RDF_TYPE;
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_UNION;
 import static edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader.toJavaUri;
 import static java.lang.String.format;
 
@@ -15,7 +14,7 @@ import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.jena.ontology.OntModel;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
@@ -36,7 +35,6 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
     private ConcurrentNavigableMap<K, C> components;
     private ServletContext ctx;
     private ConfigurationBeanLoader loader;
-    private OntModel dynamicAPIModel;
     private ConcurrentLinkedQueue<C> obsoleteComponents;
 
     protected AbstractPool() {
@@ -105,6 +103,7 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
     }
 
     private boolean isInModel(String uri) {
+    	Model dynamicAPIModel = DynapiModelProvider.getInstance().getModel();
         Resource s = dynamicAPIModel.getResource(uri);
         Property p = dynamicAPIModel.getProperty(RDF_TYPE);
 
@@ -152,8 +151,7 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
     public void init(ServletContext ctx) {
         this.ctx = ctx;
         ContextModelAccess modelAccess = ModelAccess.on(ctx);
-        dynamicAPIModel = modelAccess.getOntModel(FULL_UNION);
-        loader = new ConfigurationBeanLoader(dynamicAPIModel, ctx);
+        loader = new ConfigurationBeanLoader(DynapiModelProvider.getInstance().getModel(), ctx);
         log.debug("Context Initialization ...");
         loadComponents(components);
     }
