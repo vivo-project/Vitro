@@ -198,15 +198,15 @@ public class ConfigurationBeanLoader {
 	/**
 	 * Find all of the resources with the specified class, and instantiate them.
 	 */
-	public <T> Set<T> loadEach(Class<T> resultClass){
+	public <T> Map<String, T> loadEach(Class<T> resultClass){
 		Set<String> uris = new HashSet<>();
 		findUris(resultClass, uris);
-		Set<T> instances = new HashSet<>();
+		HashMap<String,T> instances = new HashMap<>();
 		for (String uri : uris) {
 			try {
-				instances.add(loadInstance(uri, resultClass));
+				instances.put(uri, loadInstance(uri, resultClass));
 			} catch (ConfigurationBeanLoaderException e) {
-				e.printStackTrace();
+				log.error(e, e);
 			}
 		}
 		return instances;
