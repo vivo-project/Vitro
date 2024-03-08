@@ -120,6 +120,9 @@ public class ConfigurationRdfParser {
 			for (RDFNode node : m
 					.listObjectsOfProperty(createResource(uri), RDF.type)
 					.toSet()) {
+				if (node.isAnon()) {
+					continue;
+				}
 				if (!node.isURIResource()) {
 					throw typeMustBeUriResource(node);
 				}
