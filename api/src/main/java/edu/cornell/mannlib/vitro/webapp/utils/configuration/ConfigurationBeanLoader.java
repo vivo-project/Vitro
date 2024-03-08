@@ -175,7 +175,6 @@ public class ConfigurationBeanLoader {
 			wrapper.validate();
 			return wrapper.getInstance();
 		} catch (Exception e) {
-		    log.error(e,e);
 			throw new ConfigurationBeanLoaderException(
 					"Failed to load '" + uri + "'", e);
 		}
