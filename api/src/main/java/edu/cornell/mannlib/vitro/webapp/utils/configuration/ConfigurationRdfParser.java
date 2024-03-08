@@ -121,6 +121,7 @@ public class ConfigurationRdfParser {
 			final Set<RDFNode> objectsWithProperty = m
 					.listObjectsOfProperty(createResource(uri), RDF.type)
 					.toSet();
+
             for (RDFNode node : objectsWithProperty) {
 				if (node.isAnon()) {
 					continue;
