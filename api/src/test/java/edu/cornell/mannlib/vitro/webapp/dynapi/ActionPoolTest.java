@@ -145,7 +145,7 @@ public class ActionPoolTest extends ServletContextTest {
 
         reset();
 
-        actionPool.remove(TEST_PERSON_ACTION_URI, TEST_PERSON_ACTION_NAME);
+        actionPool.unload(TEST_PERSON_ACTION_URI);
 
         assertEquals(0, actionPool.obsoleteCount());
 
@@ -168,7 +168,7 @@ public class ActionPoolTest extends ServletContextTest {
 
         actionPool.init(servletContext);
 
-        actionPool.remove(TEST_PERSON_ACTION_URI, TEST_PERSON_ACTION_NAME);
+        actionPool.unload(TEST_PERSON_ACTION_URI);
 
         assertEquals(1, actionPool.obsoleteCount());
 
@@ -177,7 +177,7 @@ public class ActionPoolTest extends ServletContextTest {
         actionHasClient.removeClient();
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testRemoveWithModelLoaded() throws IOException, ConfigurationBeanLoaderException {
         ActionPool actionPool = initWithDefaultModel();
 
@@ -185,7 +185,7 @@ public class ActionPoolTest extends ServletContextTest {
 
         actionPool.reload();
 
-        actionPool.remove(TEST_PERSON_ACTION_URI, TEST_PERSON_ACTION_NAME);
+        actionPool.unload(TEST_PERSON_ACTION_URI);
     }
 
     @Test
@@ -198,7 +198,7 @@ public class ActionPoolTest extends ServletContextTest {
 
         assertTrue(action instanceof NullAction);
 
-        actionPool.reload(TEST_PERSON_ACTION_URI);
+        actionPool.load(TEST_PERSON_ACTION_URI);
 
         assertAction(TEST_PERSON_ACTION_NAME, actionPool.get(TEST_PERSON_ACTION_NAME));
     }

@@ -12,11 +12,13 @@ public interface Pool<K, C extends Poolable<K>> {
 
     public void add(String uri, C component);
 
-    public void remove(String uri, K key);
+    public void remove(K key);
+    
+    public void load(String uri);
+    
+    public void unload(String uri);
 
     public void reload();
-
-    public void reload(String uri);
 
     public void init(ServletContext ctx);
 
