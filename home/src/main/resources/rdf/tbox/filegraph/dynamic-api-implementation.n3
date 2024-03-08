@@ -1,0 +1,31 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix dynapi_java: <java:edu.cornell.mannlib.vitro.webapp.dynapi.components#> .
+@prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+
+
+dynapi:action rdfs:subClassOf dynapi_java:Action .
+
+dynapi:operationalStep rdfs:subClassOf dynapi_java:OperationalStep .
+
+dynapi:conditionalStep rdfs:subClassOf dynapi_java:ConditionalStep .
+
+dynapi:n3Template rdfs:subClassOf dynapi_java:N3Template .
+
+dynapi:sparqlQuery rdfs:subClassOf dynapi_java:SPARQLQuery, dynapi_java:Operation .
+
+dynapi:model rdfs:subClassOf dynapi_java:ModelComponent .
+
+dynapi:parameter rdfs:subClassOf dynapi_java:Parameter .
+
+dynapi:parameterType rdfs:subClassOf dynapi_java:ParameterType .
+
+dynapi:resource rdfs:subClassOf dynapi_java:Resource .
+
+dynapi:rpc rdfs:subClassOf dynapi_java:RPC .
+
+dynapi:httpMethod rdfs:subClassOf dynapi_java:HTTPMethod .
+
+dynapi:customAction rdfs:subClassOf dynapi_java:CustomAction .
+
