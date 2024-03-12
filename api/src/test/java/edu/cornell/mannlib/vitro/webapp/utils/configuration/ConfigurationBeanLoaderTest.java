@@ -6,7 +6,9 @@ import static edu.cornell.mannlib.vitro.testing.ModelUtilitiesTestHelper.dataPro
 import static edu.cornell.mannlib.vitro.testing.ModelUtilitiesTestHelper.objectProperty;
 import static edu.cornell.mannlib.vitro.testing.ModelUtilitiesTestHelper.typeStatement;
 import static edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader.toJavaUri;
+import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDboolean;
 import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDfloat;
+import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDinteger;
 import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDstring;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -386,10 +388,28 @@ public class ConfigurationBeanLoaderTest extends
 
 		}
 		Friend friend;
+		String uri;
+		Integer intNumber;
+		boolean booleanValue;
 
 		@Property(uri = "http://set.friend/property")
 		public void setFriend(Friend friend) {
 			this.friend = friend;
+		}
+
+		@Property(uri = "http://set.friend/asString", asString = true)
+		public void setUri(String uri) {
+			this.uri = uri;
+		}
+
+		@Property(uri = "http://set.friend/setInteger")
+		public void setIntNumber(int intNumber) {
+			this.intNumber = intNumber;
+		}
+
+		@Property(uri = "http://set.friend/setBoolean")
+		public void setBooleanValue(boolean booleanValue) {
+			this.booleanValue = booleanValue;
 		}
 	}
 
@@ -687,6 +707,37 @@ public class ConfigurationBeanLoaderTest extends
 	    assertEquals(friend, friend.friend.friend);
 	  }
 
+      @Test
+      public void loadUriAsString() throws ConfigurationBeanLoaderException {
+          model.add(new Statement[] {
+                  typeStatement("http://friend.instance/one", toJavaUri(Friend.class)),
+                  typeStatement("http://friend.instance/two", toJavaUri(Friend.class)),
+                  objectProperty("http://friend.instance/one", "http://set.friend/asString",
+                          "http://friend.instance/two"), });
+
+          Friend friend = loader.loadInstance("http://friend.instance/one", Friend.class);
+          assertEquals(friend.uri, "http://friend.instance/two");
+      }
+      
+      @Test
+      public void loadInteger() throws ConfigurationBeanLoaderException {
+          model.add(new Statement[] {
+                  typeStatement("http://friend.instance/one", toJavaUri(Friend.class)),
+                  dataProperty("http://friend.instance/one", "http://set.friend/setInteger", 42, XSDinteger), });
+
+          Friend friend = loader.loadInstance("http://friend.instance/one", Friend.class);
+          assertEquals(new Integer(42), friend.intNumber);
+      }
+      
+      @Test
+      public void loadBoolean() throws ConfigurationBeanLoaderException {
+          model.add(new Statement[] {
+                  typeStatement("http://friend.instance/one", toJavaUri(Friend.class)),
+                  dataProperty("http://friend.instance/one", "http://set.friend/setBoolean", true, XSDboolean), });
+
+          Friend friend = loader.loadInstance("http://friend.instance/one", Friend.class);
+          assertEquals(Boolean.TRUE, friend.booleanValue);
+      }
 	// --------------------------------------------
 
 	@Test
