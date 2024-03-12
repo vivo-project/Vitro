@@ -27,21 +27,22 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 
 public class SparqlSelectQueryResultsChecker {
-    private static final String VAR_PROFILE_URI = "profileUri";
-    private static final String VAR_EXTERNAL_AUTH_ID = "externalAuthId";
-    private static final String VAR_MATCHING_PROPERTY_URI = "matchingPropertyUri";
-    private static final String VAR_OBJECT_URI = "objectUri";
+    private static final String PROFILE_URI = "profileUri";
+    private static final String EXTERNAL_AUTH_ID = "externalAuthId";
+    private static final String MATCHING_PROPERTY_URI = "matchingPropertyUri";
+    private static final String OBJECT_URI = "objectUri";
     private static final Log log = LogFactory.getLog(SparqlSelectQueryResultsChecker.class);
 
     public static boolean sparqlSelectQueryResultsContain(Check check, AuthorizationRequest ar, String[] inputValues) {
         String query = check.getConfiguration();
         if (StringUtils.isBlank(query)) {
             query = check.getValues().getSingleValue();
+            if (StringUtils.isBlank(query)) {
+                log.error("Sparql query is empty.");
+                return false;
+            }
         }
-        if (StringUtils.isBlank(query)) {
-            log.error("Sparql query is empty.");
-            return false;
-        }
+
         AccessObject ao = ar.getAccessObject();
         Model m = ao.getModel();
         if (m == null) {
@@ -61,13 +62,13 @@ public class SparqlSelectQueryResultsChecker {
             return makeProfileUriMatchQuery(ar, query, m, comparedValues);
         }
 
-        if (query.contains("?" + VAR_EXTERNAL_AUTH_ID) && externalAuthIdIsNotAvailable(ar)) {
-            logVariableNotAvailable(VAR_EXTERNAL_AUTH_ID);
+        if (query.contains("?" + EXTERNAL_AUTH_ID) && externalAuthIdIsNotAvailable(ar)) {
+            logVariableNotAvailable(EXTERNAL_AUTH_ID);
             return false;
         }
 
-        if (query.contains("?" + VAR_MATCHING_PROPERTY_URI) && matchingPropertyUriIsNotAvailable()) {
-            logVariableNotAvailable(VAR_MATCHING_PROPERTY_URI);
+        if (query.contains("?" + MATCHING_PROPERTY_URI) && matchingPropertyUriIsNotAvailable()) {
+            logVariableNotAvailable(MATCHING_PROPERTY_URI);
             return false;
         }
 
@@ -145,19 +146,19 @@ public class SparqlSelectQueryResultsChecker {
     }
 
     private static void setVariables(String profileUri, AuthorizationRequest ar, ParameterizedSparqlString pss) {
-        pss.setIri(VAR_PROFILE_URI, profileUri);
+        pss.setIri(PROFILE_URI, profileUri);
         AccessObject object = ar.getAccessObject();
         Optional<String> uri = object.getUri();
         if (uri.isPresent()) {
-            pss.setIri(VAR_OBJECT_URI, uri.get());
+            pss.setIri(OBJECT_URI, uri.get());
         }
         String externalAuthId = ar.getExternalAuthId();
         if (!StringUtils.isBlank(externalAuthId)) {
-            pss.setLiteral(VAR_EXTERNAL_AUTH_ID, externalAuthId);
+            pss.setLiteral(EXTERNAL_AUTH_ID, externalAuthId);
         }
         String matchingPropertyUri = SelfEditingConfiguration.getInstance().getMatchingPropertyUri();
         if (!StringUtils.isBlank(matchingPropertyUri)) {
-            pss.setIri(VAR_MATCHING_PROPERTY_URI, matchingPropertyUri);
+            pss.setIri(MATCHING_PROPERTY_URI, matchingPropertyUri);
         }
     }
 
@@ -182,7 +183,7 @@ public class SparqlSelectQueryResultsChecker {
 
     private static String createQueryMapKey(String profileUri, String queryTemplate, AuthorizationRequest ar) {
         String mapKey = queryTemplate + "." + profileUri;
-        if (queryTemplate.contains("?" + VAR_OBJECT_URI)) {
+        if (queryTemplate.contains("?" + OBJECT_URI)) {
             AccessObject object = ar.getAccessObject();
             Optional<String> uri = object.getUri();
             if (uri.isPresent()) {
@@ -207,7 +208,7 @@ public class SparqlSelectQueryResultsChecker {
     }
 
     private static boolean isProfileUriRelatedQuery(String queryTemplate) {
-        return queryTemplate.contains("?" + VAR_PROFILE_URI);
+        return queryTemplate.contains("?" + PROFILE_URI);
     }
 
 }
