@@ -1,3 +1,5 @@
+/* $This file is distributed under the terms of the license in LICENSE$ */
+
 package edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion;
 
 import java.lang.reflect.Constructor;

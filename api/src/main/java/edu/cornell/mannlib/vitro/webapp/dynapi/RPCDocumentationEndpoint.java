@@ -1,3 +1,5 @@
+/* $This file is distributed under the terms of the license in LICENSE$ */
+
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
 import static edu.cornell.mannlib.vitro.webapp.dynapi.request.DocsRequestPath.RPC_DOCS_SERVLET_PATH;
