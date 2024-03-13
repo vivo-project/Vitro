@@ -5,21 +5,21 @@
 @prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
 @prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
 @prefix dynapi_java: <java:edu.cornell.mannlib.vitro.webapp.dynapi.components#> .
-@prefix dynapi_types: <java:edu.cornell.mannlib.vitro.webapp.dynapi.data.types#> .
+@prefix dynapi_validator: <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/> .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/isNotBlank>
+dynapi_validator:isNotBlank
         a                       dynapi:Validator ,
                                 dynapi_java:validators.IsNotBlank ;
         rdfs:label              "Is not blank"@en-US ;
         vitro:mostSpecificType  dynapi:Validator .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/IsInteger>
+dynapi_validator:IsInteger
         a                       dynapi:Validator ,
                                 dynapi_java:validators.IsInteger ;
         rdfs:label              "Is integer"@en-US ;
         vitro:mostSpecificType  dynapi:Validator .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/validator/IsEmail>
+dynapi_validator:IsEmail
         a                                   dynapi:Validator ,
                                             dynapi_java:validators.RegularExpressionValidator ;
         dynapi:regularExpression            "^(.+)@(\\S+)$" ;

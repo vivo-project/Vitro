@@ -4,38 +4,39 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
 @prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix dynapi-http-method: <https://vivoweb.org/ontology/vitro-dynamic-api/http_method/> .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/get>
+dynapi-http-method:get
         a                       dynapi:HttpMethod ;
         dynapi:name             "GET" ;
         rdfs:label              "HTTP GET method"@en-US ;
         vitro:mostSpecificType  dynapi:HttpMethod .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/post>
+dynapi-http-method:post
         a                       dynapi:HttpMethod ;
         dynapi:name             "POST" ;
         rdfs:label              "HTTP POST method"@en-US ;
         vitro:mostSpecificType  dynapi:HttpMethod .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/put>
+dynapi-http-method:put
         a                       dynapi:HttpMethod ;
         dynapi:name             "PUT" ;
         rdfs:label              "HTTP PUT method"@en-US ;
         vitro:mostSpecificType  dynapi:HttpMethod .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/patch>
+dynapi-http-method:patch
         a                       dynapi:HttpMethod ;
         dynapi:name             "PATCH" ;
         rdfs:label              "HTTP PATCH method"@en-US ;
         vitro:mostSpecificType  dynapi:HttpMethod .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/delete>
+dynapi-http-method:delete
         a                       dynapi:HttpMethod ;
         dynapi:name             "DELETE" ;
         rdfs:label              "HTTP DELETE method"@en-US ;
         vitro:mostSpecificType  dynapi:HttpMethod .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/http_method/options>
+dynapi-http-method:options
         a                       dynapi:HttpMethod ;
         dynapi:name             "OPTIONS" ;
         rdfs:label              "HTTP OPTIONS method"@en-US ;

@@ -4,84 +4,86 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
 @prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
+@prefix dynapi-model: <https://vivoweb.org/ontology/vitro-dynamic-api/model/> .
+@prefix dynapi-parameter-type: <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/> .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/model/tbox_assertions>
+dynapi-model:tbox_assertions
         a                       dynapi:Model ;
         dynapi:name             "TBOX_ASSERTIONS" ;
         dynapi:isInternal       "true"^^xsd:boolean ;
         dynapi:defaultValue     "http://vitro.mannlib.cornell.edu/default/asserted-tbox" ;
         rdfs:label              "tbox assertions model"@en-US ;
-        dynapi:hasType        	<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
+        dynapi:hasType        	dynapi-parameter-type:internal-model ;
         vitro:mostSpecificType  dynapi:Model .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/model/abox_assertions>
+dynapi-model:abox_assertions
         a                       dynapi:Model ;
         dynapi:name             "ABOX_ASSERTIONS" ;
         dynapi:isInternal       "true"^^xsd:boolean ;
         dynapi:defaultValue     "http://vitro.mannlib.cornell.edu/default/vitro-kb-2" ;
         rdfs:label              "abox assertions model"@en-US ;
-        dynapi:hasType        	<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
+        dynapi:hasType        	dynapi-parameter-type:internal-model ;
         vitro:mostSpecificType  dynapi:Model .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/model/abox_union>
+dynapi-model:abox_union
         a                       dynapi:Model ;
         dynapi:name             "ABOX_UNION" ;
         dynapi:isInternal       "true"^^xsd:boolean ;
         dynapi:defaultValue     "vitro:aboxOntModel" ;
         rdfs:label              "abox union model"@en-US ;
-        dynapi:hasType        	<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
+        dynapi:hasType        	dynapi-parameter-type:internal-model ;
         vitro:mostSpecificType  dynapi:Model .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/model/tbox_union>
+dynapi-model:tbox_union
         a                       dynapi:Model ;
         dynapi:name             "TBOX_UNION" ;
         dynapi:isInternal       "true"^^xsd:boolean ;
         dynapi:defaultValue     "vitro:tboxOntModel" ;
         rdfs:label              "tbox union model"@en-US ;
-        dynapi:hasType        	<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
+        dynapi:hasType        	dynapi-parameter-type:internal-model ;
         vitro:mostSpecificType  dynapi:Model .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/model/full_union>
+dynapi-model:full_union
         a                       dynapi:Model ;
         dynapi:name             "FULL_UNION" ;
         dynapi:isInternal       "true"^^xsd:boolean ;
         dynapi:defaultValue     "vitro:jenaOntModel" ;
         rdfs:label              "full union model"@en-US ;
-        dynapi:hasType        	<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
+        dynapi:hasType        	dynapi-parameter-type:internal-model ;
         vitro:mostSpecificType  dynapi:Model .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/model/application_metadata>
+dynapi-model:application_metadata
         a                       dynapi:Model ;
         dynapi:name             "APPLICATION_METADATA" ;
         dynapi:isInternal       "true"^^xsd:boolean ;
         dynapi:defaultValue     "http://vitro.mannlib.cornell.edu/default/vitro-kb-applicationMetadata" ;
         rdfs:label              "application metadata model"@en-US ;
-        dynapi:hasType        	<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
+        dynapi:hasType        	dynapi-parameter-type:internal-model ;
         vitro:mostSpecificType  dynapi:Model .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/model/user_accounts>
+dynapi-model:user_accounts
         a                       dynapi:Model ;
         dynapi:name             "USER_ACCOUNTS" ;
         dynapi:isInternal       "true"^^xsd:boolean ;
         dynapi:defaultValue     "http://vitro.mannlib.cornell.edu/default/vitro-kb-userAccounts" ;
         rdfs:label              "user accounts model"@en-US ;
-        dynapi:hasType        	<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
+        dynapi:hasType        	dynapi-parameter-type:internal-model ;
         vitro:mostSpecificType  dynapi:Model .
         
-<https://vivoweb.org/ontology/vitro-dynamic-api/model/dynamic_api_abox_assertions>
+dynapi-model:dynamic_api_abox_assertions
         a                       dynapi:Model ;
         dynapi:name             "dynamic_api_abox_graph" ;
         dynapi:isInternal       "true"^^xsd:boolean ;
         dynapi:defaultValue     "http://vitro.mannlib.cornell.edu/default/dynamic-api-abox" ;
         rdfs:label              "dynamic api abox assertions model"@en-US ;
-        dynapi:hasType        	<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
+        dynapi:hasType        	dynapi-parameter-type:internal-model ;
         vitro:mostSpecificType  dynapi:Model .
                 
-<https://vivoweb.org/ontology/vitro-dynamic-api/model/shapes>
+dynapi-model:shapes
         a                       dynapi:Model ;
         dynapi:isInternal       "true"^^xsd:boolean ;
         dynapi:name             "http://vitro.mannlib.cornell.edu/default/shapes" ;
         dynapi:defaultValue     "http://vitro.mannlib.cornell.edu/default/shapes" ;
         rdfs:label              "SHACL shapes model"@en-US ;
-        dynapi:hasType        	<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/type/internal-model> ;
+        dynapi:hasType        	dynapi-parameter-type:internal-model ;
         vitro:mostSpecificType  dynapi:Model .

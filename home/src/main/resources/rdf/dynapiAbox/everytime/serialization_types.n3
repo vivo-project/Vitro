@@ -4,12 +4,14 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
 @prefix dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#> .
-
+@prefix dynapi-serialization-type: <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/> .
+@prefix dynapi-serialization-config: <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serialization-config/> .
+@prefix dynapi-deserialization-config: <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/> .
 #-------------------------------------------------------------------------------
 #
 # Serialization/deserialization configurations
 #
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serialization-config/byte-array-base-64>
+dynapi-serialization-config:byte-array-base-64
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "ByteArray serialization config"@en-US ;
         dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.ByteArray" ;
@@ -18,7 +20,7 @@
         dynapi:isStaticMethod	"false"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/byte-array-base-64> 
+dynapi-deserialization-config:byte-array-base-64
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "ByteArray deserialization config"@en-US ;
         dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.ByteArray" ;
@@ -27,7 +29,7 @@
         dynapi:isStaticMethod	"true"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serialization-config/json-node>
+dynapi-serialization-config:json-node
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Fasterxml Json node serialization config"@en-US ;
         dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonFasterxmlNode" ;
@@ -36,7 +38,7 @@
         dynapi:isStaticMethod	"true"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/json-node> 
+dynapi-deserialization-config:json-node
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Fasterxml Json node deserialization config"@en-US ;
         dynapi:className 	"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonFasterxmlNode" ;
@@ -45,7 +47,7 @@
         dynapi:isStaticMethod	"true"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serialization-config/uri-resource>
+dynapi-serialization-config:uri-resource
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Uri resource serialization config"@en-US ;
         dynapi:className 		"org.apache.jena.rdf.model.Resource" ;
@@ -54,7 +56,7 @@
         dynapi:isStaticMethod	"false"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
         
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/uri-resource>
+dynapi-deserialization-config:uri-resource
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Uri resource deserialization config"@en-US ;
         dynapi:className        "org.apache.jena.rdf.model.impl.ResourceImpl" ;
@@ -63,7 +65,7 @@
         dynapi:isStaticMethod   "true"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serialization-config/string-literal>
+dynapi-serialization-config:string-literal
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "String literal serialization config"@en-US ;
         dynapi:className 	"org.apache.jena.rdf.model.impl.LiteralImpl" ;
@@ -72,7 +74,7 @@
         dynapi:isStaticMethod	"false"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/string-literal>
+dynapi-deserialization-config:string-literal
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "String literal deserialization config"@en-US ;
         dynapi:className 	"org.apache.jena.rdf.model.ResourceFactory" ;
@@ -81,7 +83,7 @@
         dynapi:isStaticMethod	"true"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/generated-uri-resource> 
+dynapi-deserialization-config:generated-uri-resource
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Uri resource deserialization config"@en-US ;
         dynapi:className        "edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.ResourceGenerator" ;
@@ -90,7 +92,7 @@
         dynapi:isStaticMethod	"true"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/internal-model>
+dynapi-deserialization-config:internal-model
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Jena internal model deserialization config"@en-US ;
         dynapi:className 	"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory" ;
@@ -99,7 +101,7 @@
         dynapi:isStaticMethod	"true"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serialization-config/internal-model> 
+dynapi-serialization-config:internal-model
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Jena internal model serialization config"@en-US ;
         dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiInMemoryOntModel" ;
@@ -108,7 +110,7 @@
         dynapi:isStaticMethod	"true"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/model>
+dynapi-deserialization-config:model
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Jena model deserialization config"@en-US ;
         dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiInMemoryOntModel" ;
@@ -117,7 +119,7 @@
         dynapi:isStaticMethod	"true"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serialization-config/model> 
+dynapi-serialization-config:model
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Jena model serialization config"@en-US ;
         dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiInMemoryOntModel" ;
@@ -126,7 +128,7 @@
         dynapi:isStaticMethod	"true"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/json-container>
+dynapi-deserialization-config:json-container
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Json object deserialization config"@en-US ;
         dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer" ;
@@ -135,7 +137,7 @@
         dynapi:isStaticMethod	"true"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serialization-config/json-container> 
+dynapi-serialization-config:json-container
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Json object serialization config"@en-US ;
         dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer" ;
@@ -144,7 +146,7 @@
         dynapi:isStaticMethod	"true"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/array>
+dynapi-deserialization-config:array
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Array list deserialization config"@en-US ;
         dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiArrayList" ;
@@ -153,7 +155,7 @@
         dynapi:isStaticMethod	"true"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serialization-config/array> 
+dynapi-serialization-config:array
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Array list serialization config"@en-US ;
         dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiArrayList" ;
@@ -162,7 +164,7 @@
         dynapi:isStaticMethod	"true"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/big-integer>
+dynapi-deserialization-config:big-integer
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Big integer deserialization config"@en-US ;
         dynapi:className 		"java.math.BigInteger" ;
@@ -171,7 +173,7 @@
         dynapi:isStaticMethod	"true"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serialization-config/big-integer> 
+dynapi-serialization-config:big-integer
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Big integer serialization config"@en-US ;
         dynapi:className 		"java.math.BigInteger" ;
@@ -180,7 +182,7 @@
         dynapi:isStaticMethod	"false"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/string>
+dynapi-deserialization-config:string
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "String deserialization config"@en-US ;
         dynapi:className 		"java.lang.String" ;
@@ -189,7 +191,7 @@
         dynapi:isStaticMethod	"false"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serialization-config/string>
+dynapi-serialization-config:string
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "String serialization config"@en-US ;
         dynapi:className 		"java.lang.String" ;
@@ -198,7 +200,7 @@
         dynapi:isStaticMethod	"false"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/integer>
+dynapi-deserialization-config:integer
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Integer deserialization config"@en-US ;
         dynapi:className 		"java.lang.Integer" ;
@@ -207,7 +209,7 @@
         dynapi:isStaticMethod	"true"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serialization-config/integer>
+dynapi-serialization-config:integer
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Integer serialization config"@en-US ;
         dynapi:className 		"java.lang.Integer" ;
@@ -216,7 +218,7 @@
         dynapi:isStaticMethod	"false"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/boolean>
+dynapi-deserialization-config:boolean
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Boolean deserialization config"@en-US ;
         dynapi:className 		"java.lang.Boolean" ;
@@ -225,7 +227,7 @@
         dynapi:isStaticMethod	"true"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serialization-config/boolean>
+dynapi-serialization-config:boolean
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Boolean serialization config"@en-US ;
         dynapi:className 		"java.lang.Boolean" ;
@@ -238,14 +240,14 @@
 #
 # Parameter serialization types
 #
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/TestResultArrayType>
+dynapi-serialization-type:TestResultArrayType
         a                                   dynapi:SerializationType ,
                                             dynapi:ArraySerializationType ;
         rdfs:label                          "Test result array type"@en-US ;
         dynapi:name                         "test result array type" ;
-        dynapi:hasElementsOfType            <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/TestResultActionType> .
+        dynapi:hasElementsOfType            dynapi-serialization-type:TestResultActionType .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/TestResultActionType>
+dynapi-serialization-type:TestResultActionType
         a                                   dynapi:SerializationType ,
                                             dynapi:JsonContainerSerializationType ;
         rdfs:label                          "Test result action object type"@en-US ;
@@ -253,21 +255,21 @@
         dynapi:hasInternalElement           <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/TestResultAction> ,
                                             <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/TestResultLabel> .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/boolean>
+dynapi-serialization-type:boolean
         a                       dynapi:SerializationType ,
                                 dynapi:PrimitiveSerializationType ;
         dynapi:name             "boolean" ;
         rdfs:label              "Boolean type"@en-US ;
         vitro:mostSpecificType  dynapi:PrimitiveSerializationType .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/decimal>
+dynapi-serialization-type:decimal
         a                       dynapi:SerializationType ,
                                 dynapi:PrimitiveSerializationType ;
         dynapi:name             "decimal" ;
         rdfs:label              "Decimal type"@en-US ;
         vitro:mostSpecificType  dynapi:PrimitiveSerializationType .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/integer>
+dynapi-serialization-type:integer
         a                       dynapi:SerializationType ,
                                 dynapi:PrimitiveSerializationType ;
         dynapi:name             "integer" ;
@@ -275,21 +277,21 @@
         vitro:mostSpecificType  dynapi:PrimitiveSerializationType .
 
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/json-container>
+dynapi-serialization-type:json-container
         a                       dynapi:SerializationType ,
                                 dynapi:JsonContainerSerializationType ;
         dynapi:name             "json container" ;
         rdfs:label              "Json container type"@en-US ;
         vitro:mostSpecificType  dynapi:JsonContainerSerializationType .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/array>
+dynapi-serialization-type:array
         a                       dynapi:SerializationType ,
                                 dynapi:ArraySerializationType ;
         dynapi:name             "array" ;
         rdfs:label              "Array type"@en-US ;
         vitro:mostSpecificType  dynapi:ArraySerializationType .
 
-<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/serializedtype/string>
+dynapi-serialization-type:string
         a                       dynapi:SerializationType ,
                                 dynapi:PrimitiveSerializationType ;
         dynapi:name             "string" ;

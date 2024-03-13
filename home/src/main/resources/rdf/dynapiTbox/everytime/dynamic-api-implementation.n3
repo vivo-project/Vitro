@@ -36,7 +36,7 @@ dynapi:Parameter rdfs:subClassOf components:Parameter .
 
 dynapi:ParameterType rdfs:subClassOf types:ParameterType .
 
-dynapi:ArrayParameterType rdfs:subClassOf types:ParameterType, types:ArrayParameterType .
+dynapi:ArrayParameterType rdfs:subClassOf types:ArrayParameterType .
 
 dynapi:RDFType rdfs:subClassOf types:RDFType .
 
