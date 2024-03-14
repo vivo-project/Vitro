@@ -79,8 +79,14 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
         UserAccountsDao userAccountsDao = constructUserAccountsDao();
         I18nBundle i18n = I18n.bundle(vreq);
 
+        // Check for impossible length input
+        if (vreq.getParameter("email").length() > 320) {
+            dataContext.put("errorMessage", i18n.text("error_invalid_email", vreq.getParameter("email")));
+            return showForm(dataContext);
+        }
+
         String email = getNonNullTrimmedParameterValue(vreq, "email");
-        if (email.length() > 320 || !email.matches("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")) {
+        if (!email.matches("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")) {
             dataContext.put("errorMessage", i18n.text("error_invalid_email", email));
             return showForm(dataContext);
         }
