@@ -386,6 +386,20 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         return objectKey;
     }
 
+    protected boolean isAuthorizedToDisplay(VitroRequest vreq, String objectUri) {
+        boolean isAuthorizedToDisplay = false; 
+        AccessObject ao;
+        if (isFaux()) {
+            ao = new FauxObjectPropertyStatementAccessObject(vreq.getJenaOntModel(), subjectUri, fauxProperty, objectUri);
+        } else {
+            ao = new ObjectPropertyStatementAccessObject(vreq.getJenaOntModel(), subjectUri, property, objectUri);
+        }
+        if (PolicyHelper.isAuthorizedForActions(vreq, ao, AccessOperation.DISPLAY) ) {
+            isAuthorizedToDisplay = true;
+        }
+        return isAuthorizedToDisplay;
+    }
+    
     /* Template properties */
 
     public String getType() {
