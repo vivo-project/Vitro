@@ -46,7 +46,7 @@ public class SparqlSelectQueryResultsChecker {
         AccessObject ao = ar.getAccessObject();
         Model m = ao.getModel();
         if (m == null) {
-            log.debug("SparqlQueryContains model is not provided");
+            log.error("Model not provided");
             return false;
         }
 
@@ -116,10 +116,11 @@ public class SparqlSelectQueryResultsChecker {
             AuthorizationRequest ar) {
         HashMap<String, Set<String>> queryMap = QueryResultsMapCache.get();
         String queryMapKey = createQueryMapKey(profileUri, queryTemplate, ar);
+        HashSet<String> results = new HashSet<>();
         if (queryMap.containsKey(queryMapKey)) {
-            return queryMap.get(queryMapKey);
+            results.addAll(queryMap.get(queryMapKey));
+            return results;
         }
-        Set<String> results = new HashSet<>();
         ParameterizedSparqlString pss = new ParameterizedSparqlString();
         pss.setCommandText(queryTemplate);
         setVariables(profileUri, ar, pss);
@@ -140,7 +141,9 @@ public class SparqlSelectQueryResultsChecker {
             queryExecution.close();
         }
         debug("query results: " + results);
-        queryMap.put(queryMapKey, results);
+        Set<String> queryMapValue = new HashSet<>();
+        queryMapValue.addAll(results);
+        queryMap.put(queryMapKey, queryMapValue);
         QueryResultsMapCache.update(queryMap);
         return results;
     }
