@@ -195,7 +195,7 @@ public class DateTimeIntervalValidationVTwo implements N3ValidatorVTwo {
                  Calendar endCal = endDate.asCalendar();
 
                  if( endCal != null ){
-                     if (!startCal.before(endCal) && !startCal.equals(endCal)) {
+                     if (startCal.after(endCal)) {
                          if( startPrecision == VitroVocabulary.Precision.YEAR
                              && endPrecision == VitroVocabulary.Precision.YEAR ){
                              errors.putAll( checkYears(startCal,endCal));
