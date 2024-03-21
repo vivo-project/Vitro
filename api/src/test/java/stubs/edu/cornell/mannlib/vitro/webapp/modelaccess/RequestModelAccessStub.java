@@ -10,6 +10,7 @@ import org.apache.jena.query.Dataset;
 
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.SimpleOntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.DatasetOption;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.LanguageOption;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.OntModelSelectorOption;
@@ -91,8 +92,7 @@ public class RequestModelAccessStub implements RequestModelAccess {
 	@Override
 	public OntModelSelector getOntModelSelector(
 			OntModelSelectorOption... options) {
-		throw new RuntimeException(
-				"RequestModelAccessStub.getOntModelSelector() not implemented.");
+	    return new SimpleOntModelSelector();
 	}
 
 	@Override
