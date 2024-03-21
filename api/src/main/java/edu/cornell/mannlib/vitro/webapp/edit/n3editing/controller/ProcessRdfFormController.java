@@ -40,6 +40,11 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.ProcessRdfForm;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.RdfLiteralHash;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.ModelSelector;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.LimitRemovalsToLanguage;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 
 /**
  * This servlet will convert a request to an EditSubmission,
@@ -107,7 +112,8 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		configuration.addModelChangePreprocessor(new LimitRemovalsToLanguage(vreq.getLocale()));
 		N3EditUtils.preprocessModels(changes, configuration, vreq);
 		
-		ProcessRdfForm.applyChangesToWriteModel(changes, vreq.getRDFService(), writeModelSelector.getDefaultGraphUri(), N3EditUtils.getEditorUri(vreq));
+		String graphUri = writeModelSelector.getDefaultGraphUri();
+		ProcessRdfForm.applyChangesToWriteModel(changes, getRdfService(graphUri, writeModel), graphUri, N3EditUtils.getEditorUri(vreq));
 
 		//Here we are trying to get the entity to return to URL,
 		//More involved processing for data property apparently
@@ -117,6 +123,21 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		N3EditUtils.updateEditConfigurationForBackButton(configuration, submission, vreq, writeModel);
         PostEditCleanupController.doPostEditCleanup(vreq);
         return PostEditCleanupController.doPostEditRedirect(vreq, entityToReturnTo);
+	}
+
+	private RDFService getRdfService(String graphUri, Model writeModel) {
+		RDFService configuration = ModelAccess.getInstance().getRDFService(WhichService.CONFIGURATION);
+		boolean isConfigurationGraph = false;
+		try {
+			isConfigurationGraph = configuration.getGraphURIs().contains(graphUri);
+		} catch (RDFServiceException e) {
+			log.error(e, e);
+		}
+		if (isConfigurationGraph) {
+			return new RDFServiceModel(writeModel);
+		} else {
+			return ModelAccess.getInstance().getRDFService();
+		}
 	}
 
 	//In case of back button confusion
