@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -45,8 +44,11 @@ public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplat
             /* Put into data structure to send to template */
             String objectKey = getObjectKey();
             for (Map<String, String> map : statementData) {
-                statements.add(new ObjectPropertyStatementTemplateModel(subjectUri,
-                        op, objectKey, map, getTemplateName(), vreq));
+                String objectUri = map.get(objectKey);
+                if (isAuthorizedToDisplay(vreq, objectUri)) {
+                    statements.add(new ObjectPropertyStatementTemplateModel(subjectUri,
+                            op, objectKey, map, getTemplateName(), vreq));    
+                }
             }
 
             postprocessStatementList(statements);

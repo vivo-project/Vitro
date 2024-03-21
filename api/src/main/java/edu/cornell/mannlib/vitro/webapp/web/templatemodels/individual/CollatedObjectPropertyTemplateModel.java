@@ -235,10 +235,13 @@ public class CollatedObjectPropertyTemplateModel extends
 				subclasses.add(new SubclassTemplateModel(vclass,
 						listForThisSubclass));
 			}
-
-			listForThisSubclass.add(new ObjectPropertyStatementTemplateModel(
-					subjectUri, property, objectKey, map, getTemplateName(),
-					vreq));
+			String objectUri = map.get(objectKey);
+			if (isAuthorizedToDisplay(vreq, objectUri)) {
+			    listForThisSubclass.add(new ObjectPropertyStatementTemplateModel(
+	                    subjectUri, property, objectKey, map, getTemplateName(),
+	                    vreq));
+			}
+			
 
 		}
 
