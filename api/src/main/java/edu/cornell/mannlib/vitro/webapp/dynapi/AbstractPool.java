@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
-import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.RDF_TYPE;
-import static edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader.toJavaUri;
 import static java.lang.String.format;
 
 import java.util.List;
@@ -17,11 +15,6 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoa
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.NodeIterator;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
 
 public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C>> implements Pool<K, C> {
 
@@ -96,25 +89,20 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
                     .getName(), key, uri));
         }
 
-        if (isInModel(uri)) {
-            synchronized (mutex) {
-                K oldKey = components.putUriMapping(uri, key);
-                if (oldKey != null && !oldKey.equals(key)) {
-                    C oldComponent = components.get(oldKey);
-                    if (oldComponent != null) {
-                        obsoleteComponents.add(oldComponent);
-                        unloadObsoleteComponents();
-                    }
-                }
-                C oldComponent = components.put(key, component);
+        synchronized (mutex) {
+            K oldKey = components.putUriMapping(uri, key);
+            if (oldKey != null && !oldKey.equals(key)) {
+                C oldComponent = components.get(oldKey);
                 if (oldComponent != null) {
                     obsoleteComponents.add(oldComponent);
                     unloadObsoleteComponents();
                 }
             }
-        } else {
-            throw new RuntimeException(format("%s %s with URI %s not found in model. Not adding to pool.", getType()
-                    .getName(), key, uri));
+            C oldComponent = components.put(key, component);
+            if (oldComponent != null) {
+                obsoleteComponents.add(oldComponent);
+                unloadObsoleteComponents();
+            }
         }
     }
 
@@ -145,24 +133,6 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
         for (String uri : uris) {
             unload(uri);
         }
-    }
-
-    private boolean isInModel(String uri) {
-        Model dynamicAPIModel = DynapiModelProvider.getInstance().getModel();
-        Resource s = dynamicAPIModel.getResource(uri);
-        Property p = dynamicAPIModel.getProperty(RDF_TYPE);
-
-        String javaUri = toJavaUri(getType());
-
-        NodeIterator nit = dynamicAPIModel.listObjectsOfProperty(s, p);
-        while (nit.hasNext()) {
-            RDFNode node = nit.next();
-            if (node.isResource() && node.toString().replace("#", ".").equals(javaUri)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public void load(String uri) {

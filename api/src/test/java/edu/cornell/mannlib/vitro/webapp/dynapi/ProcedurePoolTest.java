@@ -16,6 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ProcedurePoolTest extends ServletContextTest {
@@ -125,6 +126,7 @@ public class ProcedurePoolTest extends ServletContextTest {
         procedureHasClient.removeClient();
     }
 
+    @Ignore
     @Test(expected = RuntimeException.class)
     public void testAddWithoutModelLoaded() throws IOException, ConfigurationBeanLoaderException {
         ProcedurePool procedurePool = initWithDefaultModel();
