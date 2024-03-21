@@ -4,18 +4,21 @@ package edu.cornell.mannlib.vitro.webapp.utils.configuration;
 
 import static edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader.classnameFromJavaUri;
 import static edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader.isJavaUri;
-import static edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader.isMatchingJavaUri;
-import static edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader.toJavaUri;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
-import static org.apache.jena.rdf.model.ResourceFactory.createStatement;
 
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
+import org.apache.jena.query.ParameterizedSparqlString;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Selector;
@@ -33,6 +36,28 @@ import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockedModel;
  * ConfigurationRdf object.
  */
 public class ConfigurationRdfParser {
+    
+    private static final String implementationClassesQuery = "" +
+            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" + 
+            "PREFIX dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#>\n" + 
+            "SELECT DISTINCT \n" + 
+            "?class \n" + 
+            "?java \n" + 
+            "(COUNT(DISTINCT(?intermediateClass)) as ?distance)\n" + 
+            "WHERE {\n" +
+            "  {\n" + 
+            "    ?uri a ?java .\n" + 
+            "    FILTER(STRSTARTS(STR(?java), 'java:'))\n" + 
+            "  }\n" +
+            "  UNION\n" +
+            "  {\n" + 
+            "    ?uri a ?type .\n" + 
+            "    ?type rdfs:subClassOf* ?intermediateClass .\n" + 
+            "    ?intermediateClass rdfs:subClassOf* ?class .\n" + 
+            "    ?class dynapi:implementedBy ?java .\n" + 
+            "  }\n" + 
+            "} GROUP BY ?class ?java ORDER BY ?distance\n";
+    
 	public static <T> ConfigurationRdf<T> parse(LockableModel locking,
 			String uri, Class<T> resultClass)
 			throws InvalidConfigurationRdfException {
@@ -41,8 +66,6 @@ public class ConfigurationRdfParser {
 		Objects.requireNonNull(resultClass, "resultClass may not be null.");
 
 		confirmExistenceInModel(locking, uri);
-
-		confirmEligibilityForResultClass(locking, uri, resultClass);
 
 		Set<PropertyStatement> properties = loadProperties(locking, uri);
 
@@ -61,26 +84,6 @@ public class ConfigurationRdfParser {
             if (subjectStatements.isEmpty()) {
 				throw individualDoesNotAppearInModel(uri);
 			}
-		}
-	}
-
-	private static void confirmEligibilityForResultClass(LockableModel locking,
-			String uri, Class<?> resultClass)
-			throws InvalidConfigurationRdfException {
-		String resultClassUri = toJavaUri(resultClass);
-		try (LockedModel m = locking.read()) {
-			Set<RDFNode> types = //
-					m.listObjectsOfProperty(createResource(uri), RDF.type)
-							.toSet();
-			for (RDFNode typeNode : types) {
-				if (typeNode.isURIResource()) {
-					String typeUri = typeNode.asResource().getURI();
-					if (isMatchingJavaUri(resultClassUri, typeUri)) {
-						return;
-					}
-				}
-			}
-			throw noTypeStatementForResultClass(uri, resultClassUri);
 		}
 	}
 
@@ -112,31 +115,39 @@ public class ConfigurationRdfParser {
 		}
 	}
 
-	private static <T> Class<? extends T> determineConcreteClass(
-			LockableModel locking, String uri, Class<T> resultClass)
-			throws InvalidConfigurationRdfException {
+    private static <T> Class<? extends T> determineConcreteClass(LockableModel locking, String uri,
+            Class<T> resultClass) throws InvalidConfigurationRdfException {
 		Set<Class<? extends T>> concreteClasses = new HashSet<>();
 
 		try (LockedModel m = locking.read()) {
-			final Set<RDFNode> objectsWithProperty = m
-					.listObjectsOfProperty(createResource(uri), RDF.type)
-					.toSet();
+		    ParameterizedSparqlString pss = new ParameterizedSparqlString(implementationClassesQuery);
+		    pss.setIri("uri", uri);
+		    Query query = QueryFactory.create(pss.toString());
+		    QueryExecution qexec = QueryExecutionFactory.create(query, m);
+		    try {
+                ResultSet results = qexec.execSelect();
+                int distance = -1;
+                while (results.hasNext()) {
+                    QuerySolution solution = results.nextSolution();
+                    String typeUri = solution.getResource("java").toString();
+                    int solDistance = solution.getLiteral("distance").getInt();
+                    //set to distance of first solution
+                    if(distance < 0) {
+                        distance = solDistance;
+                    }
+                    //process only solutions with the same distance
+                    if (distance != solDistance) {
+                        break;
+                    }
 
-            for (RDFNode node : objectsWithProperty) {
-				if (node.isAnon()) {
-					continue;
-				}
-				if (!node.isURIResource()) {
-					throw typeMustBeUriResource(node);
-				}
-
-				String typeUri = node.asResource().getURI();
-				if (!isConcreteClass(typeUri)) {
-					continue;
-				}
-
-				concreteClasses.add(processTypeUri(typeUri, resultClass));
-			}
+                    if (!isConcreteClass(typeUri)) {
+                        continue;
+                    }
+                    concreteClasses.add(processTypeUri(typeUri, resultClass));
+                }
+            } finally {
+                qexec.close();
+            }
 		}
 
 		if (concreteClasses.isEmpty()) {
@@ -231,20 +242,6 @@ public class ConfigurationRdfParser {
 			String typeUri, Throwable e) {
 		return new InvalidConfigurationRdfException(
 				"Can't load this type: '" + typeUri + "'", e);
-	}
-
-	private static InvalidConfigurationRdfException typeMustBeUriResource(
-			RDFNode node) {
-		return new InvalidConfigurationRdfException(
-				"Type must be a URI Resource: " + node);
-	}
-
-	private static InvalidConfigurationRdfException noTypeStatementForResultClass(
-			String uri, String resultClassUri) {
-		return new InvalidConfigurationRdfException(
-				"A type statement is required: '"
-						+ createStatement(createResource(uri), RDF.type,
-								createResource(resultClassUri)));
 	}
 
 	private static InvalidConfigurationRdfException noRdfStatements(

@@ -99,6 +99,7 @@ public class ConfigurationBeanLoaderTest extends
 						"The model contains no statements about"));
 	}
 
+	@Ignore
 	@Test
 	public void uriDoesNotDeclareResultClassAsType_throwsException()
 			throws ConfigurationBeanLoaderException {
@@ -355,10 +356,8 @@ public class ConfigurationBeanLoaderTest extends
 	public void simpleSuccess() throws ConfigurationBeanLoaderException {
 		model.add(typeStatement(SIMPLE_SUCCESS_INSTANCE_URI,
 				toJavaUri(SimpleSuccess.class)));
-
 		SimpleSuccess instance = loader.loadInstance(
 				SIMPLE_SUCCESS_INSTANCE_URI, SimpleSuccess.class);
-
 		assertNotNull(instance);
 	}
 

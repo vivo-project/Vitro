@@ -2,11 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils.configuration;
 
-import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -16,10 +14,14 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jena.query.ParameterizedSparqlString;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.vocabulary.RDF;
-
 import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockableModel;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockedModel;
 
@@ -28,7 +30,23 @@ import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockedModel;
  */
 public class ConfigurationBeanLoader {
 	
- 	private static final Log log = LogFactory.getLog(ConfigurationBeanLoader.class);
+ 	private static final String FIND_URI_QUERY = "" +
+ 	        "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" + 
+ 	        "PREFIX dynapi: <https://vivoweb.org/ontology/vitro-dynamic-api#>\n" + 
+ 	        "SELECT ?uri\n" + 
+ 	        "WHERE {\n" + 
+ 	        "  {\n" + 
+ 	        "    ?uri a ?type .\n" + 
+ 	        "    ?type dynapi:implementedBy ?java .\n" + 
+ 	        "  }\n" + 
+ 	        "  UNION\n" + 
+ 	        "  {\n" + 
+ 	        "    ?uri a ?java .\n" + 
+ 	        "  }\n" + 
+ 	        "} ";
+
+
+    private static final Log log = LogFactory.getLog(ConfigurationBeanLoader.class);
 
 
 	private static final String JAVA_URI_PREFIX = "java:";
@@ -188,14 +206,20 @@ public class ConfigurationBeanLoader {
 
 	private <T> void findUris(Class<T> resultClass, Set<String> uris) {
 		try (LockedModel m = locking.read()) {
-			for (String typeUri : toPossibleJavaUris(resultClass)) {
-				List<Resource> resources = m.listResourcesWithProperty(RDF.type,
-						createResource(typeUri)).toList();
-				for (Resource r : resources) {
-					if (r.isURIResource()) {
-						uris.add(r.getURI());
-					}
-				}
+          for (String typeUri : toPossibleJavaUris(resultClass)) {
+                ParameterizedSparqlString pss = new ParameterizedSparqlString(FIND_URI_QUERY);
+                pss.setIri("java", typeUri);
+                Query query = QueryFactory.create(pss.toString());
+                QueryExecution qexec = QueryExecutionFactory.create(query, m);
+                try {
+                    ResultSet results = qexec.execSelect();
+                    while (results.hasNext()) {
+                        QuerySolution solution = results.nextSolution();
+                        uris.add(solution.getResource("uri").getURI());
+                    }
+                } finally {
+                    qexec.close();
+                }
 			}
 		}
 	}
