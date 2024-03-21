@@ -57,8 +57,12 @@ public class CollatedObjectPropertyTemplateModel extends
 					+ op.getURI());
 
 			/* Get the data */
-			List<Map<String, String>> statementData = getStatementData();
-
+			List<Map<String, String>> statementData;
+			if (op instanceof FauxPropertyWrapper) {
+				statementData = getUnfilteredStatementData();
+			} else {
+				statementData = getStatementData(); 
+			}
 			/* Apply post-processing */
 			postprocess(statementData);
 

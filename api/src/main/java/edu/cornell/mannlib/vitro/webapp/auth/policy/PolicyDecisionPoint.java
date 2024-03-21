@@ -40,8 +40,8 @@ public class PolicyDecisionPoint {
             }
         }
 
-        pd = new BasicPolicyDecision(DecisionResult.INCONCLUSIVE,
-                "No policy returned a conclusive decision on " + ar.getAccessObject());
+        pd = new BasicPolicyDecision(DecisionResult.INCONCLUSIVE, String.format(
+                "No policy returned a conclusive decision on %s of %s", ar.getAccessOperation(), ar.getAccessObject()));
         logger.logNoDecision(pd);
         return pd;
     }
