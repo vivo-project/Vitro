@@ -6309,3 +6309,52 @@ uil-data:captcha_user_sol_invalid.Vitro
         uil:hasApp      "Vitro" ;
         uil:hasKey      "captcha_user_sol_invalid" ;
         uil:hasPackage  "Vitro-languages" .
+
+uil-data:suppress_operation_for_roles.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Denegar operaciones <b>{0}</b> para roles"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "suppress_operation_for_roles" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:operation_permissions_for_this_property.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Permitir operaciones <b>{0}</b> para esta propiedad"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "operation_permissions_for_this_property" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:operation_permissions_for_this_class.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Permitir operaciones <b>{0}</b> para esta clase"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "operation_permissions_for_this_class" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:suppress_operation_for_this_property_in_unrelated_individuals.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Impedir operaciones <b>{0}</b> para esta propiedad en páginas de objetos no relacionados"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "suppress_operation_for_this_property_in_unrelated_individuals" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:suppress_operation_for_individuals_of_this_class.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Denegar operaciones <b>{0}</b> para páginas de objetos que pertenecen a la clase editada"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "suppress_operation_for_individuals_of_this_class" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:suppress_operation_for_unrelated_individuals_of_this_class.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Evitar operaciones <b>{0}</b> para páginas de objetos no relacionados que pertenecen a la clase editada"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "suppress_operation_for_unrelated_individuals_of_this_class" ;
+        uil:hasPackage   "Vitro-languages" .
+

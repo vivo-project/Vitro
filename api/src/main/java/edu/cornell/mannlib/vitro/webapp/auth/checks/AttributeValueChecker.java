@@ -2,19 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.checks;
 
-import java.util.Arrays;
-import java.util.List;
-
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueSet;
-import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.jena.rdf.model.Model;
 
 public class AttributeValueChecker {
-    private static final Log log = LogFactory.getLog(AttributeValueChecker.class);
 
     static boolean test(Check attr, AuthorizationRequest ar, String... values) {
         CheckType testType = attr.getType();
@@ -30,42 +21,12 @@ public class AttributeValueChecker {
             case STARTS_WITH:
                 return startsWith(attr, values);
             case SPARQL_SELECT_QUERY_RESULTS_CONTAIN:
-                return sparqlQueryContains(attr, ar, values);
+                return SparqlSelectQueryResultsChecker.sparqlSelectQueryResultsContain(attr, ar, values);
             case SPARQL_SELECT_QUERY_RESULTS_NOT_CONTAIN:
-                return !sparqlQueryContains(attr, ar, values);
+                return !SparqlSelectQueryResultsChecker.sparqlSelectQueryResultsContain(attr, ar, values);
             default:
                 return false;
         }
-    }
-
-    private static boolean sparqlQueryContains(Check attr, AuthorizationRequest ar, String[] inputValues) {
-        AttributeValueSet values = attr.getValues();
-        if (!values.containsSingleValue()) {
-            log.error("SparqlQueryContains more than  one value");
-            return false;
-        }
-        String queryTemplate = values.getSingleValue();
-        if (StringUtils.isBlank(queryTemplate)) {
-            log.error("SparqlQueryContains template is empty");
-            return false;
-        }
-        AccessObject ao = ar.getAccessObject();
-        Model m = ao.getStatementOntModel();
-        if (m == null) {
-            log.debug("SparqlQueryContains model is not provided");
-            return false;
-        }
-        List<String> personUris = ar.getEditorUris();
-        if (personUris.isEmpty()) {
-            if (queryTemplate.contains("?personUri")) {
-                log.debug("Subject has no person URIs");
-                return false;
-            } else {
-                personUris.add("");
-            }
-        }
-        List<String> resourceUris = Arrays.asList(ao.getResourceUris());
-        return ProximityChecker.isAnyRelated(m, resourceUris, personUris, queryTemplate);
     }
 
     private static boolean contains(Check attr, String... inputValues) {

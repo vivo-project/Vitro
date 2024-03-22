@@ -12,7 +12,7 @@ public class FauxDataPropertyStatementAccessObject extends AccessObject {
 
     public FauxDataPropertyStatementAccessObject(OntModel ontModel, String subjectUri, FauxProperty predicate,
             String dataValue) {
-        setStatementOntModel(ontModel);
+        setModel(ontModel);
         setStatementSubject(subjectUri);
         this.predicate = predicate;
         setStatementObject(dataValue);

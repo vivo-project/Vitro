@@ -16,8 +16,12 @@ public class ValueSetFactory {
             if (avc == null) {
                 return createNew(value, qs, dataSetKey, avcKey);
             } else {
-                return returnFromRegistry(value, avc);
+                Optional<String> setUri = getSetUri(qs);
+                if (!setUri.isPresent() || !setUri.get().equals(avc.getValueSetUri())) {
+                    return createNew(value, qs, dataSetKey, avcKey);
+                }
             }
+            return returnFromRegistry(value, avc);
         }
     }
 

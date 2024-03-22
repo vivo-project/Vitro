@@ -1,0 +1,14 @@
+@prefix : <https://vivoweb.org/ontology/vitro-search-individual/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+:filter_group_search_filters rdfs:label "Filtros de búsqueda"@es .
+:filter_type rdfs:label "Tipo"@es .
+:filter_category rdfs:label "Categoría"@es .
+:sort_title_desc rdfs:label "Título Z-A"@es .
+:sort_title_asc rdfs:label "Título A-Z"@es .
+:sort_by_relevance rdfs:label "Relevancia"@es .
+:field_label_sort rdfs:label "Campo de clasificación de etiquetas"@es .
+:field_category rdfs:label "Grupo de clase"@es .
+:field_type rdfs:label "Tipo"@es .
+:filter_querytext rdfs:label "Texto"@es .
+:field_querytext rdfs:label "Campo predeterminado"@es .

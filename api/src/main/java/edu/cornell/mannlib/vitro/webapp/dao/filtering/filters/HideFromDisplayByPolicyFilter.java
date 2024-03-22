@@ -21,6 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
 /**
  * Ask the current policies whether we can show these things to the user.
@@ -80,7 +81,7 @@ public class HideFromDisplayByPolicyFilter extends VitroFiltersImpl {
 			ObjectProperty predicate = getOrCreateProperty(ops);
 			String objectUri = ops.getObjectURI();
 			return checkAuthorization(new ObjectPropertyStatementAccessObject(
-					null, subjectUri, predicate, objectUri));
+					ModelAccess.getInstance().getOntModel(), subjectUri, predicate, objectUri));
 		}
 
 		/**

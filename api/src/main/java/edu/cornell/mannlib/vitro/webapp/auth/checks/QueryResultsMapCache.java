@@ -4,7 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.auth.checks;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -12,11 +12,11 @@ import org.apache.commons.logging.LogFactory;
 public class QueryResultsMapCache implements AutoCloseable {
     private static final Log log = LogFactory.getLog(QueryResultsMapCache.class);
 
-    private static ThreadLocal<HashMap<String, List<String>>> threadLocal =
-            new ThreadLocal<HashMap<String, List<String>>>();
+    private static ThreadLocal<HashMap<String, Set<String>>> threadLocal =
+            new ThreadLocal<HashMap<String, Set<String>>>();
 
     public QueryResultsMapCache() {
-        threadLocal.set(new HashMap<String, List<String>>());
+        threadLocal.set(new HashMap<String, Set<String>>());
         log.debug("Query results map cache initialized");
     }
 
@@ -26,10 +26,10 @@ public class QueryResultsMapCache implements AutoCloseable {
         log.debug("QueryResultsMapCache is closed");
     }
 
-    public static HashMap<String, List<String>> get() {
-        HashMap<String, List<String>> queryResultsMap = threadLocal.get();
+    public static HashMap<String, Set<String>> get() {
+        HashMap<String, Set<String>> queryResultsMap = threadLocal.get();
         if (queryResultsMap == null) {
-            queryResultsMap = new HashMap<String, List<String>>();
+            queryResultsMap = new HashMap<String, Set<String>>();
             log.debug("Use a non-cached query results map");
         } else {
             log.debug("Use cached query results map");
@@ -37,7 +37,7 @@ public class QueryResultsMapCache implements AutoCloseable {
         return queryResultsMap;
     }
 
-    public static void update(HashMap<String, List<String>> queryResultsMap) {
+    public static void update(HashMap<String, Set<String>> queryResultsMap) {
         if (threadLocal.get() != null) {
             threadLocal.set(queryResultsMap);
             log.debug("Query results map cache has been updated");

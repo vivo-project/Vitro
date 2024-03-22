@@ -7,6 +7,8 @@ import org.apache.commons.logging.LogFactory;
 
 import org.apache.jena.rdf.model.Literal;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject.SOME_LITERAL;
+
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.DataPropertyStatementAccessObject;
@@ -44,10 +46,15 @@ public class NameStatementTemplateModel extends PropertyStatementTemplateModel {
         // NIHVIVO-2466 Use the same methods to get the label that are used elsewhere in the
         // application, to guarantee consistent results for individuals with multiple labels
         // across the application.
-        WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-        IndividualDao iDao = wdf.getIndividualDao();
-        EditLiteral literal = iDao.getLabelEditLiteral(subjectUri);
 
+        AccessObject ao = new DataPropertyStatementAccessObject(vreq.getJenaOntModel(), subjectUri, property, SOME_LITERAL);
+        boolean isAuthorized = PolicyHelper.isAuthorizedForActions(vreq, ao, AccessOperation.DISPLAY);
+        EditLiteral literal = null;
+        if (isAuthorized) {
+            WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+            IndividualDao iDao = wdf.getIndividualDao();
+            literal = iDao.getLabelEditLiteral(subjectUri);
+        }
         if (literal == null) {
         	// If the individual has no rdfs:label, use the local name. It will not be editable. (This replicates previous behavior;
         	// perhaps we would want to allow a label to be added. But such individuals do not usually have their profiles viewed or

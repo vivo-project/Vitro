@@ -35,6 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
 
@@ -182,8 +183,9 @@ public class DatapropRetryController extends BaseEditController {
         request.setAttribute("title","Data Property Editing Form");
         request.setAttribute("_action",action);
         request.setAttribute("unqualifiedClassName","DatatypeProperty");
-
+        request.setAttribute("i18n", I18n.bundle(vreq));
         addAccessAttributes(request, objectForEditing.getURI(), AccessObjectType.DATA_PROPERTY);
+        addNotRelatedPropertySuppressions(request, objectForEditing.getURI(), AccessObjectType.DATA_PROPERTY);
         setRequestAttributes(request,epo);
 
         try {

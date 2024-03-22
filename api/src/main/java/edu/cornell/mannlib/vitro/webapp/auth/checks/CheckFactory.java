@@ -8,6 +8,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueSet;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.ValueSetFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyLoader;
 import org.apache.jena.query.QuerySolution;
+import org.apache.jena.rdf.model.RDFNode;
 
 public class CheckFactory {
 
@@ -48,7 +49,16 @@ public class CheckFactory {
                 check = null;
         }
         check.setType(CheckType.valueOf(testId));
+        setConfiguration(qs, check);
         return check;
+    }
+
+    private static void setConfiguration(QuerySolution qs, Check check) {
+        RDFNode rdfNode = qs.get("config");
+        if (rdfNode == null || !rdfNode.isLiteral()) {
+            return;
+        }
+        check.setConfiguration(rdfNode.asLiteral().toString());
     }
 
     private static String getValue(QuerySolution qs) {
