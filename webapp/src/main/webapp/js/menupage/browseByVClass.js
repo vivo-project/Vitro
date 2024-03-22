@@ -30,19 +30,19 @@ var browseByVClass = {
     // Event listeners. Called on page load
     bindEventListeners: function() {
         // Listeners for vClass switching
-        this.vgraphVClassLinks.click(function() {
+        this.vgraphVClassLinks.on("click", function() {
             var uri = $(this).attr('data-uri');
             browseByVClass.getIndividuals(uri);
         });
 
-        this.browseVClassLinks.click(function() {
+        this.browseVClassLinks.on("click", function() {
             var uri = $(this).attr('data-uri');
             browseByVClass.getIndividuals(uri);
             return false;
         });
 
         // Listener for alpha switching
-        this.alphaIndexLinks.click(function() {
+        this.alphaIndexLinks.on("click", function() {
             var uri = $('#browse-classes li a.selected').attr('data-uri');
             var alpha = $(this).attr('data-alpha');
             browseByVClass.getIndividuals(uri, alpha);
@@ -52,7 +52,7 @@ var browseByVClass = {
         // save the selected vclass in location hash so we can reset the selection
         // if the user navigates with the back button
         this.browseVClasses.children('li').each( function() {
-           $(this).find('a').click(function () {
+           $(this).find('a').on("click", function () {
                 location.hash = $(this).attr('data-uri');
            });
         });
@@ -63,7 +63,7 @@ var browseByVClass = {
 
     // Listener for page switching -- separate from the rest because it needs to be callable
     paginationListener: function() {
-        $('.pagination li a').click(function() {
+        $('.pagination li a').on("click", function() {
             var uri = $('#browse-classes li a.selected').attr('data-uri');
             var alpha = $('#alpha-browse-individuals li a.selected').attr('data-alpha');
             var page = $(this).attr('data-page');
