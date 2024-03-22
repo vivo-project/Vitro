@@ -20,6 +20,11 @@
             rdfs:range :Procedure ;
             rdfs:label "forward to RPC"@en-US .
 
+###  https://vivoweb.org/ontology/vitro-dynamic-api#implementedBy
+:implementedBy rdf:type owl:ObjectProperty ;
+                rdfs:subPropertyOf owl:topObjectProperty ;
+                rdfs:label "Implemented by"@en-US .
+
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#procedure
 :procedure rdf:type owl:ObjectProperty ;
