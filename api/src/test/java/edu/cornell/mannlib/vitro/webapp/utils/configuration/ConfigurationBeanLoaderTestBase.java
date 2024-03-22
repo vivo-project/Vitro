@@ -55,7 +55,7 @@ public class ConfigurationBeanLoaderTestBase extends AbstractTestClass {
 		model = model();
 
 		loader = new ConfigurationBeanLoader(model, req);
-		noRequestLoader = new ConfigurationBeanLoader(model, ctx);
+		noRequestLoader = new ConfigurationBeanLoader(model);
 		noContextLoader = new ConfigurationBeanLoader(model);
 	}
 
@@ -63,15 +63,13 @@ public class ConfigurationBeanLoaderTestBase extends AbstractTestClass {
 	// Helper methods for simple failure
 	// ----------------------------------------------------------------------
 
-	protected void expectSimpleFailure(Class<?> failureClass,
-			ExpectedThrowable expected, ExpectedThrowable cause)
-			throws ConfigurationBeanLoaderException {
-		expectException(expected.getClazz(), expected.getMessageSubstring(),
-				cause.getClazz(), cause.getMessageSubstring());
+    protected void expectSimpleFailure(Class<?> failureClass, ExpectedThrowable expected, ExpectedThrowable cause)
+            throws ConfigurationBeanLoaderException {
+        expectException(expected.getClazz(), expected.getMessageSubstring(), cause.getClazz(), cause.getMessageSubstring());
 
-		@SuppressWarnings("unused")
-		Object unused = loader.loadInstance(GENERIC_INSTANCE_URI, failureClass);
-	}
+        @SuppressWarnings("unused")
+        Object unused = loader.loadInstance(GENERIC_INSTANCE_URI, failureClass);
+    }
 
 	protected ExpectedThrowable throwable(Class<? extends Throwable> clazz,
 			String messageSubstring) {
