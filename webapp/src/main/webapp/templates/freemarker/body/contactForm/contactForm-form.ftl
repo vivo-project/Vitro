@@ -40,12 +40,11 @@
             <div class="g-recaptcha" data-sitekey="${siteKey!}"></div>
             <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response" />
         <#elseif captchaToUse == "NANOCAPTCHA">
-            <!-- Your custom captcha implementation -->
             <p>
                 <label class="realpersonLabel">${i18n().enter_in_security_field}:<span class="requiredHint"> *</span></label>
                 <div class="captcha-container">
                     <span><input id="refresh" type="button" value="↻" /></span>
-                    <img id="captchaImage" src="data:image/png;base64,${challenge!}" alt="Refresh page if not displayed..." style="vertical-align: middle;">
+                    <img id="captchaImage" src="data:image/png;base64,${challenge!}" alt="${i18n().captcha_not_displayed}" style="vertical-align: middle;">
                 </div>
                 <br />
                 <span><input type="text" id="userSolution" name="userSolution" style="vertical-align: middle;"></span>
@@ -67,41 +66,4 @@
     };
 </script>
 
-${stylesheets.add('<link rel="stylesheet" href="${urls.base}/templates/freemarker/edit/forms/css/customForm.css" />',
-                  '<link rel="stylesheet" href="${urls.base}/css/jquery_plugins/jquery.realperson.css" />')}
-${scripts.add('<script type="text/javascript" src="${urls.base}/js/commentForm.js"></script>',
-              '<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.12.1.min.js"></script>')}
-
-<#if captchaToUse == "RECAPTCHAV2">
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-    <script>
-        document.getElementById('contact_form').addEventListener('submit', function() {
-            var recaptchaResponse = grecaptcha.getResponse();
-            console.log(recaptchaResponse);
-            document.getElementById('g-recaptcha-response').value = recaptchaResponse;
-        });
-    </script>
-<#elseif captchaToUse == "NANOCAPTCHA">
-    <script>
-        $(document).ready(function () {
-            $('#refresh').click(function () {
-                var oldChallengeId = $('#challengeId').val();
-
-                $.ajax({
-                    url: '${contextPath}/refreshCaptcha',
-                    type: 'GET',
-                    dataType: 'json',
-                    data: { oldChallengeId: oldChallengeId },
-                    success: function (data) {
-                        $('#userSolution').val('');
-                        $('#challengeId').val(data.challengeId);
-                        $('#captchaImage').attr('src', 'data:image/png;base64,' + data.challenge);
-                    },
-                    error: function () {
-                        console.error('Error while refreshing captcha');
-                    }
-                });
-            });
-        });
-    </script>
-</#if>
+<#include "webapp/src/main/webapp/templates/freemarker/body/captcha/captcha-clientExecutionLogic.ftl">

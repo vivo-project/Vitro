@@ -88,3 +88,6 @@ p.password-note {
     display: inline;
     vertical-align: middle;
 }
+.reset-password-link {
+    display: block;
+}

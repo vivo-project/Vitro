@@ -476,14 +476,6 @@ a.filter-search {
 		margin: 0;
 		margin-top: 13px;
 }
-/* contact form security field */
-div .realperson-challenge {
-	width: 250px;
-        margin-right: 20px;
-}
-div .realperson-text {
-	text-align: center;
-}
 /* TABLE STYLES USED IN ACCOUNTS AND PAGE MANAGEMENT */
 table#table-listing {
 	border-collapse: collapse;
