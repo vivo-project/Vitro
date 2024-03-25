@@ -80,8 +80,9 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
         I18nBundle i18n = I18n.bundle(vreq);
 
         // Check for impossible length input
-        if (vreq.getParameter("email").length() > 320) {
-            dataContext.put("errorMessage", i18n.text("error_invalid_email", vreq.getParameter("email")));
+        String rawEmailInput = vreq.getParameter("email");
+        if (rawEmailInput != null && rawEmailInput.length() > 320) {
+            dataContext.put("errorMessage", i18n.text("error_invalid_email"));
             return showForm(dataContext);
         }
 

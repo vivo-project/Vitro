@@ -3241,7 +3241,7 @@ uil-data:javascript_instructions.Vitro
 uil-data:error_invalid_email.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "''{0}'' is not a valid email address."@de-DE ;
+        rdfs:label       "Die von Ihnen angegebene E-Mail-Adresse ist ungültig."@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "error_invalid_email" ;
         uil:hasPackage  "Vitro-languages" .
