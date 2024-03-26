@@ -28,6 +28,7 @@ var processFixedHTMLDataGetterContent = {
 		//Now find and set value
 		pageContentSection.find("input[name='saveToVar']").val(saveToVarValue);
 		pageContentSection.find("textarea[name='htmlValue']").val(htmlValue);
+		initTinyMCE.initEditor(pageContentSection.find("textarea[name='htmlValue']"));
 	},
 	//For the label of the content section for editing, need to add additional value
 	retrieveContentLabel:function() {
