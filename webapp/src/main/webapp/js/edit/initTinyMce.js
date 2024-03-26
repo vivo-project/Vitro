@@ -2,28 +2,23 @@
 
 var initTinyMCE = {
     // Initial page setup
-    onLoad: function() {
+    onLoad: function(textareas) {
         this.mergeFromTemplate();
-        this.initObjects();
-        this.initEditor();
-
+        this.initEditor(textareas);
     },
 
     // Add variables from menupage template
     mergeFromTemplate: function() {
         $.extend(this, customFormData);
     },
-    initObjects: function() {
-    	this.wsywigFields = $(".useTinyMce");
-    },
     // Create references to frequently used elements for convenience
-    initEditor: function() {
-    	initTinyMCE.wsywigFields.tinymce(initTinyMCE.tinyMCEData);
+    initEditor: function(textareas) {
+    	textareas.tinymce(initTinyMCE.tinyMCEData);
 
     }
 };
 
 $(document).ready(function() {
-    initTinyMCE.onLoad();
+    initTinyMCE.onLoad($(".useTinyMce"));
 });
 
