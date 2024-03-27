@@ -72,14 +72,14 @@ public class JsonContainerTest {
 
     @Test
     public void testObjectAddJsonContainerKeyValue() {
-        JsonContainer objectValue = new JsonContainer("{\"test\":true}");
+        JsonObject objectValue = new JsonObject("{\"test\":true}");
         String expectedValue = "{\"test\":true}";
         testObjectAddKeyValue(new JsonContainerObjectParam(varName), objectValue, expectedValue);
     }
 
     @Test
     public void testObjectAddJsonArrayKeyValue() {
-        JsonContainer objectValue = new JsonContainer(JsonContainer.Type.ARRAY);
+        JsonArray objectValue = new JsonArray();
         Data data1 = new Data(new StringParam("var1"));
         TestView.setObject(data1, "string 1");
         objectValue.addValue(data1);
@@ -138,14 +138,14 @@ public class JsonContainerTest {
 
     @Test
     public void testArrayAddJsonContainerKeyValue() {
-        JsonContainer objectValue = new JsonContainer("{\"test\":true}");
+        JsonObject objectValue = new JsonObject("{\"test\":true}");
         String expectedValue = "{\"test\":true}";
         testArrayAddKeyValue(new JsonContainerObjectParam(varName), objectValue, expectedValue);
     }
 
     @Test
     public void testArrayAddJsonArrayKeyValue() {
-        JsonContainer objectValue = new JsonContainer(JsonContainer.Type.ARRAY);
+        JsonArray objectValue = new JsonArray();
         Data data1 = new Data(new StringParam("var1"));
         TestView.setObject(data1, "string 1");
         objectValue.addValue(data1);
@@ -157,7 +157,7 @@ public class JsonContainerTest {
     }
 
     private void testObjectAddValues(Parameter param, Object value, String expectedValue) {
-        JsonContainer container = new JsonContainer(JsonContainer.Type.OBJECT);
+        JsonObject container = new JsonObject();
         int n = 3;
         for (int i = 0; i < n; i++) {
             Data data = new Data(param);
@@ -166,34 +166,34 @@ public class JsonContainerTest {
         }
         String expectedJson = expectedJsonObjectValue(expectedValue, n);
         // System.out.println(expectedJson);
-        String actualJson = JsonContainer.serialize(container);
+        String actualJson = JsonFactory.serialize(container);
         assertEquals(expectedJson, actualJson);
     }
 
     private void testObjectAddKeyValue(Parameter param, Object value, String expectedValue) {
-        JsonContainer container = new JsonContainer(JsonContainer.Type.OBJECT);
+        JsonObject container = new JsonObject();
         Data data = new Data(param);
         TestView.setObject(data, value);
         container.addKeyValue(varName, data);
         String expectedJson = expectedJsonObjectKeyValue(varName, expectedValue);
         // System.out.println(expectedJson);
-        String actualJson = JsonContainer.serialize(container);
+        String actualJson = JsonFactory.serialize(container);
         assertEquals(expectedJson, actualJson);
     }
 
     private void testArrayAddKeyValue(Parameter param, Object value, String expectedValue) {
-        JsonContainer container = new JsonContainer("[]");
+        JsonArray container = new JsonArray();
         Data data = new Data(param);
         TestView.setObject(data, value);
         container.addKeyValue(varName, data);
         String expectedJson = expectedJsonArrayKeyValue(varName, expectedValue);
         // System.out.println(expectedJson);
-        String actualJson = JsonContainer.serialize(container);
+        String actualJson = JsonFactory.serialize(container);
         assertEquals(expectedJson, actualJson);
     }
 
     private void testArrayAddValues(Parameter param, Object value, String expectedValue) {
-        JsonContainer container = new JsonContainer("[]");
+        JsonArray container = new JsonArray();
         int n = 3;
         for (int i = 0; i < n; i++) {
             Data data = new Data(param);
@@ -202,7 +202,7 @@ public class JsonContainerTest {
         }
         String expectedJson = expectedJsonArrayValue(expectedValue, n);
         // System.out.println(expectedJson);
-        String actualJson = JsonContainer.serialize(container);
+        String actualJson = JsonFactory.serialize(container);
         assertEquals(expectedJson, actualJson);
     }
 

@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JacksonJsonContainer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.rdf.model.Literal;
@@ -41,7 +41,7 @@ public class RdfView {
                 List<Literal> list = Collections.singletonList(literal);
                 result.put(name, list);
             } else if (JsonContainerView.isJsonArray(param) && param.getType().getValuesType().isLiteral()) {
-                JsonContainer array = (JsonContainer) dataStore.getData(name).getObject();
+                JacksonJsonContainer array = (JacksonJsonContainer) dataStore.getData(name).getObject();
                 RDFDatatype rdfDataType = param.getType().getValuesType().getRdfType().getRDFDataType();
                 List<String> list = array.getDataAsStringList();
                 List<Literal> literalList = new LinkedList<>();
@@ -64,7 +64,7 @@ public class RdfView {
                 List<String> list = Collections.singletonList(data.getObject().toString());
                 result.put(name, list);
             } else if (JsonContainerView.isJsonArray(param) && param.getType().getValuesType().isUri()) {
-                JsonContainer array = (JsonContainer) dataStore.getData(name).getObject();
+                JacksonJsonContainer array = (JacksonJsonContainer) dataStore.getData(name).getObject();
                 List<String> list = array.getDataAsStringList();
                 result.put(name, list);
             }

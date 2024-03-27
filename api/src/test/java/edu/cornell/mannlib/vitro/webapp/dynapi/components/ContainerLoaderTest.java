@@ -13,7 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer.Type;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonFactory;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.JsonContainerObjectParam;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.StringParam;
 import org.junit.Test;
@@ -27,7 +27,7 @@ public class ContainerLoaderTest {
     public String key;
 
     @org.junit.runners.Parameterized.Parameter(1)
-    public Type containerType;
+    public JsonFactory.Type containerType;
 
     @Test
     public void testLoadIntoArrayContainer() throws InitializationException {
@@ -48,7 +48,7 @@ public class ContainerLoaderTest {
         store.addData(input.getName(), inputData);
 
         Data containerData = new Data(container);
-        JsonContainer containerObject = new JsonContainer(containerType);
+        JsonContainer containerObject = JsonFactory.getJson(containerType);
         TestView.setObject(containerData, containerObject);
         store.addData(container.getName(), containerData);
 
@@ -66,9 +66,9 @@ public class ContainerLoaderTest {
     @Parameterized.Parameters
     public static Collection<Object[]> requests() {
         return Arrays.asList(new Object[][] {
-                { "", Type.ARRAY },
-                { "", Type.OBJECT },
-                { "key", Type.ARRAY },
-                { "key", Type.OBJECT }, });
+                { "", JsonFactory.Type.ARRAY },
+                { "", JsonFactory.Type.OBJECT },
+                { "key", JsonFactory.Type.ARRAY },
+                { "key", JsonFactory.Type.OBJECT }, });
     }
 }

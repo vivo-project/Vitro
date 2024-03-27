@@ -41,12 +41,11 @@ public abstract class PoolAtomicOperation extends PoolOperation {
     protected OperationResult loadComponents(DataStore dataStore) {
         List<String> uris = getComponentUris(dataStore);
         for (String uri : uris) {
-            boolean loaded = false;
             try {
                 pool.load(uri);
-                loaded = true;
             } catch (Throwable t) {
                 log.error(t, t);
+                return OperationResult.internalServerError();
             }
         }
         return OperationResult.ok();
@@ -64,12 +63,11 @@ public abstract class PoolAtomicOperation extends PoolOperation {
         List<String> uris = getComponentUris(dataStore);
         for (String uri : uris) {
             pool.unload(uri);
-            boolean loaded = false;
             try {
                 pool.load(uri);
-                loaded = true;
             } catch (Throwable t) {
                 log.error(t, t);
+                return OperationResult.internalServerError();
             }
         }
         return OperationResult.ok();

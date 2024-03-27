@@ -11,6 +11,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.JsonContainerView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.SimpleDataView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -50,7 +51,7 @@ public class ContainerQuery extends AbstractOperation {
         String key = SimpleDataView.getStringRepresentation(firstKeyData(dataStore));
         Data item = container.getItem(key, outputParam);
         if (!item.isInitialized()) {
-            log.error(String.format("Key '%s' not found in container %s", key, JsonContainer.serialize(container)));
+            log.error(String.format("Key '%s' not found in container %s", key, JsonFactory.serialize(container)));
             return OperationResult.internalServerError();
         }
         Parameter itemParam = item.getParam();

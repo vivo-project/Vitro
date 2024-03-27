@@ -10,8 +10,10 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JacksonJsonContainer;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonArray;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer.Type;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonObject;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.LiteralParamFactory;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.URIResourceParam;
 import org.apache.jena.query.QuerySolution;
@@ -23,12 +25,12 @@ public class JsonContainerView {
     private static final String JSON_ARRAY = "json array";
     private static final String JSON_OBJECT = "json container";
 
-    public static Map<String, JsonContainer> getJsonArrays(Parameters params, DataStore dataStore) {
-        Map<String, JsonContainer> jsonArrays = new HashMap<>();
+    public static Map<String, JsonArray> getJsonArrays(Parameters params, DataStore dataStore) {
+        Map<String, JsonArray> jsonArrays = new HashMap<>();
         for (String name : params.getNames()) {
             Parameter param = params.get(name);
             if (param.isJsonContainer() && isJsonArray(param)) {
-                JsonContainer arrayNode = (JsonContainer) dataStore.getData(name).getObject();
+                JsonArray arrayNode = (JsonArray) dataStore.getData(name).getObject();
                 jsonArrays.put(name, arrayNode);
             }
         }
@@ -37,8 +39,8 @@ public class JsonContainerView {
 
     public static List<String> getStringListFromJsonArrays(Parameters params, DataStore dataStore) {
         List<String> uris = new LinkedList<>();
-        List<JsonContainer> jsonArrays = getJsonArrayList(params, dataStore);
-        for (JsonContainer array : jsonArrays) {
+        List<JsonArray> jsonArrays = getJsonArrayList(params, dataStore);
+        for (JsonArray array : jsonArrays) {
             uris.addAll(array.getDataAsStringList());
         }
         return uris;
@@ -49,38 +51,38 @@ public class JsonContainerView {
         jsonObjects.addAll(getJsonArrayList(params, dataStore));
         for (String name : params.getNames()) {
             if (!dataStore.contains(name)) {
-                final JsonContainer jsonContainer = initializeJsonContainer(dataStore, params.get(name));
+                JsonContainer jsonContainer = initializeJsonContainer(dataStore, params.get(name));
                 jsonObjects.add(jsonContainer);
             }
         }
         return jsonObjects;
     }
 
-    private static JsonContainer initializeJsonContainer(DataStore dataStore, Parameter param) {
+    private static JacksonJsonContainer initializeJsonContainer(DataStore dataStore, Parameter param) {
         Data data = new Data(param);
         data.initializeDefault();
         dataStore.addData(param.getName(), data);
-        return (JsonContainer) data.getObject();
+        return (JacksonJsonContainer) data.getObject();
     }
 
-    public static List<JsonContainer> getJsonObjectList(Parameters params, DataStore dataStore) {
-        List<JsonContainer> jsonArrays = new LinkedList<>();
+    public static List<JacksonJsonContainer> getJsonObjectList(Parameters params, DataStore dataStore) {
+        List<JacksonJsonContainer> jsonArrays = new LinkedList<>();
         for (String name : params.getNames()) {
             Parameter param = params.get(name);
             if (param.isJsonContainer() && JSON_OBJECT.equals(param.getType().getName())) {
-                JsonContainer objectNode = (JsonContainer) dataStore.getData(name).getObject();
+                JacksonJsonContainer objectNode = (JacksonJsonContainer) dataStore.getData(name).getObject();
                 jsonArrays.add(objectNode);
             }
         }
         return jsonArrays;
     }
 
-    public static List<JsonContainer> getJsonArrayList(Parameters params, DataStore dataStore) {
-        List<JsonContainer> jsonArrays = new LinkedList<>();
+    public static List<JsonArray> getJsonArrayList(Parameters params, DataStore dataStore) {
+        List<JsonArray> jsonArrays = new LinkedList<>();
         for (String name : params.getNames()) {
             Parameter param = params.get(name);
             if (param.isJsonContainer() && isJsonArray(param)) {
-                JsonContainer arrayNode = (JsonContainer) dataStore.getData(name).getObject();
+                JsonArray arrayNode = (JsonArray) dataStore.getData(name).getObject();
                 jsonArrays.add(arrayNode);
             }
         }
@@ -111,15 +113,15 @@ public class JsonContainerView {
         if (!hasJsonArrays(outputParams, dataStore)) {
             return;
         }
-        JsonContainer row = getRowMap(vars, solution);
-        Map<String, JsonContainer> jsonArrays = getJsonArrays(outputParams, dataStore);
-        for (JsonContainer array : jsonArrays.values()) {
-            array.addRow(JsonContainer.PATH_ROOT_PREFIX, row);
+        JsonObject row = getRowMap(vars, solution);
+        Map<String, JsonArray> jsonArrays = getJsonArrays(outputParams, dataStore);
+        for (JsonArray array : jsonArrays.values()) {
+            array.addRow(JacksonJsonContainer.PATH_ROOT_PREFIX, row);
         }
     }
 
-    private static JsonContainer getRowMap(List<String> vars, QuerySolution solution) {
-        JsonContainer row = new JsonContainer(Type.OBJECT);
+    private static JsonObject getRowMap(List<String> vars, QuerySolution solution) {
+        JsonObject row = new JsonObject();
 
         for (String var : vars) {
             RDFNode node = solution.get(var);
@@ -144,7 +146,7 @@ public class JsonContainerView {
 
     public static JsonContainer getJsonContainer(DataStore store, Parameter param) {
         Data data = store.getData(param.getName());
-        JsonContainer container = (JsonContainer) data.getObject();
+        JacksonJsonContainer container = (JacksonJsonContainer) data.getObject();
         return container;
     }
 }

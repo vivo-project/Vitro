@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonArray;
 
 public class JsonContainerArrayParam extends JsonContainerParam {
 
@@ -17,7 +17,7 @@ public class JsonContainerArrayParam extends JsonContainerParam {
 
     @Override
     protected String getContainerDefaultValue() {
-        return JsonContainer.EMPTY_ARRAY;
+        return JsonArray.EMPTY_ARRAY;
     }
 
 }

@@ -25,8 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer.Type;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonArray;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.JsonContainerArrayParam;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.StringPlainLiteralParam;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.URIResourceParam;
@@ -369,7 +368,7 @@ public class N3TemplateTest extends ServletContextTest {
         Parameter param = n3Template.getInputParams().get(name);
         Data data = new Data(param);
         Object[] inputArray = (Object[]) value;
-        JsonContainer array = new JsonContainer(Type.ARRAY);
+        JsonArray array = new JsonArray();
         for (Object element : inputArray) {
             Data elementData = createStringLiteral(element.toString());
             array.addValue(elementData);
@@ -389,7 +388,7 @@ public class N3TemplateTest extends ServletContextTest {
         Parameter param = n3Template.getInputParams().get(name);
         Data data = new Data(param);
         Object[] inputArray = (Object[]) value;
-        JsonContainer array = new JsonContainer(Type.ARRAY);
+        JsonArray array = new JsonArray();
         for (Object element : inputArray) {
             Data elementData = createResource(element.toString());
             array.addValue(elementData);

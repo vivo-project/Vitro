@@ -15,7 +15,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer.Type;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonFactory;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.JsonContainerObjectParam;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.StringParam;
 import org.junit.Test;
@@ -29,7 +29,7 @@ public class ContainerQueryTest {
     public String keyValue;
 
     @org.junit.runners.Parameterized.Parameter(1)
-    public Type containerType;
+    public JsonFactory.Type containerType;
 
     @org.junit.runners.Parameterized.Parameter(2)
     public String value;
@@ -40,8 +40,8 @@ public class ContainerQueryTest {
     public void test() throws InitializationException {
         ContainerQuery cq = new ContainerQuery();
         String containerName = "container";
-        Parameter container = new JsonContainerObjectParam(containerName);
-        cq.setContainer(container);
+        Parameter containerParam = new JsonContainerObjectParam(containerName);
+        cq.setContainer(containerParam);
         outputName = "output";
         String keyName = "key";
         Parameter outputParam = new StringParam(outputName);
@@ -50,19 +50,19 @@ public class ContainerQueryTest {
         cq.addInputParameter(keyParam);
 
         DataStore store = new DataStore();
-        Data containerData = new Data(container);
-        JsonContainer containerObject = new JsonContainer(containerType);
+        Data containerData = new Data(containerParam);
+        JsonContainer container = JsonFactory.getJson(containerType);
         Parameter outputParam1 = new StringParam(outputName);
         Data data = new Data(outputParam1);
         TestView.setObject(data, value);
-        if (containerType.equals(Type.ARRAY)) {
-            containerObject.addValue(data);
+        if (containerType.equals(JsonFactory.Type.ARRAY)) {
+            container.addValue(data);
         } else {
-            containerObject.addKeyValue(keyValue, data);
+            container.addKeyValue(keyValue, data);
         }
 
-        TestView.setObject(containerData, containerObject);
-        store.addData(container.getName(), containerData);
+        TestView.setObject(containerData, container);
+        store.addData(containerParam.getName(), containerData);
 
         Data keyData = new Data(keyParam);
         TestView.setObject(keyData, keyValue);
@@ -80,16 +80,16 @@ public class ContainerQueryTest {
     @Parameterized.Parameters
     public static Collection<Object[]> requests() {
         return Arrays.asList(new Object[][] {
-                { "0", Type.ARRAY, "test value" },
-                { "0", Type.OBJECT, "0" },
-                { "key", Type.OBJECT, "test value" },
-                { "key", Type.OBJECT, "" },
-                { "key$", Type.OBJECT, "test value" },
-                { "key\\ value", Type.OBJECT, "test value" },
-                { "key'", Type.OBJECT, "test value" },
-                { "key.", Type.OBJECT, "test value" },
-                { "key\n", Type.OBJECT, "test value" },
-                { "key\t", Type.OBJECT, "test value" },
+                { "0", JsonFactory.Type.ARRAY, "test value" },
+                { "0", JsonFactory.Type.OBJECT, "0" },
+                { "key", JsonFactory.Type.OBJECT, "test value" },
+                { "key", JsonFactory.Type.OBJECT, "" },
+                { "key$", JsonFactory.Type.OBJECT, "test value" },
+                { "key\\ value", JsonFactory.Type.OBJECT, "test value" },
+                { "key'", JsonFactory.Type.OBJECT, "test value" },
+                { "key.", JsonFactory.Type.OBJECT, "test value" },
+                { "key\n", JsonFactory.Type.OBJECT, "test value" },
+                { "key\t", JsonFactory.Type.OBJECT, "test value" },
 
         });
     }

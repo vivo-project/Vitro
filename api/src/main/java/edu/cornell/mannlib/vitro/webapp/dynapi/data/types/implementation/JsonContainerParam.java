@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonFactory;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ArrayParameterType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
@@ -36,7 +37,7 @@ public abstract class JsonContainerParam extends Parameter {
 
     private ImplementationConfig getSerializationConfig() throws ClassNotFoundException {
         ImplementationConfig serializationConfig = new ImplementationConfig();
-        serializationConfig.setClassName(JsonContainer.class.getCanonicalName());
+        serializationConfig.setClassName(JsonFactory.class.getCanonicalName());
         serializationConfig.setMethodName("serialize");
         serializationConfig.setMethodArguments("input");
         serializationConfig.setStaticMethod(true);
@@ -45,7 +46,7 @@ public abstract class JsonContainerParam extends Parameter {
 
     private ImplementationConfig getDeserializationConfig() throws ClassNotFoundException {
         ImplementationConfig serializationConfig = new ImplementationConfig();
-        serializationConfig.setClassName(JsonContainer.class.getCanonicalName());
+        serializationConfig.setClassName(JsonFactory.class.getCanonicalName());
         serializationConfig.setMethodName("deserialize");
         serializationConfig.setMethodArguments("input");
         serializationConfig.setStaticMethod(true);

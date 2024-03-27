@@ -14,8 +14,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.StringLengt
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.validators.Validator;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer.Type;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonArray;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.JsonContainerArrayParam;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.StringParam;
 import org.junit.Test;
@@ -133,7 +132,7 @@ public class ValidatorsTest {
         if (input instanceof String[]) {
             Parameter param = new JsonContainerArrayParam("no-name");
             Data data = new Data(param);
-            JsonContainer array = new JsonContainer(Type.ARRAY);
+            JsonArray array = new JsonArray();
             String[] inputArray = (String[]) input;
             for (String element : inputArray) {
                 Data elementData = createStringData(element);

@@ -22,8 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer.Type;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonArray;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.IntegerParam;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.JsonContainerObjectParam;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
@@ -117,7 +116,7 @@ public class LoopOperationIntegrationTest extends ServletContextTest {
 
     private Data createContainer(Parameter containerParam) {
         Data containerData = new Data(containerParam);
-        JsonContainer container = new JsonContainer(Type.ARRAY);
+        JsonArray container = new JsonArray();
         String expectedOutputParamName = "item";
         Parameter expectedOutputParam = new IntegerParam(expectedOutputParamName);
         for (Integer value : inputValues) {
@@ -127,7 +126,7 @@ public class LoopOperationIntegrationTest extends ServletContextTest {
         return containerData;
     }
 
-    private void addValue(JsonContainer container, Parameter expectedOutputParam, Integer value) {
+    private void addValue(JsonArray container, Parameter expectedOutputParam, Integer value) {
         Data data = new Data(expectedOutputParam);
         TestView.setObject(data, value);
         container.addValue(data);
