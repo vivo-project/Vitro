@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
-import javax.servlet.ServletContext;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Poolable;
 
 public interface Pool<K, C extends Poolable<K>> {
@@ -22,7 +20,7 @@ public interface Pool<K, C extends Poolable<K>> {
 
     public void reload();
 
-    public void init(ServletContext ctx);
+    public void init();
 
     public long obsoleteCount();
 

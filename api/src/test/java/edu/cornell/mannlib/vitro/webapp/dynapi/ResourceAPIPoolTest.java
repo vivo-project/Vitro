@@ -40,11 +40,11 @@ public class ResourceAPIPoolTest extends ServletContextTest {
         LoggingControl.offLogs();
         setup();
         ResourceAPIPool resourceAPIPool = ResourceAPIPool.getInstance();
-        resourceAPIPool.init(servletContext);
+        resourceAPIPool.init();
         resourceAPIPool.reload();
 
         ProcedurePool procedurePool = ProcedurePool.getInstance();
-        procedurePool.init(servletContext);
+        procedurePool.init();
         procedurePool.reload();
 
         assertEquals(0, resourceAPIPool.count());
@@ -59,11 +59,11 @@ public class ResourceAPIPoolTest extends ServletContextTest {
         setup();
 
         ResourceAPIPool resourceAPIPool = ResourceAPIPool.getInstance();
-        resourceAPIPool.init(servletContext);
+        resourceAPIPool.init();
         resourceAPIPool.reload();
 
         ProcedurePool procedurePool = ProcedurePool.getInstance();
-        procedurePool.init(servletContext);
+        procedurePool.init();
         procedurePool.reload();
 
         assertEquals(0, resourceAPIPool.count());
@@ -403,7 +403,7 @@ public class ResourceAPIPoolTest extends ServletContextTest {
 
         setup();
 
-        resourceAPIPool.init(servletContext);
+        resourceAPIPool.init();
 
         resourceAPIPool.unload(TEST_PERSON_RESOURCE_URI);
 
@@ -575,10 +575,10 @@ public class ResourceAPIPoolTest extends ServletContextTest {
         loadDefaultModel();
 
         ResourceAPIPool resourceAPIPool = ResourceAPIPool.getInstance();
-        resourceAPIPool.init(servletContext);
+        resourceAPIPool.init();
 
-        ProcedurePool actionPool = ProcedurePool.getInstance();
-        actionPool.init(servletContext);
+        ProcedurePool procedurePool = ProcedurePool.getInstance();
+        procedurePool.init();
 
         return resourceAPIPool;
     }

@@ -33,7 +33,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.MockitoAnnotations;
-import stubs.javax.servlet.ServletContextStub;
 
 @RunWith(Parameterized.class)
 public class ConditionIsNotEmptyIntegrationTest extends ServletContextTest {
@@ -74,7 +73,6 @@ public class ConditionIsNotEmptyIntegrationTest extends ServletContextTest {
         loadOntology(ontModel);
         loadModel(ontModel, TEST_ACTION);
         loadModel(storeModel, TEST_STORE);
-        servletContext = new ServletContextStub();
         Procedure action = loader.loadInstance("test:action", Procedure.class);
         assertTrue(action.isValid());
         Parameters parameters = action.getInputParams();

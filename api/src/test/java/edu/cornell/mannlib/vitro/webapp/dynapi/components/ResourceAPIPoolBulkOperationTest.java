@@ -88,7 +88,7 @@ public class ResourceAPIPoolBulkOperationTest extends ServletContextTest {
         }
 
         ResourceAPIPool resourcePool = ResourceAPIPool.getInstance();
-        resourcePool.init(servletContext);
+        resourcePool.init();
         return resourcePool;
     }
 }

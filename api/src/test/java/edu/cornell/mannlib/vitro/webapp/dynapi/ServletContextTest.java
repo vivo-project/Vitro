@@ -18,9 +18,7 @@ import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.shared.Lock;
 import org.junit.Before;
-import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccessStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccessFactoryStub;
-import stubs.javax.servlet.ServletContextStub;
 
 public abstract class ServletContextTest {
 
@@ -40,9 +38,7 @@ public abstract class ServletContextTest {
 
     protected final static ResourceAPIKey TEST_PERSON_RESOURCE_KEY = ResourceAPIKey.of("test_person_resource", "1.0.0");
 
-    protected ServletContextStub servletContext;
     protected ModelAccessFactoryStub modelAccessFactory;
-    protected ContextModelAccessStub contentModelAccess;
     protected OntModel ontModel;
 
     protected ConfigurationBeanLoader loader;
@@ -50,10 +46,7 @@ public abstract class ServletContextTest {
     @Before
     public void setup() {
         // Do not print information about loaded actions and resources
-        servletContext = new ServletContextStub();
         modelAccessFactory = new ModelAccessFactoryStub();
-
-        contentModelAccess = modelAccessFactory.get(servletContext);
 
         ontModel = ModelFactory.createOntologyModel();
 

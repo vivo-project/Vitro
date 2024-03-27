@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -60,9 +59,6 @@ public class RESTEndpointTest {
     private MockedStatic<ProcedurePool> procedurePoolStatic;
 
     private ByteArrayOutputStream baos;
-
-    @Mock
-    private ServletContext context;
 
     @Mock
     private ResourceAPIPool resourceAPIPool;
@@ -128,7 +124,6 @@ public class RESTEndpointTest {
         when(procedurePool.get(any(String.class))).thenReturn(procedure);
 
         when(request.getParameterMap()).thenReturn(params);
-        when(request.getServletContext()).thenReturn(context);
         when(request.getSession(false)).thenReturn(session);
         when(session.getAttribute("user")).thenReturn(user);
         when(user.isRootUser()).thenReturn(true);

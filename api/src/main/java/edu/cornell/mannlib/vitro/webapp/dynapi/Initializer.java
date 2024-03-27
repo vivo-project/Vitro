@@ -2,11 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.ResourceGenerator;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
@@ -18,47 +16,37 @@ public class Initializer implements ServletContextListener {
 
     }
 
-    private void initializeResourcePool(ServletContext ctx) {
-        ResourceAPIPool resourceAPIPool = ResourceAPIPool.getInstance();
-        resourceAPIPool.init(ctx);
+    private void initializeResourcePool() {
+        ResourceAPIPool.getInstance().init();
     }
 
-    private void initializeProcedurePool(ServletContext ctx) {
-        ProcedurePool actionPool = ProcedurePool.getInstance();
-        actionPool.init(ctx);
+    private void initializeProcedurePool() {
+        ProcedurePool.getInstance().init();
     }
 
-    private void initializeRPCPool(ServletContext ctx) {
-        RPCPool rpcPool = RPCPool.getInstance();
-        rpcPool.init(ctx);
+    private void initializeRPCPool() {
+        RPCPool.getInstance().init();
     }
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        ServletContext ctx = sce.getServletContext();
-        initializeStorage(ctx);
-        initializeNewResourceGenerator(ctx);
-        initializeProcedurePool(ctx);
-        initializeRPCPool(ctx);
-        initializeResourcePool(ctx);
-        initializeDynamicAPIModelFactory(ctx);
+        initializeStorage();
+        initializeNewResourceGenerator();
+        initializeProcedurePool();
+        initializeRPCPool();
+        initializeResourcePool();
     }
 
-    private void initializeStorage(ServletContext ctx) {
+    private void initializeStorage() {
         DynapiModelProvider storage = DynapiModelProvider.getInstance();
-        OntModel abox = ModelAccess.on(ctx).getOntModel(ModelNames.DYNAMIC_API_ABOX);
-        OntModel tbox = ModelAccess.on(ctx).getOntModel(ModelNames.DYNAMIC_API_TBOX);
+        OntModel abox = ModelAccess.getInstance().getOntModel(ModelNames.DYNAMIC_API_ABOX);
+        OntModel tbox = ModelAccess.getInstance().getOntModel(ModelNames.DYNAMIC_API_TBOX);
         storage.init(abox, tbox);
     }
 
-    private void initializeNewResourceGenerator(ServletContext ctx) {
+    private void initializeNewResourceGenerator() {
         ResourceGenerator resourceGenerator = ResourceGenerator.getInstance();
-        resourceGenerator.init(ModelAccess.on(ctx).getWebappDaoFactory());
-    }
-
-    private void initializeDynamicAPIModelFactory(ServletContext ctx) {
-        DynapiModelFactory factory = DynapiModelFactory.getInstance();
-        factory.init(ctx);
+        resourceGenerator.init(ModelAccess.getInstance().getWebappDaoFactory());
     }
 
     @Override

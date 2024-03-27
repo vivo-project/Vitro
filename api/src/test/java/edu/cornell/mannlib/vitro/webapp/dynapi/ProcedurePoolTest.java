@@ -29,7 +29,7 @@ public class ProcedurePoolTest extends ServletContextTest {
         setup();
 
         ProcedurePool procedurePool = ProcedurePool.getInstance();
-        procedurePool.init(servletContext);
+        procedurePool.init();
         procedurePool.reload();
 
         assertEquals(0, procedurePool.count());
@@ -179,7 +179,7 @@ public class ProcedurePoolTest extends ServletContextTest {
 
         setup();
 
-        procedurePool.init(servletContext);
+        procedurePool.init();
 
         procedurePool.unload(TEST_PERSON_ACTION_URI);
 
@@ -335,7 +335,7 @@ public class ProcedurePoolTest extends ServletContextTest {
 
         ProcedurePool procedurePool = ProcedurePool.getInstance();
 
-        procedurePool.init(servletContext);
+        procedurePool.init();
 
         return procedurePool;
     }

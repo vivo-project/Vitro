@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import javax.servlet.ServletContext;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Poolable;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
@@ -23,7 +21,6 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
     private static final Object mutex = new Object();
 
     private MultiAccessComponents<K, C> components;
-    private ServletContext ctx;
     private ConfigurationBeanLoader loader;
     private ConcurrentLinkedQueue<C> obsoleteComponents;
 
@@ -144,10 +141,6 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
     }
 
     public synchronized void reload() {
-        if (ctx == null) {
-            log.error(format("Context is null. Can't reload %s.", this.getClass().getName()));
-            return;
-        }
         if (loader == null) {
             log.error(format("Loader is null. Can't reload %s.", this.getClass().getName()));
             return;
@@ -171,10 +164,8 @@ public abstract class AbstractPool<K, C extends Poolable<K>, P extends Pool<K, C
         return components.getUris();
     }
 
-    public void init(ServletContext ctx) {
-        this.ctx = ctx;
+    public void init() {
         loader = new ConfigurationBeanLoader(DynapiModelProvider.getInstance().getModel());
-        log.debug("Context Initialization ...");
         loadComponents(components);
     }
 

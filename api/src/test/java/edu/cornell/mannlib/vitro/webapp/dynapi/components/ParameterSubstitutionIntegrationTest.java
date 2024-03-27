@@ -71,7 +71,7 @@ public class ParameterSubstitutionIntegrationTest extends ServletContextTest {
         // LoggingControl.restoreLogs();
         setup();
         ProcedurePool procedurePool = ProcedurePool.getInstance();
-        procedurePool.init(servletContext);
+        procedurePool.init();
         procedurePool.reload();
         assertEquals(0, procedurePool.count());
     }
@@ -80,7 +80,7 @@ public class ParameterSubstitutionIntegrationTest extends ServletContextTest {
         loadOntology(ontModel);
         loadModel(ontModel, RESOURCES_PATH + procedureConfiguration);
         ProcedurePool procedurePool = ProcedurePool.getInstance();
-        procedurePool.init(servletContext);
+        procedurePool.init();
         return procedurePool;
     }
 

@@ -114,7 +114,7 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
     public void reset() {
         setup();
         ProcedurePool procedurePool = ProcedurePool.getInstance();
-        procedurePool.init(servletContext);
+        procedurePool.init();
         procedurePool.reload();
         assertEquals(0, procedurePool.count());
         LoggingControl.restoreLogs();
@@ -128,7 +128,7 @@ public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
     private ProcedurePool initWithDefaultModel() throws IOException {
         loadOntology(ontModel);
         ProcedurePool procedurePool = ProcedurePool.getInstance();
-        procedurePool.init(servletContext);
+        procedurePool.init();
         return procedurePool;
     }
 

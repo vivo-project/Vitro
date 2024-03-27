@@ -63,12 +63,12 @@ public class RPCDocumentationEndpointIntegrationTest extends ServletContextInteg
 
         ProcedurePool procedurePool = ProcedurePool.getInstance();
 
-        procedurePool.init(servletContext);
+        procedurePool.init();
         procedurePool.reload();
 
         RPCPool rpcPool = RPCPool.getInstance();
 
-        rpcPool.init(servletContext);
+        rpcPool.init();
         rpcPool.reload();
 
         MockitoAnnotations.openMocks(this);

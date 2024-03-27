@@ -121,8 +121,8 @@ public class ProcedurePoolAtomicOperationTest extends ServletContextTest {
             e.printStackTrace();
         }
 
-        ProcedurePool actionPool = ProcedurePool.getInstance();
-        actionPool.init(servletContext);
-        return actionPool;
+        ProcedurePool procedurePool = ProcedurePool.getInstance();
+        procedurePool.init();
+        return procedurePool;
     }
 }

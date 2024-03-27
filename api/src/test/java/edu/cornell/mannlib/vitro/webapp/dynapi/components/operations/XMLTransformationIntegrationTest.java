@@ -64,7 +64,7 @@ public class XMLTransformationIntegrationTest extends ServletContextTest {
     public void reset() {
         setup();
         ProcedurePool procedurePool = ProcedurePool.getInstance();
-        procedurePool.init(servletContext);
+        procedurePool.init();
         procedurePool.reload();
         assertEquals(0, procedurePool.count());
         LoggingControl.restoreLogs();
@@ -73,7 +73,7 @@ public class XMLTransformationIntegrationTest extends ServletContextTest {
     private ProcedurePool initWithDefaultModel() throws IOException {
         loadOntology(ontModel);
         ProcedurePool rpcPool = ProcedurePool.getInstance();
-        rpcPool.init(servletContext);
+        rpcPool.init();
         return rpcPool;
     }
 

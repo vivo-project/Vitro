@@ -14,8 +14,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.servlet.ServletContext;
-
 import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ParameterUtils;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
@@ -70,9 +68,6 @@ public class N3TemplateTest extends ServletContextTest {
 
     @Mock
     ContextModelAccessImpl contextModelAccess;
-
-    @Mock
-    ServletContext servletContext;
 
     OntModel writeModel;
 

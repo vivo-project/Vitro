@@ -112,10 +112,10 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
 
         loadDefaultModel();
 
-        procedurePool.init(servletContext);
+        procedurePool.init();
         procedurePool.reload();
 
-        rpcPool.init(servletContext);
+        rpcPool.init();
         rpcPool.reload();
 
         MockitoAnnotations.openMocks(this);
@@ -125,7 +125,6 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
         PrintWriter writer = new PrintWriter(baos, true);
         when(response.getWriter()).thenReturn(writer);
 
-        when(request.getServletContext()).thenReturn(servletContext);
         when(request.getServletPath()).thenReturn(RPC_SERVLET_PATH);
         when(request.getSession(false)).thenReturn(session);
         when(session.getAttribute("user")).thenReturn(user);

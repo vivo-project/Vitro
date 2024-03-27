@@ -85,7 +85,7 @@ public class ResourceAPIPoolAtomicOperationTest extends ServletContextTest {
         }
 
         ResourceAPIPool resourcePool = ResourceAPIPool.getInstance();
-        resourcePool.init(servletContext);
+        resourcePool.init();
         resourcePool.unload();
         return resourcePool;
     }
