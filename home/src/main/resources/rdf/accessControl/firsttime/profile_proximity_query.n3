@@ -3,10 +3,23 @@
 @prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
 @prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
+# Reserved variable names:
+# profileUri - user account associated profile
+# objectUri - access object uri
+# externalAuthId - user account external auth id (should match with profile external auth id)
+# matchingPropertyUri - uri of property used for auth id matching, selfEditing.idMatchingProperty defined in runtime.properties 
+
+
 access-individual:PersonProfileProximityToResourceUri a access:SparqlSelectValuesQuery ;
     access:id """
     SELECT ?resourceUri WHERE {
-          BIND ( ?profileUri as ?resourceUri)
+      BIND (?profileUri as ?resourceUri)
     }
     """ .
 
+access-individual:ExternalIdMatchProfileProximityToResourceUri a access:SparqlSelectValuesQuery ;
+    access:id """
+    SELECT ?resourceUri WHERE {
+      ?resourceUri ?matchingPropertyUri ?externalAuthId .
+    }
+    """ .

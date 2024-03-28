@@ -35,6 +35,7 @@
     access:requiresCheck :OperationCheck ;
     access:requiresCheck :AccessObjectTypeCheck ;
     access:requiresCheck :RelationCheck ;
+    access:requiresCheck :RelationExternalIdMatchCheck ;
     access:requiresCheck :AccessObjectClassCheck .
 
 ### Checks
@@ -69,6 +70,11 @@
     access:value access-individual:PersonProfileProximityToResourceUri
     .
 
+:RelationExternalIdMatchCheck a access:Check ;
+    access:useOperator access-individual:SparqlSelectQueryResultsNotContain ;
+    access:hasTypeToCheck access-individual:AccessObjectUri ;
+    access:value access-individual:ExternalIdMatchProfileProximityToResourceUri
+    .
 
 :IndividualTypeQuery a access:SparqlSelectValuesQuery ;
     access:id """

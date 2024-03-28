@@ -4,13 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DecisionResult;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.TestAuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.auth.rules.AccessRule;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -43,12 +44,12 @@ public class ProximityTest extends PolicyTest {
             targetModel.leaveCriticalSection();
         }
         AccessObject ao = new ObjectPropertyStatementAccessObject(targetModel, "test:publication", null, null);
-        SimpleAuthorizationRequest ar = new SimpleAuthorizationRequest(ao, AccessOperation.EDIT);
-        ar.setEditorUris(Arrays.asList("test:bob"));
+        TestAuthorizationRequest ar = new TestAuthorizationRequest(ao, AccessOperation.EDIT);
+        ar.setEditorUris(new HashSet(Arrays.asList("test:bob")));
         assertEquals(DecisionResult.INCONCLUSIVE, policy.decide(ar).getDecisionResult());
-        ar = new SimpleAuthorizationRequest(ao, AccessOperation.EDIT);
-        ar.setEditorUris(Arrays.asList("test:alice"));
+        ar = new TestAuthorizationRequest(ao, AccessOperation.EDIT);
+        ar.setEditorUris(new HashSet(Arrays.asList("test:alice")));
         assertEquals(DecisionResult.AUTHORIZED, policy.decide(ar).getDecisionResult());
-        ar = new SimpleAuthorizationRequest(ao, AccessOperation.EDIT);
+        ar = new TestAuthorizationRequest(ao, AccessOperation.EDIT);
     }
 }

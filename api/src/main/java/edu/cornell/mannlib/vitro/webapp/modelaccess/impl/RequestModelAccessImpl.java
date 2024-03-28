@@ -21,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.Dataset;
-
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyStore;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
@@ -340,7 +340,7 @@ public class RequestModelAccessImpl implements RequestModelAccess {
 
 	private WebappDaoFactory addPolicyAwareness(WebappDaoFactory unaware) {
 		HideFromDisplayByPolicyFilter filter = new HideFromDisplayByPolicyFilter(
-				RequestIdentifiers.getIdBundleForRequest(req));
+				LoginStatusBean.getCurrentUser(req));
 		return new WebappDaoFactoryFiltering(unaware, filter);
 	}
 

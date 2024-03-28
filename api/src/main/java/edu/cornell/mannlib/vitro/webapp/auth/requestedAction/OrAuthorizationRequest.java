@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 
 public class OrAuthorizationRequest extends AuthorizationRequest {
@@ -40,11 +39,6 @@ public class OrAuthorizationRequest extends AuthorizationRequest {
 
     @Override
     public AccessOperation getAccessOperation() {
-        return null;
-    }
-
-    @Override
-    public IdentifierBundle getIds() {
         return null;
     }
 
