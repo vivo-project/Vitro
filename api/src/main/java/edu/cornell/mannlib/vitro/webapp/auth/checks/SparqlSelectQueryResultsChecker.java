@@ -12,6 +12,7 @@ import java.util.Set;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AttributeValueSet;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,47 +27,77 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 
 public class SparqlSelectQueryResultsChecker {
+    private static final String PROFILE_URI = "profileUri";
+    private static final String EXTERNAL_AUTH_ID = "externalAuthId";
+    private static final String MATCHING_PROPERTY_URI = "matchingPropertyUri";
+    private static final String OBJECT_URI = "objectUri";
     private static final Log log = LogFactory.getLog(SparqlSelectQueryResultsChecker.class);
 
     public static boolean sparqlSelectQueryResultsContain(Check check, AuthorizationRequest ar, String[] inputValues) {
-        String queryTemplate = check.getConfiguration();
-        if (StringUtils.isBlank(queryTemplate)) {
-            queryTemplate = check.getValues().getSingleValue();
+        String query = check.getConfiguration();
+        if (StringUtils.isBlank(query)) {
+            query = check.getValues().getSingleValue();
+            if (StringUtils.isBlank(query)) {
+                log.error("Sparql query is empty.");
+                return false;
+            }
         }
-        if (StringUtils.isBlank(queryTemplate)) {
-            log.error("SparqlQueryContains template is empty");
-            return false;
-        }
+
         AccessObject ao = ar.getAccessObject();
         Model m = ao.getModel();
         if (m == null) {
             log.debug("SparqlQueryContains model is not provided");
             return false;
         }
-        Set<String> profileUris = new HashSet<String>(ar.getEditorUris());
-        if (profileUris.isEmpty()) {
-            if (queryTemplate.contains("?profileUri")) {
-                log.debug("Subject has no person URIs");
-                return false;
-            } else {
-                profileUris.add("");
-            }
-        }
+
         Set<String> comparedValues = new HashSet<>();
+
         if (isQueryNotProvidedInConfiguration(check)) {
             addRelatedUrisToComparedValues(ao, comparedValues);
         } else {
             addValuesToComparedValues(check.getValues(), comparedValues);
         }
+
+        if (isProfileUriRelatedQuery(query)) {
+            return makeProfileUriMatchQuery(ar, query, m, comparedValues);
+        }
+
+        if (query.contains("?" + EXTERNAL_AUTH_ID) && externalAuthIdIsNotAvailable(ar)) {
+            logVariableNotAvailable(EXTERNAL_AUTH_ID);
+            return false;
+        }
+
+        if (query.contains("?" + MATCHING_PROPERTY_URI) && matchingPropertyUriIsNotAvailable()) {
+            logVariableNotAvailable(MATCHING_PROPERTY_URI);
+            return false;
+        }
+
+        Set<String> sparqlResults = getSparqlSelectResults(m, "", query, ar);
+        sparqlResults.retainAll(comparedValues);
+        if (!sparqlResults.isEmpty()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private static boolean makeProfileUriMatchQuery(AuthorizationRequest ar, String queryTemplate, Model m,
+            Set<String> comparedValues) {
+        boolean result = false;
+        Set<String> profileUris = new HashSet<String>(ar.getEditorUris());
+        if (profileUris.isEmpty()) {
+            log.debug("Subject has no person Uri, nothing to substitute.");
+            result = false;
+        }
         for (String profileUri : profileUris) {
-            Set<String> sparqlSelectResults = getSparqlSelectResults(m, profileUri, queryTemplate, ar);
+            Set<String> sparqlResults = getSparqlSelectResults(m, profileUri, queryTemplate, ar);
             // Return true if intersection is not empty
-            comparedValues.retainAll(sparqlSelectResults);
-            if (!comparedValues.isEmpty()) {
-                return true;
+            sparqlResults.retainAll(comparedValues);
+            if (!sparqlResults.isEmpty()) {
+                result = true;
             }
         }
-        return false;
+        return result;
     }
 
     private static void addValuesToComparedValues(AttributeValueSet values, Set<String> comparedValues) {
@@ -115,11 +146,19 @@ public class SparqlSelectQueryResultsChecker {
     }
 
     private static void setVariables(String profileUri, AuthorizationRequest ar, ParameterizedSparqlString pss) {
-        pss.setIri("profileUri", profileUri);
+        pss.setIri(PROFILE_URI, profileUri);
         AccessObject object = ar.getAccessObject();
         Optional<String> uri = object.getUri();
         if (uri.isPresent()) {
-            pss.setIri("objectUri", uri.get());
+            pss.setIri(OBJECT_URI, uri.get());
+        }
+        String externalAuthId = ar.getExternalAuthId();
+        if (!StringUtils.isBlank(externalAuthId)) {
+            pss.setLiteral(EXTERNAL_AUTH_ID, externalAuthId);
+        }
+        String matchingPropertyUri = SelfEditingConfiguration.getInstance().getMatchingPropertyUri();
+        if (!StringUtils.isBlank(matchingPropertyUri)) {
+            pss.setIri(MATCHING_PROPERTY_URI, matchingPropertyUri);
         }
     }
 
@@ -144,7 +183,7 @@ public class SparqlSelectQueryResultsChecker {
 
     private static String createQueryMapKey(String profileUri, String queryTemplate, AuthorizationRequest ar) {
         String mapKey = queryTemplate + "." + profileUri;
-        if (queryTemplate.contains("?objectUri")) {
+        if (queryTemplate.contains("?" + OBJECT_URI)) {
             AccessObject object = ar.getAccessObject();
             Optional<String> uri = object.getUri();
             if (uri.isPresent()) {
@@ -152,6 +191,24 @@ public class SparqlSelectQueryResultsChecker {
             }
         }
         return mapKey;
+    }
+
+    private static void logVariableNotAvailable(String variable) {
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Query contains ?%s, but authorization request doesn't provide it.", variable));
+        }
+    }
+
+    private static boolean externalAuthIdIsNotAvailable(AuthorizationRequest ar) {
+        return StringUtils.isBlank(ar.getExternalAuthId());
+    }
+
+    private static boolean matchingPropertyUriIsNotAvailable() {
+        return StringUtils.isBlank(SelfEditingConfiguration.getInstance().getMatchingPropertyUri());
+    }
+
+    private static boolean isProfileUriRelatedQuery(String queryTemplate) {
+        return queryTemplate.contains("?" + PROFILE_URI);
     }
 
 }
