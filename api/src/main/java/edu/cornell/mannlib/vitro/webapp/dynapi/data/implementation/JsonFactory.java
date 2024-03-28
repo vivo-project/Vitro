@@ -46,21 +46,21 @@ public class JsonFactory {
         }
         return new JsonArray(jsonString);
     }
-    
+
     public static JsonObject getEmptyObjectInstance() {
         return new JsonObject();
     }
 
-    public static JsonArray getEmptyArrayInstance(){
+    public static JsonArray getEmptyArrayInstance() {
         return new JsonArray();
     }
-    
+
     static public class JsonIsNotArrayException extends RuntimeException {
         public JsonIsNotArrayException(String json) {
             super(json);
         }
     }
-    
+
     static public class JsonIsNotObjectException extends RuntimeException {
         public JsonIsNotObjectException(String json) {
             super(json);

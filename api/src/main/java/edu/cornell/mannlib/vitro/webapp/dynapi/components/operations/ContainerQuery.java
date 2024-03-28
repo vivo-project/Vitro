@@ -38,7 +38,7 @@ public class ContainerQuery extends AbstractOperation {
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#targetContainer", minOccurs = 1, maxOccurs = 1)
     public void setContainer(Parameter param) throws InitializationException {
-        if (!param.isJsonContainer()) {
+        if (!JsonContainerView.isJsonContainer(param)) {
             throw new InitializationException("only JsonContainer parameter is allowed as a target");
         }
         inputParams.add(param);
@@ -80,7 +80,7 @@ public class ContainerQuery extends AbstractOperation {
             log.error("container param is not set");
             return false;
         }
-        if (!containerParam.isJsonContainer()) {
+        if (!JsonContainerView.isJsonContainer(containerParam)) {
             log.error("container param is not JsonContainer");
             return false;
         }
@@ -104,7 +104,7 @@ public class ContainerQuery extends AbstractOperation {
             log.error("container data param is null");
             return false;
         }
-        if (!container.getParam().isJsonContainer()) {
+        if (!JsonContainerView.isJsonContainer(container.getParam())) {
             log.error("container data is not json container");
             return false;
         }

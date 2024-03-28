@@ -109,10 +109,6 @@ public class Parameter implements Removable {
         return optional;
     }
 
-    public boolean isJsonContainer() {
-        return type.isJsonContainer();
-    }
-
     public String getDefaultValue() {
         if (defaultValue != null) {
             return defaultValue;

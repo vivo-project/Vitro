@@ -120,7 +120,7 @@ public class JSONConverter {
         if (RdfView.isRdfNode(data)) {
             return RdfView.getAsJsonNode(data);
         }
-        if (data.getParam().isJsonContainer()) {
+        if (JsonContainerView.isJsonContainer(data.getParam())) {
             return JsonContainerView.asJsonNode(data);
         }
         if (JsonView.isJsonNode(data.getParam())) {

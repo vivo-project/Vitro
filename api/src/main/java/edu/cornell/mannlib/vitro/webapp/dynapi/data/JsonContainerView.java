@@ -15,6 +15,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonArray;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonFactory;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonObject;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.LiteralParamFactory;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.URIResourceParam;
 import org.apache.jena.query.QuerySolution;
@@ -26,11 +27,23 @@ public class JsonContainerView {
     private static final String JSON_ARRAY = "json array";
     private static final String JSON_OBJECT = "json container";
 
+    public static boolean isJsonContainer(Parameter param) {
+        return isJsonContainer(param.getType());
+    }
+
+    public static boolean isJsonContainer(ParameterType type) {
+        String canonicalName = type.getImplementationType().getClassName().getCanonicalName();
+        if (JsonContainer.class.getCanonicalName().equals(canonicalName)) {
+            return true;
+        }
+        return false;
+    }
+
     public static Map<String, JsonArray> getJsonArrays(Parameters params, DataStore dataStore) {
         Map<String, JsonArray> jsonArrays = new HashMap<>();
         for (String name : params.getNames()) {
             Parameter param = params.get(name);
-            if (param.isJsonContainer() && isJsonArray(param)) {
+            if (JsonContainerView.isJsonContainer(param) && isJsonArray(param)) {
                 JsonArray arrayNode = (JsonArray) dataStore.getData(name).getObject();
                 jsonArrays.put(name, arrayNode);
             }
@@ -70,7 +83,7 @@ public class JsonContainerView {
         List<JacksonJsonContainer> jsonArrays = new LinkedList<>();
         for (String name : params.getNames()) {
             Parameter param = params.get(name);
-            if (param.isJsonContainer() && JSON_OBJECT.equals(param.getType().getName())) {
+            if (JsonContainerView.isJsonContainer(param) && JSON_OBJECT.equals(param.getType().getName())) {
                 JacksonJsonContainer objectNode = (JacksonJsonContainer) dataStore.getData(name).getObject();
                 jsonArrays.add(objectNode);
             }
@@ -82,7 +95,7 @@ public class JsonContainerView {
         List<JsonArray> jsonArrays = new LinkedList<>();
         for (String name : params.getNames()) {
             Parameter param = params.get(name);
-            if (param.isJsonContainer() && isJsonArray(param)) {
+            if (JsonContainerView.isJsonContainer(param) && isJsonArray(param)) {
                 JsonArray arrayNode = (JsonArray) dataStore.getData(name).getObject();
                 jsonArrays.add(arrayNode);
             }
@@ -97,7 +110,7 @@ public class JsonContainerView {
     public static boolean hasJsonArrays(Parameters params, DataStore dataStore) {
         for (String name : params.getNames()) {
             Parameter param = params.get(name);
-            if (param.isJsonContainer() && isJsonArray(param)) {
+            if (JsonContainerView.isJsonContainer(param) && isJsonArray(param)) {
                 return true;
             }
         }

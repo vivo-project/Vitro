@@ -9,7 +9,7 @@ public class DataInitializer {
 
     public static void initialize(Parameter param, Data data) throws ConversionException {
 
-        if (param.isJsonContainer()) {
+        if (JsonContainerView.isJsonContainer(param)) {
             initializeJsonObject(param, data);
         } else {
             initializeData(param, data);

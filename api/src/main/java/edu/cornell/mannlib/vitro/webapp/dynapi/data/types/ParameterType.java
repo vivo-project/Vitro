@@ -6,7 +6,6 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Removable;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.SerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionMethod;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -57,7 +56,7 @@ public class ParameterType implements Removable {
     public void setValuesType(ParameterType nestedType) {
         this.nestedType = nestedType;
     }
-    
+
     public ParameterType getNestedType() {
         return nestedType;
     }
@@ -109,14 +108,6 @@ public class ParameterType implements Removable {
 
     public boolean isInternal() {
         return isInternal;
-    }
-
-    public boolean isJsonContainer() {
-        final String canonicalName = getImplementationType().getClassName().getCanonicalName();
-        if (JsonContainer.class.getCanonicalName().equals(canonicalName)) {
-            return true;
-        }
-        return false;
     }
 
     public void initialize() throws InitializationException {
