@@ -12,7 +12,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.JSONConverter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ArrayParameterType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 
-public class DynapiArrayList {
+public class ArrayListFactory {
 
     public static String serialize(List list) {
         return list.toString();

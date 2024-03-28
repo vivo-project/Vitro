@@ -149,7 +149,7 @@ dynapi-serialization-config:json-container
 dynapi-deserialization-config:array
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Array list deserialization config"@en-US ;
-        dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiArrayList" ;
+        dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.ArrayListFactory" ;
         dynapi:methodName 		"deserialize";
         dynapi:methodArguments	"input";
         dynapi:isStaticMethod	"true"^^xsd:boolean ;
@@ -158,7 +158,7 @@ dynapi-deserialization-config:array
 dynapi-serialization-config:array
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Array list serialization config"@en-US ;
-        dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiArrayList" ;
+        dynapi:className 		"edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.ArrayListFactory" ;
         dynapi:methodName 		"serialize";
         dynapi:methodArguments	"input";
         dynapi:isStaticMethod	"true"^^xsd:boolean ;

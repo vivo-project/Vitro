@@ -14,7 +14,7 @@ public class ArrayView {
         }
         Data data = dataStore.getData(propertyVar);
         JsonContainer array = JsonContainerView.getJsonContainer(dataStore, data.getParam());
-        List list = array.getDataAsStringList();
+        List<String> list = array.getDataAsStringList();
         if (list.size() > 1) {
             return true;
         }
