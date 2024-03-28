@@ -5,11 +5,6 @@ span#toggleContainer {
     padding:10px 8px 0 0;
     font-size: 0.85em;
 }
-
-.property-tabs {
-    min-height: 500px;
-}
-
 section.property-group  {
     padding-top: 15px;
     border-top:none;
@@ -44,11 +39,10 @@ ul.propertyTabsList li {
 ul.propertyTabsList li:first-child {
     width: 7px;
 }
-li.nav-link {
+li.nonSelectedGroupTab {
     float:left;
     border: 1px solid #DFE6E5;
     background-color:#E4ECF3;
-    color: #5e6363;
     padding: 6px 8px 6px 8px;
     cursor:pointer;
     border-top-right-radius: 4px;
@@ -58,18 +52,11 @@ li.nav-link {
     -moz-border-radius-topleft: 4px;
     -webkit-border-top-left-radius: 4px;
 }
-
-li.nav-link:hover {
-    color: #5e6363;
-    background-color:#E4ECF3;
-}
-
-li.nav-link.active {
+li.selectedGroupTab {
     float:left;
     border: 1px solid #DFE6E5;
     border-bottom-color:#fff;
     background-color:#FFF;
-    color: #5e6363;
     padding: 6px 8px 6px 8px;
     border-top-right-radius: 4px;
     -moz-border-radius-topright: 4px;

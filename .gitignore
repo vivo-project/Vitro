@@ -19,8 +19,6 @@ utilities/sdb_to_tdb/.work
 **/overlays
 *~
 
-**/.DS_Store
-
 # Eclipse artifacts
 **/.settings
 **/.classpath
