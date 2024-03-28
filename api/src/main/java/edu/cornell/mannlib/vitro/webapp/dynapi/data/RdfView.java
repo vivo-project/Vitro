@@ -40,9 +40,9 @@ public class RdfView {
                         .getRdfType().getRDFDataType());
                 List<Literal> list = Collections.singletonList(literal);
                 result.put(name, list);
-            } else if (JsonContainerView.isJsonArray(param) && param.getType().getValuesType().isLiteral()) {
+            } else if (JsonContainerView.isJsonArray(param) && param.getType().getNestedType().isLiteral()) {
                 JacksonJsonContainer array = (JacksonJsonContainer) dataStore.getData(name).getObject();
-                RDFDatatype rdfDataType = param.getType().getValuesType().getRdfType().getRDFDataType();
+                RDFDatatype rdfDataType = param.getType().getNestedType().getRdfType().getRDFDataType();
                 List<String> list = array.getDataAsStringList();
                 List<Literal> literalList = new LinkedList<>();
                 for (String literalString : list) {
@@ -63,7 +63,7 @@ public class RdfView {
                 Data data = dataStore.getData(name);
                 List<String> list = Collections.singletonList(data.getObject().toString());
                 result.put(name, list);
-            } else if (JsonContainerView.isJsonArray(param) && param.getType().getValuesType().isUri()) {
+            } else if (JsonContainerView.isJsonArray(param) && param.getType().getNestedType().isUri()) {
                 JacksonJsonContainer array = (JacksonJsonContainer) dataStore.getData(name).getObject();
                 List<String> list = array.getDataAsStringList();
                 result.put(name, list);

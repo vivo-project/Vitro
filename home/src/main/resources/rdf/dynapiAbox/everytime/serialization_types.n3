@@ -60,7 +60,6 @@ dynapi-deserialization-config:uri-resource
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Uri resource deserialization config"@en-US ;
         dynapi:className        "org.apache.jena.rdf.model.impl.ResourceImpl" ;
-        dynapi:methodName       "";
         dynapi:methodArguments  "input";
         dynapi:isStaticMethod   "true"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .
@@ -168,7 +167,6 @@ dynapi-deserialization-config:big-integer
         a                       dynapi:ImplementationConfig ;
         rdfs:label              "Big integer deserialization config"@en-US ;
         dynapi:className 		"java.math.BigInteger" ;
-        dynapi:methodName 		"";
         dynapi:methodArguments	"input";
         dynapi:isStaticMethod	"true"^^xsd:boolean ;
         vitro:mostSpecificType  dynapi:ImplementationConfig .

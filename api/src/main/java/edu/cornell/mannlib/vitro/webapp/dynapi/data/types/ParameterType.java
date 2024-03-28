@@ -58,7 +58,7 @@ public class ParameterType implements Removable {
         this.nestedType = nestedType;
     }
     
-    public ParameterType getValuesType() {
+    public ParameterType getNestedType() {
         return nestedType;
     }
 
@@ -147,7 +147,7 @@ public class ParameterType implements Removable {
                 .append(getSerializationType(), compared.getSerializationType())
                 .append(getImplementationType(), compared.getImplementationType())
                 .append(getRdfType(), compared.getRdfType())
-                .append(getValuesType(), compared.getValuesType())
+                .append(getNestedType(), compared.getNestedType())
                 .isEquals();
     }
 
@@ -158,7 +158,7 @@ public class ParameterType implements Removable {
                 .append(getSerializationType())
                 .append(getImplementationType())
                 .append(getRdfType())
-                .append(getValuesType())
+                .append(getNestedType())
                 .toHashCode();
     }
 }

@@ -104,11 +104,6 @@ public class ConversionMethod {
                     "Class object of implementation config from implemenation type in parameter " +
                     "type provided into constructor is null");
         }
-        if (validatingConfig.getMethodName() == null) {
-            throw new InitializationException(
-                    "Method name of implementation config from implemenation type in parameter " +
-                    "type provided into constructor is null");
-        }
         if (validatingConfig.getMethodArguments() == null) {
             throw new InitializationException(
                     "Method arguments of implementation config from implemenation type in parameter " +

@@ -28,7 +28,7 @@ public class ImplementationConfig {
     }
 
     // Empty method name is a constructor
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#methodName", minOccurs = 1, maxOccurs = 1)
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#methodName", minOccurs = 0, maxOccurs = 1)
     public void setMethodName(String methodName) {
         this.methodName = methodName;
     }
