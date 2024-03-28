@@ -4,8 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
@@ -37,14 +35,6 @@ public abstract class JacksonJsonContainer implements JsonContainer {
 
     protected String escapeKey(String key) {
         return key.replace("\\", "\\\\").replace("'", "\\'");
-    }
-
-    public List<String> getDataAsStringList() {
-        List<String> result = new LinkedList<>();
-        for (Data data : dataMap.values()) {
-            result.add(data.getSerializedValue());
-        }
-        return result;
     }
 
     protected String getRandomKey() {

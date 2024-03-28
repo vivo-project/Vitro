@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.NullNode;
@@ -78,4 +81,18 @@ public class JsonObject extends JacksonJsonContainer {
         documentContext.add(PATH_ROOT_PREFIX + ".values", id);
         dataMap.put(id, data);
     }
+
+    public List<String> getDataAsStringList() {
+        List<String> result = new LinkedList<>();
+        for (Data data : dataMap.values()) {
+            result.add(data.getSerializedValue());
+        }
+        return result;
+    }
+
+    @Override
+    public Type getType() {
+        return Type.OBJECT;
+    }
+
 }

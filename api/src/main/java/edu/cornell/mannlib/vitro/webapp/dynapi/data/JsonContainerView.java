@@ -103,6 +103,7 @@ public class JsonContainerView {
         return jsonArrays;
     }
 
+    @Deprecated
     public static boolean isJsonArray(Parameter param) {
         return JSON_ARRAY.equals(param.getType().getName());
     }

@@ -10,6 +10,11 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 
 public interface JsonContainer {
 
+    enum Type {
+        ARRAY,
+        OBJECT
+    }
+
     Data getItem(String key, Parameter parameter);
 
     JsonNode asJsonNode();
@@ -21,5 +26,7 @@ public interface JsonContainer {
     List<String> getDataAsStringList();
 
     boolean contains(String key);
+
+    Type getType();
 
 }

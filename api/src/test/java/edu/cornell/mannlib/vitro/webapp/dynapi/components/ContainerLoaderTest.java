@@ -27,7 +27,7 @@ public class ContainerLoaderTest {
     public String key;
 
     @org.junit.runners.Parameterized.Parameter(1)
-    public JsonFactory.Type containerType;
+    public JsonContainer.Type containerType;
 
     @Test
     public void testLoadIntoArrayContainer() throws InitializationException {
@@ -66,9 +66,9 @@ public class ContainerLoaderTest {
     @Parameterized.Parameters
     public static Collection<Object[]> requests() {
         return Arrays.asList(new Object[][] {
-                { "", JsonFactory.Type.ARRAY },
-                { "", JsonFactory.Type.OBJECT },
-                { "key", JsonFactory.Type.ARRAY },
-                { "key", JsonFactory.Type.OBJECT }, });
+                { "", JsonContainer.Type.ARRAY },
+                { "", JsonContainer.Type.OBJECT },
+                { "key", JsonContainer.Type.ARRAY },
+                { "key", JsonContainer.Type.OBJECT }, });
     }
 }

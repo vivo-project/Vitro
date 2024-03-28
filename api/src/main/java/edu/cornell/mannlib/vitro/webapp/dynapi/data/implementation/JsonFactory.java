@@ -2,18 +2,13 @@
 
 package edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation;
 
-import static edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonFactory.Type.ARRAY;
+import static edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer.Type.ARRAY;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 
 public class JsonFactory {
 
-    public static enum Type {
-        ARRAY,
-        OBJECT
-    }
-
-    public static JsonContainer getJson(JsonFactory.Type type) {
+    public static JsonContainer getJson(JsonContainer.Type type) {
         if (type.equals(ARRAY)) {
             return new JsonArray();
         } else {

@@ -33,7 +33,7 @@ public class ConditionContainerContainsTest {
     public List<String> keyValues;
 
     @org.junit.runners.Parameterized.Parameter(1)
-    public JsonFactory.Type containerType;
+    public JsonContainer.Type containerType;
 
     @org.junit.runners.Parameterized.Parameter(2)
     public boolean result;
@@ -77,7 +77,7 @@ public class ConditionContainerContainsTest {
         String expectedOutputParamName = "output";
         Parameter expectedOutputParam = new StringParam(expectedOutputParamName);
         Data data = new Data(expectedOutputParam);
-        if (containerType.equals(JsonFactory.Type.ARRAY)) {
+        if (containerType.equals(JsonContainer.Type.ARRAY)) {
             for (int i = 0; i <= Integer.parseInt(keyValues.iterator().next()); i++) {
                 containerObject.addValue(data);
             }
@@ -93,20 +93,20 @@ public class ConditionContainerContainsTest {
     @Parameterized.Parameters
     public static Collection<Object[]> requests() {
         return Arrays.asList(new Object[][] {
-                { Arrays.asList("0"), JsonFactory.Type.ARRAY, true, "0" },
-                { Arrays.asList("0"), JsonFactory.Type.ARRAY, false, "1" },
-                { Arrays.asList("2"), JsonFactory.Type.ARRAY, true, "2" },
-                { Arrays.asList("2"), JsonFactory.Type.ARRAY, false, "u10" },
+                { Arrays.asList("0"), JsonContainer.Type.ARRAY, true, "0" },
+                { Arrays.asList("0"), JsonContainer.Type.ARRAY, false, "1" },
+                { Arrays.asList("2"), JsonContainer.Type.ARRAY, true, "2" },
+                { Arrays.asList("2"), JsonContainer.Type.ARRAY, false, "u10" },
 
-                { Arrays.asList("0"), JsonFactory.Type.OBJECT, true, "0" },
-                { Arrays.asList("key"), JsonFactory.Type.OBJECT, true, "key" },
-                { Arrays.asList("key with space"), JsonFactory.Type.OBJECT, true, "key with space" },
-                { Arrays.asList("key$"), JsonFactory.Type.OBJECT, true, "key$" },
-                { Arrays.asList("key\""), JsonFactory.Type.OBJECT, true, "key\"" },
-                { Arrays.asList("key."), JsonFactory.Type.OBJECT, true, "key." },
-                { Arrays.asList("key\n"), JsonFactory.Type.OBJECT, true, "key\n" },
-                { Arrays.asList("key\t"), JsonFactory.Type.OBJECT, true, "key\t" },
-                { Arrays.asList("key'"), JsonFactory.Type.OBJECT, true, "key'" },
-                { Arrays.asList("key\\"), JsonFactory.Type.OBJECT, true, "key\\" }, });
+                { Arrays.asList("0"), JsonContainer.Type.OBJECT, true, "0" },
+                { Arrays.asList("key"), JsonContainer.Type.OBJECT, true, "key" },
+                { Arrays.asList("key with space"), JsonContainer.Type.OBJECT, true, "key with space" },
+                { Arrays.asList("key$"), JsonContainer.Type.OBJECT, true, "key$" },
+                { Arrays.asList("key\""), JsonContainer.Type.OBJECT, true, "key\"" },
+                { Arrays.asList("key."), JsonContainer.Type.OBJECT, true, "key." },
+                { Arrays.asList("key\n"), JsonContainer.Type.OBJECT, true, "key\n" },
+                { Arrays.asList("key\t"), JsonContainer.Type.OBJECT, true, "key\t" },
+                { Arrays.asList("key'"), JsonContainer.Type.OBJECT, true, "key'" },
+                { Arrays.asList("key\\"), JsonContainer.Type.OBJECT, true, "key\\" }, });
     }
 }

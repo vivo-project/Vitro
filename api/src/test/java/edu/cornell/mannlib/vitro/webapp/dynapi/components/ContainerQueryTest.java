@@ -29,7 +29,7 @@ public class ContainerQueryTest {
     public String keyValue;
 
     @org.junit.runners.Parameterized.Parameter(1)
-    public JsonFactory.Type containerType;
+    public JsonContainer.Type containerType;
 
     @org.junit.runners.Parameterized.Parameter(2)
     public String value;
@@ -55,7 +55,7 @@ public class ContainerQueryTest {
         Parameter outputParam1 = new StringParam(outputName);
         Data data = new Data(outputParam1);
         TestView.setObject(data, value);
-        if (containerType.equals(JsonFactory.Type.ARRAY)) {
+        if (containerType.equals(JsonContainer.Type.ARRAY)) {
             container.addValue(data);
         } else {
             container.addKeyValue(keyValue, data);
@@ -80,16 +80,16 @@ public class ContainerQueryTest {
     @Parameterized.Parameters
     public static Collection<Object[]> requests() {
         return Arrays.asList(new Object[][] {
-                { "0", JsonFactory.Type.ARRAY, "test value" },
-                { "0", JsonFactory.Type.OBJECT, "0" },
-                { "key", JsonFactory.Type.OBJECT, "test value" },
-                { "key", JsonFactory.Type.OBJECT, "" },
-                { "key$", JsonFactory.Type.OBJECT, "test value" },
-                { "key\\ value", JsonFactory.Type.OBJECT, "test value" },
-                { "key'", JsonFactory.Type.OBJECT, "test value" },
-                { "key.", JsonFactory.Type.OBJECT, "test value" },
-                { "key\n", JsonFactory.Type.OBJECT, "test value" },
-                { "key\t", JsonFactory.Type.OBJECT, "test value" },
+                { "0", JsonContainer.Type.ARRAY, "test value" },
+                { "0", JsonContainer.Type.OBJECT, "0" },
+                { "key", JsonContainer.Type.OBJECT, "test value" },
+                { "key", JsonContainer.Type.OBJECT, "" },
+                { "key$", JsonContainer.Type.OBJECT, "test value" },
+                { "key\\ value", JsonContainer.Type.OBJECT, "test value" },
+                { "key'", JsonContainer.Type.OBJECT, "test value" },
+                { "key.", JsonContainer.Type.OBJECT, "test value" },
+                { "key\n", JsonContainer.Type.OBJECT, "test value" },
+                { "key\t", JsonContainer.Type.OBJECT, "test value" },
 
         });
     }
