@@ -72,14 +72,14 @@ public class JsonContainerTest {
 
     @Test
     public void testObjectAddJsonContainerKeyValue() {
-        JsonObject objectValue = new JsonObject("{\"test\":true}");
+        JsonObject objectValue = JsonFactory.getObjectInstance("{\"test\":true}");
         String expectedValue = "{\"test\":true}";
         testObjectAddKeyValue(new JsonContainerObjectParam(varName), objectValue, expectedValue);
     }
 
     @Test
     public void testObjectAddJsonArrayKeyValue() {
-        JsonArray objectValue = new JsonArray();
+        JsonArray objectValue = JsonFactory.getEmptyArrayInstance();
         Data data1 = new Data(new StringParam("var1"));
         TestView.setObject(data1, "string 1");
         objectValue.addValue(data1);
@@ -138,14 +138,14 @@ public class JsonContainerTest {
 
     @Test
     public void testArrayAddJsonContainerKeyValue() {
-        JsonObject objectValue = new JsonObject("{\"test\":true}");
+        JsonObject objectValue = JsonFactory.getObjectInstance("{\"test\":true}");
         String expectedValue = "{\"test\":true}";
         testArrayAddKeyValue(new JsonContainerObjectParam(varName), objectValue, expectedValue);
     }
 
     @Test
     public void testArrayAddJsonArrayKeyValue() {
-        JsonArray objectValue = new JsonArray();
+        JsonArray objectValue = JsonFactory.getEmptyArrayInstance();
         Data data1 = new Data(new StringParam("var1"));
         TestView.setObject(data1, "string 1");
         objectValue.addValue(data1);
@@ -157,7 +157,7 @@ public class JsonContainerTest {
     }
 
     private void testObjectAddValues(Parameter param, Object value, String expectedValue) {
-        JsonObject container = new JsonObject();
+        JsonObject container = JsonFactory.getEmptyObjectInstance();
         int n = 3;
         for (int i = 0; i < n; i++) {
             Data data = new Data(param);
@@ -171,7 +171,7 @@ public class JsonContainerTest {
     }
 
     private void testObjectAddKeyValue(Parameter param, Object value, String expectedValue) {
-        JsonObject container = new JsonObject();
+        JsonObject container = JsonFactory.getEmptyObjectInstance();
         Data data = new Data(param);
         TestView.setObject(data, value);
         container.addKeyValue(varName, data);
@@ -182,7 +182,7 @@ public class JsonContainerTest {
     }
 
     private void testArrayAddKeyValue(Parameter param, Object value, String expectedValue) {
-        JsonArray container = new JsonArray();
+        JsonArray container = JsonFactory.getEmptyArrayInstance();
         Data data = new Data(param);
         TestView.setObject(data, value);
         container.addKeyValue(varName, data);
@@ -193,7 +193,7 @@ public class JsonContainerTest {
     }
 
     private void testArrayAddValues(Parameter param, Object value, String expectedValue) {
-        JsonArray container = new JsonArray();
+        JsonArray container = JsonFactory.getEmptyArrayInstance();
         int n = 3;
         for (int i = 0; i < n; i++) {
             Data data = new Data(param);

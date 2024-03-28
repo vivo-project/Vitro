@@ -13,13 +13,14 @@ import org.apache.commons.logging.LogFactory;
 public class JsonObject extends JacksonJsonContainer {
 
     private static final Log log = LogFactory.getLog(JsonObject.class);
+
     public static final String EMPTY_OBJECT = "{}";
 
-    public JsonObject() {
+    protected JsonObject() {
         super(EMPTY_OBJECT);
     }
 
-    public JsonObject(String jsonString) {
+    protected JsonObject(String jsonString) {
         super(jsonString);
     }
 

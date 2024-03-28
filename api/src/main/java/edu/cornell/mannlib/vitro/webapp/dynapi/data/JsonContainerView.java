@@ -13,6 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JacksonJsonContainer;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonArray;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonFactory;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonObject;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.LiteralParamFactory;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.URIResourceParam;
@@ -121,7 +122,7 @@ public class JsonContainerView {
     }
 
     private static JsonObject getRowMap(List<String> vars, QuerySolution solution) {
-        JsonObject row = new JsonObject();
+        JsonObject row = JsonFactory.getEmptyObjectInstance();
 
         for (String var : vars) {
             RDFNode node = solution.get(var);

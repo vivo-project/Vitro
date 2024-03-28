@@ -16,11 +16,11 @@ public class JsonArray extends JacksonJsonContainer {
 
     public static final String EMPTY_ARRAY = "[]";
 
-    public JsonArray() {
+    protected JsonArray() {
         super(EMPTY_ARRAY);
     }
 
-    public JsonArray(String jsonString) {
+    protected JsonArray(String jsonString) {
         super(jsonString);
     }
 
