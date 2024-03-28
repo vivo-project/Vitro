@@ -6,7 +6,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.PrimitiveSerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiInMemoryOntModel;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ConversionConfiguration;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import org.apache.commons.logging.Log;
@@ -45,8 +45,8 @@ public class ModelParam extends Parameter {
         }
     }
 
-    private ImplementationConfig getSerializationConfig() throws ClassNotFoundException {
-        ImplementationConfig serializationConfig = new ImplementationConfig();
+    private ConversionConfiguration getSerializationConfig() throws ClassNotFoundException {
+        ConversionConfiguration serializationConfig = new ConversionConfiguration();
         serializationConfig.setClassName(DynapiInMemoryOntModel.class.getCanonicalName());
         serializationConfig.setMethodName("serializeN3");
         serializationConfig.setMethodArguments("input");
@@ -54,8 +54,8 @@ public class ModelParam extends Parameter {
         return serializationConfig;
     }
 
-    private ImplementationConfig getDeserializationConfig(boolean internal) throws ClassNotFoundException {
-        ImplementationConfig serializationConfig = new ImplementationConfig();
+    private ConversionConfiguration getDeserializationConfig(boolean internal) throws ClassNotFoundException {
+        ConversionConfiguration serializationConfig = new ConversionConfiguration();
         if (internal) {
             serializationConfig.setClassName(DynapiModelFactory.class.getCanonicalName());
             serializationConfig.setMethodName("getModel");

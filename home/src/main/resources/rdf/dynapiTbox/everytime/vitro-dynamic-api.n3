@@ -485,7 +485,7 @@
           rdfs:subPropertyOf owl:topDataProperty ;
           rdfs:domain [ rdf:type owl:Class ;
                        owl:unionOf ( :ImplementationType
-                                     :ImplementationConfig
+                                     :ConversionConfiguration
                                    )
                      ] ;
           rdfs:range xsd:string ;
@@ -495,7 +495,7 @@
 :methodName rdf:type owl:DatatypeProperty,
 					owl:FunctionalProperty ;
           rdfs:subPropertyOf owl:topDataProperty ;
-          rdfs:domain :ImplementationConfig ;
+          rdfs:domain :ConversionConfiguration ;
           rdfs:range xsd:string ;
           rdfs:label "Method name"@en-US .
 
@@ -504,14 +504,14 @@
 :methodArguments rdf:type owl:DatatypeProperty,
 					owl:FunctionalProperty ;
           rdfs:subPropertyOf owl:topDataProperty ;
-          rdfs:domain :ImplementationConfig ;
+          rdfs:domain :ConversionConfiguration ;
           rdfs:range xsd:string ;
           rdfs:label "Method arguments"@en-US .
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#isStaticMethod
 :isStaticMethod rdf:type owl:DatatypeProperty ,
                      owl:FunctionalProperty ;
-            rdfs:domain :ImplementationConfig ;
+            rdfs:domain :ConversionConfiguration ;
             rdfs:range xsd:boolean ;
             rdfs:label "is static method or not"@en-US .
 
@@ -781,8 +781,8 @@
                rdfs:label "Implementation type"@en-US .
 
 
-###  https://vivoweb.org/ontology/vitro-dynamic-api#ImplementationConfig
-:ImplementationConfig rdf:type owl:Class ;
+###  https://vivoweb.org/ontology/vitro-dynamic-api#ConversionConfiguration
+:ConversionConfiguration rdf:type owl:Class ;
                rdfs:label "Parameter implementation configuration"@en-US .
 
 

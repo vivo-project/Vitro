@@ -24,7 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.Primitiv
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ConversionConfiguration;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.RDFType;
@@ -260,7 +260,7 @@ public class SolrQueryTest extends ServletContextTest {
         ImplementationType impltype = new ImplementationType();
         paramType.setImplementationType(impltype);
 
-        ImplementationConfig config = new ImplementationConfig();
+        ConversionConfiguration config = new ConversionConfiguration();
 
         config.setClassName(JAVA_LANG_STRING);
         config.setMethodArguments("");

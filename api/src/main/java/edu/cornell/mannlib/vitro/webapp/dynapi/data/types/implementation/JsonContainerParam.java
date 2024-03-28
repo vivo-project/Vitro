@@ -5,7 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonFactory;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ConversionConfiguration;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import org.apache.commons.logging.Log;
@@ -34,8 +34,8 @@ public abstract class JsonContainerParam extends Parameter {
         }
     }
 
-    private ImplementationConfig getSerializationConfig() throws ClassNotFoundException {
-        ImplementationConfig serializationConfig = new ImplementationConfig();
+    private ConversionConfiguration getSerializationConfig() throws ClassNotFoundException {
+        ConversionConfiguration serializationConfig = new ConversionConfiguration();
         serializationConfig.setClassName(JsonFactory.class.getCanonicalName());
         serializationConfig.setMethodName("serialize");
         serializationConfig.setMethodArguments("input");
@@ -43,8 +43,8 @@ public abstract class JsonContainerParam extends Parameter {
         return serializationConfig;
     }
 
-    private ImplementationConfig getDeserializationConfig() throws ClassNotFoundException {
-        ImplementationConfig serializationConfig = new ImplementationConfig();
+    private ConversionConfiguration getDeserializationConfig() throws ClassNotFoundException {
+        ConversionConfiguration serializationConfig = new ConversionConfiguration();
         serializationConfig.setClassName(JsonFactory.class.getCanonicalName());
         serializationConfig.setMethodName("deserialize");
         serializationConfig.setMethodArguments("input");

@@ -8,7 +8,7 @@
 
 :methodArguments-shape
         a                    sh:NodeShape ;
-        sh:class             :ImplementationConfig ;
+        sh:class             :ConversionConfiguration ;
         sh:targetSubjectsOf  :methodArguments .
 
 :Action-requiresAccess
@@ -16,7 +16,7 @@
         sh:class  :Role ;
         sh:path   :requiresAccess .
 
-:ImplementationConfig-methodName
+:ConversionConfiguration-methodName
         a            sh:PropertyShape ;
         sh:datatype  xsd:string ;
         sh:maxCount  1 ;
@@ -74,7 +74,7 @@
         sh:path   :retractionModel .
 
 :methodName-shape  a         sh:NodeShape ;
-        sh:class             :ImplementationConfig ;
+        sh:class             :ConversionConfiguration ;
         sh:targetSubjectsOf  :methodName .
 
 :N3Template  a       sh:NodeShape , rdfs:Class ;
@@ -196,7 +196,7 @@
         sh:maxCount  1 ;
         sh:path      :hasOperation .
 
-:ImplementationConfig-methodArguments
+:ConversionConfiguration-methodArguments
         a            sh:PropertyShape ;
         sh:datatype  xsd:string ;
         sh:maxCount  1 ;
@@ -283,7 +283,7 @@
         sh:class             :OperationalStep ;
         sh:targetSubjectsOf  :isOptional .
 
-:ImplementationConfig-className
+:ConversionConfiguration-className
         a            sh:PropertyShape ;
         sh:datatype  xsd:string ;
         sh:maxCount  1 ;
@@ -323,7 +323,7 @@
 
 :isStaticMethod-shape
         a                    sh:NodeShape ;
-        sh:class             :ImplementationConfig ;
+        sh:class             :ConversionConfiguration ;
         sh:targetSubjectsOf  :isStaticMethod .
 
 :ParameterProvider  a  sh:NodeShape , rdfs:Class ;
@@ -482,7 +482,7 @@
         sh:maxCount  1 ;
         sh:path      :solrLimit .
 
-:ImplementationConfig-isStaticMethod
+:ConversionConfiguration-isStaticMethod
         a            sh:PropertyShape ;
         sh:datatype  xsd:boolean ;
         sh:maxCount  1 ;
@@ -670,9 +670,9 @@
 :Action  a           rdfs:Class , sh:NodeShape ;
         sh:property  :Action-version , :Action-requiresAccess , :Action-hasFirstStep , :Action-hasAssignedRPC .
 
-:ImplementationConfig
+:ConversionConfiguration
         a            sh:NodeShape , rdfs:Class ;
-        sh:property  :ImplementationConfig-methodName , :ImplementationConfig-isStaticMethod , :ImplementationConfig-methodArguments , :ImplementationConfig-className .
+        sh:property  :ConversionConfiguration-methodName , :ConversionConfiguration-isStaticMethod , :ConversionConfiguration-methodArguments , :ConversionConfiguration-className .
 
 :StringLengthRangeValidator-minLength
         a            sh:PropertyShape ;

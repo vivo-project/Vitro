@@ -4,7 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.PrimitiveSerializationType;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ConversionConfiguration;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.RDFType;
@@ -43,8 +43,8 @@ public class IntegerLiteralParam extends Parameter {
         return stype;
     }
 
-    private ImplementationConfig getSerializationConfig() throws ClassNotFoundException {
-        ImplementationConfig serializationConfig = new ImplementationConfig();
+    private ConversionConfiguration getSerializationConfig() throws ClassNotFoundException {
+        ConversionConfiguration serializationConfig = new ConversionConfiguration();
         serializationConfig.setClassName(Integer.class.getCanonicalName());
         serializationConfig.setMethodName("toString");
         serializationConfig.setMethodArguments("");
@@ -52,8 +52,8 @@ public class IntegerLiteralParam extends Parameter {
         return serializationConfig;
     }
 
-    private ImplementationConfig getDeserializationConfig() throws ClassNotFoundException {
-        ImplementationConfig serializationConfig = new ImplementationConfig();
+    private ConversionConfiguration getDeserializationConfig() throws ClassNotFoundException {
+        ConversionConfiguration serializationConfig = new ConversionConfiguration();
         serializationConfig.setClassName(Integer.class.getCanonicalName());
         serializationConfig.setMethodName("parseInt");
         serializationConfig.setMethodArguments("input");

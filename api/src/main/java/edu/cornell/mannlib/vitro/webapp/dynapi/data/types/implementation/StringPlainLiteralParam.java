@@ -3,7 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ConversionConfiguration;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.RDFType;
@@ -46,8 +46,8 @@ public class StringPlainLiteralParam extends Parameter {
         return type;
     }
 
-    private static ImplementationConfig getSerializationConfig() throws ClassNotFoundException {
-        ImplementationConfig serializationConfig = new ImplementationConfig();
+    private static ConversionConfiguration getSerializationConfig() throws ClassNotFoundException {
+        ConversionConfiguration serializationConfig = new ConversionConfiguration();
         serializationConfig.setClassName(Literal.class.getCanonicalName());
         serializationConfig.setMethodName("getLexicalForm");
         serializationConfig.setMethodArguments("");
@@ -55,8 +55,8 @@ public class StringPlainLiteralParam extends Parameter {
         return serializationConfig;
     }
 
-    private static ImplementationConfig getDeserializationConfig() throws ClassNotFoundException {
-        ImplementationConfig serializationConfig = new ImplementationConfig();
+    private static ConversionConfiguration getDeserializationConfig() throws ClassNotFoundException {
+        ConversionConfiguration serializationConfig = new ConversionConfiguration();
         serializationConfig.setClassName(ResourceFactory.class.getCanonicalName());
         serializationConfig.setMethodName("createPlainLiteral");
         serializationConfig.setMethodArguments("input");

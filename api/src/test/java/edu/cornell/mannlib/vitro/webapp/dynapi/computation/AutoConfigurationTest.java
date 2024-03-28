@@ -11,7 +11,7 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.SparqlSelec
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.steps.ConditionalStep;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.steps.OperationalStep;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ConversionConfiguration;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.RDFType;
@@ -122,7 +122,7 @@ public class AutoConfigurationTest {
         ParameterType uri1ParamType = new ParameterType();
         ImplementationType uri1ImplType = new ImplementationType();
 
-        ImplementationConfig config = new ImplementationConfig();
+        ConversionConfiguration config = new ConversionConfiguration();
 
         try {
             config.setClassName("java.lang.String");

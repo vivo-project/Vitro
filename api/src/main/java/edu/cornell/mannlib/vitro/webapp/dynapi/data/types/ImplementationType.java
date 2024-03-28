@@ -16,15 +16,15 @@ public class ImplementationType {
     private static final Log log = LogFactory.getLog(ImplementationType.class);
 
     private Class<?> className;
-    private ImplementationConfig serializationConfig;
-    private ImplementationConfig deserializationConfig;
+    private ConversionConfiguration serializationConfig;
+    private ConversionConfiguration deserializationConfig;
     private String defaultValue = "";
 
-    public ImplementationConfig getSerializationConfig() {
+    public ConversionConfiguration getSerializationConfig() {
         return serializationConfig;
     }
 
-    public ImplementationConfig getDeserializationConfig() {
+    public ConversionConfiguration getDeserializationConfig() {
         return deserializationConfig;
     }
 
@@ -43,18 +43,18 @@ public class ImplementationType {
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#serializationConfig", minOccurs = 1, maxOccurs = 1)
-    public void setSerializationConfig(ImplementationConfig serializationConfig) {
+    public void setSerializationConfig(ConversionConfiguration serializationConfig) {
         this.serializationConfig = serializationConfig;
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#deserializationConfig", minOccurs = 1,
             maxOccurs = 1)
-    public void setDeserializationConfig(ImplementationConfig deserializationConfig) {
+    public void setDeserializationConfig(ConversionConfiguration deserializationConfig) {
         this.deserializationConfig = deserializationConfig;
     }
 
     public Object serialize(ParameterType type, Object input) {
-        final ImplementationConfig config = serializationConfig;
+        final ConversionConfiguration config = serializationConfig;
         final boolean serialize = true;
         if (!config.isMethodInitialized()) {
             initializeMethod(type, config, serialize);
@@ -62,7 +62,7 @@ public class ImplementationType {
         return invoke(config, type, input);
     }
 
-    private void initializeMethod(ParameterType type, final ImplementationConfig config, final boolean serialize) {
+    private void initializeMethod(ParameterType type, final ConversionConfiguration config, final boolean serialize) {
         try {
             config.setConversionMethod(new ConversionMethod(type, serialize));
         } catch (InitializationException e) {
@@ -72,7 +72,7 @@ public class ImplementationType {
     }
 
     public Object deserialize(ParameterType type, Object input) {
-        final ImplementationConfig config = deserializationConfig;
+        final ConversionConfiguration config = deserializationConfig;
         final boolean serialize = false;
         if (!config.isMethodInitialized()) {
             initializeMethod(type, config, serialize);
@@ -80,7 +80,7 @@ public class ImplementationType {
         return invoke(config, type, input);
     }
 
-    private Object invoke(ImplementationConfig config, ParameterType type, Object input) {
+    private Object invoke(ConversionConfiguration config, ParameterType type, Object input) {
         try {
             return config.getConversionMethod().invoke(type, input);
         } catch (ConversionException e) {

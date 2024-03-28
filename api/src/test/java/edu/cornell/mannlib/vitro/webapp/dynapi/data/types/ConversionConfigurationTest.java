@@ -9,12 +9,12 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionMethod;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import org.junit.Test;
 
-public class ImplementationConfigTest {
+public class ConversionConfigurationTest {
     @Test
     public void testEquality() throws ClassNotFoundException, InitializationException {
 
-        ImplementationConfig config1 = new ImplementationConfig();
-        ImplementationConfig config2 = new ImplementationConfig();
+        ConversionConfiguration config1 = new ConversionConfiguration();
+        ConversionConfiguration config2 = new ConversionConfiguration();
         assertEquals(config1, config2);
         config1.setClassName(String.class.getCanonicalName());
         assertNotEquals(config1, config2);

@@ -7,20 +7,21 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class ImplementationConfig {
-    private Class<?> classObject;
+public class ConversionConfiguration {
+    private Class<?> conversionClass;
+
     private String methodName;
     private String methodArguments;
     private ConversionMethod conversionMethod = null;
     private boolean staticMethod = false;
 
-    public Class<?> getClassObject() {
-        return classObject;
+    public Class<?> getConversionClass() {
+        return conversionClass;
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#className", minOccurs = 1, maxOccurs = 1)
     public void setClassName(String className) throws ClassNotFoundException {
-        this.classObject = Class.forName(className);
+        this.conversionClass = Class.forName(className);
     }
 
     public String getMethodName() {
@@ -68,16 +69,16 @@ public class ImplementationConfig {
 
     @Override
     public boolean equals(Object object) {
-        if (!(object instanceof ImplementationConfig)) {
+        if (!(object instanceof ConversionConfiguration)) {
             return false;
         }
         if (object == this) {
             return true;
         }
-        ImplementationConfig compared = (ImplementationConfig) object;
+        ConversionConfiguration compared = (ConversionConfiguration) object;
 
         return new EqualsBuilder()
-                .append(classObject, compared.classObject)
+                .append(conversionClass, compared.conversionClass)
                 .append(methodName, compared.methodName)
                 .append(methodArguments, compared.methodArguments)
                 .append(conversionMethod, compared.conversionMethod)
@@ -88,7 +89,7 @@ public class ImplementationConfig {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(59, 103)
-                .append(classObject)
+                .append(conversionClass)
                 .append(methodName)
                 .append(methodArguments)
                 .append(conversionMethod)

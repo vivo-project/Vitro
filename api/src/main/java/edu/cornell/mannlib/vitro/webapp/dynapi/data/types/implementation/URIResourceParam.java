@@ -3,7 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ConversionConfiguration;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.RDFType;
@@ -33,8 +33,8 @@ public class URIResourceParam extends Parameter {
         type.setName(TYPE_NAME);
         ImplementationType implType = new ImplementationType();
         type.setImplementationType(implType);
-        ImplementationConfig serializationConfig = getSerializationConfig();
-        ImplementationConfig deserializationConfig = getDeserializationConfig();
+        ConversionConfiguration serializationConfig = getSerializationConfig();
+        ConversionConfiguration deserializationConfig = getDeserializationConfig();
         implType.setSerializationConfig(serializationConfig);
         implType.setDeserializationConfig(deserializationConfig);
         implType.setClassName(Resource.class.getCanonicalName());
@@ -44,8 +44,8 @@ public class URIResourceParam extends Parameter {
         return type;
     }
 
-    private static ImplementationConfig getSerializationConfig() throws ClassNotFoundException {
-        ImplementationConfig serializationConfig = new ImplementationConfig();
+    private static ConversionConfiguration getSerializationConfig() throws ClassNotFoundException {
+        ConversionConfiguration serializationConfig = new ConversionConfiguration();
         serializationConfig.setClassName(Resource.class.getCanonicalName());
         serializationConfig.setMethodName("toString");
         serializationConfig.setMethodArguments("");
@@ -53,8 +53,8 @@ public class URIResourceParam extends Parameter {
         return serializationConfig;
     }
 
-    private static ImplementationConfig getDeserializationConfig() throws ClassNotFoundException {
-        ImplementationConfig serializationConfig = new ImplementationConfig();
+    private static ConversionConfiguration getDeserializationConfig() throws ClassNotFoundException {
+        ConversionConfiguration serializationConfig = new ConversionConfiguration();
         serializationConfig.setClassName(ResourceImpl.class.getCanonicalName());
         // invoke constructor
         serializationConfig.setMethodName("");

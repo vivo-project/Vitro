@@ -5,7 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ConversionConfiguration;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import org.apache.commons.lang3.StringUtils;
@@ -19,14 +19,14 @@ public class ConversionMethod {
     private static final Log log = LogFactory.getLog(ConversionMethod.class.getName());
     private Constructor<?> constructor = null;
     private Method method = null;
-    private ImplementationConfig config = null;
+    private ConversionConfiguration config = null;
     private boolean isConstructor;
     private int methodArgsLength;
     private String[] arguments;
     private boolean isStatic;
     private Class<?> methodArgs[];
     private String methodName;
-    private Class<?> classObject;
+    private Class<?> conversionClass;
 
     public ConversionMethod(ParameterType type, boolean serialize) throws InitializationException {
         validateInput(type, serialize);
@@ -40,7 +40,7 @@ public class ConversionMethod {
             inputClass = String.class;
         }
 
-        classObject = config.getClassObject();
+        conversionClass = config.getConversionClass();
         methodName = config.getMethodName();
         String rawArgs = config.getMethodArguments();
         isStatic = config.isStatic();
@@ -60,9 +60,9 @@ public class ConversionMethod {
         isConstructor = isConstructorInvocation(methodName);
         try {
             if (isConstructor) {
-                constructor = classObject.getConstructor(methodArgs);
+                constructor = conversionClass.getConstructor(methodArgs);
             } else {
-                method = classObject.getDeclaredMethod(methodName, methodArgs);
+                method = conversionClass.getDeclaredMethod(methodName, methodArgs);
             }
         } catch (Exception e) {
             log.error(e, e);
@@ -79,7 +79,7 @@ public class ConversionMethod {
             throw new InitializationException("Implemenation type in parameter type " +
                     "provided into constructor is null");
         }
-        ImplementationConfig validatingConfig;
+        ConversionConfiguration validatingConfig;
         if (serialize) {
             if (implType.getClassName() == null) {
                 throw new InitializationException(
@@ -99,7 +99,7 @@ public class ConversionMethod {
                         "provided into constructor is null");
             }
         }
-        if (validatingConfig.getClassObject() == null) {
+        if (validatingConfig.getConversionClass() == null) {
             throw new InitializationException(
                     "Class object of implementation config from implemenation type in parameter " +
                     "type provided into constructor is null");
@@ -197,7 +197,7 @@ public class ConversionMethod {
                 .append(isStatic, compared.isStatic)
                 .append(methodArgs, compared.methodArgs)
                 .append(methodName, compared.methodName)
-                .append(classObject, compared.classObject)
+                .append(conversionClass, compared.conversionClass)
                 .isEquals();
     }
 
@@ -212,7 +212,7 @@ public class ConversionMethod {
                 .append(isStatic)
                 .append(methodArgs)
                 .append(methodName)
-                .append(classObject)
+                .append(conversionClass)
                 .toHashCode();
     }
 }

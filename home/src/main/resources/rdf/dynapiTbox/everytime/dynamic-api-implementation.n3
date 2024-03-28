@@ -40,7 +40,7 @@ dynapi:RDFType dynapi:implementedBy types:RDFType .
 
 dynapi:ImplementationType dynapi:implementedBy types:ImplementationType .
 
-dynapi:ImplementationConfig dynapi:implementedBy types:ImplementationConfig .
+dynapi:ConversionConfiguration dynapi:implementedBy types:ConversionConfiguration .
 
 dynapi:PrimitiveSerializationType dynapi:implementedBy components:serialization.PrimitiveSerializationType .
 

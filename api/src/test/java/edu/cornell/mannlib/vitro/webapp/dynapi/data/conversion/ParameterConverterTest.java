@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.ArrayListFactory;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ConversionConfiguration;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import org.junit.Test;
@@ -137,7 +137,7 @@ public class ParameterConverterTest {
         ParameterType arrayType = new ParameterType();
         ImplementationType arrayImplType = new ImplementationType();
         arrayType.setImplementationType(arrayImplType);
-        ImplementationConfig arrayConfig = new ImplementationConfig();
+        ConversionConfiguration arrayConfig = new ConversionConfiguration();
         if (serialization) {
             arrayImplType.setSerializationConfig(arrayConfig);
         } else {
@@ -160,7 +160,7 @@ public class ParameterConverterTest {
         ParameterType type = new ParameterType();
         ImplementationType implType = new ImplementationType();
         type.setImplementationType(implType);
-        ImplementationConfig config = new ImplementationConfig();
+        ConversionConfiguration config = new ConversionConfiguration();
         if (serialization) {
             implType.setSerializationConfig(config);
         } else {

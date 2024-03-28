@@ -7,7 +7,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Arrays;
 import java.util.Collection;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ConversionConfiguration;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import org.junit.Test;
@@ -40,7 +40,7 @@ public class ConversionMethodTest {
     }
 
     private ParameterType getType1() throws ClassNotFoundException {
-        ImplementationConfig config1 = new ImplementationConfig();
+        ConversionConfiguration config1 = new ConversionConfiguration();
         config1.setClassName(className1);
         config1.setMethodName(methodName1);
         config1.setMethodArguments(methodArgs1);
@@ -54,7 +54,7 @@ public class ConversionMethodTest {
     }
 
     private ParameterType getType2() throws ClassNotFoundException {
-        ImplementationConfig config1 = new ImplementationConfig();
+        ConversionConfiguration config1 = new ConversionConfiguration();
         config1.setClassName(className2);
         config1.setMethodName(methodName2);
         config1.setMethodArguments(methodArgs2);
