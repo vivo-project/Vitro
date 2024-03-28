@@ -36,8 +36,6 @@ dynapi:Parameter dynapi:implementedBy components:Parameter .
 
 dynapi:ParameterType dynapi:implementedBy types:ParameterType .
 
-dynapi:ArrayParameterType dynapi:implementedBy types:ArrayParameterType .
-
 dynapi:RDFType dynapi:implementedBy types:RDFType .
 
 dynapi:ImplementationType dynapi:implementedBy types:ImplementationType .

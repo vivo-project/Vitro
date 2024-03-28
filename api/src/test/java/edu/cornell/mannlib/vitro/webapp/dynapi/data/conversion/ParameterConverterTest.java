@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.ArrayListFactory;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ArrayParameterType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationConfig;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
@@ -135,7 +134,7 @@ public class ParameterConverterTest {
             String elementClassName, String elemMethodName, String elemArgs, boolean elemIsStatic,
             boolean serialization) throws Exception {
         final String arrayClassName = ArrayListFactory.class.getCanonicalName();
-        ArrayParameterType arrayType = new ArrayParameterType();
+        ParameterType arrayType = new ParameterType();
         ImplementationType arrayImplType = new ImplementationType();
         arrayType.setImplementationType(arrayImplType);
         ImplementationConfig arrayConfig = new ImplementationConfig();

@@ -135,13 +135,11 @@
         sh:path      :serializationType .
 
 :ParameterType  a    sh:NodeShape , rdfs:Class ;
-        sh:property  :ParameterType-serializationType , :ParameterType-implementationType , :ParameterType-rdfType , :ParameterType-isInternal , :ParameterType-name .
+        sh:property  :ParameterType-serializationType , :ParameterType-implementationType , :ParameterType-rdfType , :ParameterType-isInternal , :ParameterType-name , :ParameterType-nestedType .
 
 :Parameter  a        sh:NodeShape , rdfs:Class ;
         sh:property  :Parameter-hasCondition , :Parameter-description , :Parameter-name , :Parameter-hasValidator , :Parameter-serializationType .
 
-:ArrayParameterType  a  sh:NodeShape , rdfs:Class ;
-        sh:property  :ArrayParameterType-containsType .
 
 :nextIfNotSatisfied-shape
         a                    sh:NodeShape ;
@@ -443,11 +441,11 @@
 :ImplementationType  a  rdfs:Class , sh:NodeShape ;
         sh:property  :ImplementationType-className .
 
-:ArrayParameterType-containsType
+:ParameterType-nestedType
         a            sh:PropertyShape ;
         sh:class     :ParameterType ;
         sh:maxCount  1 ;
-        sh:path      :containsType .
+        sh:path      :nestedType .
 
 :N3Template-N3TextRetractions
         a            sh:PropertyShape ;
@@ -637,9 +635,9 @@
         sh:maxCount  1 ;
         sh:path      :maxLength .
 
-:containsType-shape  a       sh:NodeShape ;
-        sh:class             :ArrayParameterType ;
-        sh:targetSubjectsOf  :containsType .
+:nestedType-shape  a       sh:NodeShape ;
+        sh:class             :ParameterType ;
+        sh:targetSubjectsOf  :nestedType .
 
 :minValue-shape  a           sh:NodeShape ;
         sh:class             :NumericRangeValidator ;

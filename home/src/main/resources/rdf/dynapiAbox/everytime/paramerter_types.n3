@@ -60,13 +60,13 @@ dynapi-parameter-type:generated-uri
         vitro:mostSpecificType  dynapi:ParameterType .
 
 dynapi-parameter-type:array-of-strings
-        a                       dynapi:ArrayParameterType ;
+        a                       dynapi:ParameterType ;
         dynapi:name             "array" ;
         rdfs:label              "Array type"@en-US ;
         dynapi:implementationType dynapi-implementation-type:array ;
         dynapi:serializationType dynapi-serialization-type:array ;
-        dynapi:containsType      dynapi-parameter-type:string ;
-        vitro:mostSpecificType  dynapi:ArrayParameterType .
+        dynapi:nestedType      dynapi-parameter-type:string ;
+        vitro:mostSpecificType  dynapi:ParameterType .
 
 dynapi-parameter-type:string
         a                       dynapi:ParameterType ;

@@ -12,8 +12,8 @@ public class ParameterTypesTest {
 
     @Test
     public void testEquality() {
-        ArrayParameterType type1 = new ArrayParameterType();
-        ArrayParameterType type2 = new ArrayParameterType();
+        ParameterType type1 = new ParameterType();
+        ParameterType type2 = new ParameterType();
         assertEquals(type1, type2);
 
         type1.setName("name1");

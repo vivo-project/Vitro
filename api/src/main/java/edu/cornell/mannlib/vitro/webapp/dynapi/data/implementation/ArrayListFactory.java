@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.JSONConverter;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ArrayParameterType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 
 public class ArrayListFactory {
@@ -22,7 +21,7 @@ public class ArrayListFactory {
         return serialize((List) list);
     }
 
-    public static List deserialize(String input, ArrayParameterType type) throws ConversionException {
+    public static List deserialize(String input, ParameterType type) throws ConversionException {
         List listData = new ArrayList();
         JsonNode jsonNode = JSONConverter.readJson(input);
         if (jsonNode == null) {

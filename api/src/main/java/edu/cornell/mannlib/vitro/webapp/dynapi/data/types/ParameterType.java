@@ -17,7 +17,7 @@ public class ParameterType implements Removable {
     private SerializationType serializationType;
     private RDFType rdftype;
     private ImplementationType implementationType;
-    protected ParameterType valuesType = NullParameterType.getInstance();
+    protected ParameterType nestedType = NullParameterType.getInstance();
     private boolean isInternal = false;
 
     public String getName() {
@@ -53,8 +53,13 @@ public class ParameterType implements Removable {
         return implementationType;
     }
 
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#nestedType", minOccurs = 0, maxOccurs = 1)
+    public void setValuesType(ParameterType nestedType) {
+        this.nestedType = nestedType;
+    }
+    
     public ParameterType getValuesType() {
-        return valuesType;
+        return nestedType;
     }
 
     public boolean isLiteral() {

@@ -148,11 +148,11 @@
          rdfs:range :SerializationType ;
          rdfs:label "has type"@en-US .
 
-###  https://vivoweb.org/ontology/vitro-dynamic-api#containsType
-:containsType rdf:type owl:ObjectProperty ;
+###  https://vivoweb.org/ontology/vitro-dynamic-api#nestedType
+:nestedType rdf:type owl:ObjectProperty ;
          rdfs:subPropertyOf owl:topObjectProperty ;
          rdf:type owl:FunctionalProperty ;
-         rdfs:domain :ArrayParameterType ;
+         rdfs:domain :ParameterType ;
          rdfs:range :ParameterType ;
          rdfs:label "array contains type"@en-US .
 
@@ -764,12 +764,6 @@
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#ParameterType
 :ParameterType rdf:type owl:Class ;
                rdfs:label "Parameter type"@en-US .
-
-
-###  https://vivoweb.org/ontology/vitro-dynamic-api#ArrayParameterType
-:ArrayParameterType rdf:type owl:Class ;
-               rdfs:subClassOf :ParameterType ;
-               rdfs:label "Array parameter type"@en-US .
 
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#SerializationType
