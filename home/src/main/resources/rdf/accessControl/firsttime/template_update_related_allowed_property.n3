@@ -8,7 +8,7 @@
 :PolicyTemplate a access:PolicyTemplate ;
     access:hasRule :AllowMatchingPropertyStatement ;
     access:hasRule :AllowMatchingProperty ;
-    access:hasRule :AllowxternalIdMatchingPropertyStatement ;
+    access:hasRule :AllowExternalIdMatchingPropertyStatement ;
  
     access:hasDataSet :SelfEditorAddObjectPropertyDataSet ;
     access:hasDataSet :SelfEditorAddDataPropertyDataSet ;
@@ -229,7 +229,7 @@
     access:requiresCheck :RelationCheck ;
     .
 
-:AllowxternalIdMatchingPropertyStatement a access:Rule;
+:AllowExternalIdMatchingPropertyStatement a access:Rule;
     access:requiresCheck :SubjectRoleCheck ;
     access:requiresCheck :OperationCheck ;
     access:requiresCheck :AccessObjectStatementTypeCheck ;
