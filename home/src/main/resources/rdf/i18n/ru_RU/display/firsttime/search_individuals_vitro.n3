@@ -12,3 +12,7 @@
 :field_type rdfs:label "Поле тип"@ru-RU .
 :filter_querytext rdfs:label "Текст"@ru-RU .
 :field_querytext rdfs:label "Поле фильтра по умолчанию"@ru-RU .
+:sort_name_raw_desc rdfs:label "сырому названию Я-А"@ru-RU .
+:sort_name_raw_asc rdfs:label "сырому названию А-Я"@ru-RU .
+:field_score rdfs:label "Релевантность"@ru-RU .
+:field_name_raw rdfs:label "Поле сортировки по сырому названию"@ru-RU .

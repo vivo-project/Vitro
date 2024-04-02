@@ -29,3 +29,4 @@ search:hasKnownValue rdfs:label "hasKnownValue"@en-US .
 search:public rdfs:label "public"@en-US .
 search:isDefaultForRole rdfs:label "Is default for role"@en-US .
 search:moreLimit rdfs:label "initial facet limit"@en-US .
+search:hasFallback rdfs:label "has fallback"@en-US .
