@@ -27,7 +27,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.shared.Lock;
-
+import org.apache.jena.sparql.ARQException;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.QueryUtils;
@@ -239,7 +239,14 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
         for (String key : keys) {
             String value = parameters.get(key);
             if (value != null) {
-                substitution.apply(pss, key, value);
+                try {
+                    substitution.apply(pss, key, value);    
+                } catch(ARQException arcException) {
+                    log.error(String.format(
+                            "Exception happend while trying to substitute value %s of variable %s in query\n%s",
+                            value, key, pss.toString()));
+                    throw arcException;
+                }
             }
         }
     }
