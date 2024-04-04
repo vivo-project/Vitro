@@ -65,7 +65,7 @@ public class HtmlTriplePatternFragmentWriterImpl extends TriplePatternFragmentWr
     public HtmlTriplePatternFragmentWriterImpl(Map<String, String> prefixes, HashMap<String, IDataSource> datasources) throws IOException {
         super(prefixes, datasources);
 
-        cfg = new Configuration(Configuration.VERSION_2_3_23);
+        cfg = new Configuration(Configuration.VERSION_2_3_32);
         cfg.setClassForTemplateLoading(getClass(), "/tpf");
         cfg.setDefaultEncoding("UTF-8");
         cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
