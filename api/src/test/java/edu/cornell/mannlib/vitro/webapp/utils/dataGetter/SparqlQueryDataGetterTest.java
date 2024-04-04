@@ -1,6 +1,9 @@
 /* $This file is distributed under the terms of the license in LICENSE$ */
 package edu.cornell.mannlib.vitro.webapp.utils.dataGetter;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -30,6 +33,7 @@ import stubs.javax.servlet.http.HttpServletRequestStub;
 
 public class SparqlQueryDataGetterTest extends AbstractTestClass {
 
+    private static final String TO_FILTER = "toFilter";
     private static final PropertyImpl HAS_ID = new PropertyImpl("test:has-id");
     private static final String VAR_PARAM = "param";
     private static final String PERSON_TYPE = "http://xmlns.com/foaf/0.1/Person";
@@ -151,6 +155,17 @@ public class SparqlQueryDataGetterTest extends AbstractTestClass {
         params.put(VAR_PARAM, value.toString());
         Map<String, Object> data = sdg.getData(params);
         checkData(data);
+    }
+
+    @Test
+    public void testFilterUnavailableParameters() throws Exception {
+        SparqlQueryDataGetter sdg = getDataGetter("dataGetterStringParam");
+        Map<String, String> unfilteredParameters = new HashMap<String, String>();
+        unfilteredParameters.put(VAR_PARAM, "");
+        unfilteredParameters.put(TO_FILTER, "");
+        Map<String, String> filteredParameters = sdg.filterUnavailableParameters(unfilteredParameters);
+        assertFalse(filteredParameters.containsKey(TO_FILTER));
+        assertTrue(filteredParameters.containsKey(VAR_PARAM));
     }
 
     private SparqlQueryDataGetter getDataGetter(String dataGetterName)

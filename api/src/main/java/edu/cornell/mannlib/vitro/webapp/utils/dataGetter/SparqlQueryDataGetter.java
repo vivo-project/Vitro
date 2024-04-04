@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -169,6 +170,8 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
     public Map<String, Object> getData(Map<String, Object> pageData) {
     	Map<String, String> merged = mergeParameters(vreq.getParameterMap(), pageData);
 
+    	merged = filterUnavailableParameters(merged);
+
     	String boundQueryText = bindParameters(queryText, merged);
 
     	if (modelURI != null) {
@@ -177,6 +180,14 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
     	} else {
     		return doQueryOnRDFService(boundQueryText);
     	}
+    }
+
+    protected Map<String, String> filterUnavailableParameters(Map<String, String> merged) {
+        return merged
+            .entrySet()
+            .stream()
+            .filter(entry -> queryText.contains("?" + entry.getKey()))
+            .collect(Collectors.toMap(map -> map.getKey(), map -> map.getValue()));
     }
 
     /** Merge the pageData with the request parameters. PageData overrides. */
