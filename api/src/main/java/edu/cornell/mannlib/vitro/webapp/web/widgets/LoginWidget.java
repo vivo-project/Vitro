@@ -175,7 +175,6 @@ public class LoginWidget extends Widget {
     /**
      * A LoginProcessBean is outdated unless the the "in-process" flag is set in the
      * session.
-     * <p>
      * Each time we hit Authenticate, the flag is set, and each time
      * we draw the widget it is reset.
      */

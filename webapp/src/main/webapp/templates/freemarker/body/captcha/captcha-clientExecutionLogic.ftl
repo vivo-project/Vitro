@@ -1,3 +1,5 @@
+<#-- $This file is distributed under the terms of the license in LICENSE$ -->
+
 <#assign isEnabled = isEnabled!true>
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/templates/freemarker/edit/forms/css/customForm.css" />')}

@@ -48,10 +48,10 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/account/passwor
             </div>
         </form>
     <#else>
-        <h1 class="notification-text">${message}</h1>
+        <p class="notification-text">${message}</p>
     </#if>
 <#else>
-    <h1 class="notification-text">${i18n().functionality_disabled}</h1>
+    <p class="notification-text">${i18n().functionality_disabled}</p>
 </#if>
 
 <#include "webapp/src/main/webapp/templates/freemarker/body/captcha/captcha-clientExecutionLogic.ftl">
