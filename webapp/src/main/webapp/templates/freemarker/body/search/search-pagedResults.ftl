@@ -269,11 +269,13 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap
 			<select form="search-form" name="sort" id="search-form-sort" onchange="this.form.submit()" >
 			    <#assign addDefaultOption = true>
 				<#list sorting as option>
-					<#if option.selected>
-						<option value="${option.id}" selected="selected">${i18n().search_results_sort_by(option.label)}</option>
-						<#assign addDefaultOption = false>
-					<#else>
-						<option value="${option.id}" >${i18n().search_results_sort_by(option.label)}</option>
+					<#if option.display>
+						<#if option.selected>
+							<option value="${option.id}" selected="selected">${i18n().search_results_sort_by(option.label)}</option>
+							<#assign addDefaultOption = false>
+						<#else>
+							<option value="${option.id}" >${i18n().search_results_sort_by(option.label)}</option>
+						</#if>
 					</#if>
 				</#list>
 				<#if addDefaultOption>
