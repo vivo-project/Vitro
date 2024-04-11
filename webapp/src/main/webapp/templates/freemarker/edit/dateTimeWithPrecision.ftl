@@ -128,7 +128,7 @@ precisionConstants.second -- URI for precision
             <select name="${fieldName}-minute" id="${fieldName}-minute" <#if reqLevel gte 5>required </#if>>
                 <option value=""<#if !minute??> selected="selected"</#if>>${i18n()[('label.dateTimeWithPrecision.minutes_capitalized')]}</option>
                 <#assign numMinutes = 59 />
-                <#list 1..numMinutes as currentMinute>
+                <#list 0..numMinutes as currentMinute>
                     <option value="${currentMinute?string('00')}"<#if minute == "${currentMinute}"> selected="selected"</#if>>${currentMinute}</option>
                 </#list>
             </select>
@@ -138,8 +138,8 @@ precisionConstants.second -- URI for precision
             <label for="${fieldName}-second">${i18n()[('label.dateTimeWithPrecision.seconds_capitalized')]}<#if reqLevel gte 6> <span class="requiredHint">*</span></#if></label>
             <select name="${fieldName}-second" id="${fieldName}-second" <#if reqLevel gte 6>required </#if>>
                 <option value=""<#if !second??> selected="selected"</#if>>${i18n()[('label.dateTimeWithPrecision.seconds_capitalized')]}</option>
-                <#assign numMinutes = 59 />
-                <#list 1..numMinutes as currentSecond>
+                <#assign numSeconds = 59 />
+                <#list 0..numSeconds as currentSecond>
                     <option value="${currentSecond?string('00')}"<#if second == "${currentSecond}"> selected="selected"</#if>>${currentSecond}</option>
                 </#list>
             </select>
