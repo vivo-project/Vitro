@@ -134,6 +134,10 @@ search:public  a                      owl:DatatypeProperty , owl:FunctionalPrope
         rdfs:domain                   search:PublicParameter ;
         rdfs:range                    xsd:boolean .
 
+search:display a                      owl:DatatypeProperty , owl:FunctionalProperty ;
+        rdfs:domain                   search:Sort ;
+        rdfs:range                    xsd:boolean .
+
 search:isDefaultForRole
         a                   <http://www.w3.org/2002/07/owl#ObjectProperty> ;
         rdfs:domain         <https://vivoweb.org/ontology/vitro-search#FilterValue> ;

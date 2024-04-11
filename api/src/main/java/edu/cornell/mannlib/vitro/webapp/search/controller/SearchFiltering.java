@@ -123,7 +123,8 @@ public class SearchFiltering {
             + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
             + "PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n"
             + "PREFIX search: <https://vivoweb.org/ontology/vitro-search#> \n"
-            + "SELECT ( STR(?sort_label) as ?label ) ?id ?searchField ?multilingual ?isAsc ?sort_order ?fallback \n"
+            + "SELECT ( STR(?sort_label) as ?label ) ?id ?searchField " +
+            "?multilingual ?isAsc ?sort_order ?fallback ?display\n"
             + "WHERE {\n"
             + "    ?sort rdf:type search:Sort . \n"
             + "    ?sort rdfs:label ?sort_label .\n"
@@ -149,6 +150,7 @@ public class SearchFiltering {
             + "        ?sort search:order ?s_order .\n"
             + "        BIND(?s_order as ?sort_order_found).\n"
             + "    }\n"
+            + "    OPTIONAL {?sort search:display ?display }\n"
             + "    BIND(coalesce(?sort_order_found, 0) as ?sort_order)\n"
             + "    BIND(COALESCE(?f_order, false) as ?isAsc)\n"
             + "    BIND(COALESCE(?bind_multilingual, false) as ?multilingual)\n"
@@ -382,6 +384,10 @@ public class SearchFiltering {
                     RDFNode order = solution.get("sort_order");
                     if (order != null) {
                         config.setOrder(order.asLiteral().getInt());
+                    }
+                    RDFNode display = solution.get("display");
+                    if (display != null) {
+                        config.setDisplay(display.asLiteral().getBoolean());
                     }
                     sortConfigurations.put(id, config);
                 }
