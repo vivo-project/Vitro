@@ -164,7 +164,6 @@ section#pubsContainer input {
 img#indicator {
     padding-left:60px;
 }
-
 /* for placeholder text */
 ::-webkit-input-placeholder { /* WebKit browsers */
    opacity:  .25;
