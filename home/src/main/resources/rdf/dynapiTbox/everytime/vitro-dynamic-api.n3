@@ -499,6 +499,13 @@
           rdfs:range xsd:string ;
           rdfs:label "Method name"@en-US .
 
+###  https://vivoweb.org/ontology/vitro-dynamic-api#inputInterface
+:inputInterface rdf:type owl:DatatypeProperty,
+					owl:FunctionalProperty ;
+          rdfs:domain :ConversionConfiguration ;
+          rdfs:range xsd:string ;
+          rdfs:label "Input interface"@en-US .
+
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#methodArguments
 :methodArguments rdf:type owl:DatatypeProperty,

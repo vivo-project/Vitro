@@ -51,6 +51,7 @@ public class ModelParam extends Parameter {
         serializationConfig.setMethodName("serializeN3");
         serializationConfig.setMethodArguments("input");
         serializationConfig.setStaticMethod(true);
+        serializationConfig.setInputInterface(Model.class.getCanonicalName());
         return serializationConfig;
     }
 

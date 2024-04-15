@@ -43,7 +43,7 @@ public class ConversionConfigurationTest {
         type1.setImplementationType(implType1);
         implType1.setSerializationConfig(config1);
         type1.setImplementationType(implType1);
-        ConversionMethod cm1 = new ConversionMethod(type1, true);
+        ConversionMethod cm1 = new ConversionMethod(config1);
 
         config1.setConversionMethod(cm1);
         assertNotEquals(config1, config2);
@@ -54,7 +54,7 @@ public class ConversionConfigurationTest {
 
         implType2.setSerializationConfig(config2);
         type2.setImplementationType(implType2);
-        ConversionMethod cm2 = new ConversionMethod(type2, true);
+        ConversionMethod cm2 = new ConversionMethod(config2);
 
         config2.setConversionMethod(cm2);
         assertEquals(config1, config2);

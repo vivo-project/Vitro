@@ -9,6 +9,16 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class ConversionConfiguration {
     private Class<?> conversionClass;
+    private Class<?> inputInterface = String.class;
+
+    public Class<?> getInputInterface() {
+        return inputInterface;
+    }
+
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#inputInterface", minOccurs = 0, maxOccurs = 1)
+    public void setInputInterface(String inputInterface) throws ClassNotFoundException {
+        this.inputInterface = Class.forName(inputInterface);
+    }
 
     private String methodName;
     private String methodArguments;

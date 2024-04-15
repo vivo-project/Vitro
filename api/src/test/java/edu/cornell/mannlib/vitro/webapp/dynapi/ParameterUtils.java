@@ -41,9 +41,11 @@ public class ParameterUtils {
 
         ConversionConfiguration serConfig = createConfig(ModelWriterTest.MODEL_CONVERSION_CLASS, "input", "serializeN3",
                 true);
+        serConfig.setInputInterface(Model.class.getCanonicalName());
+
         implType.setSerializationConfig(serConfig);
-        ConversionConfiguration desConfig = createConfig(ModelWriterTest.MODEL_CONVERSION_CLASS, "input", "deserializeN3",
-                true);
+        ConversionConfiguration desConfig = createConfig(ModelWriterTest.MODEL_CONVERSION_CLASS, "input",
+                "deserializeN3", true);
         implType.setDeserializationConfig(desConfig);
         uriParam.setType(paramType);
         uriParam.setName(name);
@@ -70,14 +72,20 @@ public class ParameterUtils {
         ParameterType uriParamType = new ParameterType();
         ImplementationType uri1ImplType = new ImplementationType();
 
-        ConversionConfiguration config = new ConversionConfiguration();
+        ConversionConfiguration serialization = new ConversionConfiguration();
 
-        config.setClassName(String.class.getCanonicalName());
-        config.setMethodArguments("");
-        config.setMethodName("toString");
-        config.setStaticMethod(false);
-        uri1ImplType.setDeserializationConfig(config);
-        uri1ImplType.setSerializationConfig(config);
+        serialization.setClassName(String.class.getCanonicalName());
+        serialization.setMethodArguments("");
+        serialization.setMethodName("toString");
+        serialization.setStaticMethod(false);
+        uri1ImplType.setDeserializationConfig(serialization);
+
+        ConversionConfiguration deserialization = new ConversionConfiguration();
+        deserialization.setClassName(String.class.getCanonicalName());
+        deserialization.setMethodArguments("");
+        deserialization.setMethodName("toString");
+        deserialization.setStaticMethod(false);
+        uri1ImplType.setSerializationConfig(deserialization);
         uri1ImplType.setClassName(String.class.getCanonicalName());
 
         RDFType rdfType = new RDFType();
@@ -172,6 +180,7 @@ public class ParameterUtils {
     private static ConversionConfiguration getJsonSerializationConfig() throws ClassNotFoundException {
         ConversionConfiguration config = new ConversionConfiguration();
         config.setClassName(JsonFasterxmlNode.class.getCanonicalName());
+        config.setInputInterface(JsonNode.class.getCanonicalName());
         config.setMethodArguments("input");
         config.setMethodName("serialize");
         config.setStaticMethod(true);

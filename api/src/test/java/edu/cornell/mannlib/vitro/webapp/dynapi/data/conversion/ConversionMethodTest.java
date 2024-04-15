@@ -8,8 +8,6 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ConversionConfiguration;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -34,37 +32,27 @@ public class ConversionMethodTest {
 
     @Test
     public void testEquality() throws InitializationException, ClassNotFoundException {
-        ConversionMethod cm1 = new ConversionMethod(getType1(), true);
-        ConversionMethod cm2 = new ConversionMethod(getType2(), true);
+        ConversionMethod cm1 = new ConversionMethod(getType1());
+        ConversionMethod cm2 = new ConversionMethod(getType2());
         assertEquals(result, cm1.equals(cm2));
     }
 
-    private ParameterType getType1() throws ClassNotFoundException {
-        ConversionConfiguration config1 = new ConversionConfiguration();
-        config1.setClassName(className1);
-        config1.setMethodName(methodName1);
-        config1.setMethodArguments(methodArgs1);
-        ParameterType type1 = new ParameterType();
-        ImplementationType implType1 = new ImplementationType();
-        implType1.setClassName(className1);
-        type1.setImplementationType(implType1);
-        implType1.setSerializationConfig(config1);
-        type1.setImplementationType(implType1);
-        return type1;
+    private ConversionConfiguration getType1() throws ClassNotFoundException {
+        ConversionConfiguration config = new ConversionConfiguration();
+        config.setClassName(className1);
+        config.setMethodName(methodName1);
+        config.setMethodArguments(methodArgs1);
+        config.setInputInterface(className1);
+        return config;
     }
 
-    private ParameterType getType2() throws ClassNotFoundException {
-        ConversionConfiguration config1 = new ConversionConfiguration();
-        config1.setClassName(className2);
-        config1.setMethodName(methodName2);
-        config1.setMethodArguments(methodArgs2);
-        ParameterType type1 = new ParameterType();
-        ImplementationType implType1 = new ImplementationType();
-        implType1.setClassName(className2);
-        type1.setImplementationType(implType1);
-        implType1.setSerializationConfig(config1);
-        type1.setImplementationType(implType1);
-        return type1;
+    private ConversionConfiguration getType2() throws ClassNotFoundException {
+        ConversionConfiguration config = new ConversionConfiguration();
+        config.setClassName(className2);
+        config.setMethodName(methodName2);
+        config.setMethodArguments(methodArgs2);
+        config.setInputInterface(className2);
+        return config;
     }
 
     @Parameterized.Parameters

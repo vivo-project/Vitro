@@ -37,6 +37,7 @@ public class StringParam extends Parameter {
         serializationConfig.setMethodName("toString");
         serializationConfig.setMethodArguments("");
         serializationConfig.setStaticMethod(false);
+        serializationConfig.setInputInterface(String.class.getCanonicalName());
         return serializationConfig;
     }
 

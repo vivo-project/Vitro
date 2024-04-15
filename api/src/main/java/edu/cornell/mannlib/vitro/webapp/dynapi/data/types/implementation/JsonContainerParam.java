@@ -40,6 +40,7 @@ public abstract class JsonContainerParam extends Parameter {
         serializationConfig.setMethodName("serialize");
         serializationConfig.setMethodArguments("input");
         serializationConfig.setStaticMethod(true);
+        serializationConfig.setInputInterface(JsonContainer.class.getCanonicalName());
         return serializationConfig;
     }
 

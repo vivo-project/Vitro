@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JacksonJsonContainer;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.rdf.model.Literal;
@@ -104,7 +105,8 @@ public class RdfView {
     }
 
     public static boolean isRdfNode(Data data) {
-        return data.getParam().getType().isRdfType();
+        ParameterType paramType = data.getParam().getType();
+        return paramType.isUri() || paramType.isLiteral();
     }
 
     public static JsonNode getAsJsonNode(Data data) {

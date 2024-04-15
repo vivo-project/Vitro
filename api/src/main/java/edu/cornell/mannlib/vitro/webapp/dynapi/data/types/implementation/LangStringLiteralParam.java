@@ -44,6 +44,7 @@ public class LangStringLiteralParam extends Parameter {
         serializationConfig.setMethodName("serialize");
         serializationConfig.setMethodArguments("input");
         serializationConfig.setStaticMethod(true);
+        serializationConfig.setInputInterface(Literal.class.getCanonicalName());
         return serializationConfig;
     }
 

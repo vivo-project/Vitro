@@ -55,16 +55,15 @@ public class ImplementationType {
 
     public Object serialize(ParameterType type, Object input) {
         final ConversionConfiguration config = serializationConfig;
-        final boolean serialize = true;
         if (!config.isMethodInitialized()) {
-            initializeMethod(type, config, serialize);
+            initializeMethod(config);
         }
         return invoke(config, type, input);
     }
 
-    private void initializeMethod(ParameterType type, final ConversionConfiguration config, final boolean serialize) {
+    private void initializeMethod(ConversionConfiguration config) {
         try {
-            config.setConversionMethod(new ConversionMethod(type, serialize));
+            config.setConversionMethod(new ConversionMethod(config));
         } catch (InitializationException e) {
             e.printStackTrace();
             throw new RuntimeException(e.getLocalizedMessage());
@@ -73,9 +72,8 @@ public class ImplementationType {
 
     public Object deserialize(ParameterType type, Object input) {
         final ConversionConfiguration config = deserializationConfig;
-        final boolean serialize = false;
         if (!config.isMethodInitialized()) {
-            initializeMethod(type, config, serialize);
+            initializeMethod(config);
         }
         return invoke(config, type, input);
     }

@@ -52,6 +52,7 @@ public class StringPlainLiteralParam extends Parameter {
         serializationConfig.setMethodName("getLexicalForm");
         serializationConfig.setMethodArguments("");
         serializationConfig.setStaticMethod(false);
+        serializationConfig.setInputInterface(Literal.class.getCanonicalName());
         return serializationConfig;
     }
 

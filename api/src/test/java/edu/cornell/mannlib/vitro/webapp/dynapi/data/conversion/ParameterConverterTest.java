@@ -140,6 +140,7 @@ public class ParameterConverterTest {
         ConversionConfiguration arrayConfig = new ConversionConfiguration();
         if (serialization) {
             arrayImplType.setSerializationConfig(arrayConfig);
+            arrayConfig.setInputInterface(ArrayList.class.getCanonicalName());
         } else {
             arrayImplType.setDeserializationConfig(arrayConfig);
         }

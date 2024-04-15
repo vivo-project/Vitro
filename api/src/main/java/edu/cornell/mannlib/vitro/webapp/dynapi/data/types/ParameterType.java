@@ -114,11 +114,13 @@ public class ParameterType implements Removable {
         if (implementationType == null) {
             throw new InitializationException("implementation type is null");
         }
-        if (implementationType.getDeserializationConfig() != null) {
-            implementationType.getDeserializationConfig().setConversionMethod(new ConversionMethod(this, false));
+        ConversionConfiguration deserializationConfig = implementationType.getDeserializationConfig();
+        if (deserializationConfig != null) {
+            deserializationConfig.setConversionMethod(new ConversionMethod(deserializationConfig));
         }
-        if (implementationType.getSerializationConfig() != null) {
-            implementationType.getSerializationConfig().setConversionMethod(new ConversionMethod(this, true));
+        ConversionConfiguration serializationConfig = implementationType.getSerializationConfig();
+        if (serializationConfig != null) {
+            serializationConfig.setConversionMethod(new ConversionMethod(serializationConfig));
         }
 
     }

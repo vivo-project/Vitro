@@ -6,7 +6,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ConversionConfiguration;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -28,17 +27,10 @@ public class ConversionMethod {
     private String methodName;
     private Class<?> conversionClass;
 
-    public ConversionMethod(ParameterType type, boolean serialize) throws InitializationException {
-        validateInput(type, serialize);
-        Class<?> inputClass = null;
-        ImplementationType implementation = type.getImplementationType();
-        if (serialize) {
-            config = implementation.getSerializationConfig();
-            inputClass = type.getImplementationType().getClassName();
-        } else {
-            config = implementation.getDeserializationConfig();
-            inputClass = String.class;
-        }
+    public ConversionMethod(ConversionConfiguration configuration) throws InitializationException {
+        validateInput(configuration);
+        config = configuration;
+        Class<?> inputInterface = configuration.getInputInterface();
 
         conversionClass = config.getConversionClass();
         methodName = config.getMethodName();
@@ -49,7 +41,7 @@ public class ConversionMethod {
         methodArgsLength = getMethodArgsSize(arguments);
         methodArgs = new Class[methodArgsLength];
         for (int i = 0; i < methodArgs.length; i++) {
-            String className = getClassName(arguments[i], inputClass, type);
+            String className = getClassName(arguments[i], inputInterface);
             try {
                 methodArgs[i] = Class.forName(className);
             } catch (ClassNotFoundException e) {
@@ -70,44 +62,19 @@ public class ConversionMethod {
         }
     }
 
-    private void validateInput(ParameterType type, boolean serialize) throws InitializationException {
-        if (type == null) {
-            throw new InitializationException("Parameter type provided into constructor is null");
+    private void validateInput(ConversionConfiguration config) throws InitializationException {
+        if (config == null) {
+            throw new InitializationException("Conversion configuration provided into constructor is null");
         }
-        ImplementationType implType = type.getImplementationType();
-        if (implType == null) {
-            throw new InitializationException("Implemenation type in parameter type " +
-                    "provided into constructor is null");
-        }
-        ConversionConfiguration validatingConfig;
-        if (serialize) {
-            if (implType.getClassName() == null) {
-                throw new InitializationException(
-                        "Implemenation type class in parameter type provided into constructor is null");
-            }
-            validatingConfig = implType.getSerializationConfig();
-            if (validatingConfig == null) {
-                throw new InitializationException(
-                        "Serialization config from implemenation type in parameter type " +
-                        "provided into constructor is null");
-            }
-        } else {
-            validatingConfig = implType.getDeserializationConfig();
-            if (validatingConfig == null) {
-                throw new InitializationException(
-                        "Deserialization config from implemenation type in parameter type " +
-                        "provided into constructor is null");
-            }
-        }
-        if (validatingConfig.getConversionClass() == null) {
+        if (config.getConversionClass() == null) {
             throw new InitializationException(
                     "Class object of implementation config from implemenation type in parameter " +
-                    "type provided into constructor is null");
+                            "type provided into constructor is null");
         }
-        if (validatingConfig.getMethodArguments() == null) {
+        if (config.getMethodArguments() == null) {
             throw new InitializationException(
                     "Method arguments of implementation config from implemenation type in parameter " +
-                    "type provided into constructor is null");
+                            "type provided into constructor is null");
         }
 
     }
@@ -157,13 +124,12 @@ public class ConversionMethod {
         return length;
     }
 
-    private static String getClassName(String var, Class<?> inputClass, ParameterType type)
-            throws InitializationException {
+    private static String getClassName(String var, Class<?> inputClass) throws InitializationException {
         if ("input".equals(var)) {
             return inputClass.getCanonicalName();
         }
         if ("type".equals(var)) {
-            return type.getClass().getCanonicalName();
+            return ParameterType.class.getCanonicalName();
         }
         throw new InitializationException("Variable name " + var + " is not known");
     }

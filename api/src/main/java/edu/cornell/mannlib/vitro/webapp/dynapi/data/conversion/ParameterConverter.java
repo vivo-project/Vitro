@@ -7,11 +7,11 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 
 public class ParameterConverter {
 
-    public static String serialize(ParameterType type, Object input) throws ConversionException,
+    public static Object serialize(ParameterType type, Object input) throws ConversionException,
             InitializationException {
         ConversionConfiguration config = type.getImplementationType().getSerializationConfig();
         if (!config.isMethodInitialized()) {
-            config.setConversionMethod(new ConversionMethod(type, true));
+            config.setConversionMethod(new ConversionMethod(config));
         }
         return config.getConversionMethod().invoke(type, input).toString();
     }
@@ -20,7 +20,7 @@ public class ParameterConverter {
             InitializationException {
         ConversionConfiguration config = type.getImplementationType().getDeserializationConfig();
         if (!config.isMethodInitialized()) {
-            config.setConversionMethod(new ConversionMethod(type, false));
+            config.setConversionMethod(new ConversionMethod(config));
         }
         return config.getConversionMethod().invoke(type, input);
     }
