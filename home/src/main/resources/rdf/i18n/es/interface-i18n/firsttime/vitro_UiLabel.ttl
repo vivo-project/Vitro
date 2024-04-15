@@ -289,7 +289,7 @@ uil-data:password_reset_button.Vitro
 uil-data:password_reset_manual.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Para restablecer la contraseña, introduce tu email a continuación:"@es ;
+        rdfs:label       "Para restablecer la contraseña, introduzca su email a continuación:"@es ;
         uil:hasApp       "Vitro" ;
         uil:hasKey       "password_reset_manual" ;
         uil:hasPackage   "Vitro-languages" .
@@ -297,7 +297,7 @@ uil-data:password_reset_manual.Vitro
 uil-data:password_reset_forgot_email.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Si no recuerdas tu email, por favor <a href=\"{0}\">Contacta con nosotros</a>."@es ;
+        rdfs:label       "Si no recuerda su email, por favor <a href=\"{0}\">Contacte con nosotros</a>."@es ;
         uil:hasApp       "Vitro" ;
         uil:hasKey       "password_reset_forgot_email" ;
         uil:hasPackage   "Vitro-languages" .
