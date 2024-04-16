@@ -13,6 +13,6 @@
 :filter_querytext rdfs:label "Texto"@pt-BR .
 :field_querytext rdfs:label "Campo padrão"@pt-BR .
 :sort_name_raw_desc rdfs:label "Título bruto Z-A"@pt-BR .
-:sort_name_raw_asc rdfs:label "Título bruto Z-A"@pt-BR .
+:sort_name_raw_asc rdfs:label "Título bruto A-Z"@pt-BR .
 :field_score rdfs:label "Campo de relevância"@pt-BR .
 :field_name_raw rdfs:label "Campo de título bruto"@pt-BR .
