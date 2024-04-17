@@ -13,7 +13,7 @@ import java.util.Set;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyStatementAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DecisionResult;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.TestAuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.auth.rules.AccessRule;
 import org.junit.Test;
 
@@ -32,7 +32,7 @@ public class EditablePagesPolicyTest extends PolicyTest {
         assertEquals(1, policies.size());
         DynamicPolicy policy = policies.iterator().next();
         assertTrue(policy != null);
-        countRulesAndAttributes(policy, 1, new HashSet<>(Arrays.asList(6)));
+        countRulesAndAttributes(policy, 2, new HashSet<>(Arrays.asList(6)));
     }
 
     @Test
@@ -49,7 +49,7 @@ public class EditablePagesPolicyTest extends PolicyTest {
         AccessOperation operation = AccessOperation.EDIT;
         ObjectPropertyStatementAccessObject object =
                 new ObjectPropertyStatementAccessObject(null, "test://uri", SOME_PREDICATE, SOME_URI);
-        SimpleAuthorizationRequest ar = new SimpleAuthorizationRequest(object, operation);
+        TestAuthorizationRequest ar = new TestAuthorizationRequest(object, operation);
         ar.setRoleUris(Arrays.asList(CURATOR));
         assertEquals(DecisionResult.INCONCLUSIVE, policy.decide(ar).getDecisionResult());
         ar.setRoleUris(Arrays.asList(ADMIN));
@@ -70,7 +70,7 @@ public class EditablePagesPolicyTest extends PolicyTest {
         AccessOperation operation = AccessOperation.EDIT;
         ObjectPropertyStatementAccessObject object =
                 new ObjectPropertyStatementAccessObject(null, "test://uri", SOME_PREDICATE, SOME_URI);
-        SimpleAuthorizationRequest ar = new SimpleAuthorizationRequest(object, operation);
+        TestAuthorizationRequest ar = new TestAuthorizationRequest(object, operation);
         ar.setRoleUris(Arrays.asList(ADMIN));
         assertEquals(DecisionResult.INCONCLUSIVE, policy.decide(ar).getDecisionResult());
         ar.setRoleUris(Arrays.asList(CURATOR));
@@ -91,7 +91,7 @@ public class EditablePagesPolicyTest extends PolicyTest {
         AccessOperation operation = AccessOperation.EDIT;
         ObjectPropertyStatementAccessObject object =
                 new ObjectPropertyStatementAccessObject(null, "test://uri", SOME_PREDICATE, SOME_URI);
-        SimpleAuthorizationRequest ar = new SimpleAuthorizationRequest(object, operation);
+        TestAuthorizationRequest ar = new TestAuthorizationRequest(object, operation);
         ar.setRoleUris(Arrays.asList(ADMIN));
         assertEquals(DecisionResult.INCONCLUSIVE, policy.decide(ar).getDecisionResult());
         ar.setRoleUris(Arrays.asList(EDITOR));
@@ -118,7 +118,7 @@ public class EditablePagesPolicyTest extends PolicyTest {
         AccessOperation operation = AccessOperation.EDIT;
         ObjectPropertyStatementAccessObject object =
                 new ObjectPropertyStatementAccessObject(null, "test://uri", SOME_PREDICATE, SOME_URI);
-        SimpleAuthorizationRequest ar = new SimpleAuthorizationRequest(object, operation);
+        TestAuthorizationRequest ar = new TestAuthorizationRequest(object, operation);
         ar.setRoleUris(Arrays.asList(PUBLIC));
         assertEquals(DecisionResult.INCONCLUSIVE, policy.decide(ar).getDecisionResult());
         ar.setRoleUris(Arrays.asList(CUSTOM));

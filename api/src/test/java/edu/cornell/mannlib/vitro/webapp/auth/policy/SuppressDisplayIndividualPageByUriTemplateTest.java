@@ -19,7 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.IndividualAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.NamedAccessObject;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.TestAuthorizationRequest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -73,35 +73,35 @@ public class SuppressDisplayIndividualPageByUriTemplateTest extends PolicyTest {
 
     private void policyNotAffectsOtherRoles(DynamicPolicy policy) {
         AccessObject object = new IndividualAccessObject(TEST_ENTITY);
-        SimpleAuthorizationRequest ar = new SimpleAuthorizationRequest(object, ao);
+        TestAuthorizationRequest ar = new TestAuthorizationRequest(object, ao);
         ar.setRoleUris(Arrays.asList(roleUri + "_NOT_EXISTS"));
         assertEquals(INCONCLUSIVE, policy.decide(ar).getDecisionResult());
     }
 
     private void policyNotAffectsOtherEntities(DynamicPolicy policy) {
         AccessObject object = new IndividualAccessObject("test:anothe_entity");
-        SimpleAuthorizationRequest ar = new SimpleAuthorizationRequest(object, ao);
+        TestAuthorizationRequest ar = new TestAuthorizationRequest(object, ao);
         ar.setRoleUris(Arrays.asList(roleUri));
         assertEquals(INCONCLUSIVE, policy.decide(ar).getDecisionResult());
     }
 
     private void policyNotAffectsOtherOperations(DynamicPolicy policy) {
         AccessObject object = new IndividualAccessObject(TEST_ENTITY);
-        SimpleAuthorizationRequest ar = new SimpleAuthorizationRequest(object, AccessOperation.ADD);
+        TestAuthorizationRequest ar = new TestAuthorizationRequest(object, AccessOperation.ADD);
         ar.setRoleUris(Arrays.asList(roleUri));
         assertEquals(INCONCLUSIVE, policy.decide(ar).getDecisionResult());
     }
 
     private void policyNotAffectsOtherTypes(DynamicPolicy policy) {
         AccessObject object = new NamedAccessObject(TEST_ENTITY);
-        SimpleAuthorizationRequest ar = new SimpleAuthorizationRequest(object, ao);
+        TestAuthorizationRequest ar = new TestAuthorizationRequest(object, ao);
         ar.setRoleUris(Arrays.asList(roleUri));
         assertEquals(INCONCLUSIVE, policy.decide(ar).getDecisionResult());
     }
 
     private void policyDeniesAccess(DynamicPolicy policy) {
         AccessObject object = new IndividualAccessObject(TEST_ENTITY);
-        SimpleAuthorizationRequest ar = new SimpleAuthorizationRequest(object, ao);
+        TestAuthorizationRequest ar = new TestAuthorizationRequest(object, ao);
         ar.setRoleUris(Arrays.asList(roleUri));
         assertEquals(UNAUTHORIZED, policy.decide(ar).getDecisionResult());
     }

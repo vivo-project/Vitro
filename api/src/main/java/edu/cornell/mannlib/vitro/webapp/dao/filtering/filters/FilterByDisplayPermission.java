@@ -5,8 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.dao.filtering.filters;
 import static edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject.SOME_URI;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.DataPropertyAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.DataPropertyStatementAccessObject;
@@ -17,6 +15,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import net.sf.jga.fn.UnaryFunctor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class FilterByDisplayPermission extends VitroFiltersImpl {
     private static final Log log = LogFactory.getLog(FilterByDisplayPermission.class);
-    IdentifierBundle accessSubject = ActiveIdentifierBundleFactories.getUserIdentifierBundle(null);
+    UserAccount userAccount = PolicyHelper.getUserAccount(null);
 
     public FilterByDisplayPermission() {
         setDataPropertyFilter(new DataPropertyFilterByPolicy());
@@ -37,7 +36,7 @@ public class FilterByDisplayPermission extends VitroFiltersImpl {
     }
 
     boolean checkAuthorization(AccessObject accessObject) {
-        boolean decision = PolicyHelper.isAuthorizedForActions(accessSubject, accessObject, AccessOperation.DISPLAY);
+        boolean decision = PolicyHelper.isAuthorizedForActions(userAccount, accessObject, AccessOperation.DISPLAY);
         log.debug("decision is " + decision);
         return decision;
     }
