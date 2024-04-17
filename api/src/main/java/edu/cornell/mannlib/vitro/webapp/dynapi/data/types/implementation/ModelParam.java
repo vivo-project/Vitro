@@ -7,7 +7,8 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.Primitiv
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiInMemoryOntModel;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ConversionConfiguration;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DataFormat;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DefaultFormat;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,13 +28,13 @@ public class ModelParam extends Parameter {
             } else {
                 type.setName("model");
             }
-            ImplementationType implType = new ImplementationType();
-            type.setImplementationType(implType);
+            DataFormat defaultFormat = new DefaultFormat();
+            type.addFormat(defaultFormat);
             PrimitiveSerializationType serializationType = new PrimitiveSerializationType();
             serializationType.setName("string");
             type.setSerializationType(serializationType);
-            implType.setSerializationConfig(getSerializationConfig());
-            implType.setDeserializationConfig(getDeserializationConfig(internal));
+            defaultFormat.setSerializationConfig(getSerializationConfig());
+            defaultFormat.setDeserializationConfig(getDeserializationConfig(internal));
             type.addInterface(Model.class.getCanonicalName());
             if (internal) {
                 this.setDefaultValue(name);

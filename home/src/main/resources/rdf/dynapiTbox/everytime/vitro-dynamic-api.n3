@@ -122,13 +122,13 @@
          rdfs:range :RDFType ;
          rdfs:label "has RDF data type"@en-US .
 
-###  https://vivoweb.org/ontology/vitro-dynamic-api#implementationType
-:implementationType rdf:type owl:ObjectProperty ;
+###  https://vivoweb.org/ontology/vitro-dynamic-api#hasFormat
+:hasFormat rdf:type owl:ObjectProperty ;
          rdfs:subPropertyOf owl:topObjectProperty ;
          rdf:type owl:FunctionalProperty ;
          rdfs:domain :ParameterType ;
-         rdfs:range :ImplementationType ;
-         rdfs:label "has implementation type"@en-US .
+         rdfs:range :DefaultFormat ;
+         rdfs:label "has format"@en-US .
 
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#hasType
@@ -345,7 +345,7 @@
 :defaultValue rdf:type owl:DatatypeProperty ,
                       owl:FunctionalProperty ;
              rdfs:domain [ rdf:type owl:Class ;
-                           owl:unionOf ( :ImplementationType
+                           owl:unionOf ( :DefaultFormat
                                          :Parameter
                                        )
                          ] ;
@@ -779,9 +779,9 @@
                rdfs:label "RDF data type type"@en-US .
 
 
-###  https://vivoweb.org/ontology/vitro-dynamic-api#ImplementationType
-:ImplementationType rdf:type owl:Class ;
-               rdfs:label "Implementation type"@en-US .
+###  https://vivoweb.org/ontology/vitro-dynamic-api#DefaultFormat
+:DefaultFormat rdf:type owl:Class ;
+               rdfs:label "Default format"@en-US .
 
 
 ###  https://vivoweb.org/ontology/vitro-dynamic-api#ConversionConfiguration

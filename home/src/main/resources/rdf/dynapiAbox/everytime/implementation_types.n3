@@ -9,112 +9,112 @@
 @prefix dynapi-deserialization-config: <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/deserialization-config/> .
 
 dynapi-implementation-type:string
-        a                       dynapi:ImplementationType ;
+        a                       dynapi:DefaultFormat ;
         dynapi:serializationConfig dynapi-serialization-config:string ;
         dynapi:deserializationConfig dynapi-deserialization-config:string ;
         rdfs:label              "String"@en-US ;
         dynapi:defaultValue		"";
-        vitro:mostSpecificType  dynapi:ImplementationType .
+        vitro:mostSpecificType  dynapi:DefaultFormat .
 
 dynapi-implementation-type:uri-resource
-        a                       dynapi:ImplementationType ;
+        a                       dynapi:DefaultFormat ;
         dynapi:serializationConfig dynapi-serialization-config:uri-resource ;
         dynapi:deserializationConfig dynapi-deserialization-config:uri-resource ;
         rdfs:label              "Resource implementation type"@en-US ;
         dynapi:defaultValue		"";
-        vitro:mostSpecificType  dynapi:ImplementationType .
+        vitro:mostSpecificType  dynapi:DefaultFormat .
 
 dynapi-implementation-type:generated-uri-resource
-        a                       dynapi:ImplementationType ;
+        a                       dynapi:DefaultFormat ;
         dynapi:serializationConfig dynapi-serialization-config:uri-resource ;
         dynapi:deserializationConfig dynapi-deserialization-config:generated-uri-resource ;
         rdfs:label              "Resource implementation type"@en-US ;
         dynapi:defaultValue		"";
-        vitro:mostSpecificType  dynapi:ImplementationType .
+        vitro:mostSpecificType  dynapi:DefaultFormat .
 
 dynapi-implementation-type:string-literal
-        a                       dynapi:ImplementationType ;
+        a                       dynapi:DefaultFormat ;
         dynapi:serializationConfig dynapi-serialization-config:string-literal ;
         dynapi:deserializationConfig dynapi-deserialization-config:string-literal ;
         rdfs:label              "String literal implementation type"@en-US ;
         dynapi:defaultValue	"";
-        vitro:mostSpecificType  dynapi:ImplementationType .
+        vitro:mostSpecificType  dynapi:DefaultFormat .
 
 dynapi-implementation-type:integer
-        a                       dynapi:ImplementationType ;
+        a                       dynapi:DefaultFormat ;
         dynapi:serializationConfig dynapi-serialization-config:integer ;
         dynapi:deserializationConfig dynapi-deserialization-config:integer ;
         rdfs:label              "Integer"@en-US ;
         dynapi:defaultValue		"0";
-        vitro:mostSpecificType  dynapi:ImplementationType .
+        vitro:mostSpecificType  dynapi:DefaultFormat .
 
 dynapi-implementation-type:boolean
-        a                       dynapi:ImplementationType ;
+        a                       dynapi:DefaultFormat ;
         dynapi:serializationConfig dynapi-serialization-config:boolean ;
         dynapi:deserializationConfig dynapi-deserialization-config:boolean ;
         rdfs:label              "Boolean"@en-US ;
         dynapi:defaultValue		"false";
-        vitro:mostSpecificType  dynapi:ImplementationType .
+        vitro:mostSpecificType  dynapi:DefaultFormat .
 
 dynapi-implementation-type:big-integer
-        a                       dynapi:ImplementationType ;
+        a                       dynapi:DefaultFormat ;
         dynapi:serializationConfig dynapi-serialization-config:big-integer ;
         dynapi:deserializationConfig dynapi-deserialization-config:big-integer ;
         rdfs:label              "BigInteger"@en-US ;
         dynapi:defaultValue		"0";
-        vitro:mostSpecificType  dynapi:ImplementationType .
+        vitro:mostSpecificType  dynapi:DefaultFormat .
 
 dynapi-implementation-type:array
-        a                       dynapi:ImplementationType ;
+        a                       dynapi:DefaultFormat ;
         dynapi:serializationConfig dynapi-serialization-config:array ;
         dynapi:deserializationConfig dynapi-deserialization-config:array ;
         rdfs:label              "Array list"@en-US ;
         dynapi:defaultValue		"[]";
-        vitro:mostSpecificType  dynapi:ImplementationType .
+        vitro:mostSpecificType  dynapi:DefaultFormat .
 
 dynapi-implementation-type:model
-        a                       dynapi:ImplementationType ;
+        a                       dynapi:DefaultFormat ;
         dynapi:serializationConfig dynapi-serialization-config:model ;
         dynapi:deserializationConfig dynapi-deserialization-config:model ;
         rdfs:label              "Jena model"@en-US ;
         dynapi:defaultValue		"";
-        vitro:mostSpecificType  dynapi:ImplementationType .
+        vitro:mostSpecificType  dynapi:DefaultFormat .
 
 dynapi-implementation-type:internal-model
-        a                       dynapi:ImplementationType ;
+        a                       dynapi:DefaultFormat ;
         dynapi:serializationConfig dynapi-serialization-config:internal-model ;
         dynapi:deserializationConfig dynapi-deserialization-config:internal-model ;
         rdfs:label              "Jena internal model"@en-US ;
-        vitro:mostSpecificType  dynapi:ImplementationType .
+        vitro:mostSpecificType  dynapi:DefaultFormat .
 
 dynapi-implementation-type:json-container
-        a                       dynapi:ImplementationType ;
+        a                       dynapi:DefaultFormat ;
         dynapi:serializationConfig dynapi-serialization-config:json-container ;
         dynapi:deserializationConfig dynapi-deserialization-config:json-container ;
         rdfs:label              "Json container implementation type"@en-US ;
         dynapi:defaultValue		"{}";
-        vitro:mostSpecificType  dynapi:ImplementationType .
+        vitro:mostSpecificType  dynapi:DefaultFormat .
 
 dynapi-implementation-type:json-container-array
-        a                       dynapi:ImplementationType ;
+        a                       dynapi:DefaultFormat ;
         dynapi:serializationConfig dynapi-serialization-config:json-container ;
         dynapi:deserializationConfig dynapi-deserialization-config:json-container ;
         rdfs:label              "Json container array"@en-US ;
         dynapi:defaultValue		"[]";
-        vitro:mostSpecificType  dynapi:ImplementationType .
+        vitro:mostSpecificType  dynapi:DefaultFormat .
 
 dynapi-implementation-type:json-node
-        a                       dynapi:ImplementationType ;
+        a                       dynapi:DefaultFormat ;
         dynapi:serializationConfig dynapi-serialization-config:json-node ;
         dynapi:deserializationConfig dynapi-deserialization-config:json-node ;
         rdfs:label              "Json container array"@en-US ;
         dynapi:defaultValue		"{}";
-        vitro:mostSpecificType  dynapi:ImplementationType .
+        vitro:mostSpecificType  dynapi:DefaultFormat .
 
 dynapi-implementation-type:byte-array-base-64
-        a                       dynapi:ImplementationType ;
+        a                       dynapi:DefaultFormat ;
         dynapi:serializationConfig dynapi-serialization-config:byte-array-base-64 ;
         dynapi:deserializationConfig dynapi-deserialization-config:byte-array-base-64 ;
         rdfs:label              "Byte array implementation type"@en-US ;
         dynapi:defaultValue		"";
-        vitro:mostSpecificType  dynapi:ImplementationType .
+        vitro:mostSpecificType  dynapi:DefaultFormat .

@@ -7,12 +7,12 @@ import static org.junit.Assert.assertNotEquals;
 
 import org.junit.Test;
 
-public class ImplementationTypeTest {
+public class DefaultFormatTest {
 
     @Test
     public void testEquality() throws ClassNotFoundException {
-        ImplementationType type1 = new ImplementationType();
-        ImplementationType type2 = new ImplementationType();
+        DataFormat type1 = new DefaultFormat();
+        DataFormat type2 = new DefaultFormat();
         assertEquals(type1, type2);
 
         ConversionConfiguration implementationConfig1 = new ConversionConfiguration();

@@ -13,7 +13,7 @@ dynapi-parameter-type:boolean
         dynapi:name             "boolean" ;
         rdfs:label              "Boolean type"@en-US ;
         dynapi:serializationType dynapi-serialization-type:boolean ;
-        dynapi:implementationType dynapi-implementation-type:boolean ;
+        dynapi:hasFormat dynapi-implementation-type:boolean ;
         dynapi:interface        "java.lang.Boolean" ;
         .
 
@@ -22,7 +22,7 @@ dynapi-parameter-type:decimal
         dynapi:name             "decimal" ;
         rdfs:label              "Decimal type"@en-US ;
         dynapi:serializationType dynapi-serialization-type:decimal ;
-        dynapi:implementationType dynapi-implementation-type:big-integer ;
+        dynapi:hasFormat dynapi-implementation-type:big-integer ;
         dynapi:interface        "java.math.BigInteger" ;
         .
 
@@ -31,7 +31,7 @@ dynapi-parameter-type:integer
         dynapi:name             "integer" ;
         rdfs:label              "Integer type"@en-US ;
         dynapi:serializationType dynapi-serialization-type:integer ;
-        dynapi:implementationType dynapi-implementation-type:integer ;
+        dynapi:hasFormat dynapi-implementation-type:integer ;
         dynapi:interface        "java.lang.Integer" ;
         .
 
@@ -41,7 +41,7 @@ dynapi-parameter-type:integer-literal
         rdfs:label              "Integer type"@en-US ;
         dynapi:serializationType dynapi-serialization-type:integer ;
         dynapi:rdfType			 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/rdftype/integer> ;
-        dynapi:implementationType dynapi-implementation-type:integer ;
+        dynapi:hasFormat dynapi-implementation-type:integer ;
         #TODO:FIX
         dynapi:interface        "java.lang.Integer" ;
         .
@@ -51,7 +51,7 @@ dynapi-parameter-type:uri
         dynapi:name         	"uri" ;
         rdfs:label              "Individualized Resource Identifier type"@en-US ;
         dynapi:rdfType			 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/rdftype/uri> ;
-        dynapi:implementationType dynapi-implementation-type:uri-resource ;
+        dynapi:hasFormat dynapi-implementation-type:uri-resource ;
         dynapi:interface        "org.apache.jena.rdf.model.Resource" ;
         dynapi:serializationType dynapi-serialization-type:string ;
         .
@@ -61,7 +61,7 @@ dynapi-parameter-type:generated-uri
         dynapi:name         	"uri" ;
         rdfs:label              "Individualized Resource Identifier type"@en-US ;
         dynapi:rdfType			 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/rdftype/uri> ;
-        dynapi:implementationType dynapi-implementation-type:generated-uri-resource ;
+        dynapi:hasFormat dynapi-implementation-type:generated-uri-resource ;
         dynapi:interface        "org.apache.jena.rdf.model.Resource" ;
         dynapi:serializationType dynapi-serialization-type:string ;
         .
@@ -70,7 +70,7 @@ dynapi-parameter-type:array-of-strings
         a                       dynapi:ParameterType ;
         dynapi:name             "array" ;
         rdfs:label              "Array type"@en-US ;
-        dynapi:implementationType dynapi-implementation-type:array ;
+        dynapi:hasFormat dynapi-implementation-type:array ;
         dynapi:interface        "java.util.ArrayList" ;
         dynapi:serializationType dynapi-serialization-type:array ;
         dynapi:nestedType      dynapi-parameter-type:string ;
@@ -81,7 +81,7 @@ dynapi-parameter-type:string
         dynapi:name             "string" ;
         rdfs:label              "String type"@en-US ;
         dynapi:serializationType dynapi-serialization-type:string ;
-        dynapi:implementationType dynapi-implementation-type:string ;
+        dynapi:hasFormat dynapi-implementation-type:string ;
         dynapi:interface        "java.lang.String" ;
         .
 
@@ -91,7 +91,7 @@ dynapi-parameter-type:string-literal
         rdfs:label              "String literal type"@en-US ;
         dynapi:serializationType dynapi-serialization-type:string ;
         dynapi:rdfType		<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/rdftype/string> ;
-        dynapi:implementationType dynapi-implementation-type:string-literal ;
+        dynapi:hasFormat dynapi-implementation-type:string-literal ;
         dynapi:interface        "org.apache.jena.rdf.model.Literal" ;
         .
 
@@ -99,7 +99,7 @@ dynapi-parameter-type:model
         a                       dynapi:ParameterType ;
         dynapi:name             "model" ;
         rdfs:label              "Model type"@en-US ;
-        dynapi:implementationType dynapi-implementation-type:model ;
+        dynapi:hasFormat dynapi-implementation-type:model ;
         dynapi:interface        "org.apache.jena.rdf.model.Model" ;
         dynapi:serializationType dynapi-serialization-type:string ;
         .
@@ -109,7 +109,7 @@ dynapi-parameter-type:internal-model
         dynapi:name             "internal model" ;
         rdfs:label              "Model type"@en-US ;
         dynapi:isInternal		"true"^^xsd:boolean ;
-        dynapi:implementationType dynapi-implementation-type:internal-model ;
+        dynapi:hasFormat dynapi-implementation-type:internal-model ;
         dynapi:interface        "org.apache.jena.rdf.model.Model" ;
         dynapi:serializationType dynapi-serialization-type:string ;
         .
@@ -118,7 +118,7 @@ dynapi-parameter-type:JsonContainer
         a                       dynapi:ParameterType ;
         dynapi:name             "json container" ;
         rdfs:label              "Object type"@en-US ;
-        dynapi:implementationType dynapi-implementation-type:json-container ;
+        dynapi:hasFormat dynapi-implementation-type:json-container ;
         dynapi:interface        "edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer" ;
         dynapi:serializationType dynapi-serialization-type:json-container ;
         .
@@ -127,7 +127,7 @@ dynapi-parameter-type:JsonContainerArray
         a                       dynapi:ParameterType ;
         dynapi:name             "json array" ;
         rdfs:label              "Array type"@en-US ;
-        dynapi:implementationType dynapi-implementation-type:json-container-array ;
+        dynapi:hasFormat dynapi-implementation-type:json-container-array ;
         dynapi:interface        "edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer" ;
         dynapi:serializationType dynapi-serialization-type:json-container ;
         .
@@ -136,7 +136,7 @@ dynapi-parameter-type:JsonContainerArrayTest
         a                       dynapi:ParameterType ;
         dynapi:name             "json array" ;
         rdfs:label              "Array type"@en-US ;
-        dynapi:implementationType dynapi-implementation-type:json-container-array ;
+        dynapi:hasFormat dynapi-implementation-type:json-container-array ;
         dynapi:interface        "edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer" ;
         dynapi:serializationType dynapi-serialization-type:TestResultArrayType ;
         .
@@ -145,7 +145,7 @@ dynapi-parameter-type:json
         a                       dynapi:ParameterType ;
         dynapi:name             "json" ;
         rdfs:label              "Json type (fasterxml implementation)"@en-US ;
-        dynapi:implementationType dynapi-implementation-type:json-node ;
+        dynapi:hasFormat dynapi-implementation-type:json-node ;
         dynapi:interface        "com.fasterxml.jackson.databind.JsonNode" ;
         dynapi:serializationType dynapi-serialization-type:string ;
         .
@@ -154,7 +154,7 @@ dynapi-parameter-type:binary-file
         a                       dynapi:ParameterType ;
         dynapi:name             "binary file" ;
         rdfs:label              "Binary file"@en-US ;
-        dynapi:implementationType dynapi-implementation-type:byte-array-base-64 ;
+        dynapi:hasFormat dynapi-implementation-type:byte-array-base-64 ;
         dynapi:interface        "edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.ByteArray" ;
         dynapi:serializationType dynapi-serialization-type:string ;
         .

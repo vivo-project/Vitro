@@ -2,7 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.dynapi.data.types;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Removable;
@@ -18,10 +20,10 @@ public class ParameterType implements Removable {
     private String name;
     private SerializationType serializationType;
     private RDFType rdftype;
-    private ImplementationType implementationType;
     protected ParameterType nestedType = NullParameterType.getInstance();
     private boolean isInternal = false;
     private Set<Class<?>> interfaces = new HashSet<Class<?>>();
+    private Map<FormatName, DataFormat> formats = new HashMap<FormatName, DataFormat>();
 
     public String getName() {
         return name;
@@ -47,13 +49,13 @@ public class ParameterType implements Removable {
         this.isInternal = isInternal;
     }
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#implementationType", minOccurs = 1, maxOccurs = 1)
-    public void setImplementationType(ImplementationType implementationType) {
-        this.implementationType = implementationType;
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#hasFormat", minOccurs = 1)
+    public void addFormat(DataFormat format) {
+        formats.put(format.getName(), format);
     }
 
-    public ImplementationType getImplementationType() {
-        return implementationType;
+    public DataFormat getDefaultFormat() {
+        return formats.get(FormatName.DEFAULT);
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#nestedType", minOccurs = 0, maxOccurs = 1)
@@ -128,14 +130,14 @@ public class ParameterType implements Removable {
     }
 
     public void initialize() throws InitializationException {
-        if (implementationType == null) {
-            throw new InitializationException("implementation type is null");
+        if (getDefaultFormat() == null) {
+            throw new InitializationException("Default format is null");
         }
-        ConversionConfiguration deserializationConfig = implementationType.getDeserializationConfig();
+        ConversionConfiguration deserializationConfig = getDefaultFormat().getDeserializationConfig();
         if (deserializationConfig != null) {
             deserializationConfig.setConversionMethod(new ConversionMethod(deserializationConfig));
         }
-        ConversionConfiguration serializationConfig = implementationType.getSerializationConfig();
+        ConversionConfiguration serializationConfig = getDefaultFormat().getSerializationConfig();
         if (serializationConfig != null) {
             serializationConfig.setConversionMethod(new ConversionMethod(serializationConfig));
         }
@@ -155,7 +157,7 @@ public class ParameterType implements Removable {
         return new EqualsBuilder()
                 .append(getName(), compared.getName())
                 .append(getSerializationType(), compared.getSerializationType())
-                .append(getImplementationType(), compared.getImplementationType())
+                .append(getDefaultFormat(), compared.getDefaultFormat())
                 .append(getRdfType(), compared.getRdfType())
                 .append(getNestedType(), compared.getNestedType())
                 .append(getInterfaces(), compared.getInterfaces())
@@ -167,7 +169,7 @@ public class ParameterType implements Removable {
         return new HashCodeBuilder(43, 205)
                 .append(getName())
                 .append(getSerializationType())
-                .append(getImplementationType())
+                .append(getDefaultFormat())
                 .append(getRdfType())
                 .append(getNestedType())
                 .append(getInterfaces())

@@ -4,7 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ConversionConfiguration;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DataFormat;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DefaultFormat;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,10 +20,10 @@ public class BooleanParam extends Parameter {
         try {
             ParameterType type = new ParameterType();
             type.setName(TYPE_NAME);
-            ImplementationType implType = new ImplementationType();
-            type.setImplementationType(implType);
-            implType.setSerializationConfig(getSerializationConfig());
-            implType.setDeserializationConfig(getDeserializationConfig());
+            DataFormat defaultFormat = new DefaultFormat();
+            type.addFormat(defaultFormat);
+            defaultFormat.setSerializationConfig(getSerializationConfig());
+            defaultFormat.setDeserializationConfig(getDeserializationConfig());
             type.addInterface(Boolean.class.getCanonicalName());
             this.setType(type);
         } catch (Exception e) {

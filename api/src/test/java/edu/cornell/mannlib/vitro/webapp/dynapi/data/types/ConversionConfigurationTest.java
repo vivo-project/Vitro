@@ -37,23 +37,23 @@ public class ConversionConfigurationTest {
         assertEquals(config1, config2);
 
         ParameterType type1 = new ParameterType();
-        ImplementationType implType1 = new ImplementationType();
+        DataFormat defaultFormat1 = new DefaultFormat();
         type1.addInterface(String.class.getCanonicalName());
 
-        type1.setImplementationType(implType1);
-        implType1.setSerializationConfig(config1);
-        type1.setImplementationType(implType1);
+        type1.addFormat(defaultFormat1);
+        defaultFormat1.setSerializationConfig(config1);
+        type1.addFormat(defaultFormat1);
         ConversionMethod cm1 = new ConversionMethod(config1);
 
         config1.setConversionMethod(cm1);
         assertNotEquals(config1, config2);
 
         ParameterType type2 = new ParameterType();
-        ImplementationType implType2 = new ImplementationType();
+        DataFormat defaultFormat2 = new DefaultFormat();
         type2.addInterface(String.class.getCanonicalName());
 
-        implType2.setSerializationConfig(config2);
-        type2.setImplementationType(implType2);
+        defaultFormat2.setSerializationConfig(config2);
+        type2.addFormat(defaultFormat2);
         ConversionMethod cm2 = new ConversionMethod(config2);
 
         config2.setConversionMethod(cm2);

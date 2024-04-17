@@ -33,11 +33,11 @@ public class ParameterTypesTest {
         type2.setSerializationType(serializationType2);
         assertEquals(type1, type2);
 
-        ImplementationType implementationType1 = new ImplementationType();
-        ImplementationType implementationType2 = new ImplementationType();
-        type1.setImplementationType(implementationType1);
+        DataFormat implementationType1 = new DefaultFormat();
+        DataFormat implementationType2 = new DefaultFormat();
+        type1.addFormat(implementationType1);
         assertNotEquals(type1, type2);
-        type2.setImplementationType(implementationType2);
+        type2.addFormat(implementationType2);
         assertEquals(type1, type2);
 
         RDFType rdfType1 = new RDFType();

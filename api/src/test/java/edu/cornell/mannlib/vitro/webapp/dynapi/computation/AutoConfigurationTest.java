@@ -12,7 +12,8 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.steps.ConditionalStep;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.steps.OperationalStep;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ConversionConfiguration;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DataFormat;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DefaultFormat;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.RDFType;
 import org.junit.Test;
@@ -120,7 +121,7 @@ public class AutoConfigurationTest {
     private Parameter param(String name) throws InitializationException {
         Parameter param = new Parameter();
         ParameterType uri1ParamType = new ParameterType();
-        ImplementationType uri1ImplType = new ImplementationType();
+        DataFormat uri1ImplType = new DefaultFormat();
 
         ConversionConfiguration config = new ConversionConfiguration();
 
@@ -137,7 +138,7 @@ public class AutoConfigurationTest {
             rdfType.setName("anyURI");
             uri1ParamType.setRdfType(rdfType);
 
-            uri1ParamType.setImplementationType(uri1ImplType);
+            uri1ParamType.addFormat(uri1ImplType);
             param.setType(uri1ParamType);
             param.setName(name);
         } catch (ClassNotFoundException e) {

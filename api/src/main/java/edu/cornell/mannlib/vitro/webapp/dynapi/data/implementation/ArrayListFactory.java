@@ -34,7 +34,7 @@ public class ArrayListFactory {
         for (int i = 0; i < array.size(); i++) {
             JsonNode item = array.get(i);
             final ParameterType nestedType = type.getNestedType();
-            Object itemObject = nestedType.getImplementationType().deserialize(nestedType, item.toString());
+            Object itemObject = nestedType.getDefaultFormat().deserialize(nestedType, item.toString());
             listData.add(itemObject);
         }
         return listData;

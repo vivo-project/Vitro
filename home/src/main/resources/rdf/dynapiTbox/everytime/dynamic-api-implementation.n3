@@ -38,7 +38,7 @@ dynapi:ParameterType dynapi:implementedBy types:ParameterType .
 
 dynapi:RDFType dynapi:implementedBy types:RDFType .
 
-dynapi:ImplementationType dynapi:implementedBy types:ImplementationType .
+dynapi:DefaultFormat dynapi:implementedBy types:DefaultFormat .
 
 dynapi:ConversionConfiguration dynapi:implementedBy types:ConversionConfiguration .
 

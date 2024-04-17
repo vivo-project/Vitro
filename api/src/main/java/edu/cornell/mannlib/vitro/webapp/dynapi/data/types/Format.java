@@ -11,9 +11,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class ImplementationType {
+public abstract class Format implements DataFormat {
 
-    private static final Log log = LogFactory.getLog(ImplementationType.class);
+    private static final Log log = LogFactory.getLog(Format.class);
 
     private ConversionConfiguration serializationConfig;
     private ConversionConfiguration deserializationConfig;
@@ -30,6 +30,10 @@ public class ImplementationType {
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#defaultValue", minOccurs = 0, maxOccurs = 1)
     public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
+    }
+
+    public String getDefaultValue() {
+        return defaultValue;
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#serializationConfig", minOccurs = 1, maxOccurs = 1)
@@ -79,31 +83,26 @@ public class ImplementationType {
         }
     }
 
-    public String getDefaultValue() {
-        return defaultValue;
-    }
-
-    @Override
     public boolean equals(Object object) {
-        if (!(object instanceof ImplementationType)) {
+        if (!(object instanceof Format)) {
             return false;
         }
         if (object == this) {
             return true;
         }
-        ImplementationType compared = (ImplementationType) object;
+        Format compared = (Format) object;
 
         return new EqualsBuilder()
-                .append(serializationConfig, compared.serializationConfig)
-                .append(deserializationConfig, compared.deserializationConfig)
+                .append(getSerializationConfig(), compared.getSerializationConfig())
+                .append(getDeserializationConfig(), compared.getDeserializationConfig())
                 .isEquals();
     }
 
-    @Override
     public int hashCode() {
         return new HashCodeBuilder(59, 103)
                 .append(serializationConfig)
                 .append(deserializationConfig)
                 .toHashCode();
     }
+
 }

@@ -6,7 +6,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DataFormat;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DefaultFormat;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import org.junit.Test;
 
@@ -33,10 +34,10 @@ public class ParameterTest {
 
         ParameterType parameterType1 = new ParameterType();
         ParameterType parameterType2 = new ParameterType();
-        ImplementationType implementationType1 = new ImplementationType();
-        parameterType1.setImplementationType(implementationType1);
-        ImplementationType implementationType2 = new ImplementationType();
-        parameterType2.setImplementationType(implementationType2);
+        DataFormat defaultFormat1 = new DefaultFormat();
+        parameterType1.addFormat(defaultFormat1);
+        DataFormat defaultFormat2 = new DefaultFormat();
+        parameterType2.addFormat(defaultFormat2);
 
         param1.setType(parameterType1);
         assertNotEquals(param1, param2);

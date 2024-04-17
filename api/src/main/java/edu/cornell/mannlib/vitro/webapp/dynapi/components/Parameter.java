@@ -113,7 +113,7 @@ public class Parameter implements Removable {
         if (defaultValue != null) {
             return defaultValue;
         }
-        return type.getImplementationType().getDefaultValue();
+        return type.getDefaultFormat().getDefaultValue();
     }
 
     @Override

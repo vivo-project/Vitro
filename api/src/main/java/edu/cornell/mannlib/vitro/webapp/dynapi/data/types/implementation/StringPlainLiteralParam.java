@@ -4,7 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ConversionConfiguration;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DataFormat;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DefaultFormat;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.RDFType;
 import org.apache.commons.logging.Log;
@@ -31,11 +32,11 @@ public class StringPlainLiteralParam extends Parameter {
     public static ParameterType getPlainStringLiteralType() {
         ParameterType type = new ParameterType();
         type.setName(TYPE_NAME);
-        ImplementationType implType = new ImplementationType();
-        type.setImplementationType(implType);
+        DataFormat defaultFormat = new DefaultFormat();
+        type.addFormat(defaultFormat);
         try {
-            implType.setSerializationConfig(getSerializationConfig());
-            implType.setDeserializationConfig(getDeserializationConfig());
+            defaultFormat.setSerializationConfig(getSerializationConfig());
+            defaultFormat.setDeserializationConfig(getDeserializationConfig());
             type.addInterface(Literal.class.getCanonicalName());
             RDFType rdfType = new RDFType();
             rdfType.setName("string");

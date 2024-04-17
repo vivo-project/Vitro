@@ -9,7 +9,8 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.ByteArray;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonFasterxmlNode;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ConversionConfiguration;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DataFormat;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DefaultFormat;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.RDFType;
 import org.apache.jena.ontology.impl.OntModelImpl;
@@ -35,18 +36,18 @@ public class ParameterUtils {
     public static Parameter createModelParameter(String name) throws Exception {
         Parameter uriParam = new Parameter();
         ParameterType paramType = new ParameterType();
-        ImplementationType implType = new ImplementationType();
+        DataFormat defaultFormat = new DefaultFormat();
         paramType.addInterface(Model.class.getCanonicalName());
-        paramType.setImplementationType(implType);
+        paramType.addFormat(defaultFormat);
 
         ConversionConfiguration serConfig = createConfig(ModelWriterTest.MODEL_CONVERSION_CLASS, "input", "serializeN3",
                 true);
         serConfig.setInputInterface(Model.class.getCanonicalName());
 
-        implType.setSerializationConfig(serConfig);
+        defaultFormat.setSerializationConfig(serConfig);
         ConversionConfiguration desConfig = createConfig(ModelWriterTest.MODEL_CONVERSION_CLASS, "input",
                 "deserializeN3", true);
-        implType.setDeserializationConfig(desConfig);
+        defaultFormat.setDeserializationConfig(desConfig);
         uriParam.setType(paramType);
         uriParam.setName(name);
         return uriParam;
@@ -70,7 +71,7 @@ public class ParameterUtils {
     public static Parameter createUriParameter(String name) throws Exception {
         Parameter uri1Param = new Parameter();
         ParameterType uriParamType = new ParameterType();
-        ImplementationType uri1ImplType = new ImplementationType();
+        DataFormat defaultFormat = new DefaultFormat();
 
         ConversionConfiguration serialization = new ConversionConfiguration();
 
@@ -78,21 +79,21 @@ public class ParameterUtils {
         serialization.setMethodArguments("");
         serialization.setMethodName("toString");
         serialization.setStaticMethod(false);
-        uri1ImplType.setDeserializationConfig(serialization);
+        defaultFormat.setDeserializationConfig(serialization);
 
         ConversionConfiguration deserialization = new ConversionConfiguration();
         deserialization.setClassName(String.class.getCanonicalName());
         deserialization.setMethodArguments("");
         deserialization.setMethodName("toString");
         deserialization.setStaticMethod(false);
-        uri1ImplType.setSerializationConfig(deserialization);
+        defaultFormat.setSerializationConfig(deserialization);
         uriParamType.addInterface(String.class.getCanonicalName());
 
         RDFType rdfType = new RDFType();
         rdfType.setName("anyURI");
         uriParamType.setRdfType(rdfType);
 
-        uriParamType.setImplementationType(uri1ImplType);
+        uriParamType.addFormat(defaultFormat);
         uri1Param.setType(uriParamType);
         uriParamType.setSerializationType(N3TemplateTest.anyURI);
         uri1Param.setName(name);
@@ -102,7 +103,7 @@ public class ParameterUtils {
     public static Parameter createStringLiteralParameter(String name) throws Exception {
         Parameter uri1Param = new Parameter();
         ParameterType uri1ParamType = new ParameterType();
-        ImplementationType impltype = new ImplementationType();
+        DataFormat defaultFormat = new DefaultFormat();
 
         ConversionConfiguration config = new ConversionConfiguration();
 
@@ -110,15 +111,15 @@ public class ParameterUtils {
         config.setMethodArguments("");
         config.setMethodName("toString");
         config.setStaticMethod(false);
-        impltype.setDeserializationConfig(config);
-        impltype.setSerializationConfig(config);
+        defaultFormat.setDeserializationConfig(config);
+        defaultFormat.setSerializationConfig(config);
         uri1ParamType.addInterface(String.class.getCanonicalName());
 
         RDFType rdfType = new RDFType();
         rdfType.setName("string");
         uri1ParamType.setRdfType(rdfType);
 
-        uri1ParamType.setImplementationType(impltype);
+        uri1ParamType.addFormat(defaultFormat);
         uri1Param.setType(uri1ParamType);
 
         uri1ParamType.setSerializationType(N3TemplateTest.stringType);
@@ -129,7 +130,7 @@ public class ParameterUtils {
     public static Parameter createBooleanParameter(String name) throws Exception {
         Parameter uriParam = new Parameter();
         ParameterType uriParamType = new ParameterType();
-        ImplementationType uriImplType = new ImplementationType();
+        DataFormat defaultFormat = new DefaultFormat();
 
         ConversionConfiguration config = new ConversionConfiguration();
 
@@ -137,15 +138,15 @@ public class ParameterUtils {
         config.setMethodArguments("");
         config.setMethodName("toString");
         config.setStaticMethod(false);
-        uriImplType.setDeserializationConfig(config);
-        uriImplType.setSerializationConfig(config);
+        defaultFormat.setDeserializationConfig(config);
+        defaultFormat.setSerializationConfig(config);
         uriParamType.addInterface(String.class.getCanonicalName());
 
         RDFType rdfType = new RDFType();
         rdfType.setName("boolean");
         uriParamType.setRdfType(rdfType);
 
-        uriParamType.setImplementationType(uriImplType);
+        uriParamType.addFormat(defaultFormat);
         uriParam.setType(uriParamType);
         uriParamType.setSerializationType(N3TemplateTest.anyURI);
         uriParam.setName(name);
@@ -155,13 +156,13 @@ public class ParameterUtils {
     public static Parameter createJsonParameter(String allVar) throws Exception {
         Parameter jsonParam = new Parameter();
         ParameterType jsonParamType = new ParameterType();
-        ImplementationType jsonImplType = new ImplementationType();
+        DataFormat defaultFormat = new DefaultFormat();
 
-        jsonImplType.setDeserializationConfig(getJsonDeserializationConfig());
-        jsonImplType.setSerializationConfig(getJsonSerializationConfig());
+        defaultFormat.setDeserializationConfig(getJsonDeserializationConfig());
+        defaultFormat.setSerializationConfig(getJsonSerializationConfig());
         jsonParamType.addInterface(JsonNode.class.getCanonicalName());
-        jsonImplType.setDefaultValue("{ }");
-        jsonParamType.setImplementationType(jsonImplType);
+        defaultFormat.setDefaultValue("{ }");
+        jsonParamType.addFormat(defaultFormat);
         jsonParam.setType(jsonParamType);
         jsonParamType.setSerializationType(N3TemplateTest.stringType);
         jsonParam.setName(allVar);
@@ -190,13 +191,13 @@ public class ParameterUtils {
     public static Parameter createByteArrayParameter(String name) throws Exception {
         Parameter param = new Parameter();
         ParameterType paramType = new ParameterType();
-        ImplementationType implType = new ImplementationType();
+        DataFormat defaultFormat = new DefaultFormat();
 
-        implType.setDeserializationConfig(getByteArrayDeserializationConfig());
-        implType.setSerializationConfig(getByteArraySerializationConfig());
+        defaultFormat.setDeserializationConfig(getByteArrayDeserializationConfig());
+        defaultFormat.setSerializationConfig(getByteArraySerializationConfig());
         paramType.addInterface(ByteArray.class.getCanonicalName());
-        implType.setDefaultValue("");
-        paramType.setImplementationType(implType);
+        defaultFormat.setDefaultValue("");
+        paramType.addFormat(defaultFormat);
         param.setType(paramType);
         paramType.setSerializationType(N3TemplateTest.stringType);
         param.setName(name);

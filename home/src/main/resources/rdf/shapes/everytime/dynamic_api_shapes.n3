@@ -135,7 +135,7 @@
         sh:path      :serializationType .
 
 :ParameterType  a    sh:NodeShape , rdfs:Class ;
-        sh:property  :ParameterType-serializationType , :ParameterType-implementationType , :ParameterType-rdfType , :ParameterType-isInternal , :ParameterType-name , :ParameterType-nestedType .
+        sh:property  :ParameterType-serializationType , :ParameterType-hasFormat , :ParameterType-rdfType , :ParameterType-isInternal , :ParameterType-name , :ParameterType-nestedType .
 
 :Parameter  a        sh:NodeShape , rdfs:Class ;
         sh:property  :Parameter-hasCondition , :Parameter-description , :Parameter-name , :Parameter-hasValidator , :Parameter-serializationType .
@@ -243,11 +243,11 @@
         sh:class  :Model ;
         sh:path   :targetModel .
 
-:ParameterType-implementationType
+:ParameterType-hasFormat
         a            sh:PropertyShape ;
-        sh:class     :ImplementationType ;
+        sh:class     :DefaultFormat ;
         sh:maxCount  1 ;
-        sh:path      :implementationType .
+        sh:path      :hasFormat .
 
 :version-shape  a            sh:NodeShape ;
         sh:class             :Api ;
@@ -299,7 +299,7 @@
         sh:class             :SolrQuery ;
         sh:targetSubjectsOf  :solrQueryText .
 
-:ImplementationType-className
+:DefaultFormat-className
         a            sh:PropertyShape ;
         sh:datatype  xsd:string ;
         sh:maxCount  1 ;
@@ -357,10 +357,10 @@
         sh:class             :SolrQuery ;
         sh:targetSubjectsOf  :solrFilter .
 
-:implementationType-shape
+:hasFormat-shape
         a                    sh:NodeShape ;
         sh:class             :ParameterType ;
-        sh:targetSubjectsOf  :implementationType .
+        sh:targetSubjectsOf  :hasFormat .
 
 :Action-hasFirstStep  a  sh:PropertyShape ;
         sh:class  :Step ;
@@ -438,8 +438,8 @@
         sh:maxCount  1 ;
         sh:path      :maxValue .
 
-:ImplementationType  a  rdfs:Class , sh:NodeShape ;
-        sh:property  :ImplementationType-className .
+:DefaultFormat  a  rdfs:Class , sh:NodeShape ;
+        sh:property  :DefaultFormat-className .
 
 :ParameterType-nestedType
         a            sh:PropertyShape ;

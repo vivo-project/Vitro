@@ -4,7 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ConversionConfiguration;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DataFormat;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DefaultFormat;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.RDFType;
 import org.apache.commons.logging.Log;
@@ -31,12 +32,12 @@ public class URIResourceParam extends Parameter {
     public static ParameterType getUriResourceType() throws ClassNotFoundException {
         ParameterType type = new ParameterType();
         type.setName(TYPE_NAME);
-        ImplementationType implType = new ImplementationType();
-        type.setImplementationType(implType);
+        DataFormat defaultFormat = new DefaultFormat();
+        type.addFormat(defaultFormat);
         ConversionConfiguration serializationConfig = getSerializationConfig();
         ConversionConfiguration deserializationConfig = getDeserializationConfig();
-        implType.setSerializationConfig(serializationConfig);
-        implType.setDeserializationConfig(deserializationConfig);
+        defaultFormat.setSerializationConfig(serializationConfig);
+        defaultFormat.setDeserializationConfig(deserializationConfig);
         type.addInterface(Resource.class.getCanonicalName());
         RDFType rdfType = new RDFType();
         rdfType.setName(RDFType.ANY_URI);

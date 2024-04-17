@@ -25,7 +25,8 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ConversionConfiguration;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DataFormat;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DefaultFormat;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.RDFType;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
@@ -257,8 +258,8 @@ public class SolrQueryTest extends ServletContextTest {
     private Parameter createStringParameter(String name) throws Exception {
         Parameter uri1Param = new Parameter();
         ParameterType paramType = new ParameterType();
-        ImplementationType impltype = new ImplementationType();
-        paramType.setImplementationType(impltype);
+        DataFormat defaultFormat = new DefaultFormat();
+        paramType.addFormat(defaultFormat);
 
         ConversionConfiguration config = new ConversionConfiguration();
 
@@ -266,8 +267,8 @@ public class SolrQueryTest extends ServletContextTest {
         config.setMethodArguments("");
         config.setMethodName("toString");
         config.setStaticMethod(false);
-        impltype.setDeserializationConfig(config);
-        impltype.setSerializationConfig(config);
+        defaultFormat.setDeserializationConfig(config);
+        defaultFormat.setSerializationConfig(config);
         paramType.addInterface(JAVA_LANG_STRING);
 
         RDFType rdfType = new RDFType();

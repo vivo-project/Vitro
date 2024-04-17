@@ -10,7 +10,8 @@ import java.util.Arrays;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.ArrayListFactory;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ConversionConfiguration;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DataFormat;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DefaultFormat;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import org.junit.Test;
 
@@ -135,14 +136,14 @@ public class ParameterConverterTest {
             boolean serialization) throws Exception {
         final String arrayClassName = ArrayListFactory.class.getCanonicalName();
         ParameterType arrayType = new ParameterType();
-        ImplementationType arrayImplType = new ImplementationType();
-        arrayType.setImplementationType(arrayImplType);
+        DataFormat defaultFormat = new DefaultFormat();
+        arrayType.addFormat(defaultFormat);
         ConversionConfiguration arrayConfig = new ConversionConfiguration();
         if (serialization) {
-            arrayImplType.setSerializationConfig(arrayConfig);
+            defaultFormat.setSerializationConfig(arrayConfig);
             arrayConfig.setInputInterface(ArrayList.class.getCanonicalName());
         } else {
-            arrayImplType.setDeserializationConfig(arrayConfig);
+            defaultFormat.setDeserializationConfig(arrayConfig);
         }
         arrayType.addInterface(ArrayList.class.getCanonicalName());
         arrayConfig.setClassName(arrayClassName);
@@ -159,13 +160,13 @@ public class ParameterConverterTest {
     private ParameterType createType(String className, String methodName, String args, boolean isStatic,
             boolean serialization) throws Exception {
         ParameterType type = new ParameterType();
-        ImplementationType implType = new ImplementationType();
-        type.setImplementationType(implType);
+        DataFormat defaultFormat = new DefaultFormat();
+        type.addFormat(defaultFormat);
         ConversionConfiguration config = new ConversionConfiguration();
         if (serialization) {
-            implType.setSerializationConfig(config);
+            defaultFormat.setSerializationConfig(config);
         } else {
-            implType.setDeserializationConfig(config);
+            defaultFormat.setDeserializationConfig(config);
         }
         type.addInterface(className);
         config.setClassName(className);

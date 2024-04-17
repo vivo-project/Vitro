@@ -30,7 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionMethod;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.FormDataConverter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiModelFactory;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DefaultFormat;
 import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
 import org.junit.After;
@@ -164,7 +164,7 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
         LoggingControl.offLog(Endpoint.class);
         LoggingControl.offLog(FormDataConverter.class);
         LoggingControl.offLog(ConversionMethod.class);
-        LoggingControl.offLog(ImplementationType.class);
+        LoggingControl.offLog(DefaultFormat.class);
     }
 
     public static void restoreLogs() {
@@ -173,7 +173,7 @@ public class RPCEndpointIntegrationTest extends ServletContextIntegrationTest {
         LoggingControl.restoreLog(Endpoint.class);
         LoggingControl.restoreLog(FormDataConverter.class);
         LoggingControl.restoreLog(ConversionMethod.class);
-        LoggingControl.restoreLog(ImplementationType.class);
+        LoggingControl.restoreLog(DefaultFormat.class);
     }
 
     @Test

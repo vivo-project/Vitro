@@ -6,7 +6,8 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonFactory;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ConversionConfiguration;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DataFormat;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DefaultFormat;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,10 +22,10 @@ public abstract class JsonContainerParam extends Parameter {
         try {
             type = new ParameterType();
             type.setName(getContainerTypeName());
-            ImplementationType implType = new ImplementationType();
-            type.setImplementationType(implType);
-            implType.setSerializationConfig(getSerializationConfig());
-            implType.setDeserializationConfig(getDeserializationConfig());
+            DataFormat defaultFormat = new DefaultFormat();
+            type.addFormat(defaultFormat);
+            defaultFormat.setSerializationConfig(getSerializationConfig());
+            defaultFormat.setDeserializationConfig(getDeserializationConfig());
             type.addInterface(JsonContainer.class.getCanonicalName());
             this.setType(type);
             this.setDefaultValue(getContainerDefaultValue());

@@ -9,7 +9,7 @@ public class ParameterConverter {
 
     public static Object serialize(ParameterType type, Object input) throws ConversionException,
             InitializationException {
-        ConversionConfiguration config = type.getImplementationType().getSerializationConfig();
+        ConversionConfiguration config = type.getDefaultFormat().getSerializationConfig();
         if (!config.isMethodInitialized()) {
             config.setConversionMethod(new ConversionMethod(config));
         }
@@ -18,7 +18,7 @@ public class ParameterConverter {
 
     public static Object deserialize(ParameterType type, Object input) throws ConversionException,
             InitializationException {
-        ConversionConfiguration config = type.getImplementationType().getDeserializationConfig();
+        ConversionConfiguration config = type.getDefaultFormat().getDeserializationConfig();
         if (!config.isMethodInitialized()) {
             config.setConversionMethod(new ConversionMethod(config));
         }

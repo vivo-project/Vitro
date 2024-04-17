@@ -3,7 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DataFormat;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -70,25 +70,25 @@ public class Data {
 
     public void initializeFromString() {
         final ParameterType type = param.getType();
-        final ImplementationType implementationType = type.getImplementationType();
-        object = implementationType.deserialize(type, rawString);
+        final DataFormat defaultFormat = type.getDefaultFormat();
+        object = defaultFormat.deserialize(type, rawString);
         defaultInitialized = false;
     }
 
     public String getSerializedValue() {
         final ParameterType type = param.getType();
-        final ImplementationType implementationType = type.getImplementationType();
+        final DataFormat defaultFormat = type.getDefaultFormat();
         if (object == null) {
-            object = implementationType.deserialize(type, rawString);
+            object = defaultFormat.deserialize(type, rawString);
         }
-        return implementationType.serialize(type, object).toString();
+        return defaultFormat.serialize(type, object).toString();
     }
 
     public void initializeDefault() {
         ParameterType type = param.getType();
-        ImplementationType implementationType = type.getImplementationType();
+        DataFormat defaultFormat = type.getDefaultFormat();
         String defaultValue = param.getDefaultValue();
-        object = implementationType.deserialize(type, defaultValue);
+        object = defaultFormat.deserialize(type, defaultValue);
         defaultInitialized = true;
     }
 
