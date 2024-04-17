@@ -38,7 +38,7 @@ public class ConversionConfigurationTest {
 
         ParameterType type1 = new ParameterType();
         ImplementationType implType1 = new ImplementationType();
-        implType1.setClassName(String.class.getCanonicalName());
+        type1.addInterface(String.class.getCanonicalName());
 
         type1.setImplementationType(implType1);
         implType1.setSerializationConfig(config1);
@@ -50,7 +50,7 @@ public class ConversionConfigurationTest {
 
         ParameterType type2 = new ParameterType();
         ImplementationType implType2 = new ImplementationType();
-        implType2.setClassName(String.class.getCanonicalName());
+        type2.addInterface(String.class.getCanonicalName());
 
         implType2.setSerializationConfig(config2);
         type2.setImplementationType(implType2);

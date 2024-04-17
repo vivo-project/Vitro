@@ -27,7 +27,7 @@ public class LangStringLiteralParam extends Parameter {
             type.setImplementationType(implType);
             implType.setSerializationConfig(getSerializationConfig());
             implType.setDeserializationConfig(getDeserializationConfig());
-            implType.setClassName(Literal.class.getCanonicalName());
+            type.addInterface(Literal.class.getCanonicalName());
             RDFType rdfType = new RDFType();
             rdfType.setName(RDFType.LANG_STRING);
             type.setRdfType(rdfType);

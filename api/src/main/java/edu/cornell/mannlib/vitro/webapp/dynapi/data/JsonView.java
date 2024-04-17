@@ -9,7 +9,6 @@ import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
@@ -18,9 +17,7 @@ public class JsonView {
 
     public static boolean isJsonNode(Parameter param) {
         ParameterType type = param.getType();
-        ImplementationType implType = type.getImplementationType();
-        String className = implType.getClassName().getCanonicalName();
-        if (JsonNode.class.getCanonicalName().equals(className)) {
+        if (type.hasInterface(JsonNode.class)) {
             return true;
         }
         return false;

@@ -14,10 +14,6 @@ public class ImplementationTypeTest {
         ImplementationType type1 = new ImplementationType();
         ImplementationType type2 = new ImplementationType();
         assertEquals(type1, type2);
-        type1.setClassName(String.class.getCanonicalName());
-        assertNotEquals(type1, type2);
-        type2.setClassName(String.class.getCanonicalName());
-        assertEquals(type1, type2);
 
         ConversionConfiguration implementationConfig1 = new ConversionConfiguration();
         type1.setDeserializationConfig(implementationConfig1);

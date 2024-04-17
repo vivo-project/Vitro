@@ -23,7 +23,7 @@ public class StringParam extends Parameter {
             type.setImplementationType(implType);
             implType.setSerializationConfig(getSerializationConfig());
             implType.setDeserializationConfig(getDeserializationConfig());
-            implType.setClassName(String.class.getCanonicalName());
+            type.addInterface(String.class.getCanonicalName());
             this.setType(type);
         } catch (Exception e) {
             log.error(e, e);

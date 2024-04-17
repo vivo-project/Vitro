@@ -5,15 +5,13 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.data;
 import java.math.BigInteger;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 
 public class BigIntegerView {
 
     public static boolean isBigInteger(Parameter param) {
         ParameterType paramType = param.getType();
-        ImplementationType implType = paramType.getImplementationType();
-        return implType.getClassName().equals(BigInteger.class);
+        return paramType.hasInterface(BigInteger.class);
     }
 
     public static BigInteger getBigInteger(Data data) {

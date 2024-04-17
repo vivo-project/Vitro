@@ -34,7 +34,7 @@ public class ModelParam extends Parameter {
             type.setSerializationType(serializationType);
             implType.setSerializationConfig(getSerializationConfig());
             implType.setDeserializationConfig(getDeserializationConfig(internal));
-            implType.setClassName(Model.class.getCanonicalName());
+            type.addInterface(Model.class.getCanonicalName());
             if (internal) {
                 this.setDefaultValue(name);
             }

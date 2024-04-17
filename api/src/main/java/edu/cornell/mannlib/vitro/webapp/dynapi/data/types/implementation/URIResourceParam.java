@@ -37,7 +37,7 @@ public class URIResourceParam extends Parameter {
         ConversionConfiguration deserializationConfig = getDeserializationConfig();
         implType.setSerializationConfig(serializationConfig);
         implType.setDeserializationConfig(deserializationConfig);
-        implType.setClassName(Resource.class.getCanonicalName());
+        type.addInterface(Resource.class.getCanonicalName());
         RDFType rdfType = new RDFType();
         rdfType.setName(RDFType.ANY_URI);
         type.setRdfType(rdfType);

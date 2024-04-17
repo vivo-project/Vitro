@@ -8,13 +8,10 @@ import java.util.List;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiInMemoryOntModel;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import org.apache.jena.rdf.model.Model;
 
 public class ModelView {
-
-    private static final String MODEL_CANONICAL_NAME = Model.class.getCanonicalName();
 
     public static Model getModel(DataStore dataStore, Parameter param) {
         String name = param.getName();
@@ -39,9 +36,7 @@ public class ModelView {
 
     public static boolean isModel(Parameter param) {
         final ParameterType type = param.getType();
-        final ImplementationType implementationType = type.getImplementationType();
-        String name = implementationType.getClassName().getCanonicalName();
-        return MODEL_CANONICAL_NAME.equals(name);
+        return type.hasInterface(Model.class);
     }
 
     public static boolean hasModel(DataStore input, Parameter param) {
@@ -50,11 +45,7 @@ public class ModelView {
             return false;
         }
         Data data = input.getData(name);
-        String className = data.getParam().getType().getImplementationType().getClassName().getCanonicalName();
-        if (className.equals(MODEL_CANONICAL_NAME)) {
-            return true;
-        }
-        return false;
+        return data.getParam().getType().hasInterface(Model.class);
     }
 
     public static List<Model> getExistingModels(Parameters params, DataStore dataStore) {

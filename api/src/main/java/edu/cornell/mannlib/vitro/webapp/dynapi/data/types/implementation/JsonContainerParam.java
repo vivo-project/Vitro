@@ -25,7 +25,7 @@ public abstract class JsonContainerParam extends Parameter {
             type.setImplementationType(implType);
             implType.setSerializationConfig(getSerializationConfig());
             implType.setDeserializationConfig(getDeserializationConfig());
-            implType.setClassName(JsonContainer.class.getCanonicalName());
+            type.addInterface(JsonContainer.class.getCanonicalName());
             this.setType(type);
             this.setDefaultValue(getContainerDefaultValue());
         } catch (Exception e) {

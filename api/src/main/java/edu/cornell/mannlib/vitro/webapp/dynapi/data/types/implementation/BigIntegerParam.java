@@ -25,7 +25,7 @@ public class BigIntegerParam extends Parameter {
             type.setImplementationType(implType);
             implType.setSerializationConfig(getSerializationConfig());
             implType.setDeserializationConfig(getDeserializationConfig());
-            implType.setClassName(BigInteger.class.getCanonicalName());
+            type.addInterface(BigInteger.class.getCanonicalName());
             this.setType(type);
         } catch (Exception e) {
             log.error(e, e);

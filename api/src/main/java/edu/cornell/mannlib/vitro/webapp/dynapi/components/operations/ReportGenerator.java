@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.haulmont.yarg.formatters.factory.DefaultFormatterFactory;
 import com.haulmont.yarg.loaders.factory.DefaultLoaderFactory;
@@ -68,9 +69,13 @@ public class ReportGenerator extends AbstractOperation {
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#dataSource", minOccurs = 1)
     public void addDataSource(Parameter dataSource) throws InitializationException {
         if (!JsonView.isJsonNode(dataSource)) {
-            Class<?> className = dataSource.getType().getImplementationType().getClassName();
+            String intefaces = dataSource.getType().getInterfaces()
+                    .stream()
+                    .map(Object::toString)
+                    .collect(Collectors
+                    .joining(", "));
             throw new InitializationException(String.format(
-                    "Only json data sources accepted on addDataSource. Provided %s", className.getCanonicalName()));
+                    "Only json data sources accepted on addDataSource. Provided parameter implements: %s", intefaces));
         }
         inputParams.add(dataSource);
         dataSources.add(dataSource);

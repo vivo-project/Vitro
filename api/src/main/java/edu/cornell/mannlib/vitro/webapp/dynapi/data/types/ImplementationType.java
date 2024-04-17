@@ -15,7 +15,6 @@ public class ImplementationType {
 
     private static final Log log = LogFactory.getLog(ImplementationType.class);
 
-    private Class<?> className;
     private ConversionConfiguration serializationConfig;
     private ConversionConfiguration deserializationConfig;
     private String defaultValue = "";
@@ -26,15 +25,6 @@ public class ImplementationType {
 
     public ConversionConfiguration getDeserializationConfig() {
         return deserializationConfig;
-    }
-
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#className", minOccurs = 1, maxOccurs = 1)
-    public void setClassName(String className) throws ClassNotFoundException {
-        this.className = Class.forName(className);
-    }
-
-    public Class<?> getClassName() {
-        return className;
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#defaultValue", minOccurs = 0, maxOccurs = 1)
@@ -104,7 +94,6 @@ public class ImplementationType {
         ImplementationType compared = (ImplementationType) object;
 
         return new EqualsBuilder()
-                .append(className, compared.className)
                 .append(serializationConfig, compared.serializationConfig)
                 .append(deserializationConfig, compared.deserializationConfig)
                 .isEquals();
@@ -113,7 +102,6 @@ public class ImplementationType {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(59, 103)
-                .append(className)
                 .append(serializationConfig)
                 .append(deserializationConfig)
                 .toHashCode();

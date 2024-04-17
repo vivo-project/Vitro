@@ -36,7 +36,7 @@ public class StringPlainLiteralParam extends Parameter {
         try {
             implType.setSerializationConfig(getSerializationConfig());
             implType.setDeserializationConfig(getDeserializationConfig());
-            implType.setClassName(Literal.class.getCanonicalName());
+            type.addInterface(Literal.class.getCanonicalName());
             RDFType rdfType = new RDFType();
             rdfType.setName("string");
             type.setRdfType(rdfType);

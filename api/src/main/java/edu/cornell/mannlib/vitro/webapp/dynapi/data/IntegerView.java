@@ -3,15 +3,13 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 
 public class IntegerView {
 
     public static boolean isInteger(Parameter param) {
         ParameterType paramType = param.getType();
-        ImplementationType implType = paramType.getImplementationType();
-        return implType.getClassName().equals(Integer.class);
+        return paramType.hasInterface(Integer.class);
     }
 
     public static int getInteger(Data data) {

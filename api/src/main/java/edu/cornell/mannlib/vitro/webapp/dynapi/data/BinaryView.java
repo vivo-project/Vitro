@@ -6,7 +6,6 @@ import java.io.ByteArrayOutputStream;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.ByteArray;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ImplementationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 
 public class BinaryView {
@@ -17,9 +16,7 @@ public class BinaryView {
 
     public static boolean isByteArray(Parameter param) {
         ParameterType type = param.getType();
-        ImplementationType implType = type.getImplementationType();
-        String className = implType.getClassName().getCanonicalName();
-        if (ByteArray.class.getCanonicalName().equals(className)) {
+        if (type.hasInterface(ByteArray.class)) {
             return true;
         }
         return false;

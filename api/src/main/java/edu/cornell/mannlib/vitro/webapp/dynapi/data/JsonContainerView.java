@@ -32,11 +32,7 @@ public class JsonContainerView {
     }
 
     public static boolean isJsonContainer(ParameterType type) {
-        String canonicalName = type.getImplementationType().getClassName().getCanonicalName();
-        if (JsonContainer.class.getCanonicalName().equals(canonicalName)) {
-            return true;
-        }
-        return false;
+        return type.hasInterface(JsonContainer.class);
     }
 
     public static Map<String, JsonArray> getJsonArrays(Parameters params, DataStore dataStore) {

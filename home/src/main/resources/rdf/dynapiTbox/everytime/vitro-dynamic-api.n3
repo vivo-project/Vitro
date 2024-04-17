@@ -483,11 +483,7 @@
 :className rdf:type owl:DatatypeProperty,
 					owl:FunctionalProperty ;
           rdfs:subPropertyOf owl:topDataProperty ;
-          rdfs:domain [ rdf:type owl:Class ;
-                       owl:unionOf ( :ImplementationType
-                                     :ConversionConfiguration
-                                   )
-                     ] ;
+          rdfs:domain :ConversionConfiguration ;
           rdfs:range xsd:string ;
           rdfs:label "Fully-qualified implementation class name"@en-US .
 

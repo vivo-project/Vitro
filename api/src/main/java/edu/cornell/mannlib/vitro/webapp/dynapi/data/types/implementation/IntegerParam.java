@@ -25,7 +25,7 @@ public class IntegerParam extends Parameter {
             type.setSerializationType(createSerializationType());
             implType.setSerializationConfig(getSerializationConfig());
             implType.setDeserializationConfig(getDeserializationConfig());
-            implType.setClassName(Integer.class.getCanonicalName());
+            type.addInterface(Integer.class.getCanonicalName());
             this.setType(type);
         } catch (Exception e) {
             log.error(e, e);

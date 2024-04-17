@@ -144,7 +144,7 @@ public class ParameterConverterTest {
         } else {
             arrayImplType.setDeserializationConfig(arrayConfig);
         }
-        arrayImplType.setClassName(ArrayList.class.getCanonicalName());
+        arrayType.addInterface(ArrayList.class.getCanonicalName());
         arrayConfig.setClassName(arrayClassName);
         arrayConfig.setMethodName(arrayMethod);
         arrayConfig.setMethodArguments(arrayArgs);
@@ -167,7 +167,7 @@ public class ParameterConverterTest {
         } else {
             implType.setDeserializationConfig(config);
         }
-        implType.setClassName(className);
+        type.addInterface(className);
         config.setClassName(className);
         config.setMethodName(methodName);
         config.setMethodArguments(args);

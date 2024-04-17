@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.dynapi.data.types;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Removable;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.SerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionMethod;
@@ -18,6 +21,7 @@ public class ParameterType implements Removable {
     private ImplementationType implementationType;
     protected ParameterType nestedType = NullParameterType.getInstance();
     private boolean isInternal = false;
+    private Set<Class<?>> interfaces = new HashSet<Class<?>>();
 
     public String getName() {
         return name;
@@ -61,6 +65,19 @@ public class ParameterType implements Removable {
         return nestedType;
     }
 
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#interface", minOccurs = 1)
+    public void addInterface(String className) throws ClassNotFoundException {
+        interfaces.add(Class.forName(className));
+    }
+
+    public boolean hasInterface(Class<?> clazz) {
+        return interfaces.contains(clazz);
+    }
+
+    public Set<Class<?>> getInterfaces() {
+        return new HashSet<Class<?>>(interfaces);
+    }
+
     public boolean isLiteral() {
         if (!isRdfType()) {
             return false;
@@ -95,11 +112,11 @@ public class ParameterType implements Removable {
     }
 
     public boolean isString() {
-        return getImplementationType().getClassName().getCanonicalName().equals(String.class.getCanonicalName());
+        return hasInterface(String.class);
     }
 
     public boolean isBoolean() {
-        return getImplementationType().getClassName().getCanonicalName().equals(Boolean.class.getCanonicalName());
+        return hasInterface(Boolean.class);
     }
 
     public boolean isPlainString() {
@@ -141,6 +158,7 @@ public class ParameterType implements Removable {
                 .append(getImplementationType(), compared.getImplementationType())
                 .append(getRdfType(), compared.getRdfType())
                 .append(getNestedType(), compared.getNestedType())
+                .append(getInterfaces(), compared.getInterfaces())
                 .isEquals();
     }
 
@@ -152,6 +170,7 @@ public class ParameterType implements Removable {
                 .append(getImplementationType())
                 .append(getRdfType())
                 .append(getNestedType())
+                .append(getInterfaces())
                 .toHashCode();
     }
 }

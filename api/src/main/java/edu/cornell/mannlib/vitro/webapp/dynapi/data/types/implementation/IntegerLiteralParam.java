@@ -26,7 +26,7 @@ public class IntegerLiteralParam extends Parameter {
             type.setSerializationType(createSerializationType());
             implType.setSerializationConfig(getSerializationConfig());
             implType.setDeserializationConfig(getDeserializationConfig());
-            implType.setClassName(Integer.class.getCanonicalName());
+            type.addInterface(Integer.class.getCanonicalName());
             RDFType rdfType = new RDFType();
             rdfType.setName("integer");
             type.setRdfType(rdfType);

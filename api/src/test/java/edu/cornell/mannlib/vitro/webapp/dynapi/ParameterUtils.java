@@ -36,7 +36,7 @@ public class ParameterUtils {
         Parameter uriParam = new Parameter();
         ParameterType paramType = new ParameterType();
         ImplementationType implType = new ImplementationType();
-        implType.setClassName(Model.class.getCanonicalName());
+        paramType.addInterface(Model.class.getCanonicalName());
         paramType.setImplementationType(implType);
 
         ConversionConfiguration serConfig = createConfig(ModelWriterTest.MODEL_CONVERSION_CLASS, "input", "serializeN3",
@@ -86,7 +86,7 @@ public class ParameterUtils {
         deserialization.setMethodName("toString");
         deserialization.setStaticMethod(false);
         uri1ImplType.setSerializationConfig(deserialization);
-        uri1ImplType.setClassName(String.class.getCanonicalName());
+        uriParamType.addInterface(String.class.getCanonicalName());
 
         RDFType rdfType = new RDFType();
         rdfType.setName("anyURI");
@@ -112,7 +112,7 @@ public class ParameterUtils {
         config.setStaticMethod(false);
         impltype.setDeserializationConfig(config);
         impltype.setSerializationConfig(config);
-        impltype.setClassName(String.class.getCanonicalName());
+        uri1ParamType.addInterface(String.class.getCanonicalName());
 
         RDFType rdfType = new RDFType();
         rdfType.setName("string");
@@ -139,7 +139,7 @@ public class ParameterUtils {
         config.setStaticMethod(false);
         uriImplType.setDeserializationConfig(config);
         uriImplType.setSerializationConfig(config);
-        uriImplType.setClassName(String.class.getCanonicalName());
+        uriParamType.addInterface(String.class.getCanonicalName());
 
         RDFType rdfType = new RDFType();
         rdfType.setName("boolean");
@@ -159,7 +159,7 @@ public class ParameterUtils {
 
         jsonImplType.setDeserializationConfig(getJsonDeserializationConfig());
         jsonImplType.setSerializationConfig(getJsonSerializationConfig());
-        jsonImplType.setClassName(JsonNode.class.getCanonicalName());
+        jsonParamType.addInterface(JsonNode.class.getCanonicalName());
         jsonImplType.setDefaultValue("{ }");
         jsonParamType.setImplementationType(jsonImplType);
         jsonParam.setType(jsonParamType);
@@ -194,7 +194,7 @@ public class ParameterUtils {
 
         implType.setDeserializationConfig(getByteArrayDeserializationConfig());
         implType.setSerializationConfig(getByteArraySerializationConfig());
-        implType.setClassName(ByteArray.class.getCanonicalName());
+        paramType.addInterface(ByteArray.class.getCanonicalName());
         implType.setDefaultValue("");
         paramType.setImplementationType(implType);
         param.setType(paramType);

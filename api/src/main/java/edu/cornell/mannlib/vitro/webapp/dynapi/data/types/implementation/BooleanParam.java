@@ -23,7 +23,7 @@ public class BooleanParam extends Parameter {
             type.setImplementationType(implType);
             implType.setSerializationConfig(getSerializationConfig());
             implType.setDeserializationConfig(getDeserializationConfig());
-            implType.setClassName(Boolean.class.getCanonicalName());
+            type.addInterface(Boolean.class.getCanonicalName());
             this.setType(type);
         } catch (Exception e) {
             log.error(e, e);
