@@ -15,4 +15,4 @@
 :sort_name_raw_desc rdfs:label "Titel Z-A"@de-DE .
 :sort_name_raw_asc rdfs:label "Titel A-Z"@de-DE .
 :field_score rdfs:label "Relevanzfeld"@de-DE .
-:field_name_raw rdfs:label "Rohes Titelfeld"@de-DE .
+:field_name_raw rdfs:label "Titelfeld"@de-DE .
