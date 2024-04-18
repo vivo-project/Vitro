@@ -2,11 +2,12 @@
 
 package edu.cornell.mannlib.vitro.webapp.dynapi.components.operations;
 
+import java.util.Set;
+
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ParameterType;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -15,7 +16,6 @@ public class AssignOperation extends AbstractOperation {
     private static final Log log = LogFactory.getLog(AssignOperation.class);
     private Parameter targetParam;
     private Parameter assignableParam;
-    private String key;
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#assignableParameter", minOccurs = 1, maxOccurs = 1)
     public void addInputParameter(Parameter param) {
@@ -58,9 +58,9 @@ public class AssignOperation extends AbstractOperation {
             log.error("target parameter  is not set");
             return false;
         }
-        ParameterType assignableType = assignableParam.getType();
-        ParameterType targetType = targetParam.getType();
-        if (!assignableType.equals(targetType)) {
+        Set<Class<?>> assignableInterfaces = assignableParam.getType().getInterfaces();
+        Set<Class<?>> targetInterfaces = targetParam.getType().getInterfaces();
+        if (!targetInterfaces.containsAll(assignableInterfaces)) {
             log.error(String.format("assignable '%s' and target '%s' parameters are not compatible", assignableParam
                     .getName(), targetParam.getName()));
             return false;

@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data.types;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionException;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionMethod;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -27,7 +26,7 @@ public abstract class Format implements DataFormat {
         return deserializationConfig;
     }
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#defaultValue", minOccurs = 0, maxOccurs = 1)
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#defaultValue", maxOccurs = 1)
     public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
     }
@@ -36,43 +35,37 @@ public abstract class Format implements DataFormat {
         return defaultValue;
     }
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#serializationConfig", minOccurs = 1, maxOccurs = 1)
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#serializationConfig", maxOccurs = 1)
     public void setSerializationConfig(ConversionConfiguration serializationConfig) {
         this.serializationConfig = serializationConfig;
     }
 
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#deserializationConfig", minOccurs = 1,
-            maxOccurs = 1)
+    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#deserializationConfig", maxOccurs = 1)
     public void setDeserializationConfig(ConversionConfiguration deserializationConfig) {
         this.deserializationConfig = deserializationConfig;
     }
 
     public Object serialize(ParameterType type, Object input) {
-        final ConversionConfiguration config = serializationConfig;
-        if (!config.isMethodInitialized()) {
-            initializeMethod(config);
-        }
-        return invoke(config, type, input);
+        return invoke(serializationConfig, type, input);
     }
 
     private void initializeMethod(ConversionConfiguration config) {
         try {
-            config.setConversionMethod(new ConversionMethod(config));
+            config.initialize();
         } catch (InitializationException e) {
-            e.printStackTrace();
+            log.error(e, e);
             throw new RuntimeException(e.getLocalizedMessage());
         }
     }
 
     public Object deserialize(ParameterType type, Object input) {
-        final ConversionConfiguration config = deserializationConfig;
-        if (!config.isMethodInitialized()) {
-            initializeMethod(config);
-        }
-        return invoke(config, type, input);
+        return invoke(deserializationConfig, type, input);
     }
 
     private Object invoke(ConversionConfiguration config, ParameterType type, Object input) {
+        if (!config.isMethodInitialized()) {
+            initializeMethod(config);
+        }
         try {
             return config.getConversionMethod().invoke(type, input);
         } catch (ConversionException e) {

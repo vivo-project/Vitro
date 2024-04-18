@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi.data.types;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionMethod;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -63,10 +64,11 @@ public class ConversionConfiguration {
     }
 
     public boolean isMethodInitialized() {
-        if (conversionMethod == null) {
-            return false;
-        }
-        return true;
+        return conversionMethod != null;
+    }
+
+    public void initialize() throws InitializationException {
+        conversionMethod = new ConversionMethod(this);
     }
 
     public ConversionMethod getConversionMethod() {
@@ -91,7 +93,6 @@ public class ConversionConfiguration {
                 .append(conversionClass, compared.conversionClass)
                 .append(methodName, compared.methodName)
                 .append(methodArguments, compared.methodArguments)
-                .append(conversionMethod, compared.conversionMethod)
                 .append(staticMethod, compared.staticMethod)
                 .isEquals();
     }
@@ -102,7 +103,6 @@ public class ConversionConfiguration {
                 .append(conversionClass)
                 .append(methodName)
                 .append(methodArguments)
-                .append(conversionMethod)
                 .append(staticMethod)
                 .toHashCode();
     }

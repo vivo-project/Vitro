@@ -43,10 +43,6 @@ public class ConversionConfigurationTest {
         type1.addFormat(defaultFormat1);
         defaultFormat1.setSerializationConfig(config1);
         type1.addFormat(defaultFormat1);
-        ConversionMethod cm1 = new ConversionMethod(config1);
-
-        config1.setConversionMethod(cm1);
-        assertNotEquals(config1, config2);
 
         ParameterType type2 = new ParameterType();
         DataFormat defaultFormat2 = new DefaultFormat();

@@ -28,7 +28,7 @@ public class ParameterTest {
         // Default value is not important for logical equality
         param1.setDefaultValue("1");
         assertEquals(param1, param2);
-        // internal attributeis not important for logical equality
+        // internal attributes not important for logical equality
         param1.setInternal(true);
         assertEquals(param1, param2);
 

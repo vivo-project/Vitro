@@ -9,7 +9,6 @@ import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Removable;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.SerializationType;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.ConversionMethod;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -133,15 +132,6 @@ public class ParameterType implements Removable {
         if (getDefaultFormat() == null) {
             throw new InitializationException("Default format is null");
         }
-        ConversionConfiguration deserializationConfig = getDefaultFormat().getDeserializationConfig();
-        if (deserializationConfig != null) {
-            deserializationConfig.setConversionMethod(new ConversionMethod(deserializationConfig));
-        }
-        ConversionConfiguration serializationConfig = getDefaultFormat().getSerializationConfig();
-        if (serializationConfig != null) {
-            serializationConfig.setConversionMethod(new ConversionMethod(serializationConfig));
-        }
-
     }
 
     @Override
