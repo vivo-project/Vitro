@@ -12,34 +12,34 @@ dynapi-http-method:get
         a                       dynapi:HttpMethod ;
         dynapi:name             "GET" ;
         rdfs:label              "HTTP GET method"@en-US ;
-        vitro:mostSpecificType  dynapi:HttpMethod .
+        .
 
 dynapi-http-method:post
         a                       dynapi:HttpMethod ;
         dynapi:name             "POST" ;
         rdfs:label              "HTTP POST method"@en-US ;
-        vitro:mostSpecificType  dynapi:HttpMethod .
+        .
 
 dynapi-http-method:put
         a                       dynapi:HttpMethod ;
         dynapi:name             "PUT" ;
         rdfs:label              "HTTP PUT method"@en-US ;
-        vitro:mostSpecificType  dynapi:HttpMethod .
+        .
 
 dynapi-http-method:patch
         a                       dynapi:HttpMethod ;
         dynapi:name             "PATCH" ;
         rdfs:label              "HTTP PATCH method"@en-US ;
-        vitro:mostSpecificType  dynapi:HttpMethod .
+        .
 
 dynapi-http-method:delete
         a                       dynapi:HttpMethod ;
         dynapi:name             "DELETE" ;
         rdfs:label              "HTTP DELETE method"@en-US ;
-        vitro:mostSpecificType  dynapi:HttpMethod .
+        .
 
 dynapi-http-method:options
         a                       dynapi:HttpMethod ;
         dynapi:name             "OPTIONS" ;
         rdfs:label              "HTTP OPTIONS method"@en-US ;
-        vitro:mostSpecificType  dynapi:HttpMethod .
+        .

@@ -8,11 +8,7 @@ public class JsonContainerArrayParam extends JsonContainerParam {
 
     public JsonContainerArrayParam(String var) {
         super(var);
-    }
-
-    @Override
-    public String getContainerTypeName() {
-        return "json array";
+        getType().addInterface(JsonArray.class);
     }
 
     @Override

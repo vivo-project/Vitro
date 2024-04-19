@@ -14,20 +14,18 @@ import org.apache.commons.logging.LogFactory;
 
 public class IntegerLiteralParam extends Parameter {
 
-    private static final String TYPE_NAME = "integer";
     private static final Log log = LogFactory.getLog(IntegerLiteralParam.class);
 
     public IntegerLiteralParam(String var) {
         this.setName(var);
         try {
             ParameterType type = new ParameterType();
-            type.setName(TYPE_NAME);
             DataFormat defaultFormat = new DefaultFormat();
             type.addFormat(defaultFormat);
             type.setSerializationType(createSerializationType());
             defaultFormat.setSerializationConfig(getSerializationConfig());
             defaultFormat.setDeserializationConfig(getDeserializationConfig());
-            type.addInterface(Integer.class.getCanonicalName());
+            type.addInterface(Integer.class);
             RDFType rdfType = new RDFType();
             rdfType.setName("integer");
             type.setRdfType(rdfType);
@@ -46,7 +44,7 @@ public class IntegerLiteralParam extends Parameter {
 
     private ConversionConfiguration getSerializationConfig() throws ClassNotFoundException {
         ConversionConfiguration serializationConfig = new ConversionConfiguration();
-        serializationConfig.setClassName(Integer.class.getCanonicalName());
+        serializationConfig.setClass(Integer.class);
         serializationConfig.setMethodName("toString");
         serializationConfig.setMethodArguments("");
         serializationConfig.setStaticMethod(false);
@@ -55,7 +53,7 @@ public class IntegerLiteralParam extends Parameter {
 
     private ConversionConfiguration getDeserializationConfig() throws ClassNotFoundException {
         ConversionConfiguration serializationConfig = new ConversionConfiguration();
-        serializationConfig.setClassName(Integer.class.getCanonicalName());
+        serializationConfig.setClass(Integer.class);
         serializationConfig.setMethodName("parseInt");
         serializationConfig.setMethodArguments("input");
         serializationConfig.setStaticMethod(true);

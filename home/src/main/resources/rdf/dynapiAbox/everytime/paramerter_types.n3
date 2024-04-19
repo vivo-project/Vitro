@@ -12,7 +12,6 @@
 
 dynapi-parameter-type:boolean
         a                       dynapi:ParameterType ;
-        dynapi:name             "boolean" ;
         rdfs:label              "Boolean type"@en-US ;
         dynapi:serializationType dynapi-serialization-type:boolean ;
         dynapi:hasFormat dynapi-implementation-type:boolean ;
@@ -21,7 +20,6 @@ dynapi-parameter-type:boolean
 
 dynapi-parameter-type:decimal
         a                       dynapi:ParameterType ;
-        dynapi:name             "decimal" ;
         rdfs:label              "Decimal type"@en-US ;
         dynapi:serializationType dynapi-serialization-type:decimal ;
         dynapi:hasFormat dynapi-implementation-type:big-integer ;
@@ -30,7 +28,6 @@ dynapi-parameter-type:decimal
 
 dynapi-parameter-type:integer
         a                       dynapi:ParameterType ;
-        dynapi:name             "integer" ;
         rdfs:label              "Integer type"@en-US ;
         dynapi:serializationType dynapi-serialization-type:integer ;
         dynapi:hasFormat dynapi-implementation-type:integer ;
@@ -39,7 +36,6 @@ dynapi-parameter-type:integer
 
 dynapi-parameter-type:integer-literal
         a                       dynapi:ParameterType ;
-        dynapi:name             "integer" ;
         rdfs:label              "Integer type"@en-US ;
         dynapi:serializationType dynapi-serialization-type:integer ;
         dynapi:rdfType			 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/rdftype/integer> ;
@@ -50,7 +46,6 @@ dynapi-parameter-type:integer-literal
 
 dynapi-parameter-type:uri
         a                       dynapi:ParameterType ;
-        dynapi:name         	"uri" ;
         rdfs:label              "Individualized Resource Identifier type"@en-US ;
         dynapi:rdfType			 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/rdftype/uri> ;
         dynapi:hasFormat dynapi-implementation-type:uri-resource ;
@@ -60,7 +55,6 @@ dynapi-parameter-type:uri
         
 dynapi-parameter-type:generated-uri
         a                       dynapi:ParameterType ;
-        dynapi:name         	"uri" ;
         rdfs:label              "Individualized Resource Identifier type"@en-US ;
         dynapi:rdfType			 <https://vivoweb.org/ontology/vitro-dynamic-api/parameter/rdftype/uri> ;
         dynapi:hasFormat dynapi-implementation-type:generated-uri-resource ;
@@ -70,7 +64,6 @@ dynapi-parameter-type:generated-uri
 
 dynapi-parameter-type:array-of-strings
         a                       dynapi:ParameterType ;
-        dynapi:name             "array" ;
         rdfs:label              "Array type"@en-US ;
         dynapi:hasFormat dynapi-implementation-type:array ;
         dynapi:interface        "java.util.ArrayList" ;
@@ -80,7 +73,6 @@ dynapi-parameter-type:array-of-strings
 
 dynapi-parameter-type:string
         a                       dynapi:ParameterType ;
-        dynapi:name             "string" ;
         rdfs:label              "String type"@en-US ;
         dynapi:serializationType dynapi-serialization-type:string ;
         dynapi:hasFormat dynapi-implementation-type:string ;
@@ -89,7 +81,6 @@ dynapi-parameter-type:string
 
 dynapi-parameter-type:string-literal
         a                       dynapi:ParameterType ;
-        dynapi:name             "string" ;
         rdfs:label              "String literal type"@en-US ;
         dynapi:serializationType dynapi-serialization-type:string ;
         dynapi:rdfType		<https://vivoweb.org/ontology/vitro-dynamic-api/parameter/rdftype/string> ;
@@ -99,7 +90,6 @@ dynapi-parameter-type:string-literal
 
 dynapi-parameter-type:model
         a                       dynapi:ParameterType ;
-        dynapi:name             "model" ;
         rdfs:label              "Model type"@en-US ;
         dynapi:hasFormat dynapi-implementation-type:model ;
         dynapi:interface        "org.apache.jena.rdf.model.Model" ;
@@ -108,7 +98,6 @@ dynapi-parameter-type:model
 
 dynapi-parameter-type:internal-model
         a                       dynapi:ParameterType ;
-        dynapi:name             "internal model" ;
         rdfs:label              "Model type"@en-US ;
         dynapi:isInternal		"true"^^xsd:boolean ;
         dynapi:hasFormat dynapi-implementation-type:internal-model ;
@@ -118,34 +107,33 @@ dynapi-parameter-type:internal-model
 
 dynapi-parameter-type:JsonContainer
         a                       dynapi:ParameterType ;
-        dynapi:name             "json container" ;
         rdfs:label              "Object type"@en-US ;
         dynapi:hasFormat dynapi-implementation-type:json-container ;
         dynapi:interface        "edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer" ;
+        dynapi:interface        "edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonObject" ;
         dynapi:serializationType dynapi-serialization-type:json-container ;
         .
 
 dynapi-parameter-type:JsonContainerArray
         a                       dynapi:ParameterType ;
-        dynapi:name             "json array" ;
         rdfs:label              "Array type"@en-US ;
         dynapi:hasFormat dynapi-implementation-type:json-container-array ;
         dynapi:interface        "edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer" ;
+        dynapi:interface        "edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonArray" ;
         dynapi:serializationType dynapi-serialization-type:json-container ;
         .
 
 dynapi-parameter-type:JsonContainerArrayTest
         a                       dynapi:ParameterType ;
-        dynapi:name             "json array" ;
         rdfs:label              "Array type"@en-US ;
         dynapi:hasFormat dynapi-implementation-type:json-container-array ;
         dynapi:interface        "edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer" ;
+        dynapi:interface        "edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonArray" ;
         dynapi:serializationType dynapi-serialization-type:TestResultArrayType ;
         .
 
 dynapi-parameter-type:json
         a                       dynapi:ParameterType ;
-        dynapi:name             "json" ;
         rdfs:label              "Json type (fasterxml implementation)"@en-US ;
         dynapi:hasFormat dynapi-implementation-type:json-node ;
         dynapi:interface        "com.fasterxml.jackson.databind.JsonNode" ;
@@ -154,7 +142,6 @@ dynapi-parameter-type:json
 
 dynapi-parameter-type:binary-file
         a                       dynapi:ParameterType ;
-        dynapi:name             "binary file" ;
         rdfs:label              "Binary file"@en-US ;
         dynapi:hasFormat dynapi-implementation-type:byte-array-base-64 ;
         dynapi:interface        "edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.ByteArray" ;

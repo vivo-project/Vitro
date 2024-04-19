@@ -125,26 +125,21 @@ public class AutoConfigurationTest {
 
         ConversionConfiguration config = new ConversionConfiguration();
 
-        try {
-            config.setClassName("java.lang.String");
-            config.setMethodArguments("");
-            config.setMethodName("toString");
-            config.setStaticMethod(false);
-            uri1ImplType.setDeserializationConfig(config);
-            uri1ImplType.setSerializationConfig(config);
-            uri1ParamType.addInterface("java.lang.String");
+        config.setClass(String.class);
+        config.setMethodArguments("");
+        config.setMethodName("toString");
+        config.setStaticMethod(false);
+        uri1ImplType.setDeserializationConfig(config);
+        uri1ImplType.setSerializationConfig(config);
+        uri1ParamType.addInterface(String.class);
 
-            RDFType rdfType = new RDFType();
-            rdfType.setName("anyURI");
-            uri1ParamType.setRdfType(rdfType);
+        RDFType rdfType = new RDFType();
+        rdfType.setName("anyURI");
+        uri1ParamType.setRdfType(rdfType);
 
-            uri1ParamType.addFormat(uri1ImplType);
-            param.setType(uri1ParamType);
-            param.setName(name);
-        } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        uri1ParamType.addFormat(uri1ImplType);
+        param.setType(uri1ParamType);
+        param.setName(name);
         return param;
 
     }

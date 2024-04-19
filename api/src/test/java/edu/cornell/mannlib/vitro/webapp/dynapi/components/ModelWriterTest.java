@@ -12,7 +12,6 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
-import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiInMemoryOntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.ontology.impl.OntModelImpl;
 import org.apache.jena.rdf.model.Statement;
@@ -24,7 +23,6 @@ public class ModelWriterTest {
     private static final String RETRACTION = "retraction";
     private static final String TARGET = "target";
     private static final String ADDITION = "addition";
-    public static final String MODEL_CONVERSION_CLASS = DynapiInMemoryOntModel.class.getCanonicalName();
     private OntModelImpl targetModel;
     private Parameter addition;
     private Parameter target;

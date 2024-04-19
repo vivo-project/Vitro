@@ -471,7 +471,6 @@
                                   :Model
                                   :Parameter
                                   :SerializationType
-                                  :ParameterType
                                   :ResourceAPI
                                   :RDFType
                                   :Rpc

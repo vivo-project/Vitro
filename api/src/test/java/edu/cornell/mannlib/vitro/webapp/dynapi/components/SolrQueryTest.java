@@ -44,7 +44,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class SolrQueryTest extends ServletContextTest {
 
-    private static final String JAVA_LANG_STRING = String.class.getCanonicalName();
     private final static String TEST_DATA_PATH = TEST_PREFIX + "dynamic-api-individuals-solr-test.n3";
     private final static String TEST_SOLR_QUERY_URI =
             "https://vivoweb.org/ontology/vitro-dynamic-api/solrQuery/genericSolrTextQuery";
@@ -263,13 +262,13 @@ public class SolrQueryTest extends ServletContextTest {
 
         ConversionConfiguration config = new ConversionConfiguration();
 
-        config.setClassName(JAVA_LANG_STRING);
+        config.setClass(String.class);
         config.setMethodArguments("");
         config.setMethodName("toString");
         config.setStaticMethod(false);
         defaultFormat.setDeserializationConfig(config);
         defaultFormat.setSerializationConfig(config);
-        paramType.addInterface(JAVA_LANG_STRING);
+        paramType.addInterface(String.class);
 
         RDFType rdfType = new RDFType();
         rdfType.setName("string");

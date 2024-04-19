@@ -16,9 +16,9 @@ public class ConversionConfigurationTest {
         ConversionConfiguration config1 = new ConversionConfiguration();
         ConversionConfiguration config2 = new ConversionConfiguration();
         assertEquals(config1, config2);
-        config1.setClassName(String.class.getCanonicalName());
+        config1.setClass(String.class);
         assertNotEquals(config1, config2);
-        config2.setClassName(String.class.getCanonicalName());
+        config2.setClass(String.class);
         assertEquals(config1, config2);
 
         config1.setMethodName("toString");
@@ -38,7 +38,7 @@ public class ConversionConfigurationTest {
 
         ParameterType type1 = new ParameterType();
         DataFormat defaultFormat1 = new DefaultFormat();
-        type1.addInterface(String.class.getCanonicalName());
+        type1.addInterface(String.class);
 
         type1.addFormat(defaultFormat1);
         defaultFormat1.setSerializationConfig(config1);
@@ -46,7 +46,7 @@ public class ConversionConfigurationTest {
 
         ParameterType type2 = new ParameterType();
         DataFormat defaultFormat2 = new DefaultFormat();
-        type2.addInterface(String.class.getCanonicalName());
+        type2.addInterface(String.class);
 
         defaultFormat2.setSerializationConfig(config2);
         type2.addFormat(defaultFormat2);

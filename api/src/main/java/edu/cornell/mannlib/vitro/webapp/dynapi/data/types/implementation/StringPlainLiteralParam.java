@@ -15,7 +15,6 @@ import org.apache.jena.rdf.model.ResourceFactory;
 
 public class StringPlainLiteralParam extends Parameter {
 
-    private static final String TYPE_NAME = "plain string literal";
     private static final Log log = LogFactory.getLog(StringPlainLiteralParam.class);
 
     public StringPlainLiteralParam(String var) {
@@ -31,13 +30,12 @@ public class StringPlainLiteralParam extends Parameter {
 
     public static ParameterType getPlainStringLiteralType() {
         ParameterType type = new ParameterType();
-        type.setName(TYPE_NAME);
         DataFormat defaultFormat = new DefaultFormat();
         type.addFormat(defaultFormat);
         try {
             defaultFormat.setSerializationConfig(getSerializationConfig());
             defaultFormat.setDeserializationConfig(getDeserializationConfig());
-            type.addInterface(Literal.class.getCanonicalName());
+            type.addInterface(Literal.class);
             RDFType rdfType = new RDFType();
             rdfType.setName("string");
             type.setRdfType(rdfType);
@@ -49,17 +47,17 @@ public class StringPlainLiteralParam extends Parameter {
 
     private static ConversionConfiguration getSerializationConfig() throws ClassNotFoundException {
         ConversionConfiguration serializationConfig = new ConversionConfiguration();
-        serializationConfig.setClassName(Literal.class.getCanonicalName());
+        serializationConfig.setClass(Literal.class);
         serializationConfig.setMethodName("getLexicalForm");
         serializationConfig.setMethodArguments("");
         serializationConfig.setStaticMethod(false);
-        serializationConfig.setInputInterface(Literal.class.getCanonicalName());
+        serializationConfig.setInputInterface(Literal.class);
         return serializationConfig;
     }
 
     private static ConversionConfiguration getDeserializationConfig() throws ClassNotFoundException {
         ConversionConfiguration serializationConfig = new ConversionConfiguration();
-        serializationConfig.setClassName(ResourceFactory.class.getCanonicalName());
+        serializationConfig.setClass(ResourceFactory.class);
         serializationConfig.setMethodName("createPlainLiteral");
         serializationConfig.setMethodArguments("input");
         serializationConfig.setStaticMethod(true);

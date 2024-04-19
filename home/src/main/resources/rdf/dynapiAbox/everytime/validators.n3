@@ -13,17 +13,17 @@ dynapi_validator:isNotBlank
         a                       dynapi:Validator ,
                                 dynapi_java:validators.IsNotBlank ;
         rdfs:label              "Is not blank"@en-US ;
-        vitro:mostSpecificType  dynapi:Validator .
+        .
 
 dynapi_validator:IsInteger
         a                       dynapi:Validator ,
                                 dynapi_java:validators.IsInteger ;
         rdfs:label              "Is integer"@en-US ;
-        vitro:mostSpecificType  dynapi:Validator .
+        .
 
 dynapi_validator:IsEmail
         a                                   dynapi:Validator ,
                                             dynapi_java:validators.RegularExpressionValidator ;
         dynapi:regularExpression            "^(.+)@(\\S+)$" ;
         rdfs:label                          "Is email"@en-US ;
-        vitro:mostSpecificType              dynapi:Validator .
+        .

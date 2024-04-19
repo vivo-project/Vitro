@@ -20,9 +20,9 @@ public class ConversionMethodTest {
     @org.junit.runners.Parameterized.Parameter(1)
     public String methodName2;
     @org.junit.runners.Parameterized.Parameter(2)
-    public String className1;
+    public Class<?> class1;
     @org.junit.runners.Parameterized.Parameter(3)
-    public String className2;
+    public Class<?> class2;
     @org.junit.runners.Parameterized.Parameter(4)
     public String methodArgs1;
     @org.junit.runners.Parameterized.Parameter(5)
@@ -39,29 +39,29 @@ public class ConversionMethodTest {
 
     private ConversionConfiguration getType1() throws ClassNotFoundException {
         ConversionConfiguration config = new ConversionConfiguration();
-        config.setClassName(className1);
+        config.setClass(class1);
         config.setMethodName(methodName1);
         config.setMethodArguments(methodArgs1);
-        config.setInputInterface(className1);
+        config.setInputInterface(class1);
         return config;
     }
 
     private ConversionConfiguration getType2() throws ClassNotFoundException {
         ConversionConfiguration config = new ConversionConfiguration();
-        config.setClassName(className2);
+        config.setClass(class2);
         config.setMethodName(methodName2);
         config.setMethodArguments(methodArgs2);
-        config.setInputInterface(className2);
+        config.setInputInterface(class2);
         return config;
     }
 
     @Parameterized.Parameters
     public static Collection<Object[]> requests() {
         return Arrays.asList(new Object[][] {
-                { "toString", "toString", "java.lang.String", "java.lang.String", "", "", true },
-                { "toLowerCase", "toString", "java.lang.String", "java.lang.String", "", "", false },
-                { "toString", "toString", "java.lang.String", "java.lang.Integer", "", "", false },
-                { "", "", "java.lang.String", "java.lang.String", "input", "", false },
+                { "toString", "toString", String.class, String.class, "", "", true },
+                { "toLowerCase", "toString", String.class, String.class, "", "", false },
+                { "toString", "toString", String.class, Integer.class, "", "", false },
+                { "", "", String.class, String.class, "input", "", false },
 
         });
     }

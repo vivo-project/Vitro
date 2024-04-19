@@ -12,19 +12,17 @@ import org.apache.commons.logging.LogFactory;
 
 public class BooleanParam extends Parameter {
 
-    private static final String TYPE_NAME = "boolean";
     private static final Log log = LogFactory.getLog(BooleanParam.class);
 
     public BooleanParam(String var) {
         this.setName(var);
         try {
             ParameterType type = new ParameterType();
-            type.setName(TYPE_NAME);
             DataFormat defaultFormat = new DefaultFormat();
             type.addFormat(defaultFormat);
             defaultFormat.setSerializationConfig(getSerializationConfig());
             defaultFormat.setDeserializationConfig(getDeserializationConfig());
-            type.addInterface(Boolean.class.getCanonicalName());
+            type.addInterface(Boolean.class);
             this.setType(type);
         } catch (Exception e) {
             log.error(e, e);
@@ -34,7 +32,7 @@ public class BooleanParam extends Parameter {
 
     private ConversionConfiguration getSerializationConfig() throws ClassNotFoundException {
         ConversionConfiguration serializationConfig = new ConversionConfiguration();
-        serializationConfig.setClassName(Boolean.class.getCanonicalName());
+        serializationConfig.setClass(Boolean.class);
         serializationConfig.setMethodName("toString");
         serializationConfig.setMethodArguments("");
         serializationConfig.setStaticMethod(false);
@@ -43,7 +41,7 @@ public class BooleanParam extends Parameter {
 
     private ConversionConfiguration getDeserializationConfig() throws ClassNotFoundException {
         ConversionConfiguration serializationConfig = new ConversionConfiguration();
-        serializationConfig.setClassName(Boolean.class.getCanonicalName());
+        serializationConfig.setClass(Boolean.class);
         serializationConfig.setMethodName("parseBoolean");
         serializationConfig.setMethodArguments("input");
         serializationConfig.setStaticMethod(true);

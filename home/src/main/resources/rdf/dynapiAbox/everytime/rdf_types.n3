@@ -12,24 +12,24 @@ dynapi-rdf-type:uri
         a                       dynapi:RDFType;
         dynapi:name         	"anyURI" ;
         rdfs:label              "Individualized Resource Identifier rdf type"@en-US ;
-        vitro:mostSpecificType  dynapi:RDFType .
+        .
 
 dynapi-rdf-type:integer
         a                       dynapi:RDFType;
         dynapi:name         	"integer" ;
         rdfs:label              "Integer rdf type"@en-US ;
-        vitro:mostSpecificType  dynapi:RDFType .
+        .
 
 dynapi-rdf-type:string
         a                       dynapi:RDFType;
         dynapi:name         	"string" ;
         rdfs:label              "String rdf type"@en-US ;
-        vitro:mostSpecificType  dynapi:RDFType .
+        .
 
 dynapi-rdf-type:boolean
         a                       dynapi:RDFType;
         dynapi:name         	"boolean" ;
         rdfs:label              "Boolean rdf type"@en-US ;
-        vitro:mostSpecificType  dynapi:RDFType .
+        .
        
 

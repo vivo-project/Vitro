@@ -16,22 +16,12 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class ParameterType implements Removable {
 
-    private String name;
     private SerializationType serializationType;
     private RDFType rdftype;
     protected ParameterType nestedType = NullParameterType.getInstance();
     private boolean isInternal = false;
     private Set<Class<?>> interfaces = new HashSet<Class<?>>();
     private Map<FormatName, DataFormat> formats = new HashMap<FormatName, DataFormat>();
-
-    public String getName() {
-        return name;
-    }
-
-    @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#name", minOccurs = 1, maxOccurs = 1)
-    public void setName(String name) {
-        this.name = name;
-    }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#serializationType", minOccurs = 1, maxOccurs = 1)
     public void setSerializationType(SerializationType serializationType) {
@@ -67,8 +57,12 @@ public class ParameterType implements Removable {
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#interface", minOccurs = 1)
-    public void addInterface(String className) throws ClassNotFoundException {
-        interfaces.add(Class.forName(className));
+    public void addInterfaceName(String interfaceName) throws ClassNotFoundException {
+        interfaces.add(Class.forName(interfaceName));
+    }
+
+    public void addInterface(Class<?> clazz) {
+        interfaces.add(clazz);
     }
 
     public boolean hasInterface(Class<?> clazz) {
@@ -145,7 +139,6 @@ public class ParameterType implements Removable {
         ParameterType compared = (ParameterType) object;
 
         return new EqualsBuilder()
-                .append(getName(), compared.getName())
                 .append(getSerializationType(), compared.getSerializationType())
                 .append(getDefaultFormat(), compared.getDefaultFormat())
                 .append(getRdfType(), compared.getRdfType())
@@ -157,7 +150,6 @@ public class ParameterType implements Removable {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(43, 205)
-                .append(getName())
                 .append(getSerializationType())
                 .append(getDefaultFormat())
                 .append(getRdfType())

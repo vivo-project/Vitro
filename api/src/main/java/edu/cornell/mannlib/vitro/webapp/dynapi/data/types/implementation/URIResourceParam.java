@@ -15,7 +15,6 @@ import org.apache.jena.rdf.model.impl.ResourceImpl;
 
 public class URIResourceParam extends Parameter {
 
-    private static final String TYPE_NAME = "uri";
     private static final Log log = LogFactory.getLog(URIResourceParam.class);
 
     public URIResourceParam(String var) {
@@ -31,14 +30,13 @@ public class URIResourceParam extends Parameter {
 
     public static ParameterType getUriResourceType() throws ClassNotFoundException {
         ParameterType type = new ParameterType();
-        type.setName(TYPE_NAME);
         DataFormat defaultFormat = new DefaultFormat();
         type.addFormat(defaultFormat);
         ConversionConfiguration serializationConfig = getSerializationConfig();
         ConversionConfiguration deserializationConfig = getDeserializationConfig();
         defaultFormat.setSerializationConfig(serializationConfig);
         defaultFormat.setDeserializationConfig(deserializationConfig);
-        type.addInterface(Resource.class.getCanonicalName());
+        type.addInterface(Resource.class);
         RDFType rdfType = new RDFType();
         rdfType.setName(RDFType.ANY_URI);
         type.setRdfType(rdfType);
@@ -47,17 +45,17 @@ public class URIResourceParam extends Parameter {
 
     private static ConversionConfiguration getSerializationConfig() throws ClassNotFoundException {
         ConversionConfiguration serializationConfig = new ConversionConfiguration();
-        serializationConfig.setClassName(Resource.class.getCanonicalName());
+        serializationConfig.setClass(Resource.class);
         serializationConfig.setMethodName("toString");
         serializationConfig.setMethodArguments("");
         serializationConfig.setStaticMethod(false);
-        serializationConfig.setInputInterface(Resource.class.getCanonicalName());
+        serializationConfig.setInputInterface(Resource.class);
         return serializationConfig;
     }
 
     private static ConversionConfiguration getDeserializationConfig() throws ClassNotFoundException {
         ConversionConfiguration serializationConfig = new ConversionConfiguration();
-        serializationConfig.setClassName(ResourceImpl.class.getCanonicalName());
+        serializationConfig.setClass(ResourceImpl.class);
         // invoke constructor
         serializationConfig.setMethodName("");
         serializationConfig.setMethodArguments("input");

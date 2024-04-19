@@ -16,13 +16,6 @@ public class ParameterTypesTest {
         ParameterType type2 = new ParameterType();
         assertEquals(type1, type2);
 
-        type1.setName("name1");
-        assertNotEquals(type1, type2);
-        type2.setName("name2");
-        assertNotEquals(type1, type2);
-        type2.setName("name1");
-        assertEquals(type1, type2);
-
         type1.setIsInternal(true);
         assertEquals(type1, type2);
 

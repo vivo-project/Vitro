@@ -3,10 +3,10 @@
 package edu.cornell.mannlib.vitro.webapp.dynapi;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import edu.cornell.mannlib.vitro.webapp.dynapi.components.ModelWriterTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.N3TemplateTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.ByteArray;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.DynapiInMemoryOntModel;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonFasterxmlNode;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.ConversionConfiguration;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.DataFormat;
@@ -23,10 +23,10 @@ import org.apache.jena.rdf.model.Statement;
 
 public class ParameterUtils {
 
-    public static ConversionConfiguration createConfig(String className, String methodArgs, String method,
+    public static ConversionConfiguration createConfig(Class<?> clazz, String methodArgs, String method,
             boolean isStatic) throws ClassNotFoundException {
         ConversionConfiguration desConfig = new ConversionConfiguration();
-        desConfig.setClassName(className);
+        desConfig.setClass(clazz);
         desConfig.setMethodArguments(methodArgs);
         desConfig.setMethodName(method);
         desConfig.setStaticMethod(isStatic);
@@ -37,15 +37,15 @@ public class ParameterUtils {
         Parameter uriParam = new Parameter();
         ParameterType paramType = new ParameterType();
         DataFormat defaultFormat = new DefaultFormat();
-        paramType.addInterface(Model.class.getCanonicalName());
+        paramType.addInterface(Model.class);
         paramType.addFormat(defaultFormat);
 
-        ConversionConfiguration serConfig = createConfig(ModelWriterTest.MODEL_CONVERSION_CLASS, "input", "serializeN3",
+        ConversionConfiguration serConfig = createConfig(DynapiInMemoryOntModel.class, "input", "serializeN3",
                 true);
-        serConfig.setInputInterface(Model.class.getCanonicalName());
+        serConfig.setInputInterface(Model.class);
 
         defaultFormat.setSerializationConfig(serConfig);
-        ConversionConfiguration desConfig = createConfig(ModelWriterTest.MODEL_CONVERSION_CLASS, "input",
+        ConversionConfiguration desConfig = createConfig(DynapiInMemoryOntModel.class, "input",
                 "deserializeN3", true);
         defaultFormat.setDeserializationConfig(desConfig);
         uriParam.setType(paramType);
@@ -75,19 +75,19 @@ public class ParameterUtils {
 
         ConversionConfiguration serialization = new ConversionConfiguration();
 
-        serialization.setClassName(String.class.getCanonicalName());
+        serialization.setClass(String.class);
         serialization.setMethodArguments("");
         serialization.setMethodName("toString");
         serialization.setStaticMethod(false);
         defaultFormat.setDeserializationConfig(serialization);
 
         ConversionConfiguration deserialization = new ConversionConfiguration();
-        deserialization.setClassName(String.class.getCanonicalName());
+        deserialization.setClass(String.class);
         deserialization.setMethodArguments("");
         deserialization.setMethodName("toString");
         deserialization.setStaticMethod(false);
         defaultFormat.setSerializationConfig(deserialization);
-        uriParamType.addInterface(String.class.getCanonicalName());
+        uriParamType.addInterface(String.class);
 
         RDFType rdfType = new RDFType();
         rdfType.setName("anyURI");
@@ -107,13 +107,13 @@ public class ParameterUtils {
 
         ConversionConfiguration config = new ConversionConfiguration();
 
-        config.setClassName(String.class.getCanonicalName());
+        config.setClass(String.class);
         config.setMethodArguments("");
         config.setMethodName("toString");
         config.setStaticMethod(false);
         defaultFormat.setDeserializationConfig(config);
         defaultFormat.setSerializationConfig(config);
-        uri1ParamType.addInterface(String.class.getCanonicalName());
+        uri1ParamType.addInterface(String.class);
 
         RDFType rdfType = new RDFType();
         rdfType.setName("string");
@@ -134,13 +134,13 @@ public class ParameterUtils {
 
         ConversionConfiguration config = new ConversionConfiguration();
 
-        config.setClassName(String.class.getCanonicalName());
+        config.setClass(String.class);
         config.setMethodArguments("");
         config.setMethodName("toString");
         config.setStaticMethod(false);
         defaultFormat.setDeserializationConfig(config);
         defaultFormat.setSerializationConfig(config);
-        uriParamType.addInterface(String.class.getCanonicalName());
+        uriParamType.addInterface(String.class);
 
         RDFType rdfType = new RDFType();
         rdfType.setName("boolean");
@@ -160,7 +160,7 @@ public class ParameterUtils {
 
         defaultFormat.setDeserializationConfig(getJsonDeserializationConfig());
         defaultFormat.setSerializationConfig(getJsonSerializationConfig());
-        jsonParamType.addInterface(JsonNode.class.getCanonicalName());
+        jsonParamType.addInterface(JsonNode.class);
         defaultFormat.setDefaultValue("{ }");
         jsonParamType.addFormat(defaultFormat);
         jsonParam.setType(jsonParamType);
@@ -171,7 +171,7 @@ public class ParameterUtils {
 
     private static ConversionConfiguration getJsonDeserializationConfig() throws ClassNotFoundException {
         ConversionConfiguration config = new ConversionConfiguration();
-        config.setClassName(JsonFasterxmlNode.class.getCanonicalName());
+        config.setClass(JsonFasterxmlNode.class);
         config.setMethodArguments("input");
         config.setMethodName("deserialize");
         config.setStaticMethod(true);
@@ -180,8 +180,8 @@ public class ParameterUtils {
 
     private static ConversionConfiguration getJsonSerializationConfig() throws ClassNotFoundException {
         ConversionConfiguration config = new ConversionConfiguration();
-        config.setClassName(JsonFasterxmlNode.class.getCanonicalName());
-        config.setInputInterface(JsonNode.class.getCanonicalName());
+        config.setClass(JsonFasterxmlNode.class);
+        config.setInputInterface(JsonNode.class);
         config.setMethodArguments("input");
         config.setMethodName("serialize");
         config.setStaticMethod(true);
@@ -195,7 +195,7 @@ public class ParameterUtils {
 
         defaultFormat.setDeserializationConfig(getByteArrayDeserializationConfig());
         defaultFormat.setSerializationConfig(getByteArraySerializationConfig());
-        paramType.addInterface(ByteArray.class.getCanonicalName());
+        paramType.addInterface(ByteArray.class);
         defaultFormat.setDefaultValue("");
         paramType.addFormat(defaultFormat);
         param.setType(paramType);
@@ -206,7 +206,7 @@ public class ParameterUtils {
 
     private static ConversionConfiguration getByteArrayDeserializationConfig() throws ClassNotFoundException {
         ConversionConfiguration config = new ConversionConfiguration();
-        config.setClassName(ByteArray.class.getCanonicalName());
+        config.setClass(ByteArray.class);
         config.setMethodArguments("input");
         config.setMethodName("deserialize");
         config.setStaticMethod(true);
@@ -215,7 +215,7 @@ public class ParameterUtils {
 
     private static ConversionConfiguration getByteArraySerializationConfig() throws ClassNotFoundException {
         ConversionConfiguration config = new ConversionConfiguration();
-        config.setClassName(ByteArray.class.getCanonicalName());
+        config.setClass(ByteArray.class);
         config.setMethodArguments("");
         config.setMethodName("serialize");
         config.setStaticMethod(false);

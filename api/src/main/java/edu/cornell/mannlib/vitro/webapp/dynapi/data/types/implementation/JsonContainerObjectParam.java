@@ -2,17 +2,14 @@
 
 package edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonObject;
 
 public class JsonContainerObjectParam extends JsonContainerParam {
 
     public JsonContainerObjectParam(String var) {
         super(var);
-    }
-
-    @Override
-    public String getContainerTypeName() {
-        return "json container";
+        getType().addInterface(JsonContainer.class);
     }
 
     @Override

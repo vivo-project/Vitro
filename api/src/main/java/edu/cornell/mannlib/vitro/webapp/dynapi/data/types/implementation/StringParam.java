@@ -12,19 +12,17 @@ import org.apache.commons.logging.LogFactory;
 
 public class StringParam extends Parameter {
 
-    private static final String TYPE_NAME = "plain string";
     private static final Log log = LogFactory.getLog(StringParam.class);
 
     public StringParam(String var) {
         this.setName(var);
         try {
             ParameterType type = new ParameterType();
-            type.setName(TYPE_NAME);
             DataFormat defaultFormat = new DefaultFormat();
             type.addFormat(defaultFormat);
             defaultFormat.setSerializationConfig(getSerializationConfig());
             defaultFormat.setDeserializationConfig(getDeserializationConfig());
-            type.addInterface(String.class.getCanonicalName());
+            type.addInterface(String.class);
             this.setType(type);
         } catch (Exception e) {
             log.error(e, e);
@@ -34,17 +32,17 @@ public class StringParam extends Parameter {
 
     private ConversionConfiguration getSerializationConfig() throws ClassNotFoundException {
         ConversionConfiguration serializationConfig = new ConversionConfiguration();
-        serializationConfig.setClassName(String.class.getCanonicalName());
+        serializationConfig.setClass(String.class);
         serializationConfig.setMethodName("toString");
         serializationConfig.setMethodArguments("");
         serializationConfig.setStaticMethod(false);
-        serializationConfig.setInputInterface(String.class.getCanonicalName());
+        serializationConfig.setInputInterface(String.class);
         return serializationConfig;
     }
 
     private ConversionConfiguration getDeserializationConfig() throws ClassNotFoundException {
         ConversionConfiguration serializationConfig = new ConversionConfiguration();
-        serializationConfig.setClassName(String.class.getCanonicalName());
+        serializationConfig.setClass(String.class);
         serializationConfig.setMethodName("toString");
         serializationConfig.setMethodArguments("");
         serializationConfig.setStaticMethod(false);

@@ -17,8 +17,12 @@ public class ConversionConfiguration {
     }
 
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#inputInterface", minOccurs = 0, maxOccurs = 1)
-    public void setInputInterface(String inputInterface) throws ClassNotFoundException {
-        this.inputInterface = Class.forName(inputInterface);
+    public void setInputInterfaceName(String interfaceName) throws ClassNotFoundException {
+        this.inputInterface = Class.forName(interfaceName);
+    }
+
+    public void setInputInterface(Class<?> inputInterface) {
+        this.inputInterface = inputInterface;
     }
 
     private String methodName;
@@ -33,6 +37,10 @@ public class ConversionConfiguration {
     @Property(uri = "https://vivoweb.org/ontology/vitro-dynamic-api#className", minOccurs = 1, maxOccurs = 1)
     public void setClassName(String className) throws ClassNotFoundException {
         this.conversionClass = Class.forName(className);
+    }
+
+    public void setClass(Class<?> clazz) {
+        this.conversionClass = clazz;
     }
 
     public String getMethodName() {

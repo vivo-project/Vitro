@@ -21,12 +21,11 @@ public abstract class JsonContainerParam extends Parameter {
         this.setName(var);
         try {
             type = new ParameterType();
-            type.setName(getContainerTypeName());
             DataFormat defaultFormat = new DefaultFormat();
             type.addFormat(defaultFormat);
             defaultFormat.setSerializationConfig(getSerializationConfig());
             defaultFormat.setDeserializationConfig(getDeserializationConfig());
-            type.addInterface(JsonContainer.class.getCanonicalName());
+            type.addInterface(JsonContainer.class);
             this.setType(type);
             this.setDefaultValue(getContainerDefaultValue());
         } catch (Exception e) {
@@ -37,24 +36,22 @@ public abstract class JsonContainerParam extends Parameter {
 
     private ConversionConfiguration getSerializationConfig() throws ClassNotFoundException {
         ConversionConfiguration serializationConfig = new ConversionConfiguration();
-        serializationConfig.setClassName(JsonFactory.class.getCanonicalName());
+        serializationConfig.setClass(JsonFactory.class);
         serializationConfig.setMethodName("serialize");
         serializationConfig.setMethodArguments("input");
         serializationConfig.setStaticMethod(true);
-        serializationConfig.setInputInterface(JsonContainer.class.getCanonicalName());
+        serializationConfig.setInputInterface(JsonContainer.class);
         return serializationConfig;
     }
 
     private ConversionConfiguration getDeserializationConfig() throws ClassNotFoundException {
         ConversionConfiguration serializationConfig = new ConversionConfiguration();
-        serializationConfig.setClassName(JsonFactory.class.getCanonicalName());
+        serializationConfig.setClass(JsonFactory.class);
         serializationConfig.setMethodName("deserialize");
         serializationConfig.setMethodArguments("input");
         serializationConfig.setStaticMethod(true);
         return serializationConfig;
     }
-
-    protected abstract String getContainerTypeName();
 
     protected abstract String getContainerDefaultValue();
 

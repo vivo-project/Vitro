@@ -23,11 +23,6 @@ public class ModelParam extends Parameter {
         try {
             ParameterType type = new ParameterType();
             type.setIsInternal(autocreate);
-            if (internal) {
-                type.setName("internal model");
-            } else {
-                type.setName("model");
-            }
             DataFormat defaultFormat = new DefaultFormat();
             type.addFormat(defaultFormat);
             PrimitiveSerializationType serializationType = new PrimitiveSerializationType();
@@ -35,7 +30,7 @@ public class ModelParam extends Parameter {
             type.setSerializationType(serializationType);
             defaultFormat.setSerializationConfig(getSerializationConfig());
             defaultFormat.setDeserializationConfig(getDeserializationConfig(internal));
-            type.addInterface(Model.class.getCanonicalName());
+            type.addInterface(Model.class);
             if (internal) {
                 this.setDefaultValue(name);
             }
@@ -48,21 +43,21 @@ public class ModelParam extends Parameter {
 
     private ConversionConfiguration getSerializationConfig() throws ClassNotFoundException {
         ConversionConfiguration serializationConfig = new ConversionConfiguration();
-        serializationConfig.setClassName(DynapiInMemoryOntModel.class.getCanonicalName());
+        serializationConfig.setClass(DynapiInMemoryOntModel.class);
         serializationConfig.setMethodName("serializeN3");
         serializationConfig.setMethodArguments("input");
         serializationConfig.setStaticMethod(true);
-        serializationConfig.setInputInterface(Model.class.getCanonicalName());
+        serializationConfig.setInputInterface(Model.class);
         return serializationConfig;
     }
 
     private ConversionConfiguration getDeserializationConfig(boolean internal) throws ClassNotFoundException {
         ConversionConfiguration serializationConfig = new ConversionConfiguration();
         if (internal) {
-            serializationConfig.setClassName(DynapiModelFactory.class.getCanonicalName());
+            serializationConfig.setClass(DynapiModelFactory.class);
             serializationConfig.setMethodName("getModel");
         } else {
-            serializationConfig.setClassName(DynapiInMemoryOntModel.class.getCanonicalName());
+            serializationConfig.setClass(DynapiInMemoryOntModel.class);
             serializationConfig.setMethodName("deserialize");
         }
         serializationConfig.setMethodArguments("input");

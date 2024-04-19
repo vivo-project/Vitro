@@ -24,9 +24,6 @@ import org.apache.jena.rdf.model.RDFNode;
 
 public class JsonContainerView {
 
-    private static final String JSON_ARRAY = "json array";
-    private static final String JSON_OBJECT = "json container";
-
     public static boolean isJsonContainer(Parameter param) {
         return isJsonContainer(param.getType());
     }
@@ -79,7 +76,7 @@ public class JsonContainerView {
         List<JacksonJsonContainer> jsonArrays = new LinkedList<>();
         for (String name : params.getNames()) {
             Parameter param = params.get(name);
-            if (JsonContainerView.isJsonContainer(param) && JSON_OBJECT.equals(param.getType().getName())) {
+            if (param.getType().hasInterface(JsonObject.class)) {
                 JacksonJsonContainer objectNode = (JacksonJsonContainer) dataStore.getData(name).getObject();
                 jsonArrays.add(objectNode);
             }
@@ -99,9 +96,8 @@ public class JsonContainerView {
         return jsonArrays;
     }
 
-    @Deprecated
     public static boolean isJsonArray(Parameter param) {
-        return JSON_ARRAY.equals(param.getType().getName());
+        return param.getType().hasInterface(JsonArray.class);
     }
 
     public static boolean hasJsonArrays(Parameters params, DataStore dataStore) {

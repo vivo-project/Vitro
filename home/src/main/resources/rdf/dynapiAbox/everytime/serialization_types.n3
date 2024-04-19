@@ -272,21 +272,21 @@ dynapi-serialization-type:boolean
                                 dynapi:PrimitiveSerializationType ;
         dynapi:name             "boolean" ;
         rdfs:label              "Boolean type"@en-US ;
-        vitro:mostSpecificType  dynapi:PrimitiveSerializationType .
+        .
 
 dynapi-serialization-type:decimal
         a                       dynapi:SerializationType ,
                                 dynapi:PrimitiveSerializationType ;
         dynapi:name             "decimal" ;
         rdfs:label              "Decimal type"@en-US ;
-        vitro:mostSpecificType  dynapi:PrimitiveSerializationType .
+        .
 
 dynapi-serialization-type:integer
         a                       dynapi:SerializationType ,
                                 dynapi:PrimitiveSerializationType ;
         dynapi:name             "integer" ;
         rdfs:label              "Integer type"@en-US ;
-        vitro:mostSpecificType  dynapi:PrimitiveSerializationType .
+        .
 
 
 dynapi-serialization-type:json-container
@@ -294,19 +294,19 @@ dynapi-serialization-type:json-container
                                 dynapi:JsonContainerSerializationType ;
         dynapi:name             "json container" ;
         rdfs:label              "Json container type"@en-US ;
-        vitro:mostSpecificType  dynapi:JsonContainerSerializationType .
+        .
 
 dynapi-serialization-type:array
         a                       dynapi:SerializationType ,
                                 dynapi:ArraySerializationType ;
         dynapi:name             "array" ;
         rdfs:label              "Array type"@en-US ;
-        vitro:mostSpecificType  dynapi:ArraySerializationType .
+        .
 
 dynapi-serialization-type:string
         a                       dynapi:SerializationType ,
                                 dynapi:PrimitiveSerializationType ;
         dynapi:name             "string" ;
         rdfs:label              "String type"@en-US ;
-        vitro:mostSpecificType  dynapi:PrimitiveSerializationType .
+        .
 

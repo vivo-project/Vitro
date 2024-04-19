@@ -12,23 +12,23 @@ dynapi_role:editor
         a                       dynapi:UserGroup ;
         rdfs:label              "Editor user group"@en-US ;
 		dynapi:name				"http://vitro.mannlib.cornell.edu/ns/vitro/authorization#EDITOR" ;
-        vitro:mostSpecificType  dynapi:UserGroup .
+        .
 
 dynapi_role:self-editor
         a                       dynapi:UserGroup ;
         rdfs:label              "Self editor user group"@en-US ;
 		dynapi:name				"http://vitro.mannlib.cornell.edu/ns/vitro/authorization#SELF_EDITOR" ;
-        vitro:mostSpecificType  dynapi:UserGroup .
+        .
 
 dynapi_role:admin
         a                       dynapi:UserGroup ;
         rdfs:label              "Admin user group"@en-US ;
 		dynapi:name				"http://vitro.mannlib.cornell.edu/ns/vitro/authorization#ADMIN" ;
-        vitro:mostSpecificType  dynapi:UserGroup .
+        .
 
 dynapi_role:curator
         a                       dynapi:UserGroup ;
         rdfs:label              "Curator user group"@en-US ;
 		dynapi:name				"http://vitro.mannlib.cornell.edu/ns/vitro/authorization#CURATOR" ;
-        vitro:mostSpecificType  dynapi:UserGroup .
+        .
         

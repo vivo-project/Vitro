@@ -14,19 +14,17 @@ import org.apache.commons.logging.LogFactory;
 
 public class BigIntegerParam extends Parameter {
 
-    private static final String TYPE_NAME = "big integer";
     private static final Log log = LogFactory.getLog(BigIntegerParam.class);
 
     public BigIntegerParam(String var) {
         this.setName(var);
         try {
             ParameterType type = new ParameterType();
-            type.setName(TYPE_NAME);
             DataFormat defaultFormat = new DefaultFormat();
             type.addFormat(defaultFormat);
             defaultFormat.setSerializationConfig(getSerializationConfig());
             defaultFormat.setDeserializationConfig(getDeserializationConfig());
-            type.addInterface(BigInteger.class.getCanonicalName());
+            type.addInterface(BigInteger.class);
             this.setType(type);
         } catch (Exception e) {
             log.error(e, e);
@@ -36,7 +34,7 @@ public class BigIntegerParam extends Parameter {
 
     private ConversionConfiguration getSerializationConfig() throws ClassNotFoundException {
         ConversionConfiguration serializationConfig = new ConversionConfiguration();
-        serializationConfig.setClassName(BigInteger.class.getCanonicalName());
+        serializationConfig.setClass(BigInteger.class);
         serializationConfig.setMethodName("toString");
         serializationConfig.setMethodArguments("");
         serializationConfig.setStaticMethod(false);
@@ -45,7 +43,7 @@ public class BigIntegerParam extends Parameter {
 
     private ConversionConfiguration getDeserializationConfig() throws ClassNotFoundException {
         ConversionConfiguration serializationConfig = new ConversionConfiguration();
-        serializationConfig.setClassName(BigInteger.class.getCanonicalName());
+        serializationConfig.setClass(BigInteger.class);
         serializationConfig.setMethodName("");
         serializationConfig.setMethodArguments("input");
         serializationConfig.setStaticMethod(true);

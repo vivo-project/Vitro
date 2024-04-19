@@ -16,19 +16,17 @@ import org.apache.jena.rdf.model.ResourceFactory;
 
 public class LangStringLiteralParam extends Parameter {
 
-    private static final String TYPE_NAME = "lang string literal";
     private static final Log log = LogFactory.getLog(LangStringLiteralParam.class);
 
     public LangStringLiteralParam(String var) {
         this.setName(var);
         try {
             ParameterType type = new ParameterType();
-            type.setName(TYPE_NAME);
             DataFormat defaultFormat = new DefaultFormat();
             type.addFormat(defaultFormat);
             defaultFormat.setSerializationConfig(getSerializationConfig());
             defaultFormat.setDeserializationConfig(getDeserializationConfig());
-            type.addInterface(Literal.class.getCanonicalName());
+            type.addInterface(Literal.class);
             RDFType rdfType = new RDFType();
             rdfType.setName(RDFType.LANG_STRING);
             type.setRdfType(rdfType);
@@ -41,17 +39,17 @@ public class LangStringLiteralParam extends Parameter {
 
     private ConversionConfiguration getSerializationConfig() throws ClassNotFoundException {
         ConversionConfiguration serializationConfig = new ConversionConfiguration();
-        serializationConfig.setClassName(LangStringLiteralParam.class.getCanonicalName());
+        serializationConfig.setClass(LangStringLiteralParam.class);
         serializationConfig.setMethodName("serialize");
         serializationConfig.setMethodArguments("input");
         serializationConfig.setStaticMethod(true);
-        serializationConfig.setInputInterface(Literal.class.getCanonicalName());
+        serializationConfig.setInputInterface(Literal.class);
         return serializationConfig;
     }
 
     private ConversionConfiguration getDeserializationConfig() throws ClassNotFoundException {
         ConversionConfiguration serializationConfig = new ConversionConfiguration();
-        serializationConfig.setClassName(LangStringLiteralParam.class.getCanonicalName());
+        serializationConfig.setClass(LangStringLiteralParam.class);
         serializationConfig.setMethodName("deserialize");
         serializationConfig.setMethodArguments("input");
         serializationConfig.setStaticMethod(true);
