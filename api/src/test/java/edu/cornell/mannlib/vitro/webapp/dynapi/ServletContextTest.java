@@ -74,7 +74,7 @@ public abstract class ServletContextTest {
 
     private String[] getBaseIndividuals() {
         return new String[] { ABOX_PREFIX + "http_methods.n3", ABOX_PREFIX + "paramerter_types.n3",
-            ABOX_PREFIX + "validators.n3", ABOX_PREFIX + "user_groups.n3", ABOX_PREFIX + "implementation_types.n3",
+            ABOX_PREFIX + "validators.n3", ABOX_PREFIX + "user_groups.n3", ABOX_PREFIX + "formats.n3",
             ABOX_PREFIX + "rdf_types.n3", ABOX_PREFIX + "validators.n3", ABOX_PREFIX + "model_parameters.n3",
             ABOX_PREFIX + "serialization_types.n3" };
     }
