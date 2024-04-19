@@ -92,9 +92,4 @@ public class JsonArray extends JacksonJsonContainer {
         return result;
     }
 
-    @Override
-    public Type getType() {
-        return Type.ARRAY;
-    }
-
 }

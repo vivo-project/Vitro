@@ -14,8 +14,11 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JacksonJsonContainer;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonArray;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonFactory;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonObject;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.JsonContainerObjectParam;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.StringParam;
 import org.junit.Test;
@@ -29,7 +32,7 @@ public class ContainerQueryTest {
     public String keyValue;
 
     @org.junit.runners.Parameterized.Parameter(1)
-    public JsonContainer.Type containerType;
+    public Class<? extends JacksonJsonContainer> containerClass;
 
     @org.junit.runners.Parameterized.Parameter(2)
     public String value;
@@ -51,11 +54,11 @@ public class ContainerQueryTest {
 
         DataStore store = new DataStore();
         Data containerData = new Data(containerParam);
-        JsonContainer container = JsonFactory.getJson(containerType);
+        JsonContainer container = JsonFactory.getJson(containerClass);
         Parameter outputParam1 = new StringParam(outputName);
         Data data = new Data(outputParam1);
         TestView.setObject(data, value);
-        if (containerType.equals(JsonContainer.Type.ARRAY)) {
+        if (containerClass.equals(JsonArray.class)) {
             container.addValue(data);
         } else {
             container.addKeyValue(keyValue, data);
@@ -80,16 +83,16 @@ public class ContainerQueryTest {
     @Parameterized.Parameters
     public static Collection<Object[]> requests() {
         return Arrays.asList(new Object[][] {
-                { "0", JsonContainer.Type.ARRAY, "test value" },
-                { "0", JsonContainer.Type.OBJECT, "0" },
-                { "key", JsonContainer.Type.OBJECT, "test value" },
-                { "key", JsonContainer.Type.OBJECT, "" },
-                { "key$", JsonContainer.Type.OBJECT, "test value" },
-                { "key\\ value", JsonContainer.Type.OBJECT, "test value" },
-                { "key'", JsonContainer.Type.OBJECT, "test value" },
-                { "key.", JsonContainer.Type.OBJECT, "test value" },
-                { "key\n", JsonContainer.Type.OBJECT, "test value" },
-                { "key\t", JsonContainer.Type.OBJECT, "test value" },
+                { "0", JsonArray.class, "test value" },
+                { "0", JsonObject.class, "0" },
+                { "key", JsonObject.class, "test value" },
+                { "key", JsonObject.class, "" },
+                { "key$", JsonObject.class, "test value" },
+                { "key\\ value", JsonObject.class, "test value" },
+                { "key'", JsonObject.class, "test value" },
+                { "key.", JsonObject.class, "test value" },
+                { "key\n", JsonObject.class, "test value" },
+                { "key\t", JsonObject.class, "test value" },
 
         });
     }

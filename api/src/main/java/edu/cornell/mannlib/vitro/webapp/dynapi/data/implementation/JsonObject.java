@@ -90,9 +90,4 @@ public class JsonObject extends JacksonJsonContainer {
         return result;
     }
 
-    @Override
-    public Type getType() {
-        return Type.OBJECT;
-    }
-
 }

@@ -12,8 +12,11 @@ import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.conversion.InitializationException;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JacksonJsonContainer;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonArray;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonContainer;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonFactory;
+import edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation.JsonObject;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.JsonContainerObjectParam;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.StringParam;
 import org.junit.Test;
@@ -27,7 +30,7 @@ public class ContainerLoaderTest {
     public String key;
 
     @org.junit.runners.Parameterized.Parameter(1)
-    public JsonContainer.Type containerType;
+    public Class<? extends JacksonJsonContainer> containerClass;
 
     @Test
     public void testLoadIntoArrayContainer() throws InitializationException {
@@ -48,7 +51,7 @@ public class ContainerLoaderTest {
         store.addData(input.getName(), inputData);
 
         Data containerData = new Data(container);
-        JsonContainer containerObject = JsonFactory.getJson(containerType);
+        JsonContainer containerObject = JsonFactory.getJson(containerClass);
         TestView.setObject(containerData, containerObject);
         store.addData(container.getName(), containerData);
 
@@ -66,9 +69,9 @@ public class ContainerLoaderTest {
     @Parameterized.Parameters
     public static Collection<Object[]> requests() {
         return Arrays.asList(new Object[][] {
-                { "", JsonContainer.Type.ARRAY },
-                { "", JsonContainer.Type.OBJECT },
-                { "key", JsonContainer.Type.ARRAY },
-                { "key", JsonContainer.Type.OBJECT }, });
+                { "", JsonArray.class },
+                { "", JsonObject.class },
+                { "key", JsonArray.class },
+                { "key", JsonObject.class }, });
     }
 }
