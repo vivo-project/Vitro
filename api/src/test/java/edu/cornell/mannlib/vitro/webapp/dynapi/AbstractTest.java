@@ -20,7 +20,7 @@ import org.apache.jena.shared.Lock;
 import org.junit.Before;
 import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccessFactoryStub;
 
-public abstract class ServletContextTest {
+public abstract class AbstractTest {
 
     public static final String ABOX_PREFIX = "../home/src/main/resources/rdf/dynapiAbox/everytime/";
     public static final String TBOX_PREFIX = "../home/src/main/resources/rdf/dynapiTbox/everytime/";

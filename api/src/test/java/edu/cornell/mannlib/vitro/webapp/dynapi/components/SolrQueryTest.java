@@ -16,8 +16,8 @@ import static org.mockito.Mockito.when;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationImpl;
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
+import edu.cornell.mannlib.vitro.webapp.dynapi.AbstractTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
-import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.AbstractOperation;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.SolrQuery;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.PrimitiveSerializationType;
@@ -42,7 +42,7 @@ import org.mockito.MockedStatic;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SolrQueryTest extends ServletContextTest {
+public class SolrQueryTest extends AbstractTest {
 
     private final static String TEST_DATA_PATH = TEST_PREFIX + "dynamic-api-individuals-solr-test.n3";
     private final static String TEST_SOLR_QUERY_URI =

@@ -11,8 +11,8 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collection;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.AbstractTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
-import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
@@ -35,7 +35,7 @@ import org.junit.runners.Parameterized;
 import org.mockito.MockitoAnnotations;
 
 @RunWith(Parameterized.class)
-public class ConditionIsNotEmptyIntegrationTest extends ServletContextTest {
+public class ConditionIsNotEmptyIntegrationTest extends AbstractTest {
 
     private static final String MODEL_PARAM = "FULL_UNION";
     private static final String INPUT_PARAM = "input_param";

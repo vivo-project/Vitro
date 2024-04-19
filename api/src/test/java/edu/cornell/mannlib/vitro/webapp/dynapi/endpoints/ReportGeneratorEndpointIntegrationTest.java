@@ -21,10 +21,10 @@ import java.util.Collection;
 import com.haulmont.yarg.formatters.impl.XlsxFormatter;
 import com.haulmont.yarg.reporting.Reporting;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.dynapi.AbstractTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.Endpoint;
 import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ProcedurePool;
-import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullProcedure;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameters;
@@ -55,7 +55,7 @@ import org.junit.runners.Parameterized;
 import org.mockito.MockedStatic;
 
 @RunWith(Parameterized.class)
-public class ReportGeneratorEndpointIntegrationTest extends ServletContextTest {
+public class ReportGeneratorEndpointIntegrationTest extends AbstractTest {
 
     private static final String REPORT_GENERATOR_URI = "resource_id";
     private static final String RESOURCES_PATH =

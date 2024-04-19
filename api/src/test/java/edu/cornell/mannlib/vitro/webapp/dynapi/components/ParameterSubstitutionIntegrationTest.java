@@ -14,9 +14,9 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.dynapi.AbstractTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.Endpoint;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ProcedurePool;
-import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
@@ -37,7 +37,7 @@ import org.junit.runners.Parameterized;
 import org.mockito.MockedStatic;
 
 @RunWith(Parameterized.class)
-public class ParameterSubstitutionIntegrationTest extends ServletContextTest {
+public class ParameterSubstitutionIntegrationTest extends AbstractTest {
     private static final String RESULT = "result";
     private static final String RESOURCES_PATH =
             "src/test/resources/edu/cornell/mannlib/vitro/webapp/dynapi/components/ParameterSubstitution/";

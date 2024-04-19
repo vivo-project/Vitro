@@ -7,9 +7,9 @@ import static org.junit.Assert.assertNotEquals;
 
 import java.io.IOException;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.AbstractTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ProcedurePool;
-import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.PoolBulkOperation;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.PoolOperation;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.ProcedurePoolBulkOperation;
@@ -19,7 +19,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ProcedurePoolBulkOperationTest extends ServletContextTest {
+public class ProcedurePoolBulkOperationTest extends AbstractTest {
 
     private final static String TEST_ACTION_URI =
             "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testProcedure1";

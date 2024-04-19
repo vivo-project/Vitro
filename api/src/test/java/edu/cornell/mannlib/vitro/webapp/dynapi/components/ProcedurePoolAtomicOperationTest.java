@@ -8,9 +8,9 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.AbstractTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ProcedurePool;
-import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.PoolOperation;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.ProcedurePoolAtomicOperation;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
@@ -23,7 +23,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ProcedurePoolAtomicOperationTest extends ServletContextTest {
+public class ProcedurePoolAtomicOperationTest extends AbstractTest {
 
     private static final String JSON_OBJECT_PARAM = "jsonContainerParam";
     private static final String STRING_PARAM_NAME = "stringParam";

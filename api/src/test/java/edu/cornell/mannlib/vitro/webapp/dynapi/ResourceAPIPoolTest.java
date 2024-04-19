@@ -20,7 +20,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class ResourceAPIPoolTest extends ServletContextTest {
+public class ResourceAPIPoolTest extends AbstractTest {
 
     protected final static String TEST_PERSON_RESOURCE_URI =
             "https://vivoweb.org/ontology/vitro-dynamic-api/resourceAPI/testPersonResource1";

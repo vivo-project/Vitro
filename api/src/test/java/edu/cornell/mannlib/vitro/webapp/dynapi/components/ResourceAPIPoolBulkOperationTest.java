@@ -7,9 +7,9 @@ import static org.junit.Assert.assertNotEquals;
 
 import java.io.IOException;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.AbstractTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ResourceAPIPool;
-import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.PoolOperation;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.ResourceAPIPoolBulkOperation;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
@@ -18,7 +18,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ResourceAPIPoolBulkOperationTest extends ServletContextTest {
+public class ResourceAPIPoolBulkOperationTest extends AbstractTest {
 
     private final static String TEST_RESOURCE_URI =
             "https://vivoweb.org/ontology/vitro-dynamic-api/resourceAPI/testResource1";

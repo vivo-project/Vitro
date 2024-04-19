@@ -5,14 +5,14 @@ package edu.cornell.mannlib.vitro.webapp.dynapi.components.conditions;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
+import edu.cornell.mannlib.vitro.webapp.dynapi.AbstractTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Parameter;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.types.implementation.StringParam;
 import org.junit.Test;
 
-public class ConditionIsNotInitializedByDefaultTest extends ServletContextTest {
+public class ConditionIsNotInitializedByDefaultTest extends AbstractTest {
 
     @Test
     public void testConditionIsNotInitilaizedByDefault() {

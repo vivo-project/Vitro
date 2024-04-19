@@ -6,9 +6,9 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.AbstractTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ResourceAPIPool;
-import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.PoolOperation;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.ResourceAPIPoolAtomicOperation;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
@@ -20,7 +20,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ResourceAPIPoolAtomicOperationTest extends ServletContextTest {
+public class ResourceAPIPoolAtomicOperationTest extends AbstractTest {
 
     private static final String STRING_PARAM_NAME = "stringParam";
     private final static String TEST_ACTION_URI =

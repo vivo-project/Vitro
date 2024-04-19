@@ -12,8 +12,8 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collection;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.AbstractTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
-import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
@@ -30,7 +30,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class SparqlSelectQueryIntegrationTest extends ServletContextTest {
+public class SparqlSelectQueryIntegrationTest extends AbstractTest {
     private static final String OBJECT = "object";
     private static final String QUERY = "query";
     private static final String URI = "uri";

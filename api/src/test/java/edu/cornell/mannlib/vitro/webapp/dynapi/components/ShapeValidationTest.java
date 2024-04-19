@@ -13,8 +13,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.AbstractTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
-import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ShapesGraphPool;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.ShapeValidation;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
@@ -42,7 +42,7 @@ import org.junit.runners.Parameterized;
 import org.mockito.MockedStatic;
 
 @RunWith(Parameterized.class)
-public class ShapeValidationTest extends ServletContextTest {
+public class ShapeValidationTest extends AbstractTest {
 
     private static final String RESULT_PARAM_NAME = "result";
     private static final String REPORT_PARAM_NAME = "report";

@@ -15,7 +15,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
-public abstract class ServletContextIntegrationTest extends ServletContextTest {
+public abstract class AbstractIntegrationTest extends AbstractTest {
 
     protected Map<String, String[]> parameterMap;
 

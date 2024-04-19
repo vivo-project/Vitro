@@ -19,7 +19,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class ProcedurePoolTest extends ServletContextTest {
+public class ProcedurePoolTest extends AbstractTest {
 
     protected final static String TEST_PERSON_ACTION_URI =
             "https://vivoweb.org/ontology/vitro-dynamic-api/procedure/testPersonProcedure1";

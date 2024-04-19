@@ -16,8 +16,8 @@ import java.util.Base64;
 import java.util.Collection;
 
 import com.haulmont.yarg.formatters.impl.XlsxFormatter;
+import edu.cornell.mannlib.vitro.webapp.dynapi.AbstractTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
-import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
@@ -44,7 +44,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class ReportGeneratorIntegrationTest extends ServletContextTest {
+public class ReportGeneratorIntegrationTest extends AbstractTest {
     private static final String REPORT = "report";
     private static final String QUERY_MODEL = "querymodel";
     private static final String RESOURCES_PATH =

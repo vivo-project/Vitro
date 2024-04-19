@@ -14,9 +14,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.AbstractTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ParameterUtils;
-import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.operations.N3Template;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.PrimitiveSerializationType;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.serialization.SerializationType;
@@ -53,7 +53,7 @@ import org.mockito.MockedStatic;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class N3TemplateTest extends ServletContextTest {
+public class N3TemplateTest extends AbstractTest {
 
     private final static String TEST_DATA_PATH = TEST_PREFIX + "dynamic-api-individuals-n3template-test.n3";
     private final static String TEST_N3TEMPLATE_URI =

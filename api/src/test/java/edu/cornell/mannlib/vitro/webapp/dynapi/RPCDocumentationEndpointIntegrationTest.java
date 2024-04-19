@@ -26,7 +26,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 @RunWith(Parameterized.class)
-public class RPCDocumentationEndpointIntegrationTest extends ServletContextIntegrationTest {
+public class RPCDocumentationEndpointIntegrationTest extends AbstractIntegrationTest {
 
     private RPCDocumentationEndpoint rpcEndpoint;
 

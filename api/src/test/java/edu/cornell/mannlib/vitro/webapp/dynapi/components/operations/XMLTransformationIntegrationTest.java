@@ -12,9 +12,9 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.dynapi.AbstractTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ProcedurePool;
-import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.NullProcedure;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.OperationResult;
 import edu.cornell.mannlib.vitro.webapp.dynapi.components.Procedure;
@@ -35,7 +35,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class XMLTransformationIntegrationTest extends ServletContextTest {
+public class XMLTransformationIntegrationTest extends AbstractTest {
 
     private static final String TEST_PROCEDURE_URI = "test:xml-transformation-procedure";
     private static final String OUTPUT = "output";

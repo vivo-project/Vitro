@@ -26,7 +26,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 @RunWith(Parameterized.class)
-public class RESTDocumentationEndpointIntegrationTest extends ServletContextIntegrationTest {
+public class RESTDocumentationEndpointIntegrationTest extends AbstractIntegrationTest {
 
     private RESTDocumentationEndpoint restEndpoint;
 

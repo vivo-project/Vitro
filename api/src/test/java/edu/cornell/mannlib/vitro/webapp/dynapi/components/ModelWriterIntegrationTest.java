@@ -11,9 +11,9 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collection;
 
+import edu.cornell.mannlib.vitro.webapp.dynapi.AbstractTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.LoggingControl;
 import edu.cornell.mannlib.vitro.webapp.dynapi.ParameterUtils;
-import edu.cornell.mannlib.vitro.webapp.dynapi.ServletContextTest;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.Data;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.DataStore;
 import edu.cornell.mannlib.vitro.webapp.dynapi.data.TestView;
@@ -31,7 +31,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class ModelWriterIntegrationTest extends ServletContextTest {
+public class ModelWriterIntegrationTest extends AbstractTest {
     private static final String TARGET_NAME = "target";
     private static final String ADDITIONS_NAME = "addition";
     private static final String RETRACTIONS_NAME = "retraction";
