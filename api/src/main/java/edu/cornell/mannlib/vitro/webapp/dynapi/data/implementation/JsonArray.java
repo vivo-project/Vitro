@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.dynapi.data.implementation;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -86,8 +87,17 @@ public class JsonArray extends JacksonJsonContainer {
 
     public List<String> getDataAsStringList() {
         List<String> result = new LinkedList<>();
-        for (Data data : dataMap.values()) {
-            result.add(data.getSerializedValue());
+        if (dataMap.isEmpty()) {
+            JsonNode node = (JsonNode) documentContext.json();
+            Iterator<JsonNode> elements = node.elements();
+            while (elements.hasNext()) {
+                JsonNode element = elements.next();
+                result.add(element.asText());
+            }
+        } else {
+            for (Data data : dataMap.values()) {
+                result.add(data.getSerializedValue());
+            }
         }
         return result;
     }
