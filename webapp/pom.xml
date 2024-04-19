@@ -22,6 +22,59 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.6.1</version>
+                <executions>
+                    <execution>
+                        <id>unpack-webjars</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.webjars</groupId>
+                                    <artifactId>jquery</artifactId>
+                                    <type>jar</type>
+                                    <includes>
+                                        META-INF/resources/webjars/jquery/*/*.map,
+                                        META-INF/resources/webjars/jquery/*/*.js
+                                    </includes>
+                                    <fileMappers>
+                                        <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                                            <pattern>^META-INF/resources/webjars/jquery/[^/]+/</pattern>
+                                            <replacement>./</replacement>
+                                        </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                                    </fileMappers>
+                                    <outputDirectory>target/${project.artifactId}-${project.version}/webjars/jquery/</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.webjars</groupId>
+                                    <artifactId>jquery-ui</artifactId>
+                                    <type>jar</type>
+                                    <includes>
+                                        META-INF/resources/webjars/jquery-ui/*/*.css,
+                                        META-INF/resources/webjars/jquery-ui/*/images/*.png,
+                                        META-INF/resources/webjars/jquery-ui/*/*.js
+                                    </includes>
+                                    <fileMappers>
+                                        <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                                            <pattern>^META-INF/resources/webjars/jquery-ui/[^/]+/</pattern>
+                                            <replacement>./</replacement>
+                                        </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                                    </fileMappers>
+                                    <outputDirectory>target/${project.artifactId}-${project.version}/webjars/jquery-ui/</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
@@ -38,6 +91,16 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>jquery</artifactId>
+            <version>3.7.1</version>
+        </dependency>
+        <dependency>
+           <groupId>org.webjars</groupId>
+            <artifactId>jquery-ui</artifactId>
+            <version>1.13.2</version>
+        </dependency>
         <dependency>
             <groupId>org.vivoweb</groupId>
             <artifactId>vitro-api</artifactId>
