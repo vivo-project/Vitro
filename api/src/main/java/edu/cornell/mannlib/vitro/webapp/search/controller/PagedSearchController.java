@@ -171,7 +171,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                 log.debug(getSpentTime(startTime) + "ms spent before read filter configurations.");
             }
             Set<String> currentRoles = SearchFiltering.getCurrentUserRoles(vreq);
-            Map<String, SearchFilter> filterConfigurationsByField = SearchFiltering.readFilterConfigurations(currentRoles);
+            Map<String, SearchFilter> filterConfigurationsByField = SearchFiltering.readFilterConfigurations(currentRoles, vreq);
             if (log.isDebugEnabled()) {
                 log.debug(getSpentTime(startTime) + "ms spent before get sort configurations.");
             }
@@ -187,7 +187,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             if (log.isDebugEnabled()) {
                 log.debug(getSpentTime(startTime) + "ms spent after setSelectedFilters.");
             }
-            Map<String, SortConfiguration> sortConfigurations = SearchFiltering.getSortConfigurations();
+            Map<String, SortConfiguration> sortConfigurations = SearchFiltering.getSortConfigurations(vreq);
             if (log.isDebugEnabled()) {
                 log.debug(getSpentTime(startTime) + "ms spent before get query configurations.");
             }
@@ -270,7 +270,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                 Map<String, SearchFilter> filtersForTemplateById =
                         SearchFiltering.getFiltersForTemplate(filterConfigurationsByField);
                 body.put("filters", filtersForTemplateById);
-                body.put("filterGroups", SearchFiltering.readFilterGroupsConfigurations(filtersForTemplateById));
+                body.put("filterGroups", SearchFiltering.readFilterGroupsConfigurations(vreq, filtersForTemplateById));
                 body.put("sorting", sortConfigurations.values());
                 body.put("emptySearch", isEmptySearchFilters(filterConfigurationsByField));
             }
@@ -365,7 +365,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                     }
                 }
                 if (searchFilter.isLocalizationRequired() && StringUtils.isBlank(filterValue.getName())) {
-                    String label = SearchFiltering.getUriLabel(value.getName());
+                    String label = SearchFiltering.getUriLabel(value.getName(), vreq);
                     if (!StringUtils.isBlank(label)) {
                         filterValue.setName(label);
                     }
