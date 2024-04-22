@@ -227,11 +227,16 @@ public class SearchFiltering {
         return requestFilters;
     }
 
-    public static Map<String, SearchFilter> readFilterConfigurations(Set<String> currentRoles) {
+    public static Map<String, SearchFilter> readFilterConfigurations(Set<String> currentRoles, VitroRequest vreq) {
         long startTime = System.nanoTime();
 
         Map<String, SearchFilter> filtersByField = new LinkedHashMap<>();
-        Model model = ModelAccess.getInstance().getOntModelSelector().getDisplayModel();
+        Model model;
+        if (vreq != null) {
+            model = ModelAccess.on(vreq).getOntModelSelector().getDisplayModel();
+        } else {
+            model = ModelAccess.getInstance().getOntModelSelector().getDisplayModel();
+        }
         if (model == null) {
             return filtersByField;
         }
@@ -286,7 +291,7 @@ public class SearchFiltering {
     }
 
     public static void addDefaultFilters(SearchQuery query, Set<String> currentRoles) {
-        Map<String, SearchFilter> filtersByField = SearchFiltering.readFilterConfigurations(currentRoles);
+        Map<String, SearchFilter> filtersByField = SearchFiltering.readFilterConfigurations(currentRoles, null);
         SearchFiltering.addPreconfiguredFiltersToQuery( query, filtersByField.values());
     }
 
@@ -310,9 +315,10 @@ public class SearchFiltering {
         }
     }
 
-    public static List<SearchFilterGroup> readFilterGroupsConfigurations(Map<String, SearchFilter> filtersById) {
+    public static List<SearchFilterGroup> readFilterGroupsConfigurations(VitroRequest vreq,
+            Map<String, SearchFilter> filtersById) {
         Map<String, SearchFilterGroup> groups = new LinkedHashMap<>();
-        Model model = ModelAccess.getInstance().getOntModelSelector().getDisplayModel();
+        Model model = ModelAccess.on(vreq).getOntModelSelector().getDisplayModel();
         model.enterCriticalSection(Lock.READ);
         try {
             Query facetQuery = QueryFactory.create(FILTER_GROUPS_QUERY);
@@ -350,9 +356,9 @@ public class SearchFiltering {
         return new LinkedList<SearchFilterGroup>(groups.values());
     }
 
-    public static Map<String, SortConfiguration> getSortConfigurations() {
+    public static Map<String, SortConfiguration> getSortConfigurations(VitroRequest vreq) {
         Map<String, SortConfiguration> sortConfigurations = new LinkedHashMap<>();
-        Model model = ModelAccess.getInstance().getOntModelSelector().getDisplayModel();
+        Model model = ModelAccess.on(vreq).getOntModelSelector().getDisplayModel();
         model.enterCriticalSection(Lock.READ);
         try {
             Query facetQuery = QueryFactory.create(SORT_QUERY);
@@ -530,9 +536,9 @@ public class SearchFiltering {
         return true;
     }
 
-    static String getUriLabel(String uri) {
+    static String getUriLabel(String uri, VitroRequest vreq) {
         String result = "";
-        Model model = ModelAccess.getInstance().getOntModelSelector().getFullModel();
+        Model model = ModelAccess.on(vreq).getOntModelSelector().getFullModel();
         model.enterCriticalSection(Lock.READ);
         try {
             QuerySolutionMap initialBindings = new QuerySolutionMap();
