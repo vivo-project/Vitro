@@ -364,7 +364,7 @@ public class SearchFiltering {
                 }
                 String field = searchFieldNode == null ? "" : searchFieldNode.toString();
                 String id = idNode == null ? "" : idNode.toString();
-                String label = solution.get("label").toString();
+                String label = solution.get("label").asLiteral().getLexicalForm();
 
                 if (!sortConfigurations.containsKey(id)) {
                     SortConfiguration config = new SortConfiguration(id, label, field);
