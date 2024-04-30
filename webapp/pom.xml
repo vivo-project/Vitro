@@ -97,6 +97,23 @@
                                     </fileMappers>
                                     <outputDirectory>target/${project.artifactId}-${project.version}/webjars/jquery-ui/</outputDirectory>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.webjars.npm</groupId>
+                                    <artifactId>openfonts__noto-sans_all</artifactId>
+                                    <type>jar</type>
+                                    <includes>
+                                        META-INF/resources/webjars/openfonts__noto-sans_all/*/*.css,
+                                        META-INF/resources/webjars/openfonts__noto-sans_all/*/*/*.woff,
+                                        META-INF/resources/webjars/openfonts__noto-sans_all/*/*/*.woff2
+                                    </includes>
+                                    <fileMappers>
+                                        <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                                            <pattern>^META-INF/resources/webjars/openfonts__noto-sans_all/[^/]+/</pattern>
+                                            <replacement>./</replacement>
+                                        </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                                    </fileMappers>
+                                    <outputDirectory>target/${project.artifactId}-${project.version}/webjars/fonts/noto-sans/</outputDirectory>
+                                </artifactItem>
                             </artifactItems>
                             <overWriteReleases>true</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
@@ -140,6 +157,11 @@
            <groupId>org.webjars</groupId>
             <artifactId>jquery-ui</artifactId>
             <version>1.13.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>openfonts__noto-sans_all</artifactId>
+            <version>1.44.0</version>
         </dependency>
         <dependency>
             <groupId>org.vivoweb</groupId>
