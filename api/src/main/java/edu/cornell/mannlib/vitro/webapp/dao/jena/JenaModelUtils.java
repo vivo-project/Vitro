@@ -581,11 +581,11 @@ public class JenaModelUtils {
             if (whereClause) {
                 if (t.getSubject().isBlank()) {
                     patternBuff.append("    FILTER(isBlank(").append(
-                    		SparqlGraph.sparqlNodeDelete(t.getSubject(), null)).append(")) \n");
+                    		sparqlNodeDelete(t.getSubject(), null)).append(")) \n");
                 }
                 if (t.getObject().isBlank()) {
                     patternBuff.append("    FILTER(isBlank(").append(
-                    		SparqlGraph.sparqlNodeDelete(t.getObject(), null)).append(")) \n");
+                    		sparqlNodeDelete(t.getObject(), null)).append(")) \n");
                 }
             }
         }
