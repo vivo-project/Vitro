@@ -571,13 +571,13 @@ public class JenaModelUtils {
         Set<String> lines = new HashSet<>();
         for(Statement stmt : stmts) {
             Triple t = stmt.asTriple();
-            String lineWithoutVars = getLine(patternBuff, t, false);
+            String lineWithoutVars = getLine(t, false);
             if (lines.contains(lineWithoutVars)) {
                 continue;
             } else {
                 lines.add(lineWithoutVars);
             }
-            patternBuff.append(getLine(patternBuff, t, true));
+            patternBuff.append(getLine(t, true));
             if (whereClause) {
                 if (t.getSubject().isBlank()) {
                     patternBuff.append("    FILTER(isBlank(").append(
@@ -591,7 +591,7 @@ public class JenaModelUtils {
         }
     }
 
-    private static String getLine(StringBuffer patternBuff, Triple t, boolean createBlankNodeVariables) {
+    private static String getLine(Triple t, boolean createBlankNodeVariables) {
         if (createBlankNodeVariables) {
             return sparqlNodeDelete(t.getSubject(), null) +
                     " " +
