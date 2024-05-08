@@ -65,7 +65,7 @@ public class EntityPolicyController {
                 getLoader().updateAccessControlModel(toRemove, false);
             }
         } else {
-            reduceInactiveValueSet(entityUri, aot, ao, role);
+            reduceInactiveValueSet(entityUri, aot, ao, role, namedKeyComponents);
         }
     }
 
@@ -74,9 +74,9 @@ public class EntityPolicyController {
     }
 
     private static void reduceInactiveValueSet(String entityUri, AccessObjectType aot, AccessOperation ao,
-            String role) {
+            String role, String... namedKeyComponents) {
         StringBuilder removals = new StringBuilder();
-        getDataValueStatements(entityUri, aot, ao, Collections.singleton(role), removals);
+        getDataValueStatements(entityUri, aot, ao, Collections.singleton(role), removals, namedKeyComponents);
         getLoader().updateAccessControlModel(removals.toString(), false);
     }
 
