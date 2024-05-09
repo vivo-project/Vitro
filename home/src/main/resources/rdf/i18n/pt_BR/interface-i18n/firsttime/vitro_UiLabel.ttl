@@ -257,7 +257,7 @@ uil-data:reset_password_note.Vitro
 uil-data:password_reset_email_sent.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Um e-mail de recuperação de senha será enviado para a conta {0} se essa estiver vinculado a uma conta existente."@pt-BR ;
+        rdfs:label       "Um e-mail de recuperação de senha será enviado para a conta {0} se essa estiver vinculada a uma conta existente."@pt-BR ;
         uil:hasApp       "Vitro" ;
         uil:hasKey       "password_reset_email_sent" ;
         uil:hasPackage   "Vitro-languages" .
@@ -6369,7 +6369,7 @@ uil-data:captcha_user_sol_invalid.Vitro
 uil-data:captcha_not_displayed.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Atualizar página se não estiver sendo exibida..."@pt-BR ;
+        rdfs:label       "Atualizar a página se não estiver sendo exibida..."@pt-BR ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "captcha_not_displayed" ;
         uil:hasPackage  "Vitro-languages" .
