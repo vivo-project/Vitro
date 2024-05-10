@@ -254,6 +254,62 @@ uil-data:reset_password_note.Vitro
         uil:hasKey      "reset_password_note" ;
         uil:hasPackage  "Vitro-languages" .
 
+uil-data:password_reset_email_sent.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Se ha enviado un correo de recuperación de la contraseña a {0}, si está vinculado a una cuenta existente."@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_email_sent" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:password_reset_label.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Olvidé mi contraseña"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_label" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:password_reset_title.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Restablecer Contraseña"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_title" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:password_reset_button.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Restablecer mi contraseña"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_button" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:password_reset_manual.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Para restablecer la contraseña, introduzca su email a continuación:"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_manual" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:password_reset_forgot_email.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Si no recuerda su email, por favor <a href=\"{0}\">Contacte con nosotros</a>."@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_forgot_email" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:functionality_disabled.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Funcionalidad desactivada por el administrador del sitio."@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "functionality_disabled" ;
+        uil:hasPackage   "Vitro-languages" .
+
 uil-data:startup_status.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
@@ -3185,7 +3241,7 @@ uil-data:javascript_instructions.Vitro
 uil-data:error_invalid_email.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "''{0}'' no es una dirección de correo electrónico válida."@es ;
+        rdfs:label       "La dirección de correo electrónico que ha proporcionado no es válida."@es ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "error_invalid_email" ;
         uil:hasPackage  "Vitro-languages" .
@@ -6310,6 +6366,14 @@ uil-data:captcha_user_sol_invalid.Vitro
         uil:hasKey      "captcha_user_sol_invalid" ;
         uil:hasPackage  "Vitro-languages" .
 
+uil-data:captcha_not_displayed.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Actualizar la página si no se muestra..."@es ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "captcha_not_displayed" ;
+        uil:hasPackage  "Vitro-languages" .
+
 uil-data:suppress_operation_for_roles.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
@@ -6358,3 +6422,26 @@ uil-data:suppress_operation_for_unrelated_individuals_of_this_class.Vitro
         uil:hasKey       "suppress_operation_for_unrelated_individuals_of_this_class" ;
         uil:hasPackage   "Vitro-languages" .
 
+uil-data:password_reset_admin_notification_email_subject.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "${siteName} solicitud de restablecimiento de contraseña"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_admin_notification_email_subject" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:password_reset_admin_notification_email_plain_text.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Hemos recibido una solicitud para restablecer la contraseña del usuario ${userAccount.firstName} ${userAccount.lastName} (${userAccount.emailAddress}).\n\nUsted está recibiendo este mensaje porque las notificaciones de administrador para restablecimientos de contraseña están habilitadas."@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_admin_notification_email_plain_text" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:password_reset_admin_notification_email_html.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "<p><br /> Hemos recibido una solicitud para restablecer la contraseña del usuario ${userAccount.firstName} ${userAccount.lastName} (${userAccount.emailAddress}).<br /> </p> <br /><br /> <p><br /> Usted está recibiendo este mensaje porque las notificaciones de administrador para restablecimientos de contraseña están habilitadas.</p>"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "password_reset_admin_notification_email_html" ;
+        uil:hasPackage   "Vitro-languages" .
