@@ -22,6 +22,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
@@ -300,7 +302,7 @@ public class FreemarkerConfigurationImpl extends Configuration {
 			Map<String, String> urls = new HashMap<String, String>();
 
 			// Templates use this to construct urls.
-			urls.put("base", ctx.getContextPath());
+			urls.put("base", ContextPath.getPath(ctx));
 			urls.put("home", UrlBuilder.getHomeUrl());
 			urls.put("about", UrlBuilder.getUrl(Route.ABOUT));
 			urls.put("search", UrlBuilder.getUrl(Route.SEARCH));

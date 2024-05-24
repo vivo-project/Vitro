@@ -10,6 +10,8 @@ import javax.servlet.annotation.WebServlet;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.CaptchaServiceBean;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
@@ -61,7 +63,7 @@ public class ContactFormController extends FreemarkerHttpServlet {
         else {
             CaptchaServiceBean.addCaptchaRelatedFieldsToPageContext(body);
 
-            body.put("contextPath", vreq.getContextPath());
+            body.put("contextPath", ContextPath.getPath(vreq));
             body.put("formAction", "submitFeedback");
 
             if (vreq.getHeader("Referer") == null) {
