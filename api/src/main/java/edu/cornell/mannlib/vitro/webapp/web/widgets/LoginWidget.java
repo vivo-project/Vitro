@@ -15,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginInProcessFlag;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
@@ -191,7 +192,7 @@ public class LoginWidget extends Widget {
      * What's the URL for this servlet?
      */
     private String getAuthenticateUrl(HttpServletRequest request) {
-        String contextPath = request.getContextPath();
+        String contextPath = ContextPath.getPath(request);
         return contextPath + "/authenticate";
     }
 
@@ -199,7 +200,7 @@ public class LoginWidget extends Widget {
      * What's the URL for this servlet, with the cancel parameter added?
      */
     private String getCancelUrl(HttpServletRequest request) {
-        String contextPath = request.getContextPath();
+        String contextPath = ContextPath.getPath(request);
         String urlParams = "?cancel=true";
         return contextPath + "/authenticate" + urlParams;
     }

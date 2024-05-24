@@ -30,6 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.beans.ResourceBean;
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LogoutRedirector;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
@@ -155,7 +156,7 @@ public class VitroHttpServlet extends HttpServlet implements MultipartRequestWra
 		try {
 			DisplayMessage.setMessage(request,
 					I18n.bundle(request).text("insufficient_authorization"));
-			response.sendRedirect(request.getContextPath());
+			response.sendRedirect(ContextPath.getPath(request));
 		} catch (IOException e) {
 			log.error("Could not redirect to show insufficient authorization.");
 		}
@@ -196,7 +197,7 @@ public class VitroHttpServlet extends HttpServlet implements MultipartRequestWra
 		} catch (UnsupportedEncodingException e) {
 			log.error("Really? No UTF-8 encoding?", e);
 		}
-		return request.getContextPath() + Controllers.AUTHENTICATE
+		return ContextPath.getPath(request) + Controllers.AUTHENTICATE
 				+ "?afterLogin=" + encodedAfterLoginUrl;
 	}
 
