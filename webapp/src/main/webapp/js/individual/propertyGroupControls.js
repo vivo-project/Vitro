@@ -138,7 +138,6 @@ $(document).ready(function(){
                     // deselect the default first tab
 
                     if ( groupName == "viewAll" ) {
-                        console.log("View all")
                         showAllTabs();
                     } else {
 
