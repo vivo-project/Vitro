@@ -2,8 +2,7 @@
 
 @prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/access-allowed-property/> .
 @prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
-
-:PublicDisplayDataPropertyValueSet access:value
-    <http://vitro.mannlib.cornell.edu/ns/vitro/public#filename> ,
-    <http://vitro.mannlib.cornell.edu/ns/vitro/public#mimeType> ,
-    <http://www.w3.org/2000/01/rdf-schema#label> .
+    
+:CuratorDisplayObjectPropertyValueSet access:value
+    <http://vitro.mannlib.cornell.edu/ns/vitro/public#downloadLocation> ,
+    <http://vitro.mannlib.cornell.edu/ns/vitro/public#mainImage> .
