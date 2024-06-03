@@ -18,5 +18,5 @@ Disallow: /comments.jsp
 Disallow: /dataservice/
 Disallow: /contact
 Disallow: /submitFeedback
-Disallow: /forgot-password
+Disallow: /forgotPassword
 
