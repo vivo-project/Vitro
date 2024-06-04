@@ -6,13 +6,13 @@ $(document).ready(function(){
     $("#login").removeClass('hidden');
 
     // focus on email or newpassword field
-    $('.focus').focus();
+    $('.focus').trigger("focus");
 
     // fade in error alerts
     $('section#error-alert').css('display', 'none').fadeIn(1500);
 
     // toggle vivo account authentication form
-    $('h3.internal-auth').click(function() {
+    $('h3.internal-auth').on("click", function() {
         $('.vivoAccount').toggle();
     });
 

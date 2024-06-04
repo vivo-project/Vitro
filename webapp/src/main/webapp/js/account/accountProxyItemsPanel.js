@@ -82,7 +82,7 @@ function proxyItemsPanel(panel, contextInfo)  {
 	        	uri: info.uri
 	        },
 	        complete: function(xhr, status) {
-	            var results = $.parseJSON(xhr.responseText);
+	            var results = JSON.parse(xhr.responseText);
 	            if (results.length > 0) {
 	                if ("classLabel" in results[0]) {
 	                    info.classLabel = results[0].classLabel;
@@ -190,19 +190,19 @@ $(document).ready(function() {
 
 	var progressImage;
 
-	$('#addProfileEditor').click(function(event){
+	$('#addProfileEditor').on("click", function(event){
         progressImage = $(event.target).closest("section").find(".loading-profileMyAccoount")
     });
 
-    $('#selectProfileEditors').click(function(event){
+    $('#selectProfileEditors').on("click", function(event){
         progressImage = $(event.target).closest("section").find(".loading-relateEditor")
     });
 
-    $('#selectProfiles').click(function(event){
+    $('#selectProfiles').on("click", function(event){
         progressImage = $(event.target).closest("section").find(".loading-relateProfile")
     });
 
-    $('#addProfile').click(function(event){
+    $('#addProfile').on("click", function(event){
         progressImage = $(event.target).closest("section").find(".loading-addProfile")
     });
 
