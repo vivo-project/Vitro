@@ -123,7 +123,8 @@ public class SearchFiltering {
             + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
             + "PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n"
             + "PREFIX search: <https://vivoweb.org/ontology/vitro-search#> \n"
-            + "SELECT ( STR(?sort_label) as ?label ) ?id ?searchField ?multilingual ?isAsc ?sort_order \n"
+            + "SELECT ( STR(?sort_label) as ?label ) ?id ?searchField " +
+            "?multilingual ?isAsc ?sort_order ?fallback ?display\n"
             + "WHERE {\n"
             + "    ?sort rdf:type search:Sort . \n"
             + "    ?sort rdfs:label ?sort_label .\n"
@@ -142,10 +143,14 @@ public class SearchFiltering {
             + "        ?sort search:isAscending ?f_ord  .\n"
             + "        BIND(?f_ord as ?f_order) .\n"
             + "    }\n"
+            + "    OPTIONAL {\n"
+            + "        ?sort search:hasFallback/search:id ?fallback .\n"
+            + "    }\n"
             + "    OPTIONAL{ "
             + "        ?sort search:order ?s_order .\n"
             + "        BIND(?s_order as ?sort_order_found).\n"
             + "    }\n"
+            + "    OPTIONAL {?sort search:display ?display }\n"
             + "    BIND(coalesce(?sort_order_found, 0) as ?sort_order)\n"
             + "    BIND(COALESCE(?f_order, false) as ?isAsc)\n"
             + "    BIND(COALESCE(?bind_multilingual, false) as ?multilingual)\n"
@@ -359,13 +364,10 @@ public class SearchFiltering {
                 }
                 String field = searchFieldNode == null ? "" : searchFieldNode.toString();
                 String id = idNode == null ? "" : idNode.toString();
-                String label = solution.get("label").toString();
+                String label = solution.get("label").asLiteral().getLexicalForm();
 
-                SortConfiguration config = null;
-                if (sortConfigurations.containsKey(id)) {
-                    config = sortConfigurations.get(id);
-                } else {
-                    config = new SortConfiguration(id, label, field);
+                if (!sortConfigurations.containsKey(id)) {
+                    SortConfiguration config = new SortConfiguration(id, label, field);
 
                     RDFNode multilingual = solution.get("multilingual");
                     if (multilingual != null) {
@@ -375,10 +377,17 @@ public class SearchFiltering {
                     if (isAsc != null) {
                         config.setAscOrder(isAsc.asLiteral().getBoolean());
                     }
-
+                    RDFNode fallback = solution.get("fallback");
+                    if (fallback != null && fallback.isLiteral()) {
+                        config.setFallback(fallback.asLiteral().toString());
+                    }
                     RDFNode order = solution.get("sort_order");
                     if (order != null) {
                         config.setOrder(order.asLiteral().getInt());
+                    }
+                    RDFNode display = solution.get("display");
+                    if (display != null) {
+                        config.setDisplay(display.asLiteral().getBoolean());
                     }
                     sortConfigurations.put(id, config);
                 }

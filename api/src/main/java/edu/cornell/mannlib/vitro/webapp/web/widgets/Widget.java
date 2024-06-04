@@ -21,6 +21,7 @@ import freemarker.core.Macro;
 import freemarker.template.Template;
 import freemarker.template.TemplateHashModel;
 import freemarker.template.TemplateModelException;
+import freemarker.template.TemplateSequenceModel;
 
 public abstract class Widget {
 
@@ -111,7 +112,7 @@ public abstract class Widget {
         StringWriter out = new StringWriter();
 
         try {
-            String templateString = macro.getChildNodes().get(0).toString();
+            String templateString = getTemplateString(macro);
             // NB Using this method of creating a template from a string does not allow the widget template to import
             // other templates (but it can include other templates). We'd need to use a StringTemplateLoader
             // in the config instead. See StringTemplateLoader API doc.
@@ -128,6 +129,16 @@ public abstract class Widget {
         String output = out.toString();
         log.debug("Macro output: " + output);
         return output;
+    } 
+
+    private String getTemplateString(Macro macro) throws TemplateModelException {
+        TemplateSequenceModel childNodes = macro.getChildNodes();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < childNodes.size(); i++) {
+            sb.append(childNodes.get(i));
+        }
+        String template = sb.toString();
+        return template;
     }
 
     private String processMacroToString(Environment env, String widgetName, String macroName, Map<String, Object> map) {

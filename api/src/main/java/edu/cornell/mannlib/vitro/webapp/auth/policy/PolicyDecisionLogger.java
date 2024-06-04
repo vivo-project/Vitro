@@ -7,11 +7,11 @@ import static edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DecisionResult
 import java.util.regex.Pattern;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Policy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings;
 import edu.cornell.mannlib.vitro.webapp.utils.developer.Key;
 import org.apache.commons.logging.Log;
@@ -33,7 +33,7 @@ public class PolicyDecisionLogger {
     private final DeveloperSettings settings;
     private final AccessObject object;
     private final AccessOperation operation;
-    private final IdentifierBundle whoToAuth;
+    private final UserAccount whoToAuth;
 
     private final boolean enabled;
 
@@ -43,7 +43,7 @@ public class PolicyDecisionLogger {
 
     public PolicyDecisionLogger(AuthorizationRequest ar) {
         this.settings = DeveloperSettings.getInstance();
-        this.whoToAuth = ar.getIds();
+        this.whoToAuth = ar.getUserAccount();
         this.object = ar.getAccessObject();
         this.operation = ar.getAccessOperation();
 
@@ -67,7 +67,7 @@ public class PolicyDecisionLogger {
      */
     private boolean passesUserRestriction() {
         Pattern userRestriction = compilePatternFromSetting(Key.AUTHORIZATION_LOG_DECISIONS_USER_RESTRICTION);
-        return userRestriction == null || userRestriction.matcher(String.valueOf(whoToAuth)).find();
+        return userRestriction == null || userRestriction.matcher(String.valueOf(whoToAuth.getUri())).find();
     }
 
     /**
@@ -126,7 +126,7 @@ public class PolicyDecisionLogger {
         if (passesRestrictions(String.valueOf(policy), pd)) {
             if (this.includeIdentifiers) {
                 log.info(String.format("Decision on %s %s by %s was %s; user is %s", this.operation, this.object,
-                        policy.getShortUri(), pd, this.whoToAuth));
+                        policy.getShortUri(), pd, getUser()));
             } else {
                 log.info(String.format("Decision on %s %s by %s was %s", this.operation, this.object,
                         policy.getShortUri(), pd));
@@ -156,10 +156,14 @@ public class PolicyDecisionLogger {
     public void logNoDecision(PolicyDecision pd) {
         if (enabled) {
             if (this.includeIdentifiers) {
-                log.info(pd.getMessage() + "; user is " + this.whoToAuth);
+                log.info(pd.getMessage() + "; user is " + getUser());
             } else {
                 log.info(pd.getMessage());
             }
         }
+    }
+
+    private String getUser() {
+        return whoToAuth.getLastName() + ", " + whoToAuth.getFirstName() + " uri:'" + whoToAuth.getUri() + "'";
     }
 }

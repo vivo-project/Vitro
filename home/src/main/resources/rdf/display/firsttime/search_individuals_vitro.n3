@@ -33,24 +33,51 @@
         vitro-search:public        true .
 
 :sort_title_desc  a                vitro-search:Sort ;
-        vitro-search:order         20 ;
-        vitro-search:sortField     :field_label_sort ;
         vitro-search:isAscending   false ;
+        vitro-search:hasFallback   :sort_name_raw_desc ;
+        vitro-search:order         30 ;
+        vitro-search:sortField     :field_label_sort ;
+        vitro-search:display       true ;
         vitro-search:id            "titledesc" .
 
-:sort_title_asc  a                vitro-search:Sort ;
-        vitro-search:sortField     :field_label_sort ;
+:sort_title_asc  a                 vitro-search:Sort ;
         vitro-search:isAscending   true ;
-        vitro-search:order         30 ;
+        vitro-search:hasFallback   :sort_name_raw_asc ;
+        vitro-search:order         20 ;
+        vitro-search:sortField     :field_label_sort ;
+        vitro-search:display       true ;
         vitro-search:id            "titleasc" .
 
+:sort_name_raw_desc  a             vitro-search:Sort ;
+        vitro-search:isAscending   false ;
+        vitro-search:order         50 ;
+        vitro-search:sortField     :field_name_raw ;
+        vitro-search:id            "name_raw_desc" .
+
+:sort_name_raw_asc  a                vitro-search:Sort ;
+        vitro-search:isAscending   true ;
+        vitro-search:order         40 ;
+        vitro-search:sortField     :field_name_raw ;
+        vitro-search:id            "name_raw_asc" .
+
 :sort_by_relevance a                vitro-search:Sort ;
+        vitro-search:sortField     :field_score ;
+        vitro-search:display       true ;
+        vitro-search:order         60 ;
         vitro-search:id            "relevance" .
+
+:field_score
+        a                          vitro-search:SearchField ;
+        vitro-search:indexField    "score" .
 
 :field_label_sort
         a                          vitro-search:SearchField ;
         vitro-search:isLanguageSpecific true ;
         vitro-search:indexField    "_label_sort" .
+
+:field_name_raw
+        a                          vitro-search:SearchField ;
+        vitro-search:indexField    "nameRaw" .
 
 :field_category
         a                          vitro-search:SearchField ;

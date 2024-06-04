@@ -54,20 +54,20 @@ public class UpdateRelatedAllowedPropertiesPolicyTemplateTest extends PolicyTest
     public static Collection<Object[]> requests() {
         return Arrays.asList(new Object[][] {
 
-                { ADD, OBJECT_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
-                { ADD, DATA_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
-                { ADD, FAUX_OBJECT_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
-                { ADD, FAUX_DATA_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
+                { ADD, OBJECT_PROPERTY, SELF_EDITOR, 3, num(4, 5) },
+                { ADD, DATA_PROPERTY, SELF_EDITOR, 3, num(4, 5) },
+                { ADD, FAUX_OBJECT_PROPERTY, SELF_EDITOR, 3, num(4, 5) },
+                { ADD, FAUX_DATA_PROPERTY, SELF_EDITOR, 3, num(4, 5) },
 
-                { DROP, OBJECT_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
-                { DROP, DATA_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
-                { DROP, FAUX_OBJECT_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
-                { DROP, FAUX_DATA_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
+                { DROP, OBJECT_PROPERTY, SELF_EDITOR, 3, num(4, 5) },
+                { DROP, DATA_PROPERTY, SELF_EDITOR, 3, num(4, 5) },
+                { DROP, FAUX_OBJECT_PROPERTY, SELF_EDITOR, 3, num(4, 5) },
+                { DROP, FAUX_DATA_PROPERTY, SELF_EDITOR, 3, num(4, 5) },
 
-                { EDIT, OBJECT_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
-                { EDIT, DATA_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
-                { EDIT, FAUX_OBJECT_PROPERTY, SELF_EDITOR, 2, num(4, 5) },
-                { EDIT, FAUX_DATA_PROPERTY, SELF_EDITOR, 2, num(4, 5) }, });
+                { EDIT, OBJECT_PROPERTY, SELF_EDITOR, 3, num(4, 5) },
+                { EDIT, DATA_PROPERTY, SELF_EDITOR, 3, num(4, 5) },
+                { EDIT, FAUX_OBJECT_PROPERTY, SELF_EDITOR, 3, num(4, 5) },
+                { EDIT, FAUX_DATA_PROPERTY, SELF_EDITOR, 3, num(4, 5) }, });
 
     }
 

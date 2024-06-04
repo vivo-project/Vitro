@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -465,12 +466,10 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         if (sortOptions.isEmpty()) {
             return;
         }
+        Set<String> appliedSortOptions = new HashSet<String>();
         if (!StringUtils.isBlank(sortType) && sortOptions.containsKey(sortType)) {
             SortConfiguration conf = sortOptions.get(sortType);
-            String field = conf.getField(vreq.getLocale());
-            if (!StringUtils.isBlank(field)) {
-                query.addSortField(field, conf.getSortOrder());
-            }
+            addSortField(vreq, query, conf, sortOptions, appliedSortOptions);
             conf.setSelected(true);
             return;
         }
@@ -478,12 +477,26 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         // If text field is empty, apply the first sort option
         if (textQueryIsEmpty) {
             SortConfiguration conf = sortOptions.entrySet().iterator().next().getValue();
-            String field = conf.getField(vreq.getLocale());
-            if (!StringUtils.isBlank(field)) {
-                query.addSortField(field, conf.getSortOrder());
-            }
+            addSortField(vreq, query, conf, sortOptions, appliedSortOptions);
         }
         // If text field is not empty, sort by relevance (no need to add sort field)
+    }
+
+    private void addSortField(VitroRequest vreq, SearchQuery query, SortConfiguration conf,
+            Map<String, SortConfiguration> sortOptions, Set<String> appliedSortOptions) {
+        if (conf == null || appliedSortOptions.contains(conf.getId())) {
+            return;
+        }
+        appliedSortOptions.add(conf.getId());
+        String field = conf.getField(vreq.getLocale());
+        if (StringUtils.isBlank(field)) {
+            log.error(String.format("Sort field is not set for '%s'", conf.getId()));
+            return;
+        }
+        query.addSortField(field, conf.getSortOrder());
+        if (sortOptions.containsKey(conf.getFallback())) {
+            addSortField(vreq, query, sortOptions.get(conf.getFallback()), sortOptions, appliedSortOptions);
+        }
     }
 
     private String getSortType(VitroRequest vreq) {

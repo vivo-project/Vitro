@@ -13,6 +13,8 @@ public class SortConfiguration {
     private boolean selected = false;
     private String label = "";
     private int order = 0;
+    private String fallback;
+    private boolean display = false;
 
     public SortConfiguration(String id, String label, String field) {
         this.id = id;
@@ -87,4 +89,19 @@ public class SortConfiguration {
         this.order = order;
     }
 
+    public String getFallback() {
+        return fallback;
+    }
+
+    public void setFallback(String id) {
+        this.fallback = id;
+    }
+
+    public void setDisplay(boolean display) {
+        this.display = display;
+    }
+
+    public boolean isDisplay() {
+        return display;
+    }
 }

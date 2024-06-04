@@ -12,3 +12,4 @@
 :field_type rdfs:label "Type"@en-CA .
 :filter_querytext rdfs:label "Text"@en-CA .
 :field_querytext rdfs:label "Default field"@en-CA .
+:field_score rdfs:label "Score"@en-CA .

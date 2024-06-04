@@ -12,3 +12,4 @@
 :field_type rdfs:label "Поле тип"@ru-RU .
 :filter_querytext rdfs:label "Текст"@ru-RU .
 :field_querytext rdfs:label "Поле фильтра по умолчанию"@ru-RU .
+:field_score rdfs:label "Релевантность"@ru-RU .

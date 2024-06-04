@@ -12,3 +12,4 @@
 :field_type rdfs:label "Tipo"@pt-BR .
 :filter_querytext rdfs:label "Texto"@pt-BR .
 :field_querytext rdfs:label "Campo padrão"@pt-BR .
+:field_score rdfs:label "Campo de relevância"@pt-BR .

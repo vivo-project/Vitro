@@ -12,3 +12,8 @@
 :field_type rdfs:label "Type"@en-US .
 :filter_querytext rdfs:label "Text"@en-US .
 :field_querytext rdfs:label "Default field"@en-US .
+:sort_name_raw_desc rdfs:label "Label without language tag in descending order"@en-US .
+:sort_name_raw_asc rdfs:label "Label without language tag in ascending order"@en-US .
+:field_score rdfs:label "Score"@en-US .
+:field_name_raw rdfs:label "Label without language tag"@en-US .
+

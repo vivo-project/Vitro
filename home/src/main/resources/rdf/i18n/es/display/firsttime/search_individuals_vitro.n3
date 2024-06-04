@@ -12,3 +12,7 @@
 :field_type rdfs:label "Tipo"@es .
 :filter_querytext rdfs:label "Texto"@es .
 :field_querytext rdfs:label "Campo predeterminado"@es .
+:sort_name_raw_desc rdfs:label "Etiqueta sin etiqueta de idioma en orden descendente"@es .
+:sort_name_raw_asc rdfs:label "Etiqueta sin etiqueta de idioma en orden ascendente"@es .
+:field_score rdfs:label "Campo de relevancia"@es .
+:field_name_raw rdfs:label "Etiqueta sin etiqueta de idioma"@es .

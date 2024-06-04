@@ -12,3 +12,4 @@
 :field_type rdfs:label "Taper"@fr-CA .
 :filter_querytext rdfs:label "Texte"@fr-CA .
 :field_querytext rdfs:label "Champ par défaut"@fr-CA .
+:field_score rdfs:label "Champ de pertinence"@fr-CA .

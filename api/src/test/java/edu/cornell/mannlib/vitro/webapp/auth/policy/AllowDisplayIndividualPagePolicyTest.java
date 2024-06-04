@@ -15,7 +15,7 @@ import java.util.Set;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.IndividualAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.NamedAccessObject;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.TestAuthorizationRequest;
 import org.junit.Test;
 
 public class AllowDisplayIndividualPagePolicyTest extends PolicyTest {
@@ -33,13 +33,13 @@ public class AllowDisplayIndividualPagePolicyTest extends PolicyTest {
         assertEquals(1000, policy.getPriority());
         countRulesAndAttributes(policy, 1, Collections.singleton(2));
         AccessObject ao = new IndividualAccessObject("https://test-individual");
-        SimpleAuthorizationRequest ar = new SimpleAuthorizationRequest(ao, DISPLAY);
+        TestAuthorizationRequest ar = new TestAuthorizationRequest(ao, DISPLAY);
         ar.setRoleUris(Arrays.asList(PUBLIC));
         assertEquals(AUTHORIZED, policy.decide(ar).getDecisionResult());
-        ar = new SimpleAuthorizationRequest(ao, ADD);
+        ar = new TestAuthorizationRequest(ao, ADD);
         assertEquals(INCONCLUSIVE, policy.decide(ar).getDecisionResult());
         ao = new NamedAccessObject("https://test-individual");
-        ar = new SimpleAuthorizationRequest(ao, DISPLAY);
+        ar = new TestAuthorizationRequest(ao, DISPLAY);
         assertEquals(INCONCLUSIVE, policy.decide(ar).getDecisionResult());
     }
 }

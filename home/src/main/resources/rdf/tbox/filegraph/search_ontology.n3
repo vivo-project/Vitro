@@ -110,6 +110,10 @@ search:sortField  a                   owl:FunctionalProperty , owl:ObjectPropert
         rdfs:domain                   search:Sort ;
         rdfs:range                    search:SearchField .
 
+search:hasFallback  a                 owl:FunctionalProperty , owl:ObjectProperty ;
+        rdfs:domain                   search:Sort ;
+        rdfs:range                    search:Sort .
+
 search:id  a                          owl:DatatypeProperty , owl:FunctionalProperty ;
         rdfs:domain                   search:PublicParameter ;
         rdfs:range                    xsd:string .
@@ -128,6 +132,10 @@ search:hasKnownValue  a                owl:ObjectProperty ;
 
 search:public  a                      owl:DatatypeProperty , owl:FunctionalProperty ;
         rdfs:domain                   search:PublicParameter ;
+        rdfs:range                    xsd:boolean .
+
+search:display a                      owl:DatatypeProperty , owl:FunctionalProperty ;
+        rdfs:domain                   search:Sort ;
         rdfs:range                    xsd:boolean .
 
 search:isDefaultForRole

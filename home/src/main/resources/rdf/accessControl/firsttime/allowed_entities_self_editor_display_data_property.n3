@@ -4,4 +4,6 @@
 @prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
 
 :SelfEditorDisplayDataPropertyValueSet access:value
+    <http://vitro.mannlib.cornell.edu/ns/vitro/public#filename> ,
+    <http://vitro.mannlib.cornell.edu/ns/vitro/public#mimeType> ,
     <http://www.w3.org/2000/01/rdf-schema#label> .

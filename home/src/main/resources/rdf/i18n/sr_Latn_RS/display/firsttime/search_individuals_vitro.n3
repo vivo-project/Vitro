@@ -12,3 +12,4 @@
 :field_type rdfs:label "Tip"@sr-Latn-RS .
 :filter_querytext rdfs:label "Tekst"@sr-Latn-RS .
 :field_querytext rdfs:label "Podrazumevano polje"@sr-Latn-RS .
+:field_score rdfs:label "Polje za relevantnost"@sr-Latn-RS .

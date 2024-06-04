@@ -52,7 +52,7 @@ public class BulkUpdatingOntModel extends AbstractOntModelDecorator {
     @Override
     public Model add(StmtIterator iter) {
         if (updater != null && iter != null) {
-            Graph g = GraphFactory.createPlainGraph();
+            Graph g = GraphFactory.createGraphMem();
             while (iter.hasNext()) {
                 g.add(iter.nextStatement().asTriple());
             }
@@ -76,7 +76,7 @@ public class BulkUpdatingOntModel extends AbstractOntModelDecorator {
     @Override
     public Model add(Statement[] statements) {
         if (updater != null && statements != null) {
-            Graph g = GraphFactory.createPlainGraph();
+            Graph g = GraphFactory.createGraphMem();
             for (Statement s : statements) {
                 g.add(s.asTriple());
             }
@@ -155,7 +155,7 @@ public class BulkUpdatingOntModel extends AbstractOntModelDecorator {
     @Override
     public Model remove(StmtIterator iter) {
         if (updater != null && iter != null) {
-            Graph g = GraphFactory.createPlainGraph();
+            Graph g = GraphFactory.createGraphMem();
             while (iter.hasNext()) {
                 g.add(iter.nextStatement().asTriple());
             }
@@ -179,7 +179,7 @@ public class BulkUpdatingOntModel extends AbstractOntModelDecorator {
     @Override
     public Model remove(Statement[] statements) {
         if (updater != null && statements != null) {
-            Graph g = GraphFactory.createPlainGraph();
+            Graph g = GraphFactory.createGraphMem();
             for (Statement s : statements) {
                 g.add(s.asTriple());
             }
@@ -193,7 +193,7 @@ public class BulkUpdatingOntModel extends AbstractOntModelDecorator {
     @Override
     public Model remove(List<Statement> statements) {
         if (updater != null && statements != null) {
-            Graph g = GraphFactory.createPlainGraph();
+            Graph g = GraphFactory.createGraphMem();
             for (Statement s : statements) {
                 g.add(s.asTriple());
             }

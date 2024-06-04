@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vedit.beans;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -100,9 +99,7 @@ public class LoginStatusBean {
 		if (!getBean(session).isLoggedIn()) {
 			return null;
 		}
-
-		ServletContext ctx = session.getServletContext();
-		WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
+		WebappDaoFactory wadf = ModelAccess.getInstance().getWebappDaoFactory();
 		UserAccountsDao userAccountsDao = wadf.getUserAccountsDao();
 		if (userAccountsDao == null) {
 			log.error("No UserAccountsDao");

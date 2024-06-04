@@ -1,0 +1,7 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/access-allowed-property/> .
+
+:AdminAddObjectPropertyValueSet access:value
+    <http://vitro.mannlib.cornell.edu/ns/vitro/public#mainImage> .

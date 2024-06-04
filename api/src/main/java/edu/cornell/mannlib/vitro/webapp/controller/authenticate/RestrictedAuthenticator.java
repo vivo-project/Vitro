@@ -7,8 +7,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
@@ -47,11 +45,7 @@ public class RestrictedAuthenticator extends Authenticator {
 			return false;
 		}
 
-		ArrayIdentifierBundle ids = new ArrayIdentifierBundle();
-		ids.addAll(getIdsForUserAccount(userAccount));
-		ids.addAll(RequestIdentifiers.getIdBundleForRequest(req));
-
-		return PolicyHelper.isAuthorizedForActions(ids, SimplePermission.LOGIN_DURING_MAINTENANCE.ACTION);
+		return PolicyHelper.isAuthorizedForActions(userAccount, SimplePermission.LOGIN_DURING_MAINTENANCE.ACTION);
 	}
 
 	@Override

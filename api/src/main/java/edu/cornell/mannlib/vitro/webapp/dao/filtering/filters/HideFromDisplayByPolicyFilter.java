@@ -3,14 +3,12 @@
 package edu.cornell.mannlib.vitro.webapp.dao.filtering.filters;
 
 import net.sf.jga.fn.UnaryFunctor;
-
-import static edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject.SOME_URI;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject.SOME_URI;
+
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.DataPropertyAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.DataPropertyStatementAccessObject;
@@ -22,21 +20,23 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 
 /**
  * Ask the current policies whether we can show these things to the user.
  */
 public class HideFromDisplayByPolicyFilter extends VitroFiltersImpl {
-	private static final Log log = LogFactory
-			.getLog(HideFromDisplayByPolicyFilter.class);
 
-	private final IdentifierBundle idBundle;
+    private static final Log log = LogFactory.getLog(HideFromDisplayByPolicyFilter.class);
 
-	public HideFromDisplayByPolicyFilter(IdentifierBundle idBundle) {
-		if (idBundle == null) {
-			throw new NullPointerException("idBundle may not be null.");
+	private final UserAccount userAccount;
+
+	public HideFromDisplayByPolicyFilter(UserAccount userAccount) {
+		if (userAccount == null) {
+		    log.debug("UserAccount provided for PolicyFilter is null. Fall back to default user account.");
+			userAccount = PolicyHelper.getUserAccount(null);
 		}
-		this.idBundle = idBundle;
+		this.userAccount = userAccount;
 
 		setDataPropertyFilter(new DataPropertyFilterByPolicy());
 		setObjectPropertyFilter(new ObjectPropertyFilterByPolicy());
@@ -45,7 +45,7 @@ public class HideFromDisplayByPolicyFilter extends VitroFiltersImpl {
 	}
 
 	boolean checkAuthorization(AccessObject whatToAuth) {
-	    return PolicyHelper.isAuthorizedForActions(idBundle, whatToAuth, AccessOperation.DISPLAY);
+	    return PolicyHelper.isAuthorizedForActions(userAccount, whatToAuth, AccessOperation.DISPLAY);
 	}
 
 	private class DataPropertyFilterByPolicy extends

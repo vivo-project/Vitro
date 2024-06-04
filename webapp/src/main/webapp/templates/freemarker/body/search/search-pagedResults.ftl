@@ -2,10 +2,11 @@
 
 ${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/css/nouislider.css"/>')}
 ${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/css/search-results.css"/>')}
-${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/bootstrap-5.3.2/css/bootstrap.min.css"/>')}
+${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/js/bootstrap/css/bootstrap.min.css"/>')}
+${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/js/bootstrap/css/bootstrap-theme.min.css"/>')}
 ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/nouislider.min.js"></script>')}
 ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/wNumb.min.js"></script>')}
-${headScripts.add('<script type="text/javascript" src="${urls.base}/bootstrap-5.3.2/js/bootstrap.min.js"></script>')}
+${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap/js/bootstrap.min.js"></script>')}
 
 <@searchForm  />
 
@@ -268,11 +269,13 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/bootstrap-5.
 			<select form="search-form" name="sort" id="search-form-sort" onchange="this.form.submit()" >
 			    <#assign addDefaultOption = true>
 				<#list sorting as option>
-					<#if option.selected>
-						<option value="${option.id}" selected="selected">${i18n().search_results_sort_by(option.label)}</option>
-						<#assign addDefaultOption = false>
-					<#else>
-						<option value="${option.id}" >${i18n().search_results_sort_by(option.label)}</option>
+					<#if option.display>
+						<#if option.selected>
+							<option value="${option.id}" selected="selected">${i18n().search_results_sort_by(option.label)}</option>
+							<#assign addDefaultOption = false>
+						<#else>
+							<option value="${option.id}" >${i18n().search_results_sort_by(option.label)}</option>
+						</#if>
 					</#if>
 				</#list>
 				<#if addDefaultOption>
@@ -299,11 +302,11 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/bootstrap-5.
 
 <#macro searchFormGroupTab group active >
 	<#if active>
-	 	<li class="active nav-item form-group-tab">
+	 	<li class="active form-group-tab">
 	<#else>
-		<li class="form-group-tab nav-item">
+		<li class="form-group-tab">
 	</#if>
-			<a data-toggle="tab" class="nav-link" href="#${group.id?html}" id="${group.id?html}-tab" data-bs-toggle="tab" data-bs-target="#${group.id?html}" type="button" role="tab" aria-controls="${group.id?html}" aria-selected="false">${group.label?html}</a>
+			<a data-toggle="tab" href="#${group.id?html}">${group.label?html}</a>
 		</li>
 </#macro>
 
@@ -313,7 +316,7 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/bootstrap-5.
 		<#return>
 	</#if>
 		<li class="filter-tab">
-			<a data-toggle="tab" class="nav-link" href="#${filter.id?html}" id="${filter.id?html}-tab" data-bs-toggle="tab" data-bs-target="#${filter.id?html}" type="button" role="tab" aria-controls="${filter.id?html}" aria-selected="false">${filter.name?html}</a>
+			<a data-toggle="tab" href="#${filter.id?html}">${filter.name?html}</a>
 		</li>
 </#macro>
 
