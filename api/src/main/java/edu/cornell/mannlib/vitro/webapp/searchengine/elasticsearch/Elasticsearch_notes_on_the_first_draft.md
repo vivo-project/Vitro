@@ -65,57 +65,79 @@ git clone -b feature/elasticsearchExperiments https://github.com/j2blake/Vitro.g
 ```
 curl -X PUT "localhost:9200/vivo?pretty" -H 'Content-Type: application/json' -d'
 {
-  "mappings": {
-    "_doc": { 
-      "properties": { 
-        "ALLTEXT": { 
-          "type": "text",
-          "analyzer": "english"
-        }, 
-        "ALLTEXTUNSTEMMED": { 
-          "type": "text",
-          "analyzer": "standard"
-        }, 
-        "DocId": {
-          "type": "keyword"  
-        }, 
-        "classgroup": {
-          "type": "keyword"  
-        }, 
-        "type": {
-          "type": "keyword"  
-        }, 
-        "mostSpecificTypeURIs": {
-          "type": "keyword"  
-        }, 
-        "indexedTime": { 
-          "type": "long" 
-        },
-        "nameRaw": { 
-          "type": "keyword" 
-        },
-        "URI": { 
-          "type": "keyword" 
-        },
-        "THUMBNAIL": { 
-          "type": "integer" 
-        },
-        "THUMBNAIL_URL": { 
-          "type": "keyword" 
-        },
-        "nameLowercaseSingleValued": {
-          "type": "text",
-          "analyzer": "standard",
-          "fielddata": "true"
-        },
-        "BETA" : {
-          "type" : "float"
+  "settings": {
+    "index": {
+      "analysis": {
+        "analyzer": {
+          "default": {
+            "type": "english"
+          }
         }
       }
     }
   },
-  "query": {
-    "default_field": "ALLTEXT"
+  "mappings": {
+    "dynamic_templates": [
+      {
+        "field_sort_template": {
+          "match": "*_label_sort",
+          "mapping": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            },
+            "fielddata": true
+          }
+        }
+      }
+    ],
+    "properties": { 
+      "ALLTEXT": { 
+        "type": "text",
+        "analyzer": "english"
+      }, 
+      "ALLTEXTUNSTEMMED": { 
+        "type": "text",
+        "analyzer": "standard"
+      }, 
+      "DocId": {
+        "type": "keyword"  
+      }, 
+      "classgroup": {
+        "type": "keyword"  
+      }, 
+      "type": {
+        "type": "keyword"  
+      }, 
+      "mostSpecificTypeURIs": {
+        "type": "keyword"  
+      }, 
+      "indexedTime": { 
+        "type": "long" 
+      },
+      "nameRaw": { 
+        "type": "keyword" 
+      },
+      "URI": { 
+        "type": "keyword" 
+      },
+      "THUMBNAIL": { 
+        "type": "integer" 
+      },
+      "THUMBNAIL_URL": { 
+        "type": "keyword" 
+      },
+      "nameLowercaseSingleValued": {
+        "type": "text",
+        "analyzer": "standard",
+        "fielddata": true
+      },
+      "BETA" : {
+        "type" : "float"
+      }
+    }
   }
 }
 '
