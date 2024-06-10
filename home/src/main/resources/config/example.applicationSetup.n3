@@ -69,13 +69,22 @@
 #    and more rigorous life-cycle checking.
 #
 
+#:instrumentedSearchEngineWrapper
+#    a   vitroWebapp:searchengine.InstrumentedSearchEngineWrapper ,
+#        vitroWebapp:modules.searchEngine.SearchEngine ;
+#    :wraps :solrSearchEngine .
+
+#:solrSearchEngine
+#    a   vitroWebapp:searchengine.solr.SolrSearchEngine ,
+#        vitroWebapp:modules.searchEngine.SearchEngine .
+
 :instrumentedSearchEngineWrapper
     a   vitroWebapp:searchengine.InstrumentedSearchEngineWrapper ,
         vitroWebapp:modules.searchEngine.SearchEngine ;
-    :wraps :solrSearchEngine .
+    :wraps :elasticSearchEngine .
 
-:solrSearchEngine
-    a   vitroWebapp:searchengine.solr.SolrSearchEngine ,
+:elasticSearchEngine
+    a   vitroWebapp:searchengine.elasticsearch.ElasticSearchEngine ,
         vitroWebapp:modules.searchEngine.SearchEngine .
 
 # ----------------------------
