@@ -98,32 +98,36 @@ class ResponseParser {
         highlightingMap = new HashMap<>();
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> uberHits = (Map<String, Object>) responseMap
-                .get("hits");
+        Map<String, Object> uberHits = (Map<String, Object>) responseMap.get("hits");
         if (uberHits == null) {
-            log.warn("Didn't find a 'hits' field " + "in the query response: "
-                    + responseMap);
+            log.warn("Didn't find a 'hits' field in the query response: " + responseMap);
             return;
         }
 
-        Integer total = (Integer) uberHits.get("total");
+        // Updated handling of the 'total' field
+        @SuppressWarnings("unchecked")
+        Map<String, Object> totalMap = (Map<String, Object>) uberHits.get("total");
+        if (totalMap == null) {
+            log.warn("Didn't find a 'hits.total' field in the query response: " + responseMap);
+            return;
+        }
+        Integer total = ((Number) totalMap.get("value")).intValue(); // Extract the integer value
+
         if (total == null) {
-            log.warn("Didn't find a 'hits.total' field "
-                    + "in the query response: " + responseMap);
+            log.warn("Didn't find a 'hits.total.value' field in the query response: " + responseMap);
             return;
         }
 
         @SuppressWarnings("unchecked")
-        List<Map<String, Object>> hits = (List<Map<String, Object>>) uberHits
-                .get("hits");
+        List<Map<String, Object>> hits = (List<Map<String, Object>>) uberHits.get("hits");
         if (hits == null) {
-            log.warn("Didn't find a 'hits.hits' field "
-                    + "in the query response: " + responseMap);
+            log.warn("Didn't find a 'hits.hits' field in the query response: " + responseMap);
             return;
         }
 
         parseDocuments(hits);
     }
+
 
     private void parseDocuments(List<Map<String, Object>> hits) {
         for (Map<String, Object> hit : hits) {
