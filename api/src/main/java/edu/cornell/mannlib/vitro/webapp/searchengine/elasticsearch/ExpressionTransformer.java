@@ -1,0 +1,176 @@
+package edu.cornell.mannlib.vitro.webapp.searchengine.elasticsearch;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+
+public class ExpressionTransformer {
+
+    private static final Map<String, Integer> priorities;
+
+    static {
+        Map<String, Integer> priorityTempMap = new HashMap<>();
+        priorityTempMap.put("AND", 2);
+        priorityTempMap.put("OR", 1);
+        priorityTempMap.put("NOT", 3);
+        priorityTempMap.put("(", 0);
+        priorities = Collections.unmodifiableMap(priorityTempMap);
+    }
+
+    public Query parseAdvancedQuery(List<String> expression) {
+        return buildQueryFromPostFixExpression(transformToPostFixNotation(expression));
+    }
+
+    private List<String> transformToPostFixNotation(List<String> expression) {
+        Stack<String> tokenStack = new Stack<>();
+        ArrayList<String> postfixExpression = new ArrayList<>();
+
+        for (String token : expression) {
+            if (!priorities.containsKey(token) && !token.equals(")")) {
+                postfixExpression.add(token);
+            } else if (token.equals("(")) {
+                tokenStack.push(token);
+            } else if (token.equals(")")) {
+                while (!tokenStack.isEmpty() && !tokenStack.peek().equals("(")) {
+                    postfixExpression.add(tokenStack.pop());
+                }
+                tokenStack.pop(); // Remove the '(' from stack
+            } else {
+                while (!tokenStack.isEmpty() &&
+                    priorities.get(token) <= priorities.getOrDefault(tokenStack.peek(), 0)) {
+                    postfixExpression.add(tokenStack.pop());
+                }
+                tokenStack.push(token);
+            }
+        }
+
+        while (!tokenStack.isEmpty()) {
+            postfixExpression.add(tokenStack.pop());
+        }
+
+        return postfixExpression;
+    }
+
+    private Query buildQueryFromPostFixExpression(List<String> postfixExpression) {
+        Stack<Query> queryStack = new Stack<>();
+
+        for (String token : postfixExpression) {
+            switch (token.toUpperCase()) {
+                case "AND":
+                    Query mustContain = queryStack.pop();
+                    queryStack.push(BoolQuery.of(q -> {
+                        q.must(mustContain);
+                        q.must(queryStack.pop());
+                        return q;
+                    })._toQuery());
+                    break;
+                case "OR":
+                    Query shouldContain = queryStack.pop();
+                    queryStack.push(BoolQuery.of(q -> {
+                        q.should(shouldContain);
+                        q.should(queryStack.pop());
+                        return q;
+                    })._toQuery());
+                    break;
+                case "NOT":
+                    Query mustNotContain = queryStack.pop();
+                    queryStack.push(BoolQuery.of(q -> {
+                        q.must(queryStack.pop());
+                        q.mustNot(mustNotContain);
+                        return q;
+                    })._toQuery());
+                    break;
+                default:
+                    String[] fieldValueTuple = token.split(":", 2);
+
+                    if (fieldValueTuple[0].startsWith("-")) {
+                        queryStack.push(BoolQuery.of(q -> {
+                            q.mustNot(CustomQueryBuilder.buildQuery(
+                                decideQueryType(fieldValueTuple[1]),
+                                fieldValueTuple[0].replaceFirst("-", ""),
+                                fieldValueTuple[1]));
+                            return q;
+                        })._toQuery());
+                        break;
+                    }
+
+                    SearchType searchType = decideQueryType(fieldValueTuple[1]);
+
+                    queryStack.push(CustomQueryBuilder.buildQuery(
+                        searchType,
+                        fieldValueTuple[0],
+                        fieldValueTuple[1]));
+            }
+        }
+
+        return queryStack.pop();
+    }
+
+    public static String removeWhitespacesFromRangeExpression(String expression) {
+        String regex = "\\[\\s*([^\\s]+)\\s+TO\\s+([^\\s]+)\\s*\\]";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(expression);
+
+        StringBuffer result = new StringBuffer();
+        while (matcher.find()) {
+            String replacement = "[" + matcher.group(1) + "TO" + matcher.group(2) + "]";
+            matcher.appendReplacement(result, replacement);
+        }
+        matcher.appendTail(result);
+
+        return result.toString();
+    }
+
+    public static String fillInMissingOperators(String query) {
+        String[] tokens = query.split(" ");
+        StringBuilder modifiedQuery = new StringBuilder();
+
+        for (int i = 0; i < tokens.length; i++) {
+            String currentToken = tokens[i];
+
+            if (!priorities.containsKey(currentToken) && !currentToken.contains(":") && !currentToken.equals(")")) {
+                currentToken = "ALLTEXT:" + currentToken;
+            }
+
+            if (i > 0 && currentToken.contains(":") && !priorities.containsKey(tokens[i - 1])) {
+                modifiedQuery.append(" OR ");
+            }
+
+            if (i > 0 && currentToken.startsWith("(") && !priorities.containsKey(tokens[i - 1])) {
+                modifiedQuery.append(" AND ");
+            }
+
+            modifiedQuery.append(currentToken);
+
+            if (i < tokens.length - 1) {
+                modifiedQuery.append(" ");
+            }
+        }
+
+        return modifiedQuery.toString();
+    }
+
+    private static SearchType decideQueryType(String value) {
+        SearchType searchType = SearchType.MATCH;
+
+        if (value.startsWith("\"") && value.endsWith("\"")) {
+            searchType = SearchType.PHRASE;
+        } else if (value.contains("TO")) {
+            searchType = SearchType.RANGE;
+        } else if (value.contains("*")) {
+            searchType = SearchType.WILDCARD;
+        } else if (value.endsWith("~")) {
+            searchType = SearchType.FUZZY;
+        }
+
+        return searchType;
+    }
+}
