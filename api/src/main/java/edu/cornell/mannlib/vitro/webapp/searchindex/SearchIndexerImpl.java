@@ -27,7 +27,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -93,7 +92,6 @@ public class SearchIndexerImpl implements SearchIndexer {
 	private Integer threadPoolSize;
 	private WorkerThreadPool pool;
 
-	private ServletContext ctx;
 	private List<SearchIndexExcluder> excluders;
 	private List<DocumentModifier> modifiers;
 	private Set<IndexingUriFinder> uriFinders;
@@ -134,7 +132,6 @@ public class SearchIndexerImpl implements SearchIndexer {
 					"startup() called after shutdown().");
 		}
 		try {
-			this.ctx = application.getServletContext();
 			this.wadf = getFilteredWebappDaoFactory();
 			loadConfiguration();
 
@@ -150,14 +147,14 @@ public class SearchIndexerImpl implements SearchIndexer {
 
 	/** With a filtered factory, only public data goes into the search index. */
 	private WebappDaoFactory getFilteredWebappDaoFactory() {
-		WebappDaoFactory rawWadf = ModelAccess.on(ctx).getWebappDaoFactory();
-		VitroFilters vf = VitroFilterUtils.getPublicFilter(ctx);
+		WebappDaoFactory rawWadf = ModelAccess.getInstance().getWebappDaoFactory();
+		VitroFilters vf = VitroFilterUtils.getPublicFilter();
 		return new WebappDaoFactoryFiltering(rawWadf, vf);
 	}
 
 	private void loadConfiguration() throws ConfigurationBeanLoaderException {
 		ConfigurationBeanLoader beanLoader = new ConfigurationBeanLoader(
-				ModelAccess.on(ctx).getOntModel(DISPLAY), ctx);
+				ModelAccess.getInstance().getOntModel(DISPLAY));
 		uriFinders = beanLoader.loadAll(IndexingUriFinder.class);
 
 		excluders = new ArrayList<>();
