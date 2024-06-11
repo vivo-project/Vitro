@@ -7,10 +7,13 @@ import static edu.cornell.mannlib.vitro.webapp.searchengine.elasticsearch.JsonTr
 import static edu.cornell.mannlib.vitro.webapp.searchengine.elasticsearch.JsonTree.tree;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -48,8 +51,30 @@ public class QueryConverter {
     }
 
     private Map<String, Object> filteredOrNot() {
+        ExpressionTransformer transformer = new ExpressionTransformer();
         if (query.getFilters().isEmpty()) {
-            return new QueryStringMap(query.getQuery()).map;
+            String queryForParsing = ExpressionTransformer.fillInMissingOperators(
+                ExpressionTransformer.removeWhitespacesFromRangeExpression(
+                    query.getQuery()
+                        .replace("(", "( ")
+                        .replace(")", " )")
+                ));
+            List<String> queryTokens = new ArrayList<>(Arrays.asList(queryForParsing.split(" ")));
+            queryTokens.removeIf(String::isEmpty);
+            String es8Query = BoolQuery.of(q -> {
+                q.must(transformer.parseAdvancedQuery(queryTokens));
+                return q;
+            })._toQuery().toString();
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                Map<String, Object> queryMap =
+                    objectMapper.readValue(es8Query.replaceFirst("Query: ", ""), new TypeReference<Map<String, Object>>() {
+                    });
+                return queryMap;
+            } catch (JsonProcessingException e) {
+                log.error("Query parsing for ES8 failed, falling back to old parsing method.");
+                return new QueryStringMap(query.getQuery()).map;
+            }
         } else {
             return buildFilterStructure();
         }
@@ -118,7 +143,7 @@ public class QueryConverter {
                 .put("size", ifPositive(query.getRows())) //
                 .put("sort", sortFields) //
                 .put("_source", returnFields) //
-                .put("aggregations", facets) //
+                .put("aggs", facets) //
                 .asMap();
     }
 
