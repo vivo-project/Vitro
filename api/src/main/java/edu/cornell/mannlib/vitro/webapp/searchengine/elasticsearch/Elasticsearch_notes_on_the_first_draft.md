@@ -91,6 +91,21 @@ curl -X PUT "localhost:9200/vivo?pretty" -H 'Content-Type: application/json' -d'
             "fielddata": true
           }
         }
+      },
+      {
+        "field_ss_template": {
+          "match": "*_ss",
+          "mapping": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            },
+            "fielddata": true
+          }
+        }
       }
     ],
     "properties": { 
