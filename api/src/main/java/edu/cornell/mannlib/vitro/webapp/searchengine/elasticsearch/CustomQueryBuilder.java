@@ -1,5 +1,6 @@
 package edu.cornell.mannlib.vitro.webapp.searchengine.elasticsearch;
 
+import co.elastic.clients.elasticsearch._types.query_dsl.ExistsQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.FuzzyQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchPhraseQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
@@ -38,6 +39,10 @@ public class CustomQueryBuilder {
                     .field(field)
                     .from(values[0])
                     .to(values[1])
+                )._toQuery();
+            case EXISTS:
+                return ExistsQuery.of(m -> m
+                    .field(field)
                 )._toQuery();
             case WILDCARD:
                 return WildcardQuery.of(m -> m

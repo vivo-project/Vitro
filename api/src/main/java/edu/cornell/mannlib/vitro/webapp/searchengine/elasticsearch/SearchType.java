@@ -6,5 +6,6 @@ public enum SearchType {
     PHRASE,
     RANGE,
     PREFIX,
-    WILDCARD
+    WILDCARD,
+    EXISTS
 }
