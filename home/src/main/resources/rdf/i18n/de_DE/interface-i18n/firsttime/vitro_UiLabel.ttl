@@ -577,7 +577,7 @@ uil-data:you_can.Vitro
 uil-data:supply_sparql_query.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Sie müssen eine Sparql-Anfrage angeben."@de-DE ;
+        rdfs:label       "Sie müssen eine Sparql-Abfrage angeben."@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "supply_sparql_query" ;
         uil:hasPackage  "Vitro-languages" .
@@ -1281,7 +1281,7 @@ uil-data:password_saved.Vitro
 uil-data:supply_query_variable.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Sie müssen eine Variable angeben, um Anfrageergebnisse zu speichern."@de-DE ;
+        rdfs:label       "Sie müssen eine Variable angeben, um Abfrageergebnisse zu speichern."@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "supply_query_variable" ;
         uil:hasPackage  "Vitro-languages" .
@@ -1321,7 +1321,7 @@ uil-data:verbose_property_status.Vitro
 uil-data:sparql_query_select_ask_results.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Format for SELECT and ASK query results"@de-DE ;
+        rdfs:label       "Format für SELECT- und ASK-Abfrageergebnisse"@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "sparql_query_select_ask_results" ;
         uil:hasPackage  "Vitro-languages" .
@@ -2369,7 +2369,7 @@ uil-data:no_image.Vitro
 uil-data:sparql_query_save_results.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Save results to file"@de-DE ;
+        rdfs:label       "Ergebnisse in Datei speichern"@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "sparql_query_save_results" ;
         uil:hasPackage  "Vitro-languages" .
@@ -3137,7 +3137,7 @@ uil-data:resource_uri.Vitro
 uil-data:sparql_query_run_query.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Run Query"@de-DE ;
+        rdfs:label       "Query starten"@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "sparql_query_run_query" ;
         uil:hasPackage  "Vitro-languages" .
@@ -3353,7 +3353,7 @@ uil-data:search_tip_one.Vitro
 uil-data:sparql_query_construct_describe_results.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Format for CONSTRUCT and DESCRIBE query results"@de-DE ;
+        rdfs:label       "Format für CONSTRUCT- und DESCRIBE-Abfrageergebnisse"@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "sparql_query_construct_describe_results" ;
         uil:hasPackage  "Vitro-languages" .
@@ -3945,7 +3945,7 @@ uil-data:date_time_value_for.Vitro
 uil-data:sparql_query_title.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "SPARQL Query"@de-DE ;
+        rdfs:label       "SPARQL-Query"@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "sparql_query_title" ;
         uil:hasPackage  "Vitro-languages" .
@@ -4233,7 +4233,7 @@ uil-data:browse_page_javascript_one.Vitro
 uil-data:sparql_query_builder.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "SPARQL Query Builder"@de-DE ;
+        rdfs:label       "SPARQL-Query-Builder"@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "sparql_query_builder" ;
         uil:hasPackage  "Vitro-languages" .
@@ -5081,7 +5081,7 @@ uil-data:return_to_the.Vitro
 uil-data:sparql_query.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "SPARQL Query"@de-DE ;
+        rdfs:label       "SPARQL-Query"@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "sparql_query" ;
         uil:hasPackage  "Vitro-languages" .
