@@ -3945,7 +3945,7 @@ uil-data:date_time_value_for.Vitro
 uil-data:sparql_query_title.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "SPARQL-Query"@de-DE ;
+        rdfs:label       "SPARQL-Abfrage"@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "sparql_query_title" ;
         uil:hasPackage  "Vitro-languages" .
