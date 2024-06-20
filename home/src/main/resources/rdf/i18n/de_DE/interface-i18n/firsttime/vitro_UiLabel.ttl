@@ -5081,7 +5081,7 @@ uil-data:return_to_the.Vitro
 uil-data:sparql_query.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "SPARQL-Query"@de-DE ;
+        rdfs:label       "SPARQL-Abfrage"@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "sparql_query" ;
         uil:hasPackage  "Vitro-languages" .
