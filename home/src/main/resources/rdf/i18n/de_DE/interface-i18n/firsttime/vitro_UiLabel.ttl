@@ -3137,7 +3137,7 @@ uil-data:resource_uri.Vitro
 uil-data:sparql_query_run_query.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Query starten"@de-DE ;
+        rdfs:label       "Abfrage starten"@de-DE ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "sparql_query_run_query" ;
         uil:hasPackage  "Vitro-languages" .
