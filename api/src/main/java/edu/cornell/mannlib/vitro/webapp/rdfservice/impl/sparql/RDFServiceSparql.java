@@ -378,6 +378,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
                     if (rebuildGraphURICache) {
                         try {
                             isRebuildGraphURICacheRunning = true;
+                            rebuildGraphURICache = false;
                             Set<String> newURIs = new HashSet<>();
                             try {
                                 String fastJenaQuery = "SELECT DISTINCT ?g WHERE { GRAPH ?g {} } ORDER BY ?g";
@@ -394,7 +395,6 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
                             log.error(e, e);
                         } finally {
                             isRebuildGraphURICacheRunning = false;
-                            rebuildGraphURICache = false;
                         }
                     }
                 }
