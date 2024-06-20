@@ -307,6 +307,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
                         DatasetWrapper dw = getDatasetWrapper();
                         try {
                             isRebuildGraphURICacheRunning = true;
+                            rebuildGraphURICache = false;
                             Dataset d = dw.getDataset();
                             Set<String> newURIs = new HashSet<>();
                             d.begin(ReadWrite.READ);
@@ -324,7 +325,6 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
                         } finally {
                             isRebuildGraphURICacheRunning = false;
                             dw.close();
-                            rebuildGraphURICache = false;
                         }
                     }
                 }
