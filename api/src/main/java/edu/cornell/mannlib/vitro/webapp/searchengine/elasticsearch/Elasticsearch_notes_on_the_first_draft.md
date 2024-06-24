@@ -11,6 +11,8 @@
 * Create a search index with the appropriate mapping (see below).
 * Check out VIVO and this branch of Vitro (see below), and do the usual installation procedure.
 * Modify `{vitro_home}/config/applicationSetup.n3` to use this driver (see below).
+* Modify the `vitro.local.elastic.url` configuration property to contain ES index base URL
+* Comment out (or completely remove) the `vitro.local.solr.url` property
 * Start elasticsearch
 * Start VIVO
 
@@ -202,6 +204,7 @@ Again, any location and port may be used, but they must match the "base URL" in 
         <java:edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine> ;
     :hasBaseUrl "http://localhost:9200/vivo" .
 ```
+Note that `hasBaseUrl "http://localhost:9200/vivo" .` can be omitted.
 
 ## Enhance the contents of the search index
 ### An example: Publication URIs in the author's search document
