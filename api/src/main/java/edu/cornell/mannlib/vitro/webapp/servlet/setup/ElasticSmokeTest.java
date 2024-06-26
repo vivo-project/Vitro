@@ -35,11 +35,11 @@ public class ElasticSmokeTest {
     public void doTest(ServletContextEvent sce) {
         final StartupStatus ss = StartupStatus.getBean(sce.getServletContext());
 
-        String elasticUrlString = ConfigurationProperties.getBean(sce).getProperty("vitro.local.elastic.url", "");
+        String elasticUrlString = ConfigurationProperties.getBean(sce).getProperty("vitro.local.searchengine.url", "");
         if (elasticUrlString.isEmpty()) {
             ss.fatal(listener, "Can't connect to ElasticSearch engine. "
                     + "runtime.properties must contain a value for "
-                    + "vitro.local.elastic.url");
+                    + "vitro.local.searchengine.url");
             return;
         }
 
@@ -49,7 +49,7 @@ public class ElasticSmokeTest {
             elasticUrl = new URL(elasticUrlString);
         } catch (MalformedURLException e) {
             ss.fatal(listener, "Can't connect to ElasticSearch engine. "
-                    + "The value for vitro.local.elastic.url "
+                    + "The value for vitro.local.searchengine.url "
                     + "in runtime.properties is not a valid URL: '"
                     + elasticUrlString + "'", e);
         }

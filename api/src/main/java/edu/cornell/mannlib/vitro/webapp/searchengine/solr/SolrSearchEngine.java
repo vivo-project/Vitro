@@ -45,9 +45,9 @@ public class SolrSearchEngine implements SearchEngine {
 	public void startup(Application application, ComponentStartupStatus css) {
 		ServletContext ctx = application.getServletContext();
 		String solrServerUrlString = ConfigurationProperties.getBean(ctx)
-				.getProperty("vitro.local.solr.url");
+				.getProperty("vitro.local.searchengine.url");
 		if (solrServerUrlString == null) {
-			css.fatal("Could not find vitro.local.solr.url in "
+			css.fatal("Could not find vitro.local.searchengine.url in "
 					+ "runtime.properties.  Vitro application needs the URL of "
 					+ "a solr server that it can use to index its data. It "
 					+ "should be something like http://localhost:${port}"
