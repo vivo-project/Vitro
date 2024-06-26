@@ -16,12 +16,12 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
 import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchInputDocument;
 import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchQuery;
+import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpHead;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 
 /**
  * A first version of an Elasticsearch engine implementation.
@@ -41,11 +41,11 @@ public class ElasticSearchEngine implements SearchEngine {
 
     @Override
     public void startup(Application application, ComponentStartupStatus css) {
-        String elasticUrlString = ConfigurationProperties.getInstance().getProperty("vitro.local.elastic.url", "");
+        String elasticUrlString = ConfigurationProperties.getInstance().getProperty("vitro.local.searchengine.url", "");
         if (elasticUrlString.isEmpty()) {
             css.fatal("Can't connect to ElasticSearch engine. "
                 + "runtime.properties must contain a value for "
-                + "vitro.local.elastic.url");
+                + "vitro.local.searchengine.url");
         }
 
         baseUrl = elasticUrlString;
@@ -64,14 +64,14 @@ public class ElasticSearchEngine implements SearchEngine {
     @Override
     public void ping() throws SearchEngineException {
         HttpHead httpHead = new HttpHead(baseUrl);
+        HttpClient httpClient = HttpClientFactory.getHttpClient();
 
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            try (CloseableHttpResponse response = httpClient.execute(httpHead)) {
-                int statusCode = response.getStatusLine().getStatusCode();
-                if (statusCode != 200) {
-                    throw new SearchEngineException(
-                        "Failed to ping Elasticsearch - ES responded with status code " + statusCode);
-                }
+        try {
+            HttpResponse response = httpClient.execute(httpHead);
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode != 200) {
+                throw new SearchEngineException(
+                    "Failed to ping Elasticsearch - ES responded with status code " + statusCode);
             }
         } catch (SearchEngineException | IOException e) {
             throw new SearchEngineException("Failed to put to Elasticsearch - request failed");
