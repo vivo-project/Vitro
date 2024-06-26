@@ -11,8 +11,7 @@
 * Create a search index with the appropriate mapping (see below).
 * Check out VIVO and this branch of Vitro (see below), and do the usual installation procedure.
 * Modify `{vitro_home}/config/applicationSetup.n3` to use this driver (see below).
-* Modify the `vitro.local.elastic.url` configuration property to contain ES index base URL
-* Comment out (or completely remove) the `vitro.local.solr.url` property
+* Modify the `vitro.local.searchengine.url` configuration property to contain ES index base URL
 * Start elasticsearch
 * Start VIVO
 
