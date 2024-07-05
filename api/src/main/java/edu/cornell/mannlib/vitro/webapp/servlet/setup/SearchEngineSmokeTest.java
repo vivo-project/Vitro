@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
-import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
+import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpsBasicClientFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
@@ -32,7 +32,7 @@ public class SearchEngineSmokeTest implements ServletContextListener {
         String baseServiceUrl = getBaseServiceUrl(url);
 
         ServiceType serviceType = ServiceType.UNKNOWN;
-        HttpClient httpClient = HttpClientFactory.getHttpClient();
+        HttpClient httpClient = ESHttpsBasicClientFactory.getHttpClient();
         HttpGet request = new HttpGet(baseServiceUrl);
 
         try {
@@ -103,7 +103,7 @@ public class SearchEngineSmokeTest implements ServletContextListener {
                 break;
             case OPENSEARCH:
                 log.debug("Initializing OpenSearch: " + searchEngineUrlString);
-                ss.fatal(this, "OpenSearch is not yet supported.");
+                new ElasticSmokeTest(this).doTest(sce);
                 break;
             case SOLR:
                 log.debug("Initializing Solr: " + searchEngineUrlString);
