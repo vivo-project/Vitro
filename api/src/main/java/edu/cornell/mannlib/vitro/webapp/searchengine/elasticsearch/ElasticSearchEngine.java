@@ -17,6 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
 import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchInputDocument;
 import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchQuery;
 import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
+import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpsBasicClientFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
@@ -64,7 +65,12 @@ public class ElasticSearchEngine implements SearchEngine {
     @Override
     public void ping() throws SearchEngineException {
         HttpHead httpHead = new HttpHead(baseUrl);
-        HttpClient httpClient = HttpClientFactory.getHttpClient();
+        HttpClient httpClient;
+        if (baseUrl.startsWith("https")) {
+            httpClient = ESHttpsBasicClientFactory.getHttpClient();
+        } else {
+            httpClient = HttpClientFactory.getHttpClient();
+        }
 
         try {
             HttpResponse response = httpClient.execute(httpHead);
