@@ -9,17 +9,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
+import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpsBasicClientFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.client.fluent.Request;
-import org.apache.http.client.fluent.Response;
-import org.apache.http.entity.ContentType;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPut;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputField;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.util.EntityUtils;
 
 /**
  * The nuts and bolts of adding a document to the Elasticsearch index
@@ -80,10 +84,19 @@ public class ESAdder {
         try {
             String url = baseUrl + "/_doc/"
                     + URLEncoder.encode(docId, "UTF8");
-            Response response = Request.Put(url)
-                    .bodyString(json, ContentType.APPLICATION_JSON).execute();
+            HttpClient httpClient;
+            if (baseUrl.startsWith("https")) {
+                httpClient = ESHttpsBasicClientFactory.getHttpClient();
+            } else {
+                httpClient = HttpClientFactory.getHttpClient();
+            }
+
+            HttpPut request = new HttpPut(url);
+            request.addHeader("Content-Type", "application/json");
+            request.setEntity(new StringEntity(json));
+            HttpResponse response = httpClient.execute(request);
             log.debug("Response from Elasticsearch: "
-                    + response.returnContent().asString());
+                    + EntityUtils.toString(response.getEntity()));
         } catch (Exception e) {
             throw new SearchEngineException("Failed to put to Elasticsearch",
                     e);
