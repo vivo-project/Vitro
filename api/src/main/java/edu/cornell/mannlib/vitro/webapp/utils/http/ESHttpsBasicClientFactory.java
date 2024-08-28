@@ -5,6 +5,8 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -18,6 +20,8 @@ import org.apache.http.ssl.SSLContextBuilder;
 
 public class ESHttpsBasicClientFactory {
 
+    private static final Log log = LogFactory.getLog(ESHttpsBasicClientFactory.class);
+
     private static volatile CloseableHttpClient httpsClient;
 
     private static void initializeClient() {
@@ -25,6 +29,13 @@ public class ESHttpsBasicClientFactory {
             ConfigurationProperties.getInstance().getProperty("vitro.local.searchengine.username", "");
         String elasticPassword =
             ConfigurationProperties.getInstance().getProperty("vitro.local.searchengine.password", "");
+
+        if (elasticUsername.isEmpty() && elasticPassword.isEmpty()) {
+            log.warn(
+                "You haven't set up username and password for your ES/OS client. " +
+                    "If this is intentional, it is strongly recommended to switch to " +
+                    "basic authentication as well as https.)");
+        }
 
         CredentialsProvider credsProvider = new BasicCredentialsProvider();
         credsProvider.setCredentials(
