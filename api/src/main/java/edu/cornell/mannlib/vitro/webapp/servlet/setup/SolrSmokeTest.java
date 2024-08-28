@@ -20,7 +20,6 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 import org.apache.http.util.EntityUtils;
@@ -52,12 +51,11 @@ public class SolrSmokeTest {
 	public void doTest(ServletContextEvent sce) {
 		final StartupStatus ss = StartupStatus.getBean(sce.getServletContext());
 
-		String solrUrlString = ConfigurationProperties.getInstance()
-				.getProperty("vitro.local.searchengine.url", "");
+		String solrUrlString = SearchEngineSmokeTest.getSearchEngineURLProperty();
 		if (solrUrlString.isEmpty()) {
 			ss.fatal(listener, "Can't connect to Solr search engine. "
 					+ "runtime.properties must contain a value for "
-					+ "vitro.local.searchengine.url");
+					+ "vitro.local.searchengine.url (vitro.local.solr.url)");
 			return;
 		}
 
@@ -67,7 +65,7 @@ public class SolrSmokeTest {
 			solrUrl = new URL(solrUrlString);
 		} catch (MalformedURLException e) {
 			ss.fatal(listener, "Can't connect to Solr search engine. "
-					+ "The value for vitro.local.searchengine.url "
+					+ "The value for vitro.local.searchengine.url (vitro.local.solr.url) "
 					+ "in runtime.properties is not a valid URL: '"
 					+ solrUrlString + "'", e);
 		}
@@ -151,14 +149,14 @@ public class SolrSmokeTest {
 		private void warnSocketTimeout() {
 			ss.warning(listener, "Can't connect to the Solr search engine. "
 					+ "The socket connection has repeatedly timed out. "
-					+ "Check the value of vitro.local.searchengine.url in "
+					+ "Check the value of vitro.local.searchengine.url (vitro.local.solr.url) in "
 					+ "runtime.properties. Is Solr responding at that URL?");
 		}
 
 		private void warnBadHttpStatus(int status) {
 			ss.warning(listener, "Can't connect to the Solr search engine. "
 					+ "The Solr server returned a status code of " + status
-					+ ". Check the value of vitro.local.searchengine.url in "
+					+ ". Check the value of vitro.local.searchengine.url (vitro.local.solr.url) in "
 					+ "runtime.properties.");
 		}
 
@@ -170,7 +168,7 @@ public class SolrSmokeTest {
 		private void warnUnknownHost(UnknownHostException e) {
 			ss.warning(listener, "Can't connect to the Solr search engine. '"
 					+ e.getMessage() + "' is an unknown host."
-					+ "Check the value of vitro.local.searchengine.url in "
+					+ "Check the value of vitro.local.searchengine.url (vitro.local.solr.url) in "
 					+ "runtime.properties.", e);
 		}
 
@@ -178,7 +176,7 @@ public class SolrSmokeTest {
 			ss.warning(listener, "Can't connect to the Solr search engine. "
 					+ "The host refused the connection. "
 					+ "Is it possible that the port number is incorrect? "
-					+ "Check the value of vitro.local.searchengine.url in "
+					+ "Check the value of vitro.local.searchengine.url (vitro.local.solr.url) in "
 					+ "runtime.properties.", e);
 		}
 
