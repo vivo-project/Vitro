@@ -10,7 +10,7 @@ import javax.servlet.ServletContextListener;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.searchengine.base.SearchEngineUtil;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpsBasicClientFactory;
 import org.apache.commons.logging.Log;
@@ -77,30 +77,11 @@ public class SearchEngineSmokeTest implements ServletContextListener {
         return url;
     }
 
-    public static String getSearchEngineURLProperty() {
-        ConfigurationProperties config = ConfigurationProperties.getInstance();
-        if (config.getProperty("vitro.local.searchengine.url", "").isEmpty()) {
-            return tryFetchLegacySolrConfiguration(config);
-        }
-
-        return config.getProperty("vitro.local.searchengine.url", "");
-    }
-
-    private static String tryFetchLegacySolrConfiguration(ConfigurationProperties config) {
-        String legacyConfigValue = config.getProperty("vitro.local.solr.url", "");
-        if (!legacyConfigValue.isEmpty()) {
-            log.warn(
-                "vitro.local.solr.url is deprecated, switch to using vitro.local.searchengine.url as soon as possible.");
-        }
-
-        return legacyConfigValue;
-    }
-
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         final StartupStatus ss = StartupStatus.getBean(sce.getServletContext());
 
-        String searchEngineUrlString = getSearchEngineURLProperty();
+        String searchEngineUrlString = SearchEngineUtil.getSearchEngineURLProperty();
 
         if (searchEngineUrlString.isEmpty()) {
             ss.fatal(this, "No search engine is configured");
