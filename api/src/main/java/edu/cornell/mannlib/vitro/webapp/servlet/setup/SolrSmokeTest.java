@@ -11,6 +11,7 @@ import java.net.UnknownHostException;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import edu.cornell.mannlib.vitro.webapp.searchengine.base.SearchEngineUtil;
 import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -51,7 +52,7 @@ public class SolrSmokeTest {
 	public void doTest(ServletContextEvent sce) {
 		final StartupStatus ss = StartupStatus.getBean(sce.getServletContext());
 
-		String solrUrlString = SearchEngineSmokeTest.getSearchEngineURLProperty();
+		String solrUrlString = SearchEngineUtil.getSearchEngineURLProperty();
 		if (solrUrlString.isEmpty()) {
 			ss.fatal(listener, "Can't connect to Solr search engine. "
 					+ "runtime.properties must contain a value for "
