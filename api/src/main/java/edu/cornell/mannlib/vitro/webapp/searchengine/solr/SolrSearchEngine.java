@@ -10,6 +10,7 @@ import java.util.Collection;
 
 import javax.servlet.ServletContext;
 
+import edu.cornell.mannlib.vitro.webapp.searchengine.base.SearchEngineUtil;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.SearchEngineSmokeTest;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
@@ -44,7 +45,7 @@ public class SolrSearchEngine implements SearchEngine {
 	@Override
 	public void startup(Application application, ComponentStartupStatus css) {
 		ServletContext ctx = application.getServletContext();
-		String solrServerUrlString = SearchEngineSmokeTest.getSearchEngineURLProperty();
+		String solrServerUrlString = SearchEngineUtil.getSearchEngineURLProperty();
 		if (solrServerUrlString == null) {
 			css.fatal("Could not find vitro.local.searchengine.url in "
 					+ "runtime.properties.  Vitro application needs the URL of "
