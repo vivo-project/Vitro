@@ -32,8 +32,10 @@ public class ConfigurationPropertiesImpl extends ConfigurationProperties {
 
 	public ConfigurationPropertiesImpl(InputStream stream,
 			Map<String, String> preemptiveProperties,
-			Map<String, String> buildProperties) throws IOException {
+			Map<String, String> buildProperties,
+			Map<String, String> contextProperties) throws IOException {
 		Map<String, String> map = new HashMap<>(buildProperties);
+		map.putAll(contextProperties);
 
 		Properties props = loadFromPropertiesFile(stream);
 		for (String key: props.stringPropertyNames()) {
