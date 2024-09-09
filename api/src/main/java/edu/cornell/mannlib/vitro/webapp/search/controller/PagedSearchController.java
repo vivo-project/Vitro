@@ -3,6 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.search.controller;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -124,7 +126,10 @@ public class PagedSearchController extends FreemarkerHttpServlet {
 
                 response.setCharacterEncoding("UTF-8");
                 response.setContentType("text/csv;charset=UTF-8");
-                response.setHeader("Content-Disposition", "attachment; filename=search.csv");
+                String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmmss"));
+                String applicationName = vreq.getAppBean().getApplicationName();
+                String fileName = date + "_" + applicationName + "_searchterm.csv";
+                response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
                 writeTemplate(rvalues.getTemplateName(), rvalues.getMap(), request, response);
             } catch (Exception e) {
                 log.error(e, e);
