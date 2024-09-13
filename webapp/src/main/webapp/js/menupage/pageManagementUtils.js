@@ -280,7 +280,11 @@ var pageManagementUtils = {
 	handleClickDone:function() {
 		var selectedType = pageManagementUtils.contentTypeSelect.val();
 		var selectedTypeText = $("#typeSelect option:selected").text();
-
+		if(selectedType == "fixedHtml") {
+			let htmlContent = tinyMCE.get("fixedHTMLValue").getContent();
+			tinyMCE.get("fixedHTMLValue").remove();
+			pageManagementUtils.fixedHTMLSection.find("#fixedHTMLValue").val(htmlContent);
+		}
 		//Hide all sections
 		pageManagementUtils.classGroupSection.hide();
 		pageManagementUtils.fixedHTMLSection.hide();
@@ -368,6 +372,7 @@ var pageManagementUtils = {
             if ( _this.contentTypeSelect.val() == "fixedHtml" ) {
                 pageManagementUtils.headerBar.text(pageManagementUtils.fixedHtml + " - ");
                 pageManagementUtils.fixedHTMLSection.show();
+                initTinyMCE.initEditor(pageManagementUtils.fixedHTMLSection.find("#fixedHTMLValue"));
             	pageManagementUtils.sparqlQuerySection.hide();
             	pageManagementUtils.searchIndividualsSection.hide();
             }
@@ -473,7 +478,6 @@ var pageManagementUtils = {
 
         // Get rid of the cancel link; it'll be replaced by a delete link
         $newContentObj.find('span#cancelContent' + counter).html('');
-
         if ( contentType == "sparqlQuery" || contentType == "fixedHtml" || contentType == "searchIndividuals") {
         	varOrClass = $newContentObj.find('input[name="saveToVar"]').val();
         }
@@ -521,6 +525,9 @@ var pageManagementUtils = {
         $newDivContainer.appendTo($('section#contentDivs'));
         //place new content object
         $newContentObj.prependTo($innerDiv);
+        $newContentObj.find("textarea[name='htmlValue']").each(function() {
+            initTinyMCE.initEditor($(this));
+        });
     },
     bindClonedContentDoneEvent:function($newContentObj) {
     	//Done button should just collapse the cloned content
