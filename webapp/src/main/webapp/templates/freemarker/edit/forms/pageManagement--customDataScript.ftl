@@ -30,6 +30,7 @@ scripts list.-->
       dataGetterLabelToURI:{
       		//maps labels to URIs
       		"browseClassGroup": "java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupPageData",
+		"searchFilterValues": "java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SearchFilterValuesDataGetter",
       		"individualsForClasses": "java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.IndividualsForClassesDataGetter",
       		"sparqlQuery":"java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter",
       		"fixedHtml":"java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.FixedHTMLDataGetter",

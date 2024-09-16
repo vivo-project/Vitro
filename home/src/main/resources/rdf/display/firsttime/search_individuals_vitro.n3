@@ -4,7 +4,7 @@
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 
 :filter_group_search_filters  a    vitro-search:FilterGroup ;
-        vitro-search:contains      :filter_category , :filter_type , :filter_querytext ;
+        vitro-search:contains      :filter_category , :filter_type , :filter_querytext;
         vitro-search:id            "main" ;
         vitro-search:order         1 ;
         vitro-search:public        true .
@@ -24,6 +24,27 @@
         vitro-search:id            "category" ;
         vitro-search:isUriValues   true ;
         vitro-search:public        true .
+
+:filter_raw_label_regex
+        a                           vitro-search:Filter ;
+        rdfs:label                  "Label regular expression"@en-US ;
+        vitro-search:facetResults   false ;
+        vitro-search:filterField    :field_name_raw ;
+        vitro-search:id             "raw_label_regex" ;
+        vitro-search:public         true ;
+        vitro-search:userInput      true ;
+        vitro-search:userInputRegex true .
+
+:filter_label_regex
+        a                           vitro-search:Filter ;
+        rdfs:label                  "Label regular expression"@en-US ;
+        vitro-search:facetResults   false ;
+        vitro-search:filterField    :field_label_display ;
+        vitro-search:id             "label_regex" ;
+        vitro-search:public         true ;
+        vitro-search:userInput      true ;
+        vitro-search:userInputRegex true .
+
 
 :filter_querytext
         a                          vitro-search:Filter ;
@@ -75,6 +96,11 @@
         vitro-search:isLanguageSpecific true ;
         vitro-search:indexField    "_label_sort" .
 
+:field_label_display
+        a                          vitro-search:SearchField ;
+        vitro-search:isLanguageSpecific true ;
+        vitro-search:indexField    "_label_display" .
+
 :field_name_raw
         a                          vitro-search:SearchField ;
         vitro-search:indexField    "nameRaw" .
@@ -85,7 +111,6 @@
 
 :field_type  a                    vitro-search:SearchField ;
         vitro-search:indexField   "type" ;
-        vitro-search:isLanguageSpecific true ;
         vitro-search:multivalued  true .
 
 :field_querytext

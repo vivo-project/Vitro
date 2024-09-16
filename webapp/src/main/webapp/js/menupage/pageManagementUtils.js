@@ -102,6 +102,7 @@ var pageManagementUtils = {
 		//list of options
 		this.contentTypeSelectOptions =  $('select#typeSelect option');
 		this.classGroupSection = $("section#browseClassGroup");
+		this.searchFilterSection = $("section#searchFilterValues");
 		this.sparqlQuerySection = $("section#sparqlQuery");
 		this.fixedHTMLSection = $("section#fixedHtml");
 		this.searchIndividualsSection = $("section#searchIndividuals");
@@ -145,6 +146,7 @@ var pageManagementUtils = {
 	   // $("section#pageDetails").hide();
 	    this.headerBar.hide();
 	    this.classGroupSection.hide();
+	    this.searchFilterSection.hide();
 	    this.sparqlQuerySection.hide();
 	    this.fixedHTMLSection.hide();
 	    this.searchIndividualsSection.hide();
@@ -241,6 +243,7 @@ var pageManagementUtils = {
 	        pageManagementUtils.clearSourceTemplateValues();
 	        pageManagementUtils.headerBar.hide();
             pageManagementUtils.classGroupSection.hide();
+            pageManagementUtils.searchFilterSection.hide();
             pageManagementUtils.fixedHTMLSection.hide();
             pageManagementUtils.sparqlQuerySection.hide();
             pageManagementUtils.contentTypeSelectOptions.eq(0).prop('selected', 'selected');
@@ -287,6 +290,7 @@ var pageManagementUtils = {
 		}
 		//Hide all sections
 		pageManagementUtils.classGroupSection.hide();
+		pageManagementUtils.searchFilterSection.hide();
 		pageManagementUtils.fixedHTMLSection.hide();
 		pageManagementUtils.sparqlQuerySection.hide();
 		pageManagementUtils.searchIndividualsSection.hide();
@@ -359,6 +363,7 @@ var pageManagementUtils = {
     	pageManagementUtils.clearSourceTemplateValues();
         if ( _this.contentTypeSelect.val() == "browseClassGroup" ) {
             pageManagementUtils.classGroupSection.show();
+            pageManagementUtils.searchFilterSection.hide();
             pageManagementUtils.fixedHTMLSection.hide();
             pageManagementUtils.sparqlQuerySection.hide();
             pageManagementUtils.searchIndividualsSection.hide();
@@ -366,7 +371,7 @@ var pageManagementUtils = {
             pageManagementUtils.headerBar.show();
             $('div#selfContainedDiv').hide();
         }
-        if ( _this.contentTypeSelect.val() == "fixedHtml" || _this.contentTypeSelect.val() == "sparqlQuery" || _this.contentTypeSelect.val() == "searchIndividuals") {
+        if ( _this.contentTypeSelect.val() == "fixedHtml" || _this.contentTypeSelect.val() == "sparqlQuery" || _this.contentTypeSelect.val() == "searchIndividuals" || _this.contentTypeSelect.val() == "searchFilterValues") {
         	 pageManagementUtils.classGroupSection.hide();
         	 //if fixed html show that, otherwise show sparql results
             if ( _this.contentTypeSelect.val() == "fixedHtml" ) {
@@ -375,10 +380,18 @@ var pageManagementUtils = {
                 initTinyMCE.initEditor(pageManagementUtils.fixedHTMLSection.find("#fixedHTMLValue"));
             	pageManagementUtils.sparqlQuerySection.hide();
             	pageManagementUtils.searchIndividualsSection.hide();
+            	pageManagementUtils.searchFilterSection.hide();
             }
             else if (_this.contentTypeSelect.val() == "sparqlQuery"){
                 pageManagementUtils.headerBar.text(pageManagementUtils.sparqlResults + " - ");
                 pageManagementUtils.sparqlQuerySection.show();
+            	pageManagementUtils.fixedHTMLSection.hide();
+            	pageManagementUtils.searchIndividualsSection.hide();
+            	pageManagementUtils.searchFilterSection.hide();
+            } else if (_this.contentTypeSelect.val() == "searchFilterValues"){
+                pageManagementUtils.headerBar.text(pageManagementUtils.browseSearchFilter + " - ");
+                pageManagementUtils.searchFilterSection.show();
+                pageManagementUtils.sparqlQuerySection.hide();
             	pageManagementUtils.fixedHTMLSection.hide();
             	pageManagementUtils.searchIndividualsSection.hide();
             } else {
@@ -386,6 +399,7 @@ var pageManagementUtils = {
             	pageManagementUtils.headerBar.text(pageManagementUtils.searchIndividuals + " - ");
                 pageManagementUtils.sparqlQuerySection.hide();
             	pageManagementUtils.fixedHTMLSection.hide();
+            	pageManagementUtils.searchFilterSection.hide();
             	pageManagementUtils.searchIndividualsSection.show();
             }
 
@@ -395,6 +409,7 @@ var pageManagementUtils = {
         }
         if ( _this.contentTypeSelect.val() == "" ) {
         	pageManagementUtils.classGroupSection.hide();
+        	pageManagementUtils.searchFilterSection.hide();
         	pageManagementUtils.fixedHTMLSection.hide();
         	pageManagementUtils.sparqlQuerySection.hide();
         	pageManagementUtils.searchIndividualsSection.hide();

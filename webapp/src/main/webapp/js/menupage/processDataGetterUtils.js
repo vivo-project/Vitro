@@ -7,6 +7,7 @@
 //This will need to be overridden or extended, what have you.. in VIVO
 var processDataGetterUtils = {
 		dataGetterProcessorMap:{"browseClassGroup": processClassGroupDataGetterContent,
+								"searchFilterValues": processSearchFilterValuesDataGetterContent,
 								"sparqlQuery": processSparqlDataGetterContent,
 								"fixedHtml":processFixedHTMLDataGetterContent,
 								"individualsForClasses":processIndividualsForClassesDataGetterContent,

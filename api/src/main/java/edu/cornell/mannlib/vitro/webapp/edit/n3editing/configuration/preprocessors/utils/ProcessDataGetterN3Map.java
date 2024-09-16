@@ -7,29 +7,37 @@ import java.util.HashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupPageData;
+import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.FixedHTMLDataGetter;
+import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.IndividualsForClassesDataGetter;
+import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SearchFilterValuesDataGetter;
+import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SearchIndividualsDataGetter;
+import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter;
+
 /*
  * This class determines what n3 should be returned for a particular data getter and can be overwritten or extended in VIVO.
  */
 public class ProcessDataGetterN3Map {
     private static final Log log = LogFactory.getLog(ProcessDataGetterN3Map.class);
 
-	private static HashMap<String, String> dataGetterMap;
+	private static HashMap<String, Class> dataGetterMap;
 
 	static {
-		dataGetterMap = new HashMap<String, String>();
-		dataGetterMap.put("edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessSparqlDataGetterN3");
-		dataGetterMap.put("edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupPageData", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessClassGroupDataGetterN3");
-		dataGetterMap.put("edu.cornell.mannlib.vitro.webapp.utils.dataGetter.IndividualsForClassesDataGetter", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessIndividualsForClassesDataGetterN3");
-		dataGetterMap.put("edu.cornell.mannlib.vitro.webapp.utils.dataGetter.FixedHTMLDataGetter", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessFixedHTMLN3");
-		dataGetterMap.put("edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SearchIndividualsDataGetter", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessSearchIndividualsDataGetterN3");
+		dataGetterMap = new HashMap<String, Class>(); 
+		dataGetterMap.put(SparqlQueryDataGetter.class.getCanonicalName(), ProcessSparqlDataGetterN3.class);
+		dataGetterMap.put(ClassGroupPageData.class.getCanonicalName(), ProcessClassGroupDataGetterN3.class);
+		dataGetterMap.put(SearchFilterValuesDataGetter.class.getCanonicalName(), ProcessSearchFilterValuesDataGetterN3.class);
+		dataGetterMap.put(IndividualsForClassesDataGetter.class.getCanonicalName(), ProcessIndividualsForClassesDataGetterN3.class);
+		dataGetterMap.put(FixedHTMLDataGetter.class.getCanonicalName(), ProcessFixedHTMLN3.class);
+		dataGetterMap.put(SearchIndividualsDataGetter.class.getCanonicalName(), ProcessSearchIndividualsDataGetterN3.class);
 	}
 
-    public static HashMap<String, String> getDataGetterTypeToProcessorMap() {
+    public static HashMap<String, Class> getDataGetterTypeToProcessorMap() {
 		return dataGetterMap;
     }
 
-	public static void replaceDataGetterMap(HashMap<String, String> newMap) {
-		dataGetterMap = new HashMap<String, String>();
+	public static void replaceDataGetterMap(HashMap<String, Class> newMap) {
+		dataGetterMap = new HashMap<String, Class>();
 		dataGetterMap.putAll(newMap);
 	}
 }
