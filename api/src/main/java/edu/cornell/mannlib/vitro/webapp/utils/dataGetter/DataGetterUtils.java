@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -447,8 +447,38 @@ public class DataGetterUtils {
 		templateData.put("associatedPage", group.getPublicName());
 		templateData.put("associatedPageURI", group.getURI());
     }
+	
+    private static final String searchFiltersQuery =
+	    "PREFIX search: <https://vivoweb.org/ontology/vitro-search#> \n" +
+	    "SELECT ?filterUri ?filterName WHERE {\n" +
+	    "  ?filterUri a search:Filter .\n" +
+        "  ?filterUri search:facetResults true .\n" +
+	    "  ?filterUri <" + VitroVocabulary.LABEL + "> ?filterName .\n" +
+	    "}";
 
-
-
+    public static Object getSearchFilters(VitroRequest vreq) {
+        OntModel model = vreq.getDisplayModel();
+        List<HashMap<String, String>> filters = new ArrayList<HashMap<String, String>>();
+        Query q = QueryFactory.create(searchFiltersQuery);
+        QuerySolutionMap bindings = new QuerySolutionMap();
+        model.enterCriticalSection(Lock.READ);
+        try (QueryExecution qexec = QueryExecutionFactory.create(q, model, bindings);) {
+            ResultSet res = qexec.execSelect();
+            while (res.hasNext()) {
+                QuerySolution sol = res.next();
+                Resource uri = sol.getResource("filterUri");
+                Literal name = sol.getLiteral("filterName");
+                HashMap<String, String> filter = new HashMap<String, String>();
+                filter.put("URI", uri.toString());
+                filter.put("publicName", name.getLexicalForm());
+                filters.add(filter);
+            }
+        } catch (Exception e) {
+            log.error(e, e);
+        } finally {
+            model.leaveCriticalSection();
+        }
+        return filters;
+    }
 
 }

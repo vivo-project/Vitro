@@ -137,6 +137,7 @@ public class DisplayVocabulary {
 
     /* URI of property for Fixed HTML Generator */
     public static final String FIXED_HTML_VALUE = DISPLAY_NS + "htmlValue";
+    public static final String SEARCH_FILTER_VALUE = DISPLAY_NS + "searchFilter";
 
 
     /* URI of property for Search Query Generator */

@@ -526,6 +526,8 @@ private String getExistingIsSelfContainedTemplateQuery() {
      	MenuManagementDataUtils.includeRequiredSystemData(vreq.getSession().getServletContext(), data);
     	data.put("classGroup", new ArrayList<String>());
     	data.put("classGroups", DataGetterUtils.getClassGroups(vreq));
+    	data.put("searchFilter", new ArrayList<String>());
+    	data.put("searchFilters", DataGetterUtils.getSearchFilters(vreq));
     	//for search individuals data get getter
     	data.put("classes", this.getAllVClasses(vreq));
     	data.put("availablePermissions", this.getAvailablePermissions(vreq));
