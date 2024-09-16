@@ -3,7 +3,6 @@ package edu.cornell.mannlib.vitro.webapp.search.controller;
 import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_PUBLIC_URI;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
@@ -12,8 +11,10 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -54,7 +55,7 @@ public class SearchFiltering {
             + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
             + "SELECT ?filter_id ?filter_type ?filter_label ?value_label ?value_id  ?field_name ?public ?filter_order "
             + "?value_order (STR(?isUriReq) as ?isUri ) ?multivalued ?input ?regex ?facet ?min ?max ?role "
-            + "?value_public ?more_limit \n"
+            + "?value_public ?more_limit ?multilingual ?reverseFacetOrder\n"
             + "WHERE {\n"
             + "    ?filter rdf:type search:Filter .\n"
             + "    ?filter rdfs:label ?filter_label .\n"
@@ -77,11 +78,16 @@ public class SearchFiltering {
             + "            ?value search:public ?value_public .\n"
             + "        }\n"
             + "    }\n"
+            + "    OPTIONAL {\n"
+            + "        ?field search:isLanguageSpecific ?f_multilingual  .\n"
+            + "        BIND(?f_multilingual as ?bind_multilingual) .\n"
+            + "    }\n"
             + "    OPTIONAL {?field search:multivalued ?multivalued}\n"
             + "    OPTIONAL {?filter search:isUriValues ?isUriReq }\n"
             + "    OPTIONAL {?filter search:userInput ?input }\n"
             + "    OPTIONAL {?filter search:userInputRegex ?regex }\n"
             + "    OPTIONAL {?filter search:facetResults ?facet }\n"
+            + "    OPTIONAL {?filter search:reverseFacetOrder ?reverseFacetOrder }\n"
             + "    OPTIONAL {?filter search:from ?min }\n"
             + "    OPTIONAL {?filter search:public ?public }\n"
             + "    OPTIONAL {?filter search:to ?max }\n"
@@ -92,6 +98,7 @@ public class SearchFiltering {
             + "    }\n"
             + "    BIND(coalesce(?filter_order_found, 0) as ?filter_order)\n"
             + "    BIND(coalesce(?value_order_found, 0) as ?value_order)\n"
+            + "    BIND(COALESCE(?bind_multilingual, false) as ?multilingual)\n"
             + "} ORDER BY ?filter_id ?filter_order ?value_order";
 
     private static final String FILTER_GROUPS_QUERY = ""
@@ -157,42 +164,15 @@ public class SearchFiltering {
             + "    BIND(COALESCE(?bind_multilingual, false) as ?multilingual)\n"
             + "} ORDER BY ?sort_order ?label ";
 
-    protected static void addFiltersToQuery(VitroRequest vreq, SearchQuery query,
-            Map<String, SearchFilter> filterById) {
-        Enumeration<String> paramNames = vreq.getParameterNames();
-        while (paramNames.hasMoreElements()) {
-            String paramFilterName = paramNames.nextElement();
-            if (!StringUtils.isBlank(paramFilterName) && paramFilterName.startsWith(SearchFiltering.FILTERS)) {
-                String[] filters = vreq.getParameterValues(paramFilterName);
-                if (filters != null && filters.length > 0) {
-                    for (String filter : filters) {
-                        String[] pair = filter.split(":", 2);
-                        if (pair.length == 2) {
-                            String name = pair[0].replace("\"", "");
-                            String value = pair[1].replace("\"", "");
-                            SearchFilter searchFilter = filterById.get(name);
-                            if (searchFilter != null && searchFilter.getField() != null) {
-                                query.addFilterQuery(searchFilter.getField() + ":\"" + value + "\"");
-                            }
-
-                        }
-                    }
-                }
-
-            }
-        }
-        addPreconfiguredFiltersToQuery(query, filterById.values());
-    }
-
-    public static void addPreconfiguredFiltersToQuery(SearchQuery query, Collection<SearchFilter> collection) {
-        for (SearchFilter searchFilter : collection) {
+    protected static void addFiltersToQuery(SearchQuery query, Map<String, SearchFilter> filters) {
+        for (SearchFilter searchFilter : filters.values()) {
             if (searchFilter.isInput()) {
                 SearchFiltering.addInputFilter(query, searchFilter);
             } else if (searchFilter.isRange()) {
                 SearchFiltering.addRangeFilter(query, searchFilter);
             }
             for (FilterValue fv : searchFilter.getValues().values()) {
-                if (fv.isDefault()) {
+                if (fv.isDefault() || fv.getSelected()) {
                     query.addFilterQuery(searchFilter.getField() + ":\"" + fv.getId() + "\"");
                 }
             }
@@ -204,32 +184,44 @@ public class SearchFiltering {
         Enumeration<String> paramNames = vreq.getParameterNames();
         while (paramNames.hasMoreElements()) {
             String paramFilterName = paramNames.nextElement();
-            if (!StringUtils.isBlank(paramFilterName) && paramFilterName.startsWith(SearchFiltering.FILTERS)) {
-                String[] filters = vreq.getParameterValues(paramFilterName);
-                if (filters != null && filters.length > 0) {
-                    for (String filter : filters) {
+            if (paramFilterName.startsWith(SearchFiltering.FILTERS)) {
+                String[] filterValues = vreq.getParameterValues(paramFilterName);
+                if (filterValues != null && filterValues.length > 0) {
+                    for (String filter : filterValues) {
                         String[] pair = filter.split(":", 2);
                         if (pair.length == 2) {
-                            String name = pair[0].replace("\"", "");
+                            String filterId = pair[0].replace("\"", "");
                             String value = pair[1].replace("\"", "");
-                            if (requestFilters.containsKey(name)) {
-                                List<String> list = requestFilters.get(name);
+                            if (requestFilters.containsKey(filterId)) {
+                                List<String> list = requestFilters.get(filterId);
                                 list.add(value);
                             } else {
-                                requestFilters.put(name, new LinkedList<String>(Arrays.asList(value)));
+                                requestFilters.put(filterId, new LinkedList<String>(Arrays.asList(value)));
                             }
                         }
                     }
                 }
             }
+            if (paramFilterName.startsWith(SearchFiltering.FILTER_RANGE)) {
+                String[] values = vreq.getParameterValues(paramFilterName);
+                if (values != null && values.length > 0) {
+                    String filterId = paramFilterName.replace(SearchFiltering.FILTER_RANGE, "");
+                    requestFilters.put(filterId, new LinkedList<String>(Arrays.asList(values[0])));
+                }
+            }
+            if (paramFilterName.startsWith(SearchFiltering.FILTER_INPUT_PREFIX)) {
+                String[] values = vreq.getParameterValues(paramFilterName);
+                if (values != null && values.length > 0) {
+                    String filterId = paramFilterName.replace(SearchFiltering.FILTER_INPUT_PREFIX, "");
+                    requestFilters.put(filterId, new LinkedList<String>(Arrays.asList(values[0])));
+                }
+            }
         }
-
         return requestFilters;
     }
 
     public static Map<String, SearchFilter> readFilterConfigurations(Set<String> currentRoles, VitroRequest vreq) {
         long startTime = System.nanoTime();
-
         Map<String, SearchFilter> filtersByField = new LinkedHashMap<>();
         Model model;
         if (vreq != null) {
@@ -258,8 +250,10 @@ public class SearchFiltering {
                 if (filtersByField.containsKey(resultFieldName)) {
                     filter = filtersByField.get(resultFieldName);
                 } else {
-                    filter = createSearchFilter(filtersByField, solution, resultFilterId, resultFieldName);
+                    Optional<Locale> locale = vreq != null ? Optional.of(vreq.getLocale()) : Optional.empty();
+                    filter = createSearchFilter(filtersByField, solution, resultFilterId, resultFieldName, locale);
                 }
+                filter.setMulitlingual(solution.get("multilingual").asLiteral().getBoolean());
                 if (solution.get("value_id") == null) {
                     continue;
                 }
@@ -292,7 +286,18 @@ public class SearchFiltering {
 
     public static void addDefaultFilters(SearchQuery query, Set<String> currentRoles) {
         Map<String, SearchFilter> filtersByField = SearchFiltering.readFilterConfigurations(currentRoles, null);
-        SearchFiltering.addPreconfiguredFiltersToQuery( query, filtersByField.values());
+        for (SearchFilter searchFilter : filtersByField.values()) {
+            if (searchFilter.isInput()) {
+                SearchFiltering.addInputFilter(query, searchFilter);
+            } else if (searchFilter.isRange()) {
+                SearchFiltering.addRangeFilter(query, searchFilter);
+            }
+            for (FilterValue fv : searchFilter.getValues().values()) {
+                if (fv.isDefault() || fv.getSelected()) {
+                    query.addFilterQuery(searchFilter.getField() + ":\"" + fv.getId() + "\"");
+                }
+            }
+        }
     }
 
     public static Map<String, SearchFilter> sortFilters(Map<String, SearchFilter> filters) {
@@ -408,9 +413,9 @@ public class SearchFiltering {
     }
 
     private static SearchFilter createSearchFilter(Map<String, SearchFilter> filtersByField,
-            QuerySolution solution, String resultFilterId, String resultFieldName) {
+            QuerySolution solution, String resultFilterId, String resultFieldName, Optional<Locale> locale) {
         SearchFilter filter;
-        filter = new SearchFilter(resultFilterId);
+        filter = new SearchFilter(resultFilterId, locale);
         filtersByField.put(resultFieldName, filter);
         filter.setName(solution.get("filter_label"));
         filter.setOrder(solution.get("filter_order"));
@@ -450,6 +455,11 @@ public class SearchFiltering {
             filter.setFacetsRequired(facet.asLiteral().getBoolean());
         }
 
+        RDFNode reverseFacetOrder = solution.get("reverseFacetOrder");
+        if (reverseFacetOrder != null) {
+            filter.setReverseFacetOrder(reverseFacetOrder.asLiteral().getBoolean());
+        }
+
         RDFNode moreLimit = solution.get("more_limit");
         if (moreLimit != null && moreLimit.isLiteral()) {
             filter.setMoreLimit(moreLimit.asLiteral().getInt());
@@ -472,8 +482,7 @@ public class SearchFiltering {
         }
         String searchText = searchFilter.getInputText();
         if (searchFilter.isInputRegex()) {
-            searchText = searchText.replaceAll("([ )(:])", "\\\\$1") + "*";
-            query.addFilterQuery(searchFilter.getField() + ":" + searchText);
+            query.addFilterQuery(searchFilter.getField() + ":/" + searchText + "/");
         } else {
             query.addFilterQuery(searchFilter.getField() + ":\"" + searchText + "\"");
         }
@@ -498,17 +507,26 @@ public class SearchFiltering {
         return "";
     }
 
-    public static void setSelectedFilters(Map<String, SearchFilter> filtersByField,
-            Map<String, List<String>> requestFilters) {
-        for (SearchFilter filter : filtersByField.values()) {
+    public static void setSelectedFilters(Map<String, SearchFilter> filters, Map<String, List<String>> requestFilters) {
+        for (SearchFilter filter : filters.values()) {
             if (requestFilters.containsKey(filter.getId())) {
                 List<String> requestValues = requestFilters.get(filter.getId());
                 if (!SearchFiltering.isEmptyValues(requestValues)) {
                     filter.setSelected(true);
-                    for (String requestValue : requestValues) {
-                        if (filter.getValues().containsKey(requestValue)) {
-                            FilterValue value = filter.getValue(requestValue);
-                            value.setSelected(true);
+                    if (filter.isRange()) {
+                        filter.setRangeValues(requestValues.iterator().next());
+                    } else if (filter.isInput()) {
+                        filter.setInputText(requestValues.iterator().next());
+                    } else {
+                        for (String requestValue : requestValues) {
+                            if (filter.getValues().containsKey(requestValue)) {
+                                FilterValue value = filter.getValue(requestValue);
+                                value.setSelected(true);
+                            } else {
+                                FilterValue value = new FilterValue(requestValue);
+                                value.setSelected(true);
+                                filter.addValue(value);
+                            }
                         }
                     }
                 }

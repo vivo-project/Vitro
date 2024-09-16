@@ -17,26 +17,26 @@ public class ProcessDataGetterN3Utils {
     private static final Log log = LogFactory.getLog(ProcessDataGetterN3Utils.class);
 
     public static ProcessDataGetterN3 getDataGetterProcessorN3(String dataGetterClass, ObjectNode jsonObject) {
-    	HashMap<String, String> map = ProcessDataGetterN3Map.getDataGetterTypeToProcessorMap();
+    	HashMap<String, Class> map = ProcessDataGetterN3Map.getDataGetterTypeToProcessorMap();
     	//
     	if(map.containsKey(dataGetterClass)) {
-    		String processorClass = map.get(dataGetterClass);
+    		Class<?> processorClass = map.get(dataGetterClass);
     		try {
     			ProcessDataGetterN3 pn = instantiateClass(processorClass, jsonObject);
     			return pn;
     		} catch(Exception ex) {
     			log.error("Exception occurred in trying to get processor class for n3 for " + dataGetterClass, ex);
     			return null;
-    		}
+    		} 
     	}
+    	log.error(ProcessDataGetterN3Map.class.getSimpleName() + " doesn't contain processor class for n3 for " + dataGetterClass);
     	return null;
     }
 
-    private static ProcessDataGetterN3 instantiateClass(String processorClass, ObjectNode jsonObject) {
+    private static ProcessDataGetterN3 instantiateClass(Class<?> processorClass, ObjectNode jsonObject) {
     	ProcessDataGetterN3 pn = null;
     	try {
-	    	Class<?> clz = Class.forName(processorClass);
-	    	Constructor<?>[] ctList = clz.getConstructors();
+	    	Constructor<?>[] ctList = processorClass.getConstructors();
 	    	for (Constructor<?> ct: ctList) {
 		    	Class<?>[] parameterTypes =ct.getParameterTypes();
 				if(parameterTypes.length > 0 && parameterTypes[0].isAssignableFrom(jsonObject.getClass())) {
@@ -47,7 +47,7 @@ public class ProcessDataGetterN3Utils {
 	    	}
 
     	} catch(Exception ex) {
-			log.error("Error occurred instantiating " + processorClass, ex);
+			log.error("Error occurred instantiating " + processorClass.getCanonicalName(), ex);
 		}
     	return pn;
 
