@@ -306,10 +306,12 @@ var customForm = {
         		//Reset the URI of the input to one that says new uri required
         		//That will be overwritten if value selected from autocomplete
         		//We do this everytime the user types anything in the autocomplete box
+        		let autocompleteType = customForm.acTypes[$(selectedObj).attr('acGroupName')];
         		customForm.initDefaultBlankURI(selectedObj);
-                if (request.term in customForm.acCache) {
+        		let cacheKey = autocompleteType + ":" + request.term;
+                if (cacheKey in customForm.acCache) {
                     // console.log('found term in cache');
-                    response(customForm.acCache[request.term]);
+                    response(customForm.acCache[cacheKey]);
                     return;
                 }
                 // console.log('not getting term from cache');
@@ -318,7 +320,7 @@ var customForm = {
                     dataType: 'json',
                     data: {
                         term: request.term,
-                        type: customForm.acTypes[$(selectedObj).attr('acGroupName')],
+                        type: autocompleteType,
                         multipleTypes:(customForm.acMultipleTypes == undefined || customForm.acMultipleTypes == null)? null: customForm.acMultipleTypes
                     },
                     complete: function(xhr, status) {
@@ -333,7 +335,7 @@ var customForm = {
                         	filteredResults = customForm.removeConceptSubclasses(filteredResults);
                         }
 
-                        customForm.acCache[request.term] = filteredResults;
+                        customForm.acCache[cacheKey] = filteredResults;
                         response(filteredResults);
                     }
                 });
