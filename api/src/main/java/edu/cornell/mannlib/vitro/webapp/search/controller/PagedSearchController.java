@@ -115,7 +115,10 @@ public class PagedSearchController extends FreemarkerHttpServlet {
 
                 response.setCharacterEncoding("UTF-8");
                 response.setContentType("text/xml;charset=UTF-8");
-                response.setHeader("Content-Disposition", "attachment; filename=search.xml");
+                String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmmss"));
+                String applicationName = vreq.getAppBean().getApplicationName();
+                String fileName = date + "_" + applicationName + "_searchresults.xml";
+                response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
                 writeTemplate(rvalues.getTemplateName(), rvalues.getMap(), request, response);
             } catch (Exception e) {
                 log.error(e, e);
@@ -128,7 +131,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                 response.setContentType("text/csv;charset=UTF-8");
                 String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmmss"));
                 String applicationName = vreq.getAppBean().getApplicationName();
-                String fileName = date + "_" + applicationName + "_searchterm.csv";
+                String fileName = date + "_" + applicationName + "_searchresults.csv";
                 response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
                 writeTemplate(rvalues.getTemplateName(), rvalues.getMap(), request, response);
             } catch (Exception e) {
