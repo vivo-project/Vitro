@@ -209,7 +209,7 @@ public class LoginWidget extends Widget {
      * What's the password recovery URL for this servlet?
      */
     private String getForgotPasswordUrl(HttpServletRequest request) {
-        String contextPath = request.getContextPath();
+        String contextPath = ContextPath.getPath(request);
         return contextPath + "/forgotPassword";
     }
 
