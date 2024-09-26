@@ -1,6 +1,7 @@
 <%-- $This file is distributed under the terms of the license in LICENSE$ --%>
 
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.config.ContextPath"%>
 <%@ page import="org.apache.log4j.*" %>
 <%@ page import="java.util.*" %>
 
@@ -51,7 +52,7 @@ try {
     out.write("<p>" + notes + "</p>");
 
     // output category information in a form with a simple table
-    out.write("<form name=\"Formular\" ACTION=\""+request.getContextPath()+request.getServletPath()+"\" METHOD=\"POST\">");
+    out.write("<form name=\"Formular\" ACTION=\""+ContextPath.getPath(request)+request.getServletPath()+"\" METHOD=\"POST\">");
     out.write("<table cellpadding=4>\r\n");
     out.write(" <tr>\r\n");
     out.write("  <td><b>Logger</b></td>\r\n");
