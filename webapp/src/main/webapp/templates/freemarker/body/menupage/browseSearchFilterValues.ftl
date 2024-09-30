@@ -72,13 +72,12 @@
              </#if>
             href="${urls.currentPage}?filters_main=${searchFilter?url + ":"?url + selectedValue?url}" title="select all">${i18n().all}</a></li>
             <#list i18n().browse_results_alphabetical_index?split(",") as c>
-                <#assign regexValue = "[" + c?lower_case + c?upper_case + "].*">
-                <#assign regexEncodedValue = "%5B" + c?lower_case?url + c?upper_case?url + "%5D.*">
+                <#assign regexValue = "(" + c?lower_case?cap_first + "|" + c?lower_case + "|" + c?upper_case + ").*">
                 <li><a 
                     <#if indexFilter.inputText == regexValue >
                         class="selected" 
                     </#if>
-                    href="${urls.currentPage}?filters_main=${searchFilter?url + ":"?url + selectedValue?url}&filter_input_${indexFilterName}=${regexEncodedValue}" title="${i18n().browse_all_starts_with(c?upper_case)}">${c?upper_case}</a>
+                    href="${urls.currentPage}?filters_main=${searchFilter?url + ":"?url + selectedValue?url}&filter_input_${indexFilterName}=${regexValue?url}" title="${i18n().browse_all_starts_with(c?upper_case)}">${c?upper_case}</a>
                 </li>
             </#list>
             </ul>
