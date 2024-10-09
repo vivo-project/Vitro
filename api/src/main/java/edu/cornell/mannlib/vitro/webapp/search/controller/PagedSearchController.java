@@ -171,9 +171,22 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             if (log.isDebugEnabled()) {
                 log.debug(getSpentTime(startTime) + "ms spent before read filter configurations.");
             }
-            Map<String, SearchFilter> filterConfigurationsByField = SearchFiltering.readFilterConfigurations(vreq);
+            Set<String> currentRoles = SearchFiltering.getCurrentUserRoles(vreq);
+            Map<String, SearchFilter> filterConfigurationsByField = SearchFiltering.readFilterConfigurations(currentRoles, vreq);
             if (log.isDebugEnabled()) {
                 log.debug(getSpentTime(startTime) + "ms spent before get sort configurations.");
+            }
+            for (SearchFilter filter: filterConfigurationsByField.values()) {
+                filter.setInputText(SearchFiltering.getFilterInputText(vreq, filter.getId()));
+                filter.setRangeValues(SearchFiltering.getFilterRangeText(vreq, filter.getId()));
+            }
+            Map<String, List<String>> requestFilters = SearchFiltering.getRequestFilters(vreq);
+            if (log.isDebugEnabled()) {
+                log.debug(getSpentTime(startTime) + "ms spent after getRequestFilters.");
+            }
+            SearchFiltering.setSelectedFilters(filterConfigurationsByField, requestFilters);
+            if (log.isDebugEnabled()) {
+                log.debug(getSpentTime(startTime) + "ms spent after setSelectedFilters.");
             }
             Map<String, SortConfiguration> sortConfigurations = SearchFiltering.getSortConfigurations(vreq);
             if (log.isDebugEnabled()) {

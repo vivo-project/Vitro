@@ -16,3 +16,7 @@ Disallow: /pubsbyorg/
 Disallow: /fedsearch/
 Disallow: /comments.jsp
 Disallow: /dataservice/
+Disallow: /contact
+Disallow: /submitFeedback
+Disallow: /forgotPassword
+

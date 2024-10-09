@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph.sparqlNode;
+import static edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph.sparqlNodeDelete;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -565,24 +568,44 @@ public class JenaModelUtils {
 
     private static void addStatementPatterns(List<Statement> stmts,
     		StringBuffer patternBuff, boolean whereClause) {
+        Set<String> lines = new HashSet<>();
         for(Statement stmt : stmts) {
             Triple t = stmt.asTriple();
-            patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getSubject(), null));
-            patternBuff.append(" ");
-            patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getPredicate(), null));
-            patternBuff.append(" ");
-            patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getObject(), null));
-            patternBuff.append(" .\n");
+            String lineWithoutVars = getLine(t, false);
+            if (lines.contains(lineWithoutVars)) {
+                continue;
+            } else {
+                lines.add(lineWithoutVars);
+            }
+            patternBuff.append(getLine(t, true));
             if (whereClause) {
                 if (t.getSubject().isBlank()) {
                     patternBuff.append("    FILTER(isBlank(").append(
-                    		SparqlGraph.sparqlNodeDelete(t.getSubject(), null)).append(")) \n");
+                    		sparqlNodeDelete(t.getSubject(), null)).append(")) \n");
                 }
                 if (t.getObject().isBlank()) {
                     patternBuff.append("    FILTER(isBlank(").append(
-                    		SparqlGraph.sparqlNodeDelete(t.getObject(), null)).append(")) \n");
+                    		sparqlNodeDelete(t.getObject(), null)).append(")) \n");
                 }
             }
+        }
+    }
+
+    private static String getLine(Triple t, boolean createBlankNodeVariables) {
+        if (createBlankNodeVariables) {
+            return sparqlNodeDelete(t.getSubject(), null) +
+                    " " +
+                    sparqlNodeDelete(t.getPredicate(), null) +
+                    " " +
+                    sparqlNodeDelete(t.getObject(), null) +
+                    " .\n";
+        } else {
+            return sparqlNode(t.getSubject(), null) +
+                    " " +
+                    sparqlNode(t.getPredicate(), null) +
+                    " " +
+                    sparqlNode(t.getObject(), null) +
+                    " .\n";
         }
     }
 

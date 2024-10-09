@@ -10,9 +10,17 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ModelSerializationFormat;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceImpl;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -30,27 +38,18 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.OWL;
 
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ModelSerializationFormat;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceImpl;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
-
 public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
 
-    private final static Log log = LogFactory.getLog(
-            SameAsFilteringRDFServiceFactory.class);
+    private final static Log log = LogFactory.getLog(SameAsFilteringRDFServiceFactory.class);
     private RDFServiceFactory f;
     private Model sameAsModel;
 
     public SameAsFilteringRDFServiceFactory(RDFServiceFactory rdfServiceFactory) {
         this.f = rdfServiceFactory;
         try {
-            InputStream in = f.getRDFService().sparqlConstructQuery("CONSTRUCT { ?s <" + OWL.sameAs.getURI() + "> ?o } WHERE { ?s <" + OWL.sameAs.getURI() + "> ?o } ", ModelSerializationFormat.N3);
+            InputStream in = f.getRDFService().sparqlConstructQuery(
+                    "CONSTRUCT { ?s <" + OWL.sameAs.getURI() + "> ?o } WHERE { ?s <" + OWL.sameAs.getURI() + "> ?o } ",
+                    ModelSerializationFormat.N3);
             sameAsModel = RDFServiceUtils.parseModel(in, ModelSerializationFormat.N3);
         } catch (RDFServiceException e) {
             throw new RuntimeException(e);
@@ -98,11 +97,9 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
         }
 
         @Override
-        public InputStream sparqlConstructQuery(String query,
-                RDFService.ModelSerializationFormat resultFormat)
-                        throws RDFServiceException {
-            Model m = RDFServiceUtils.parseModel(
-                    s.sparqlConstructQuery(query, resultFormat), resultFormat);
+        public InputStream sparqlConstructQuery(String query, RDFService.ModelSerializationFormat resultFormat)
+                throws RDFServiceException {
+            Model m = RDFServiceUtils.parseModel(s.sparqlConstructQuery(query, resultFormat), resultFormat);
             Model filtered = ModelFactory.createDefaultModel();
             StmtIterator stmtIt = m.listStatements();
             while (stmtIt.hasNext()) {
@@ -112,14 +109,12 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
                 }
             }
             ByteArrayOutputStream out = new ByteArrayOutputStream();
-            filtered.write(out, RDFServiceUtils.getSerializationFormatString(
-                    resultFormat));
+            filtered.write(out, RDFServiceUtils.getSerializationFormatString(resultFormat));
             return new ByteArrayInputStream(out.toByteArray());
         }
 
         @Override
-        public void sparqlConstructQuery(String query, Model model)
-                throws RDFServiceException {
+        public void sparqlConstructQuery(String query, Model model) throws RDFServiceException {
             Model m = ModelFactory.createDefaultModel();
             s.sparqlConstructQuery(query, m);
 
@@ -133,11 +128,9 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
         }
 
         @Override
-        public InputStream sparqlSelectQuery(String query, ResultFormat resultFormat)
-                throws RDFServiceException {
-            ResultSet rs = ResultSetFactory.load(
-                    s.sparqlSelectQuery(query, resultFormat),
-                            RDFServiceUtils.getJenaResultSetFormat(resultFormat));
+        public InputStream sparqlSelectQuery(String query, ResultFormat resultFormat) throws RDFServiceException {
+            ResultSet rs = ResultSetFactory.load(s.sparqlSelectQuery(query, resultFormat),
+                    RDFServiceUtils.getJenaResultSetFormat(resultFormat));
             List<QuerySolution> solutions = new ArrayList<QuerySolution>();
             while (rs.hasNext()) {
                 QuerySolution solution = rs.nextSolution();
@@ -148,27 +141,26 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
             ResultSet resultSet = new FilteredResultSet(solutions, rs);
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             switch (resultFormat) {
-               case CSV:
-                  ResultSetFormatter.outputAsCSV(outputStream,resultSet);
-                  break;
-               case TEXT:
-                  ResultSetFormatter.out(outputStream,resultSet);
-                  break;
-               case JSON:
-                  ResultSetFormatter.outputAsJSON(outputStream, resultSet);
-                  break;
-               case XML:
-                  ResultSetFormatter.outputAsXML(outputStream, resultSet);
-                  break;
-               default:
-                  throw new RDFServiceException("unrecognized result format");
+                case CSV:
+                    ResultSetFormatter.outputAsCSV(outputStream, resultSet);
+                    break;
+                case TEXT:
+                    ResultSetFormatter.out(outputStream, resultSet);
+                    break;
+                case JSON:
+                    ResultSetFormatter.outputAsJSON(outputStream, resultSet);
+                    break;
+                case XML:
+                    ResultSetFormatter.outputAsXML(outputStream, resultSet);
+                    break;
+                default:
+                    throw new RDFServiceException("unrecognized result format");
             }
             return new ByteArrayInputStream(outputStream.toByteArray());
         }
 
         @Override
-        public void sparqlSelectQuery(String query, ResultSetConsumer consumer)
-                throws RDFServiceException {
+        public void sparqlSelectQuery(String query, ResultSetConsumer consumer) throws RDFServiceException {
 
             s.sparqlSelectQuery(query, new ResultSetConsumer.Chaining(consumer) {
                 @Override
@@ -200,13 +192,14 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
             if (resource.isAnon()) {
                 return sameAsResources;
             }
-            String queryStr = "SELECT DISTINCT ?s WHERE { <" + resource.getURI() + "> <" + OWL.sameAs.getURI() + "> ?s } ORDER BY ?s";
-            try  {
+            String queryStr = "SELECT DISTINCT ?s WHERE { <" + resource.getURI() + "> <" + OWL.sameAs.getURI()
+                    + "> ?s } ORDER BY ?s";
+            try {
                 Query query = QueryFactory.create(queryStr);
                 QueryExecution qe = QueryExecutionFactory.create(query, sameAsModel);
                 try {
                     ResultSet rs = qe.execSelect();
-                    //ResultSet rs = JSONInput.fromJSON(s.sparqlSelectQuery(queryStr, ResultFormat.JSON));
+                    // ResultSet rs = JSONInput.fromJSON(s.sparqlSelectQuery(queryStr, ResultFormat.JSON));
                     while (rs.hasNext()) {
                         QuerySolution q = rs.next();
                         Resource res = q.getResource("s");
@@ -219,14 +212,14 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
                     qe.close();
                 }
                 return sameAsResources;
-            } catch (/*RDFService*/Exception e) {
+            } catch (/* RDFService */Exception e) {
                 throw new RuntimeException(e);
             }
         }
 
         private boolean isRedundant(QuerySolution q) {
             Iterator<String> varIt = q.varNames();
-            while(varIt.hasNext()) {
+            while (varIt.hasNext()) {
                 String varName = varIt.next();
                 RDFNode n = q.get(varName);
                 if (n.isResource()) {
@@ -241,17 +234,14 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
         }
 
         @Override
-        public boolean changeSetUpdate(ChangeSet changeSet)
-                throws RDFServiceException {
+        public boolean changeSetUpdate(ChangeSet changeSet) throws RDFServiceException {
             return s.changeSetUpdate(changeSet);
         }
 
         @Override
-        public InputStream sparqlDescribeQuery(String query,
-                ModelSerializationFormat resultFormat)
+        public InputStream sparqlDescribeQuery(String query, ModelSerializationFormat resultFormat)
                 throws RDFServiceException {
-            Model m = RDFServiceUtils.parseModel(
-                    s.sparqlConstructQuery(query, resultFormat), resultFormat);
+            Model m = RDFServiceUtils.parseModel(s.sparqlConstructQuery(query, resultFormat), resultFormat);
             Model filtered = ModelFactory.createDefaultModel();
             StmtIterator stmtIt = m.listStatements();
             while (stmtIt.hasNext()) {
@@ -261,8 +251,7 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
                 }
             }
             ByteArrayOutputStream out = new ByteArrayOutputStream();
-            filtered.write(out, RDFServiceUtils.getSerializationFormatString(
-                    resultFormat));
+            filtered.write(out, RDFServiceUtils.getSerializationFormatString(resultFormat));
             return new ByteArrayInputStream(out.toByteArray());
         }
 
@@ -282,27 +271,23 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
         }
 
         @Override
-    	public void serializeAll(OutputStream outputStream)
-    			throws RDFServiceException {
-        	s.serializeAll(outputStream);
-    	}
-
-    	@Override
-    	public void serializeGraph(String graphURI, OutputStream outputStream)
-    			throws RDFServiceException {
-    		s.serializeGraph(graphURI, outputStream);
-    	}
-
-    	@Override
-    	public boolean isEquivalentGraph(String graphURI,
-    			InputStream serializedGraph,
-    			ModelSerializationFormat serializationFormat) throws RDFServiceException {
-    		return s.isEquivalentGraph(graphURI, serializedGraph, serializationFormat);
-    	}
+        public void serializeAll(OutputStream outputStream) throws RDFServiceException {
+            s.serializeAll(outputStream);
+        }
 
         @Override
-        public boolean isEquivalentGraph(String graphURI,
-                                         Model graph) throws RDFServiceException {
+        public void serializeGraph(String graphURI, OutputStream outputStream) throws RDFServiceException {
+            s.serializeGraph(graphURI, outputStream);
+        }
+
+        @Override
+        public boolean isEquivalentGraph(String graphURI, InputStream serializedGraph,
+                ModelSerializationFormat serializationFormat) throws RDFServiceException {
+            return s.isEquivalentGraph(graphURI, serializedGraph, serializationFormat);
+        }
+
+        @Override
+        public boolean isEquivalentGraph(String graphURI, Model graph) throws RDFServiceException {
             return s.isEquivalentGraph(graphURI, graph);
         }
 
@@ -316,8 +301,10 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
             s.close();
         }
 
+        @Override
+        protected void rebuildGraphUris() {
+        }
 
     }
-
 
 }

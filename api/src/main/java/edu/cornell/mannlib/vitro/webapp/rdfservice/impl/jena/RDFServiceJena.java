@@ -9,9 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
@@ -58,58 +56,53 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 
     protected abstract DatasetWrapper getDatasetWrapper();
 
-    protected volatile boolean rebuildGraphURICache = true;
-    protected volatile boolean isRebuildGraphURICacheRunning = false;
-    protected final List<String> graphURIs = new CopyOnWriteArrayList<String>();
-
     @Override
-	public abstract boolean changeSetUpdate(ChangeSet changeSet) throws RDFServiceException;
+    public abstract boolean changeSetUpdate(ChangeSet changeSet) throws RDFServiceException;
 
     protected void notifyListenersOfPreChangeEvents(ChangeSet changeSet) {
-		for (Object o : changeSet.getPreChangeEvents()) {
-		    this.notifyListenersOfEvent(o);
-		}
-	}
+        for (Object o : changeSet.getPreChangeEvents()) {
+            this.notifyListenersOfEvent(o);
+        }
+    }
 
     protected void insureThatInputStreamsAreResettable(ChangeSet changeSet) throws IOException {
-		for (ModelChange modelChange: changeSet.getModelChanges()) {
+        for (ModelChange modelChange : changeSet.getModelChanges()) {
             if (!modelChange.getSerializedModel().markSupported()) {
                 byte[] bytes = IOUtils.toByteArray(modelChange.getSerializedModel());
                 modelChange.setSerializedModel(new ByteArrayInputStream(bytes));
             }
             modelChange.getSerializedModel().mark(Integer.MAX_VALUE);
         }
-	}
+    }
 
     protected void applyChangeSetToModel(ChangeSet changeSet, Dataset dataset) {
-		for (ModelChange modelChange: changeSet.getModelChanges()) {
-			dataset.getLock().enterCriticalSection(Lock.WRITE);
-			try {
-				Model model = (modelChange.getGraphURI() == null) ?
-						dataset.getDefaultModel() :
-						dataset.getNamedModel(modelChange.getGraphURI());
-				operateOnModel(model, modelChange);
-			} finally {
-				dataset.getLock().leaveCriticalSection();
-			}
-		}
-	}
+        for (ModelChange modelChange : changeSet.getModelChanges()) {
+            dataset.getLock().enterCriticalSection(Lock.WRITE);
+            try {
+                Model model = (modelChange.getGraphURI() == null) ? dataset.getDefaultModel()
+                        : dataset.getNamedModel(modelChange.getGraphURI());
+                operateOnModel(model, modelChange);
+            } finally {
+                dataset.getLock().leaveCriticalSection();
+            }
+        }
+    }
 
     protected void notifyListenersOfPostChangeEvents(ChangeSet changeSet) {
-		for (Object o : changeSet.getPostChangeEvents()) {
-		    this.notifyListenersOfEvent(o);
-		}
-	}
+        for (Object o : changeSet.getPostChangeEvents()) {
+            this.notifyListenersOfEvent(o);
+        }
+    }
 
     protected void operateOnModel(Model model, ModelChange modelChange) {
         model.enterCriticalSection(Lock.WRITE);
         try {
-			if (log.isDebugEnabled()) {
-				dumpOperation(model, modelChange);
-			}
+            if (log.isDebugEnabled()) {
+                dumpOperation(model, modelChange);
+            }
             if (modelChange.getOperation() == ModelChange.Operation.ADD) {
-            	Model addition = parseModel(modelChange);
-            	model.add(addition);
+                Model addition = parseModel(modelChange);
+                model.add(addition);
             } else if (modelChange.getOperation() == ModelChange.Operation.REMOVE) {
                 Model removal = parseModel(modelChange);
                 JenaModelUtils.removeWithBlankNodesAsVariables(removal, model);
@@ -121,56 +114,52 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         }
     }
 
-	/**
-	 * As a debug statement, log info about the model change operation: add or
-	 * delete, model URI, model class, punctuation count, beginning of the
-	 * string.
-	 */
-	private void dumpOperation(Model model, ModelChange modelChange) {
-		String op = String.valueOf(modelChange.getOperation());
+    /**
+     * As a debug statement, log info about the model change operation: add or delete, model URI, model class,
+     * punctuation count, beginning of the string.
+     */
+    private void dumpOperation(Model model, ModelChange modelChange) {
+        String op = String.valueOf(modelChange.getOperation());
 
-		byte[] changeBytes = new byte[0];
-		try {
-			modelChange.getSerializedModel().mark(Integer.MAX_VALUE);
-			changeBytes = IOUtils.toByteArray(modelChange.getSerializedModel());
-			modelChange.getSerializedModel().reset();
-		} catch (IOException e) {
-			// leave it empty.
-		}
+        byte[] changeBytes = new byte[0];
+        try {
+            modelChange.getSerializedModel().mark(Integer.MAX_VALUE);
+            changeBytes = IOUtils.toByteArray(modelChange.getSerializedModel());
+            modelChange.getSerializedModel().reset();
+        } catch (IOException e) {
+            // leave it empty.
+        }
 
-		int puncCount = 0;
-		boolean inUri = false;
-		boolean inQuotes = false;
-		for (byte b : changeBytes) {
-			if (inQuotes) {
-				if (b == '"') {
-					inQuotes = false;
-				}
-			} else if (inUri) {
-				if (b == '>') {
-					inUri = false;
-				}
-			} else {
-				if (b == '"') {
-					inQuotes = true;
-				} else if (b == '<') {
-					inUri = true;
-				} else if ((b == ',') || (b == ';') || (b == '.')) {
-					puncCount++;
-				}
-			}
-		}
+        int puncCount = 0;
+        boolean inUri = false;
+        boolean inQuotes = false;
+        for (byte b : changeBytes) {
+            if (inQuotes) {
+                if (b == '"') {
+                    inQuotes = false;
+                }
+            } else if (inUri) {
+                if (b == '>') {
+                    inUri = false;
+                }
+            } else {
+                if (b == '"') {
+                    inQuotes = true;
+                } else if (b == '<') {
+                    inUri = true;
+                } else if ((b == ',') || (b == ';') || (b == '.')) {
+                    puncCount++;
+                }
+            }
+        }
 
-		String changeString = new String(changeBytes).replace('\n', ' ');
+        String changeString = new String(changeBytes).replace('\n', ' ');
 
-		log.debug(String.format(
-				">>>>OPERATION: %3.3s %03dpunc, format=%s, graphUri='%s'\n"
-						+ "    start=%.200s\n" + "    model=%s",
-				modelChange.getOperation(), puncCount,
-				modelChange.getSerializationFormat(),
-				modelChange.getGraphURI(), changeString,
-				ToString.modelToString(model)));
-	}
+        log.debug(String.format(
+                ">>>>OPERATION: %3.3s %03dpunc, format=%s, graphUri='%s'\n" + "    start=%.200s\n" + "    model=%s",
+                modelChange.getOperation(), puncCount, modelChange.getSerializationFormat(), modelChange.getGraphURI(),
+                changeString, ToString.modelToString(model)));
+    }
 
     private Model parseModel(ModelChange modelChange) {
         Model model = ModelFactory.createDefaultModel();
@@ -179,8 +168,8 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         return model;
     }
 
-    private InputStream getRDFResultStream(String query, boolean construct,
-            ModelSerializationFormat resultFormat) throws RDFServiceException {
+    private InputStream getRDFResultStream(String query, boolean construct, ModelSerializationFormat resultFormat)
+            throws RDFServiceException {
         DatasetWrapper dw = getDatasetWrapper();
         try {
             Dataset d = dw.getDataset();
@@ -222,8 +211,8 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
     private static final boolean DESCRIBE = false;
 
     @Override
-    public InputStream sparqlConstructQuery(String query,
-            ModelSerializationFormat resultFormat) throws RDFServiceException {
+    public InputStream sparqlConstructQuery(String query, ModelSerializationFormat resultFormat)
+            throws RDFServiceException {
         return getRDFResultStream(query, CONSTRUCT, resultFormat);
     }
 
@@ -232,17 +221,16 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
     }
 
     @Override
-    public InputStream sparqlDescribeQuery(String query,
-            ModelSerializationFormat resultFormat) throws RDFServiceException {
+    public InputStream sparqlDescribeQuery(String query, ModelSerializationFormat resultFormat)
+            throws RDFServiceException {
         return getRDFResultStream(query, DESCRIBE, resultFormat);
     }
 
-	/**
-	 * TODO Is there a way to accomplish this without buffering the entire result?
-	 */
+    /**
+     * TODO Is there a way to accomplish this without buffering the entire result?
+     */
     @Override
-    public InputStream sparqlSelectQuery(String query, ResultFormat resultFormat)
-            throws RDFServiceException {
+    public InputStream sparqlSelectQuery(String query, ResultFormat resultFormat) throws RDFServiceException {
         DatasetWrapper dw = getDatasetWrapper();
         try {
             Dataset d = dw.getDataset();
@@ -252,20 +240,20 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
                 ResultSet resultSet = qe.execSelect();
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 switch (resultFormat) {
-                   case CSV:
-                      ResultSetFormatter.outputAsCSV(outputStream,resultSet);
-                      break;
-                   case TEXT:
-                      ResultSetFormatter.out(outputStream,resultSet);
-                      break;
-                   case JSON:
-                      ResultSetFormatter.outputAsJSON(outputStream, resultSet);
-                      break;
-                   case XML:
-                      ResultSetFormatter.outputAsXML(outputStream, resultSet);
-                      break;
-                   default:
-                      throw new RDFServiceException("unrecognized result format");
+                    case CSV:
+                        ResultSetFormatter.outputAsCSV(outputStream, resultSet);
+                        break;
+                    case TEXT:
+                        ResultSetFormatter.out(outputStream, resultSet);
+                        break;
+                    case JSON:
+                        ResultSetFormatter.outputAsJSON(outputStream, resultSet);
+                        break;
+                    case XML:
+                        ResultSetFormatter.outputAsXML(outputStream, resultSet);
+                        break;
+                    default:
+                        throw new RDFServiceException("unrecognized result format");
                 }
                 InputStream result = new ByteArrayInputStream(outputStream.toByteArray());
                 return result;
@@ -278,8 +266,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
     }
 
     @Override
-    public void sparqlSelectQuery(String query, ResultSetConsumer consumer)
-            throws RDFServiceException {
+    public void sparqlSelectQuery(String query, ResultSetConsumer consumer) throws RDFServiceException {
         DatasetWrapper dw = getDatasetWrapper();
         try {
             Dataset d = dw.getDataset();
@@ -295,7 +282,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         }
     }
 
-     @Override
+    @Override
     public boolean sparqlAskQuery(String query) throws RDFServiceException {
         DatasetWrapper dw = getDatasetWrapper();
         try {
@@ -312,14 +299,6 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         }
     }
 
-    @Override
-    public List<String> getGraphURIs() throws RDFServiceException {
-        if (rebuildGraphURICache && !isRebuildGraphURICacheRunning) {
-            rebuildGraphUris();
-        }
-        return graphURIs;
-    }
-
     protected void rebuildGraphUris() {
         Thread thread = new VitroBackgroundThread(new Runnable() {
             public void run() {
@@ -328,33 +307,24 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
                         DatasetWrapper dw = getDatasetWrapper();
                         try {
                             isRebuildGraphURICacheRunning = true;
+                            rebuildGraphURICache = false;
                             Dataset d = dw.getDataset();
-                            Set<String> newGraphUris = new HashSet<>();
+                            Set<String> newURIs = new HashSet<>();
                             d.begin(ReadWrite.READ);
                             try {
                                 Iterator<String> nameIt = d.listNames();
                                 while (nameIt.hasNext()) {
-                                    newGraphUris.add(nameIt.next());
+                                    newURIs.add(nameIt.next());
                                 }
                             } finally {
                                 d.end();
                             }
-                            Set<String> oldGraphUris = new HashSet<String>(graphURIs);
-                            if (newGraphUris.equals(oldGraphUris)) {
-                                return;
-                            }
-                            Set<String> removedGraphUris = new HashSet<String>(oldGraphUris);
-                            removedGraphUris.removeAll(newGraphUris);
-                            graphURIs.removeAll(removedGraphUris);
-                            Set<String> addedGraphUris = new HashSet<String>(newGraphUris);
-                            addedGraphUris.removeAll(oldGraphUris);
-                            graphURIs.addAll(addedGraphUris);
+                            updateGraphURIs(newURIs);
                         } catch (Exception e) {
                             log.error(e, e);
                         } finally {
                             isRebuildGraphURICacheRunning = false;
                             dw.close();
-                            rebuildGraphURICache = false;
                         }
                     }
                 }
@@ -365,66 +335,64 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 
     @Override
     public void getGraphMetadata() throws RDFServiceException {
-    	// nothing to do
+        // nothing to do
     }
 
     @Override
-	public void serializeAll(OutputStream outputStream)
-			throws RDFServiceException {
-    	String query = "SELECT * WHERE { GRAPH ?g {?s ?p ?o}}";
-		serialize(outputStream, query);
-	}
+    public void serializeAll(OutputStream outputStream) throws RDFServiceException {
+        String query = "SELECT * WHERE { GRAPH ?g {?s ?p ?o}}";
+        serialize(outputStream, query);
+    }
 
-	@Override
-	public void serializeGraph(String graphURI, OutputStream outputStream)
-			throws RDFServiceException {
-		String query = "SELECT * WHERE { GRAPH <" + graphURI + "> {?s ?p ?o}}";
-		serialize(outputStream, query);
-	}
+    @Override
+    public void serializeGraph(String graphURI, OutputStream outputStream) throws RDFServiceException {
+        String query = "SELECT * WHERE { GRAPH <" + graphURI + "> {?s ?p ?o}}";
+        serialize(outputStream, query);
+    }
 
-	private void serialize(OutputStream outputStream, String query) throws RDFServiceException {
-		DatasetWrapper dw = getDatasetWrapper();
-		try {
-			Dataset d = dw.getDataset();
-			Query q = createQuery(query);
-			QueryExecution qe = createQueryExecution(query, q, d);
-			// These properties only help for SDB, but shouldn't hurt for TDB.
-			qe.getContext().set(SDB.jdbcFetchSize, Integer.MIN_VALUE);
-			qe.getContext().set(SDB.jdbcStream, true);
-			qe.getContext().set(SDB.streamGraphAPI, true);
-			try {
-				ResultSet resultSet = qe.execSelect();
-				if (resultSet.getResultVars().contains("g")) {
-					Iterator<Quad> quads = new ResultSetQuadsIterator(resultSet);
-					RDFDataMgr.writeQuads(outputStream, quads);
-				} else {
-					Iterator<Triple> triples = new ResultSetTriplesIterator(resultSet);
-					RDFDataMgr.writeTriples(outputStream, triples);
-				}
-			} finally {
-				qe.close();
-			}
-		} finally {
-			dw.close();
-		}
-	}
-
-	/**
-	 * The basic version. Parse the model from the file, read the model from the
-	 * tripleStore, and ask whether they are isomorphic.
-	 */
-	@Override
-	public boolean isEquivalentGraph(String graphURI, InputStream serializedGraph,
-			ModelSerializationFormat serializationFormat) throws RDFServiceException {
-		Model fileModel = RDFServiceUtils.parseModel(serializedGraph, serializationFormat);
-		Model tripleStoreModel = new RDFServiceDataset(this).getNamedModel(graphURI);
-		Model fromTripleStoreModel = ModelFactory.createDefaultModel().add(tripleStoreModel);
-		return fileModel.isIsomorphicWith(fromTripleStoreModel);
-	}
+    private void serialize(OutputStream outputStream, String query) throws RDFServiceException {
+        DatasetWrapper dw = getDatasetWrapper();
+        try {
+            Dataset d = dw.getDataset();
+            Query q = createQuery(query);
+            QueryExecution qe = createQueryExecution(query, q, d);
+            // These properties only help for SDB, but shouldn't hurt for TDB.
+            qe.getContext().set(SDB.jdbcFetchSize, Integer.MIN_VALUE);
+            qe.getContext().set(SDB.jdbcStream, true);
+            qe.getContext().set(SDB.streamGraphAPI, true);
+            try {
+                ResultSet resultSet = qe.execSelect();
+                if (resultSet.getResultVars().contains("g")) {
+                    Iterator<Quad> quads = new ResultSetQuadsIterator(resultSet);
+                    RDFDataMgr.writeQuads(outputStream, quads);
+                } else {
+                    Iterator<Triple> triples = new ResultSetTriplesIterator(resultSet);
+                    RDFDataMgr.writeTriples(outputStream, triples);
+                }
+            } finally {
+                qe.close();
+            }
+        } finally {
+            dw.close();
+        }
+    }
 
     /**
-     * The basic version. Parse the model from the file, read the model from the
-     * tripleStore, and ask whether they are isomorphic.
+     * The basic version. Parse the model from the file, read the model from the tripleStore, and ask whether they are
+     * isomorphic.
+     */
+    @Override
+    public boolean isEquivalentGraph(String graphURI, InputStream serializedGraph,
+            ModelSerializationFormat serializationFormat) throws RDFServiceException {
+        Model fileModel = RDFServiceUtils.parseModel(serializedGraph, serializationFormat);
+        Model tripleStoreModel = new RDFServiceDataset(this).getNamedModel(graphURI);
+        Model fromTripleStoreModel = ModelFactory.createDefaultModel().add(tripleStoreModel);
+        return fileModel.isIsomorphicWith(fromTripleStoreModel);
+    }
+
+    /**
+     * The basic version. Parse the model from the file, read the model from the tripleStore, and ask whether they are
+     * isomorphic.
      */
     @Override
     public boolean isEquivalentGraph(String graphURI, Model graph) throws RDFServiceException {
@@ -439,15 +407,16 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 
     @Override
     public long countTriples(RDFNode subject, RDFNode predicate, RDFNode object) throws RDFServiceException {
-        Query countQuery = QueryFactory.create("SELECT (COUNT(?s) AS ?count) WHERE { ?s ?p ?o } ORDER BY ?s ?p ?o", Syntax.syntaxSPARQL_11);
+        Query countQuery = QueryFactory.create("SELECT (COUNT(?s) AS ?count) WHERE { ?s ?p ?o } ORDER BY ?s ?p ?o",
+                Syntax.syntaxSPARQL_11);
         QuerySolutionMap map = new QuerySolutionMap();
-        if ( subject != null ) {
+        if (subject != null) {
             map.add("s", subject);
         }
-        if ( predicate != null ) {
+        if (predicate != null) {
             map.add("p", predicate);
         }
-        if ( object != null ) {
+        if (object != null) {
             map.add("o", object);
         }
 
@@ -457,7 +426,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
             try (QueryExecution qexec = QueryExecutionFactory.create(countQuery, d, map)) {
                 ResultSet results = qexec.execSelect();
                 if (results.hasNext()) {
-                    QuerySolution soln = results.nextSolution() ;
+                    QuerySolution soln = results.nextSolution();
                     Literal literal = soln.getLiteral("count");
                     return literal.getLong();
                 }
@@ -470,16 +439,17 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
     }
 
     @Override
-    public Model getTriples(RDFNode subject, RDFNode predicate, RDFNode object, long limit, long offset) throws RDFServiceException {
+    public Model getTriples(RDFNode subject, RDFNode predicate, RDFNode object, long limit, long offset)
+            throws RDFServiceException {
         Query query = QueryFactory.create("CONSTRUCT WHERE { ?s ?p ?o }", Syntax.syntaxSPARQL_11);
         QuerySolutionMap map = new QuerySolutionMap();
-        if ( subject != null ) {
+        if (subject != null) {
             map.add("s", subject);
         }
-        if ( predicate != null ) {
+        if (predicate != null) {
             map.add("p", predicate);
         }
-        if ( object != null ) {
+        if (object != null) {
             map.add("o", object);
         }
 
@@ -514,19 +484,22 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
     protected QueryExecution createQueryExecution(String queryString, Query q, Dataset d) {
         return QueryExecutionFactory.create(q, d);
     }
-	/*
-	 * UQAM-Linguistic-Management Useful among other things to transport the linguistic context in the service
-	 * (non-Javadoc)
-	 * @see edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService#setVitroRequest(edu.cornell.mannlib.vitro.webapp.controller.VitroRequest)
-	 */
-	private VitroRequest vitroRequest;
 
-	public void setVitroRequest(VitroRequest vitroRequest) {
-		this.vitroRequest = vitroRequest;
-	}
+    /*
+     * UQAM-Linguistic-Management Useful among other things to transport the linguistic context in the service
+     * (non-Javadoc)
+     * 
+     * @see edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService#setVitroRequest(edu.cornell.mannlib.vitro.webapp.
+     * controller.VitroRequest)
+     */
+    private VitroRequest vitroRequest;
 
-	public VitroRequest getVitroRequest() {
-		return vitroRequest;
-	}
+    public void setVitroRequest(VitroRequest vitroRequest) {
+        this.vitroRequest = vitroRequest;
+    }
+
+    public VitroRequest getVitroRequest() {
+        return vitroRequest;
+    }
 
 }
