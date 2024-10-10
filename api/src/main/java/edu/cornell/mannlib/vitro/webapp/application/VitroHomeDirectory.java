@@ -176,8 +176,7 @@ public class VitroHomeDirectory {
 		private void confirmValidDirectory() {
 			Path vhd = getPath();
 			if (!Files.exists(vhd)) {
-				throw new IllegalStateException("Vitro home directory '" + vhd
-						+ "' does not exist.");
+			    createHomeDirectory(vhd);
 			}
 			if (!Files.isDirectory(vhd)) {
 				throw new IllegalStateException("Vitro home directory '" + vhd
@@ -239,6 +238,18 @@ public class VitroHomeDirectory {
         }
         log.info("Copied home files to " + vhdDir.toPath());
         
+    }
+
+    /**
+     * Create home directory
+     */
+    private static void createHomeDirectory(Path vhdDir) {
+        try {
+            vhdDir.toFile().mkdirs();
+        } catch (Exception e) {
+            log.error(e, e);
+            throw new RuntimeException("Failed to create home directory " + vhdDir);
+        }
     }
 
     /**
