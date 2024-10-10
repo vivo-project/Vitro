@@ -4,16 +4,22 @@ package edu.cornell.mannlib.vitro.webapp.application;
 
 import static edu.cornell.mannlib.vitro.webapp.application.BuildProperties.WEBAPP_PATH_BUILD_PROPERTIES;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.naming.InitialContext;
 import javax.servlet.ServletContext;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -32,6 +38,8 @@ public class VitroHomeDirectory {
 	private final ServletContext ctx;
 	private final Path path;
 	private final String discoveryMessage;
+    private Set<String> excludedHomeFiles = new HashSet<>(Arrays.asList("rdf"));
+
 
 	public VitroHomeDirectory(ServletContext ctx, Path path,
 			String discoveryMessage) {
@@ -210,4 +218,67 @@ public class VitroHomeDirectory {
 		}
 	}
 
+    /**
+     * Populates home directory with home files, excluding the rdf directory
+     */
+    public void populate() {
+        File vhdDir = getPath().toFile();
+
+        if (!vhdDir.isDirectory() || vhdDir.list() == null) {
+            throw new RuntimeException("Application home dir is not a directory! " + vhdDir);
+        }
+        
+        if (!vhdDir.canWrite()) {
+            throw new RuntimeException("Application home dir is not writable! " + vhdDir);
+        }
+        try {
+            copy(vhdDir);
+        } catch(Exception e) {
+            log.error(e, e);
+            throw new RuntimeException("Failed to copy home files! " + vhdDir);
+        }
+        log.info("Copied home files to " + vhdDir.toPath());
+        
+    }
+
+    /**
+     * Copy file from home source to home destination
+     */
+    private void copy(File homeDestination) throws IOException {
+        File homeSrcPath = new File(getHomeSrcPath(ctx));
+        File[] contents = homeSrcPath.listFiles();
+        for (File child : contents) {
+            if (!isExcluded(child)) {
+                FileUtils.copyDirectory(child, homeDestination);
+            }
+        }
+    }
+
+    /**
+     * Test if file name is excluded from copying
+     * 
+     * @return true if file should be excluded
+     */
+    private boolean isExcluded(File child) {
+        if (excludedHomeFiles.contains(child.getName())) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Get source home file directory path
+     * 
+     * @return source home files directory path
+     */
+    public static String getHomeSrcPath(ServletContext context) {
+        String location = "/WEB-INF/resources/home-files";
+        String realPath = context.getRealPath(location);
+        if (realPath == null) {
+            log.error("Application home files not found in: " + location);
+            throw new RuntimeException("Application home files not found in: " + location);
+        }
+        return realPath;
+    }
+    
 }

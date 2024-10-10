@@ -32,7 +32,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 
-import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
+import edu.cornell.mannlib.vitro.webapp.application.VitroHomeDirectory;
 
 import javax.servlet.ServletContext;
 
@@ -81,7 +81,7 @@ public class RDFFilesLoader {
 	public static void loadFirstTimeFiles(ServletContext ctx, String modelPath, Model model,
 			boolean firstTime) {
 		if (firstTime) {
-			String home = locateHomeDirectory();
+			String home = locateHomeDirectory(ctx);
 
 			// Load common files
 			Set<Path> paths = getPaths(home, RDF, modelPath, FIRST_TIME);
@@ -113,7 +113,7 @@ public class RDFFilesLoader {
 	public static void loadEveryTimeFiles(ServletContext ctx, String modelPath, OntModel model) {
 		OntModel everytimeModel = ModelFactory
 				.createOntologyModel(OntModelSpec.OWL_MEM);
-		String home = locateHomeDirectory();
+		String home = locateHomeDirectory(ctx);
 
 		// Load common files
 		Set<Path> paths = getPaths(home, RDF, modelPath, EVERY_TIME);
@@ -220,9 +220,8 @@ public class RDFFilesLoader {
 			return DEFAULT_RDF_FORMAT;
 	}
 
-	private static String locateHomeDirectory() {
-		return ApplicationUtils.instance().getHomeDirectory().getPath()
-				.toString();
+	private static String locateHomeDirectory(ServletContext ctx) {
+		return VitroHomeDirectory.getHomeSrcPath(ctx);
 	}
 
 	/**
