@@ -137,7 +137,7 @@ public class ExpressionTransformer {
             String currentToken = tokens[i];
 
             if (!priorities.containsKey(currentToken) && !currentToken.contains(":") && !currentToken.equals(")")) {
-                currentToken = "ALLTEXT:" + currentToken;
+                currentToken = "ALLTEXT:" + currentToken + " OR nameLowercaseSingleValued:" + currentToken;
             }
 
             if (i > 0 && currentToken.contains(":") && !priorities.containsKey(tokens[i - 1])) {

@@ -29,7 +29,7 @@ public class ESCounter {
 
     public int count() throws SearchEngineException {
         try {
-            String url = baseUrl + "/_doc/_count";
+            String url = baseUrl + "/_count";
             HttpClient httpClient;
             if (baseUrl.startsWith("https")) {
                 httpClient = ESHttpsBasicClientFactory.getHttpClient();
