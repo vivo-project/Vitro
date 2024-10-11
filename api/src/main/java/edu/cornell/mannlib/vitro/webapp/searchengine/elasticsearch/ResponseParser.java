@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -41,8 +42,7 @@ class ResponseParser {
     @SuppressWarnings("unchecked")
     public ResponseParser(String responseString) throws SearchEngineException {
         try {
-            this.responseMap = new ObjectMapper().readValue(responseString,
-                    HashMap.class);
+            this.responseMap = new ObjectMapper().readValue(responseString, new TypeReference<Map<String, Object>>() {});
         } catch (IOException e) {
             throw new SearchEngineException(e);
         }
