@@ -28,9 +28,11 @@ public class ProcessDataGetterN3Utils {
     			log.error("Exception occurred in trying to get processor class for n3 for " + dataGetterClass, ex);
     			return null;
     		} 
+    	} else {
+    	    log.error(ProcessDataGetterN3Map.class.getSimpleName() + " doesn't contain processor class for n3 for " + dataGetterClass);
+    	    return null;
     	}
-    	log.error(ProcessDataGetterN3Map.class.getSimpleName() + " doesn't contain processor class for n3 for " + dataGetterClass);
-    	return null;
+    	
     }
 
     private static ProcessDataGetterN3 instantiateClass(Class<?> processorClass, ObjectNode jsonObject) {
