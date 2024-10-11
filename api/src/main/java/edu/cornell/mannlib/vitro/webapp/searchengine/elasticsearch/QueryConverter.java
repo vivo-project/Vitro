@@ -125,7 +125,7 @@ public class QueryConverter {
     private Map<String, Object> figureFacet(String field) {
         return tree() //
                 .put("terms", tree() //
-                        .put("field", field) //
+                        .put("field", field.endsWith("_ss") ? field + ".keyword" : field) //
                         .put("size", ifPositive(query.getFacetLimit())) //
                         .put("min_doc_count",
                                 ifPositive(query.getFacetMinCount()))) //
