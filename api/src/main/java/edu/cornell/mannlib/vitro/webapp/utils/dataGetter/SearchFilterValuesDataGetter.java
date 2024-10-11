@@ -38,10 +38,10 @@ public class SearchFilterValuesDataGetter extends DataGetterBase implements Data
     private static final String searchFilterUri = "<" + DisplayVocabulary.SEARCH_FILTER_VALUE + ">";
     private static final Log log = LogFactory.getLog(SearchFilterValuesDataGetter.class);
 
-    String dataGetterURI;
-    String searchFilter;
-    VitroRequest vreq;
-    ServletContext context;
+    private String dataGetterURI;
+    private String searchFilter;
+    private VitroRequest vreq;
+    private ServletContext context;
 
     /**
      * Constructor with display model and data getter URI that will be called by reflection.
