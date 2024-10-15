@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.searchengine.elasticsearch;
 
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -93,7 +94,7 @@ public class ESAdder {
 
             HttpPut request = new HttpPut(url);
             request.addHeader("Content-Type", "application/json");
-            request.setEntity(new StringEntity(json));
+            request.setEntity(new StringEntity(json, "UTF-8"));
             HttpResponse response = httpClient.execute(request);
             log.debug("Response from Elasticsearch: "
                     + EntityUtils.toString(response.getEntity()));
