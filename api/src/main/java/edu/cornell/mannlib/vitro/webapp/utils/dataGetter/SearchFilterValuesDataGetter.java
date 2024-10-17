@@ -5,12 +5,10 @@ import static edu.cornell.mannlib.vitro.webapp.search.controller.SearchFiltering
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Optional;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
@@ -57,13 +55,8 @@ public class SearchFilterValuesDataGetter extends DataGetterBase implements Data
         Map<String, Object> defaultSearchResults = PagedSearchController.process(vreq, requestFilters).getMap();
         responseMap.put("filterGenericInfo", defaultSearchResults);
         requestFilters = SearchFiltering.getRequestFilters(vreq);
-        Optional<FilterValue> filterValue = Optional.absent();
         if (!isValidFilterValueProvided(requestFilters, defaultSearchResults)) {
-            // get first filter value from emptyRequestMap and apply it for next request.
-            filterValue = getFirstFilterValue(defaultSearchResults);
-            if (filterValue.isPresent()) {
-                requestFilters.put(searchFilter, new ArrayList<String>(Arrays.asList(filterValue.get().getId())));
-            }
+            requestFilters.put(searchFilter, new ArrayList<String>(Arrays.asList(ANY_VALUE)));
         }
         responseMap.putAll(PagedSearchController.process(vreq, requestFilters).getMap());
         responseMap.put("searchFilter", this.searchFilter);
@@ -97,20 +90,6 @@ public class SearchFilterValuesDataGetter extends DataGetterBase implements Data
             log.error(e, e);
         }
         return false;
-    }
-
-    private Optional<FilterValue> getFirstFilterValue(Map<String, Object> defaultSearchResults) {
-        try {
-            Map<String, SearchFilter> filterMap = (Map<String, SearchFilter>) defaultSearchResults.get("filters");
-            SearchFilter f = filterMap.get(searchFilter);
-            Collection<FilterValue> values = f.getValues().values();
-            if (!values.isEmpty()) {
-                return Optional.of(values.iterator().next());
-            }
-        } catch (Exception e) {
-            log.error(e, e);
-        }
-        return Optional.absent();
     }
 
     /**
