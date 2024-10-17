@@ -48,6 +48,7 @@ public class SearchFiltering {
     private static final String FILTER_RANGE = "filter_range_";
     private static final String FILTER_INPUT_PREFIX = "filter_input_";
     private static final String FILTERS = "filters";
+    public static final String ANY_VALUE = "[* TO *]";
 
     private static final String FILTER_QUERY = ""
             + "PREFIX search: <https://vivoweb.org/ontology/vitro-search#>\n"
@@ -173,7 +174,11 @@ public class SearchFiltering {
             }
             for (FilterValue fv : searchFilter.getValues().values()) {
                 if (fv.isDefault() || fv.getSelected()) {
-                    query.addFilterQuery(searchFilter.getField() + ":\"" + fv.getId() + "\"");
+                    if (ANY_VALUE.equals(fv.getId())) {
+                        query.addFilterQuery(searchFilter.getField() + ":" + ANY_VALUE );
+                    } else {
+                        query.addFilterQuery(searchFilter.getField() + ":\"" + fv.getId() + "\"");
+                    }
                 }
             }
         }

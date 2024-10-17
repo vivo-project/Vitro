@@ -1,15 +1,14 @@
 /* $This file is distributed under the terms of the license in LICENSE$ */
 package edu.cornell.mannlib.vitro.webapp.utils.dataGetter;
 
+import static edu.cornell.mannlib.vitro.webapp.search.controller.SearchFiltering.ANY_VALUE;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.servlet.ServletContext;
 
 import com.google.common.base.Optional;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
@@ -41,7 +40,6 @@ public class SearchFilterValuesDataGetter extends DataGetterBase implements Data
     private String dataGetterURI;
     private String searchFilter;
     private VitroRequest vreq;
-    private ServletContext context;
 
     /**
      * Constructor with display model and data getter URI that will be called by reflection.
@@ -54,7 +52,8 @@ public class SearchFilterValuesDataGetter extends DataGetterBase implements Data
     public Map<String, Object> getData(Map<String, Object> pageData) {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(vreq.getParameterMap());
-        Map<String, List<String>> requestFilters = Collections.emptyMap();
+        Map<String, List<String>> requestFilters = new HashMap<>();
+        requestFilters.put(searchFilter, new ArrayList<String>(Arrays.asList(ANY_VALUE)));
         Map<String, Object> defaultSearchResults = PagedSearchController.process(vreq, requestFilters).getMap();
         responseMap.put("filterGenericInfo", defaultSearchResults);
         requestFilters = SearchFiltering.getRequestFilters(vreq);
@@ -129,7 +128,6 @@ public class SearchFilterValuesDataGetter extends DataGetterBase implements Data
         }
 
         this.vreq = vreq;
-        this.context = vreq.getSession().getServletContext();
         this.dataGetterURI = dataGetterURI;
 
         QuerySolutionMap initBindings = new QuerySolutionMap();
