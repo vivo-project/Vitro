@@ -1,0 +1,5 @@
+.li-selected > label {
+	background: url(../../images/arrowIcon.gif) 0px 5px no-repeat;
+	color: #2ea0cf;
+	padding-left: 16px;
+}
