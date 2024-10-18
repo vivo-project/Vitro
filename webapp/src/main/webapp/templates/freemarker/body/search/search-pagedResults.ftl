@@ -226,7 +226,7 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap
 						<#if filters[filterId]??>
 							<#assign f = filters[filterId]>
 							<#if ( user.loggedIn || f.public ) && !f.hidden >
-								<@searchFormFilterTab f assignedActive emptySearch/>  
+								<@searchFormFilterTab f assignedActive/>  
 								<#if !assignedActive && (f.selected || emptySearch )>
 									<#assign assignedActive = true>
 								</#if>
@@ -257,7 +257,7 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap
 		<#assign valueNumber = 1>
 		<#list filter.values?values as v>
 			<#if v.selected>
-				${getInput(filter, v, getValueID(filter.id, valueNumber), valueNumber)}
+				<@getInput filter v getValueID(filter.id, valueNumber) valueNumber />
 				<#if user.loggedIn || filter.public>
 					${getSelectedLabel(valueNumber, v, filter)}
 				</#if>
@@ -315,7 +315,7 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap
 		</li>
 </#macro>
 
-<#macro searchFormFilterTab filter assignedActive isEmptySearch>
+<#macro searchFormFilterTab filter assignedActive>
 	<#if filter.id == "querytext">
 		<#-- skip query text filter -->
 		<#return>
@@ -347,7 +347,7 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap
 							<a class="more-facets-link" href="javascript:void(0);" onclick="expandSearchOptions(this)">${i18n().paging_link_more}</a>
 						</#if>
 						<#if user.loggedIn || v.publiclyAvailable>
-						    ${getInput(filter, v, getValueID(filter.id, valueNumber), valueNumber)}
+						    <@getInput filter v getValueID(filter.id, valueNumber) valueNumber />
 						    ${getLabel(valueNumber, v, filter, additionalLabels)}
 						</#if>
 					</#if>
@@ -425,7 +425,7 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap
 	<input form="search-form" id="filter_input_${filter.id?html}"  placeholder="${i18n().search_field_placeholder}" class="search-vivo" type="text" name="filter_input_${filter.id?html}" value="${filter.inputText?html}" autocapitalize="none" />
 </#macro>
 
-<#function getInput filter filterValue valueID valueNumber>
+<#macro getInput filter filterValue valueID valueNumber form="search-form">
 	<#assign checked = "" >
 	<#assign class = "" >
 	<#if filterValue.selected>
@@ -441,9 +441,17 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap
 		<#assign filterName = filterName + "_" + valueNumber >
 	</#if>
 
-	<#return "<input form=\"search-form\" type=\"" + type + "\" id=\"" + valueID?html + "\"  value=\"" + filter.id?html + ":" + filterValue.id?html 
-		+ "\" name=\"filters_" + valueID?html + "\" style=\"display:none;\" " + checked + "\" class=\"" + class + "\" >" />
-</#function>
+	<input 
+		form="${form}" 
+		type="${type}" 
+		id="${valueID?html}" 
+		value="${filter.id?html + ":" + filterValue.id?html}" 
+		name="filters_${valueID?html}" 
+		style="display:none;" 
+		${checked} 
+		class="${class}" 
+	>
+</#macro>
 
 <#function getValueID id number>
 	<#return id + "__" + number /> 
