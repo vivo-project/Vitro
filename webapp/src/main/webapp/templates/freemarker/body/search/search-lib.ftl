@@ -1,41 +1,3 @@
-<#-- $This file is distributed under the terms of the license in LICENSE$ -->
-
-${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/css/nouislider.css"/>')}
-${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/css/search-results.css"/>')}
-
-${headScripts.add('<script type="text/javascript" src="${urls.base}/webjars/floatingui/floating-ui.core.umd.js"></script>')}
-${headScripts.add('<script type="text/javascript" src="${urls.base}/webjars/floatingui/floating-ui.dom.umd.js"></script>')}
-${headScripts.add('<script type="text/javascript" src="${urls.base}/js/tooltip/tooltip-utils.js"></script>')}
-
-${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/js/bootstrap/css/bootstrap.min.css"/>')}
-${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/js/bootstrap/css/bootstrap-theme.min.css"/>')}
-${headScripts.add('<script type="text/javascript" src="${urls.base}/js/nouislider.min.js"></script>')}
-${headScripts.add('<script type="text/javascript" src="${urls.base}/js/wNumb.min.js"></script>')}
-${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap/js/bootstrap.min.js"></script>')}
-
-<#include "search-lib.ftl">
-
-<script>
-	let searchFormId = "search-form";
-</script>
-
-<@searchForm  />
-
-<div class="contentsBrowseGroup">
-
-    <@printPagingLinks />
-    <#-- Search results -->
-    <ul class="searchhits">
-        <#list individuals as individual>
-            <li>
-                <@shortView uri=individual.uri viewContext="search" />
-            </li>
-        </#list>
-    </ul>
-
-    <@printPagingLinks />
-    <br />
-</div> 
 
 <#macro printPagingLinks>
 
@@ -144,7 +106,7 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap
             <#if v.selected>
                 <@getInput filter v getValueID(filter.id, valueNumber) valueNumber />
                 <#if user.loggedIn || filter.public>
-                    <@getSelectedLabel valueNumber, v, filter />
+                    <@getSelectedLabel getValueID(filter.id, valueNumber)?html v filter />
                 </#if>
             </#if>
             <#assign valueNumber = valueNumber + 1>
@@ -232,7 +194,7 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap
                         </#if>
                         <#if user.loggedIn || v.publiclyAvailable>
                             <@getInput filter v getValueID(filter.id, valueNumber) valueNumber />
-                            <@getLabel valueNumber, v, filter, additionalLabels />
+                            <@getLabel getValueID(filter.id, valueNumber)?html v filter additionalLabels />
                         </#if>
                     </#if>
                     <#assign valueNumber = valueNumber + 1>
@@ -271,15 +233,15 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap
 </#macro>
 
 
-<#macro getSelectedLabel valueID value filter >
+<#macro getSelectedLabel valueId value filter >
     <#assign label = filter.name + " : " + value.name >
     <#if !filter.localizationRequired>
         <#assign label = filter.name + " : " + value.id >
     </#if>
-    <label for="${getValueID(filter.id, valueNumber)?html}">${getValueLabel(label, value.count)?html}</label>
+    <label for="${valueId}">${getValueLabel(label, value.count)?html}</label>
 </#macro>
 
-<#macro getLabel valueID value filter additional=false >
+<#macro getLabel valueId value filter additional=false >
     <#assign label = value.name >
     <#assign additionalClass = "" >
     <#if !filter.localizationRequired>
@@ -288,10 +250,8 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap
     <#if additional=true>
         <#assign additionalClass = "additional-search-options hidden-search-option" >
     </#if>
-
-    <label class="${additionalClass}" for="${getValueID(filter.id, valueNumber)?html}" >${getValueLabel(label, value.count)?html}</label>
+    <label class="${additionalClass}" for="${valueId}" >${getValueLabel(label, value.count)?html}</label>
 </#macro>
-
 
 <#macro userSelectedInput filter>
     <#if filter.inputText?has_content>
@@ -343,20 +303,8 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap
 
 <#function getValueLabel label count >
     <#assign result = label >
-    ${label}
     <#if count!=0>
         <#assign result = result + " (" + count + ")" >
     </#if>
     <#return result />
 </#function>
-
-${stylesheets.add('<link rel="stylesheet" href="//code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />',
-  				  '<link rel="stylesheet" href="${urls.base}/css/search.css" />')}
-
-${headScripts.add('<script src="//code.jquery.com/ui/1.10.3/jquery-ui.js"></script>',
-                  '<script type="text/javascript" src="${urls.base}/js/tiny_mce/tiny_mce.js"></script>'
-                  )}
-
-${scripts.add('<script type="text/javascript" src="${urls.base}/js/searchDownload.js"></script>')}
-${scripts.add('<script type="text/javascript" src="${urls.base}/js/search/search_results.js"></script>')}
-
