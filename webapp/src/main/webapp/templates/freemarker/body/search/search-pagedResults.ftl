@@ -52,129 +52,10 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap
 
 <#macro printResultNumbers>
     <h2 class="searchResultsHeader">
-    <#escape x as x?html>
-        ${i18n().results_found(hitCount)} 
-    </#escape>
-    <script type="text/javascript">
-        var url = window.location.toString();
-        if (url.indexOf("?") == -1){
-            var queryText = 'querytext=${querytext?js_string}';
-        } else {
-            var urlArray = url.split("?");
-            var queryText = urlArray[1];
-        }
-
-        var urlsBase = '${urls.base}';
-        
-        $("input:radio").on("click",function (e) {
-            var input=$(this);
-            if (input.is(".selected-input")) { 
-                input.prop("checked",false);
-            } else {
-                input.prop("checked",true);
-            }
-            $('#search-form').submit();
-        });
-        
-        $("input:checkbox").on("click",function (e) {
-            var input=$(this);
-            input.checked = !input.checked;
-            $('#search-form').submit();
-        });
-        
-        function clearInput(elementId) {
-              let inputEl = document.getElementById(elementId);
-              inputEl.value = "";
-              let srcButton = document.getElementById("button_" + elementId);
-              srcButton.classList.add("unchecked-selected-search-input-label");
-              $('#search-form').submit();
-        }
-        
-        function createSliders(){
-            sliders = document.getElementsByClassName('range-slider-container');
-            for (let sliderElement of sliders) {
-                createSlider(sliderElement);
-            }
-            $(".noUi-handle").on("mousedown", function (e) {
-                $(this)[0].setPointerCapture(e.pointerId);
-            });
-            $(".noUi-handle").on("mouseup", function (e) {
-                $('#search-form').submit();
-            });
-            $(".noUi-handle").on("pointerup", function (e) {
-                $('#search-form').submit();
-            });
-        };
-            
-        function createSlider(sliderContainer){
-            rangeSlider = sliderContainer.querySelector('.range-slider');
-            
-            noUiSlider.create(rangeSlider, {
-                range: {
-                    min: Number(sliderContainer.getAttribute('min')),
-                    max: Number(sliderContainer.getAttribute('max'))
-                },
-            
-                step: 1,
-                start: [Number(sliderContainer.querySelector('.range-slider-start').textContent), 
-                          Number(sliderContainer.querySelector('.range-slider-end').textContent)],
-            
-                format: wNumb({
-                    decimals: 0
-                })
-            });
-            
-            var dateValues = [
-                 sliderContainer.querySelector('.range-slider-start'),
-                 sliderContainer.querySelector('.range-slider-end')
-            ];
-            
-            var input = sliderContainer.querySelector('.range-slider-input');
-            var first = true;
-            
-            rangeSlider.noUiSlider.on('update', function (values, handle) {
-                dateValues[handle].innerHTML = values[handle];
-                var active = input.getAttribute('active');
-                if (active === null){
-                    input.setAttribute('active', "false");
-                } else if (active !== "true"){
-                    input.setAttribute('active', "true");
-                } else {
-                    var startDate = new Date(+values[0],0,1);
-                    var endDate = new Date(+values[1],0,1);
-                    input.value = startDate.toISOString() + " " + endDate.toISOString();
-                }
-            });
-        }
-        
-        window.onload = (event) => {
-              createSliders();
-        };
-        
-        $('#search-form').submit(function () {
-        $('#search-form')
-            .find('input')
-            .filter(function () {
-                return !this.value;
-            })
-            .prop('name', '');
-        });
-        
-        function expandSearchOptions(){
-            $(event.target).parent().children('.additional-search-options').removeClass("hidden-search-option");
-            $(event.target).parent().children('.less-facets-link').show();
-            $(event.target).hide();
-        }
-    
-        function collapseSearchOptions(){
-            $(event.target).parent().children('.additional-search-options').addClass("hidden-search-option");
-            $(event.target).parent().children('.more-facets-link').show();
-            $(event.target).hide();
-        }
-    
-    </script>
-    <img id="downloadIcon" src="images/download-icon.png" alt="${i18n().download_results}" title="${i18n().download_results}" />
-    <#-- <span id="downloadResults" style="float:left"></span>  -->
+        <#escape x as x?html>
+            ${i18n().results_found(hitCount)} 
+        </#escape>
+        <img id="downloadIcon" src="images/download-icon.png" alt="${i18n().download_results}" title="${i18n().download_results}" />
     </h2>
 </#macro>
 
@@ -335,7 +216,6 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap
                         <@createUserInput filter />
                     </div>
                 </#if>
-    
                 <#assign valueNumber = 1>
                 <#assign additionalLabels = false>
                 <#list filter.values?values as v>
@@ -350,7 +230,6 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap
                         </#if>
                     </#if>
                     <#assign valueNumber = valueNumber + 1>
-
                 </#list>
                 <#if additionalLabels >
                     <a class="less-facets-link additional-search-options hidden-search-option" href="javascript:void(0);" onclick="collapseSearchOptions(this)">${i18n().display_less}</a>
@@ -464,7 +343,6 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap
     </#if>
     <#return result />
 </#function>
-<!-- end contentsBrowseGroup -->
 
 ${stylesheets.add('<link rel="stylesheet" href="//code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />',
   				  '<link rel="stylesheet" href="${urls.base}/css/search.css" />')}
@@ -474,3 +352,5 @@ ${headScripts.add('<script src="//code.jquery.com/ui/1.10.3/jquery-ui.js"></scri
                   )}
 
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/searchDownload.js"></script>')}
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/search/search_results.js"></script>')}
+
