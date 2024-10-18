@@ -12,9 +12,7 @@ import java.util.Map;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
-import edu.cornell.mannlib.vitro.webapp.search.controller.FilterValue;
 import edu.cornell.mannlib.vitro.webapp.search.controller.PagedSearchController;
-import edu.cornell.mannlib.vitro.webapp.search.controller.SearchFilter;
 import edu.cornell.mannlib.vitro.webapp.search.controller.SearchFiltering;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -55,7 +53,7 @@ public class SearchFilterValuesDataGetter extends DataGetterBase implements Data
         Map<String, Object> defaultSearchResults = PagedSearchController.process(vreq, requestFilters).getMap();
         responseMap.put("filterGenericInfo", defaultSearchResults);
         requestFilters = SearchFiltering.getRequestFilters(vreq);
-        if (!isValidFilterValueProvided(requestFilters, defaultSearchResults)) {
+        if (!isValidFilterValueProvided(requestFilters)) {
             requestFilters.put(searchFilter, new ArrayList<String>(Arrays.asList(ANY_VALUE)));
         }
         responseMap.putAll(PagedSearchController.process(vreq, requestFilters).getMap());
@@ -70,26 +68,17 @@ public class SearchFilterValuesDataGetter extends DataGetterBase implements Data
         return Boolean.valueOf(cp.getProperty("RDFService.languageFilter", "false"));
     }
 
-    private boolean isValidFilterValueProvided(Map<String, List<String>> requestFilters,
-            Map<String, Object> defaultSearchResults) {
-        String mainFilterValue = vreq.getParameter("filters_main");
-        List<String> requestedValues = requestFilters.get(searchFilter);
-        if (StringUtils.isBlank(mainFilterValue) || requestedValues == null || requestedValues.isEmpty()
-                || StringUtils.isBlank(requestedValues.iterator().next())) {
+    private boolean isValidFilterValueProvided(Map<String, List<String>> requestFilters) {
+        if (!requestFilters.containsKey(searchFilter)) {
             return false;
         }
-        String requestedValue = requestedValues.iterator().next();
-        try {
-            Map<String, SearchFilter> filterMap = (Map<String, SearchFilter>) defaultSearchResults.get("filters");
-            SearchFilter f = filterMap.get(searchFilter);
-            Map<String, FilterValue> values = f.getValues();
-            if (values.containsKey(requestedValue)) {
+        List<String> values = requestFilters.get(searchFilter);
+        for (String value : values) {
+            if (!StringUtils.isBlank(value)) {
                 return true;
             }
-        } catch (Exception e) {
-            log.error(e, e);
         }
-        return false;
+        return true;
     }
 
     /**
