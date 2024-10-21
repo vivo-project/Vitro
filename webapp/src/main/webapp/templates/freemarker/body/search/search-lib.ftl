@@ -30,17 +30,17 @@
 <#macro searchForm>
         <div id="selected-filters">
             <@printSelectedFilterValueLabels filters />
-        </div>  
-        <div id="filter-groups">
-            <ul class="nav nav-tabs">
-                <#assign active = true>
-                <#list filterGroups as group>
-                    <#if ( user.loggedIn || group.public ) && !group.hidden >
-                        <@searchFormGroupTab group active/>
-                        <#assign active = false>
-                    </#if>  
-                </#list>
-            </ul>
+        </div>
+        <div id="filter-groups" class="tabs">
+            <#assign active = true>
+            <#list filterGroups as group>
+                <#if ( user.loggedIn || group.public ) && !group.hidden >
+                    <@searchFormGroupTab group active/>
+                    <#assign active = false>
+                </#if>  
+            </#list>
+        </div>
+        <div class="tabs filter-area">
             <#assign active = true>
             <#list filterGroups as group>
                 <#if ( user.loggedIn || group.public ) && !group.hidden >
@@ -49,6 +49,7 @@
                 </#if>
             </#list>
         </div>
+        
         <div id="search-form-footer">
             <div>
                 <@printResultNumbers />
@@ -61,13 +62,10 @@
 </#macro>
 
 <#macro groupFilters group active>
-    <#if active >
-        <div id="${group.id}" class="tab-pane fade in active filter-area">
-    <#else>
-        <div id="${group.id}" class="tab-pane fade filter-area">
-    </#if>
-            <div id="search-filter-group-container-${group.id}">
-                <ul class="nav nav-tabs">
+    
+        <div id="${group.id}" class="tab <#if active >active<#else>fade</#if>">
+            <div id="search-filter-group-container-${group.id}" class="search-filter-group-container">
+                <div class="tabs">
                     <#assign assignedActive = false>
                     <#list group.filters as filterId>
                         <#if filters[filterId]??>
@@ -80,7 +78,7 @@
                             </#if>
                         </#if>
                     </#list>
-                </ul>
+                </div>
             </div>
             <div id="search-filter-group-tab-content-${group.id}" class="tab-content">
                 <#assign assignedActive = false>
@@ -153,27 +151,22 @@
 </#macro>
 
 <#macro searchFormGroupTab group active >
-    <#if active>
-         <li class="active form-group-tab">
-    <#else>
-        <li class="form-group-tab">
-    </#if>
-            <a data-toggle="tab" href="#${group.id?html}">${group.label?html}</a>
-        </li>
+    <div class="tab <#if active>active</#if>">
+        <a href="#" onclick="openTab(event, '${group.id?html}');return false;">${group.label?html}</a>
+    </div>
 </#macro>
 
 <#macro searchFormFilterTab filter assignedActive>
     <#if filter.id == "querytext">
-        <#-- skip query text filter -->
         <#return>
     </#if>
-        <li class="filter-tab">
-            <a data-toggle="tab" href="#${filter.id?html}">${filter.name?html}</a>
-        </li>
+        <div class="tab filter-tab" >
+            <a href="#" onclick="openTab(event, '${filter.id?html}');return false;">${filter.name?html}</a>
+        </div>
 </#macro>
 
 <#macro printFilterValues filter assignedActive isEmptySearch>
-        <div id="${filter.id?html}" class="tab-pane fade filter-area">
+        <div id="${filter.id?html}" class="tab fade filter-area">
             <#if filter.id == "querytext">
             <#-- skip query text filter -->
             <#elseif filter.type == "RangeFilter">

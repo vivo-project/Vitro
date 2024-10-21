@@ -103,3 +103,20 @@ function collapseSearchOptions(){
     $(event.target).parent().children('.more-facets-link').show();
     $(event.target).hide();
 }
+
+function openTab(event, tabName) {
+  let currentTab = document.getElementById(tabName);
+  let tabs = currentTab.parentElement.querySelectorAll(':scope > .tab');
+  for (let i = 0; i < tabs.length; i++) {
+    let tab = tabs[i];
+    tab.classList.add('fade');
+  }
+  let tabElement = event.srcElement.parentElement;
+  let srcTabs = tabElement.parentElement.querySelectorAll(':scope > .tab');
+  for (let i = 0; i < srcTabs.length; i++) {
+    let tab = srcTabs[i];
+    tab.classList.remove('active');
+  }
+  tabElement.classList.add('active');
+  currentTab.classList.remove('fade');
+}
