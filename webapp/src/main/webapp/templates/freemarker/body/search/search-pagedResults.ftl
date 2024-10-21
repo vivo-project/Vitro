@@ -7,16 +7,19 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/webjars/floa
 ${headScripts.add('<script type="text/javascript" src="${urls.base}/webjars/floatingui/floating-ui.dom.umd.js"></script>')}
 ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/tooltip/tooltip-utils.js"></script>')}
 
-${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/js/bootstrap/css/bootstrap.min.css"/>')}
-${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/js/bootstrap/css/bootstrap-theme.min.css"/>')}
 ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/nouislider.min.js"></script>')}
 ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/wNumb.min.js"></script>')}
-${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap/js/bootstrap.min.js"></script>')}
 
 <#include "search-lib.ftl">
 
 <script>
 	let searchFormId = "search-form";
+	let urlsBase = "${urls.base}";
+	if (window.location.toString().indexOf("?") == -1){
+		var queryText = 'querytext=${querytext?js_string}';
+	} else {
+		var queryText = window.location.toString().split("?")[1];
+	}
 </script>
 
 <@searchForm  />
