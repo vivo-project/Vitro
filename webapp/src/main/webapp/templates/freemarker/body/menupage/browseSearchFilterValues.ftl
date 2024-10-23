@@ -79,20 +79,33 @@
                 <li id="${value.id?html}" class="li-selected">
                     <a href="#" class="selected">
                         <@sl.getInput f value sl.getValueID(f.id, valueNumber) valueNumber 'filter-form' />
-                        <@sl.getSelectedLabel sl.getValueID(filter.id, valueNumber)?html value f />
+                        <@sl.getSelectedLabel sl.getValueID(filter.id, valueNumber)?html value f getCurrentCount(f value) />
                     </a>
                 </li>
             <#else>
                 <li id="${value.id?html}">
                     <a href="#">
                         <@sl.getInput f value sl.getValueID(f.id, valueNumber) valueNumber 'filter-form' />
-                        <@sl.getLabel sl.getValueID(f.id, valueNumber) value f />
+                        <@sl.getLabel sl.getValueID(f.id, valueNumber) value f getCurrentCount(f value) />
                     </a>
                 </li>
             </#if>
             <#assign valueNumber = valueNumber + 1>
         </#list>
 </#macro>
+
+<#function getCurrentCount f v>
+    <#if filters[f.id]??>
+        <#assign filter = filters[f.id]>
+        <#if filter.values[v.id]??>
+            <#return filter.values[v.id].count >
+        <#else>
+            <#return 0 />
+        </#if>
+    <#else>
+        <#return 0 />
+    </#if>
+</#function>
 
 <#macro filterFacets f>
     <#assign selectedValue = "" >
@@ -109,14 +122,14 @@
             <li id="${value.id?html}" class="li-selected">
                 <a href="#" class="selected">
                     <@sl.getInput f value sl.getValueID(f.id, valueNumber) valueNumber 'filter-form' />
-                    <@sl.getSelectedLabel sl.getValueID(f.id, valueNumber)?html value f />
+                    <@sl.getSelectedLabel sl.getValueID(f.id, valueNumber)?html value f getCurrentCount(f value) />
                 </a>
             </li>
         <#else>
             <li id="${value.id?html}">
                 <a href="#">
                     <@sl.getInput f value sl.getValueID(f.id, valueNumber) valueNumber 'filter-form' />
-                    <@sl.getLabel sl.getValueID(f.id, valueNumber) value f />
+                    <@sl.getLabel sl.getValueID(f.id, valueNumber) value f getCurrentCount(f value) />
                 </a>
             </li>
         </#if>
@@ -130,8 +143,8 @@
     <#else>
         <#assign indexFilterName = "raw_label_regex">
     </#if>
-    <#if filters[indexFilterName]??>
-        <#assign indexFilter = filters[indexFilterName]>
+    <#if filterGenericInfo.filters[indexFilterName]??>
+        <#assign indexFilter = filterGenericInfo.filters[indexFilterName]>
         <nav id="alpha-browse-container" role="navigation">
             <ul id="alpha-browse-individuals">
             <li>

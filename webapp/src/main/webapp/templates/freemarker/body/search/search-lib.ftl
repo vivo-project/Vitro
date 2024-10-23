@@ -104,7 +104,7 @@
             <#if v.selected>
                 <@getInput filter v getValueID(filter.id, valueNumber) valueNumber />
                 <#if user.loggedIn || filter.public>
-                    <@getSelectedLabel getValueID(filter.id, valueNumber)?html v filter />
+                    <@getSelectedLabel getValueID(filter.id, valueNumber)?html v filter v.count />
                 </#if>
             </#if>
             <#assign valueNumber = valueNumber + 1>
@@ -187,7 +187,7 @@
                         </#if>
                         <#if user.loggedIn || v.publiclyAvailable>
                             <@getInput filter v getValueID(filter.id, valueNumber) valueNumber />
-                            <@getLabel getValueID(filter.id, valueNumber)?html v filter additionalLabels />
+                            <@getLabel getValueID(filter.id, valueNumber)?html v filter additionalLabels v.count />
                         </#if>
                     </#if>
                     <#assign valueNumber = valueNumber + 1>
@@ -226,15 +226,15 @@
 </#macro>
 
 
-<#macro getSelectedLabel valueId value filter >
+<#macro getSelectedLabel valueId value filter count >
     <#assign label = filter.name + " : " + value.name >
     <#if !filter.localizationRequired>
         <#assign label = filter.name + " : " + value.id >
     </#if>
-    <label for="${valueId}">${getValueLabel(label, value.count)?html}</label>
+    <label for="${valueId}">${getValueLabel(label, count)?html}</label>
 </#macro>
 
-<#macro getLabel valueId value filter additional=false >
+<#macro getLabel valueId value filter count additional=false >
     <#assign label = value.name >
     <#assign additionalClass = "" >
     <#if !filter.localizationRequired>
@@ -243,7 +243,7 @@
     <#if additional=true>
         <#assign additionalClass = "additional-search-options hidden-search-option" >
     </#if>
-    <label class="${additionalClass}" for="${valueId}" >${getValueLabel(label, value.count)?html}</label>
+    <label class="${additionalClass}" for="${valueId}" >${getValueLabel(label, count)?html}</label>
 </#macro>
 
 <#macro userSelectedInput filter>
