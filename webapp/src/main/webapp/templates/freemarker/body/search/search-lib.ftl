@@ -187,7 +187,7 @@
                         </#if>
                         <#if user.loggedIn || v.publiclyAvailable>
                             <@getInput filter v getValueID(filter.id, valueNumber) valueNumber />
-                            <@getLabel getValueID(filter.id, valueNumber)?html v filter additionalLabels v.count />
+                            <@getLabel getValueID(filter.id, valueNumber)?html v filter v.count additionalLabels />
                         </#if>
                     </#if>
                     <#assign valueNumber = valueNumber + 1>
