@@ -4,31 +4,32 @@
 <script>
     let searchFormId = "filter-form";
 </script>
-
+<#-- <#assign additionalFilters = ["type"]> -->
 <#if filterGenericInfo.filters[searchFilter]??>
     <section id="menupage-intro" role="region">
         <h2>${page.title}</h2>
     </section>
-    <#assign additionalFilters = ["type"]>
     ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/menupage/menupage.css" />')}
     <form id="filter-form" name="filter-form" autocomplete="off" method="get" action="${urls.currentPage}">
         <section id="noJavascriptContainer">
             <section id="browse-by" role="region">
                 <nav role="navigation">
                     <ul id="browse-classes">
-                        <#list additionalFilters as filterId>
-                            <#if filterGenericInfo.filters[filterId]?? >
-                                <#assign filter = filterGenericInfo.filters[filterId] >
-                                <#if ( user.loggedIn || filter.public ) && !filter.hidden >
-                                    <li class="filter-tab">
-                                        <a href="#" <#if filter.selected> class="selected" </#if> >${filter.name?html}</a>
-                                        <ul id="facet-values">
-                                            <@collapsedFacets filter />
-                                        </ul>
-                                    </li>
+                        <#if additionalFilters?? >
+                            <#list additionalFilters as filterId>
+                                <#if filterGenericInfo.filters[filterId]?? >
+                                    <#assign filter = filterGenericInfo.filters[filterId] >
+                                    <#if ( user.loggedIn || filter.public ) && !filter.hidden >
+                                        <li class="filter-tab">
+                                            <a href="#" <#if filter.selected> class="selected" </#if> >${filter.name?html}</a>
+                                            <ul id="facet-values">
+                                                <@collapsedFacets filter />
+                                            </ul>
+                                        </li>
+                                    </#if>
                                 </#if>
-                            </#if>
-                        </#list>
+                            </#list>
+                        </#if>
                         <div class="divider" style="border-top: 0.5rem solid #fff;margin: -2px;"></div>
                         <@filterFacets filterGenericInfo.filters[searchFilter] />
                     </ul>
