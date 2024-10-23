@@ -68,29 +68,31 @@
         <#assign selectedValue = "" >
         <#assign valueNumber = 1>
         <#list f.values?values as value>
-            <#if value.selected>
-                <#assign selectedValue = value.id >
+            <#if user.loggedIn || value.publiclyAvailable>
+                <#if value.selected>
+                    <#assign selectedValue = value.id >
+                </#if>
+                <#assign valueLabel = value.name >
+                <#if !(valueLabel?has_content)>
+                    <#assign valueLabel = value.id >
+                </#if>
+                <#if value.selected>
+                    <li id="${value.id?html}" class="li-selected">
+                        <a href="#" class="selected">
+                            <@sl.getInput f value sl.getValueID(f.id, valueNumber) valueNumber 'filter-form' />
+                            <@sl.getSelectedLabel sl.getValueID(filter.id, valueNumber)?html value f getCurrentCount(f value) />
+                        </a>
+                    </li>
+                <#else>
+                    <li id="${value.id?html}">
+                        <a href="#">
+                            <@sl.getInput f value sl.getValueID(f.id, valueNumber) valueNumber 'filter-form' />
+                            <@sl.getLabel sl.getValueID(f.id, valueNumber) value f getCurrentCount(f value) />
+                        </a>
+                    </li>
+                </#if>
+                <#assign valueNumber = valueNumber + 1>
             </#if>
-            <#assign valueLabel = value.name >
-            <#if !(valueLabel?has_content)>
-                <#assign valueLabel = value.id >
-            </#if>
-            <#if value.selected>
-                <li id="${value.id?html}" class="li-selected">
-                    <a href="#" class="selected">
-                        <@sl.getInput f value sl.getValueID(f.id, valueNumber) valueNumber 'filter-form' />
-                        <@sl.getSelectedLabel sl.getValueID(filter.id, valueNumber)?html value f getCurrentCount(f value) />
-                    </a>
-                </li>
-            <#else>
-                <li id="${value.id?html}">
-                    <a href="#">
-                        <@sl.getInput f value sl.getValueID(f.id, valueNumber) valueNumber 'filter-form' />
-                        <@sl.getLabel sl.getValueID(f.id, valueNumber) value f getCurrentCount(f value) />
-                    </a>
-                </li>
-            </#if>
-            <#assign valueNumber = valueNumber + 1>
         </#list>
 </#macro>
 
@@ -111,29 +113,31 @@
     <#assign selectedValue = "" >
     <#assign valueNumber = 1>
     <#list f.values?values as value>
-        <#if value.selected>
-            <#assign selectedValue = value.id >
+        <#if user.loggedIn || value.publiclyAvailable>
+            <#if value.selected>
+                <#assign selectedValue = value.id >
+            </#if>
+            <#assign valueLabel = value.name >
+            <#if !(valueLabel?has_content)>
+                <#assign valueLabel = value.id >
+            </#if>
+            <#if value.selected>
+                <li id="${value.id?html}" class="li-selected">
+                    <a href="#" class="selected">
+                        <@sl.getInput f value sl.getValueID(f.id, valueNumber) valueNumber 'filter-form' />
+                        <@sl.getSelectedLabel sl.getValueID(f.id, valueNumber)?html value f getCurrentCount(f value) />
+                    </a>
+                </li>
+            <#else>
+                <li id="${value.id?html}">
+                    <a href="#">
+                        <@sl.getInput f value sl.getValueID(f.id, valueNumber) valueNumber 'filter-form' />
+                        <@sl.getLabel sl.getValueID(f.id, valueNumber) value f getCurrentCount(f value) />
+                    </a>
+                </li>
+            </#if>
+            <#assign valueNumber = valueNumber + 1>
         </#if>
-        <#assign valueLabel = value.name >
-        <#if !(valueLabel?has_content)>
-            <#assign valueLabel = value.id >
-        </#if>
-        <#if value.selected>
-            <li id="${value.id?html}" class="li-selected">
-                <a href="#" class="selected">
-                    <@sl.getInput f value sl.getValueID(f.id, valueNumber) valueNumber 'filter-form' />
-                    <@sl.getSelectedLabel sl.getValueID(f.id, valueNumber)?html value f getCurrentCount(f value) />
-                </a>
-            </li>
-        <#else>
-            <li id="${value.id?html}">
-                <a href="#">
-                    <@sl.getInput f value sl.getValueID(f.id, valueNumber) valueNumber 'filter-form' />
-                    <@sl.getLabel sl.getValueID(f.id, valueNumber) value f getCurrentCount(f value) />
-                </a>
-            </li>
-        </#if>
-        <#assign valueNumber = valueNumber + 1>
     </#list>
 </#macro>
 
