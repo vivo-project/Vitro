@@ -109,7 +109,7 @@
             </#if>
             <#assign valueNumber = valueNumber + 1>
         </#list>
-        <@userSelectedInput filter />
+        <@userSelectedInput filter "search-form" />
     </#list>
 </#macro>
 
@@ -170,7 +170,7 @@
             <#if filter.id == "querytext">
             <#-- skip query text filter -->
             <#elseif filter.type == "RangeFilter">
-                <@rangeFilter filter/>
+                <@rangeFilter filter "search-form" />
             <#else>
                 <#if filter.input>
                     <div class="user-filter-search-input">
@@ -199,7 +199,7 @@
         </div>
 </#macro>
 
-<#macro rangeFilter filter>
+<#macro rangeFilter filter form>
     <#assign min = filter.min >
     <#assign max = filter.max >
     <#assign from = filter.fromYear >
@@ -220,7 +220,7 @@
             <#else>
                 <div class="range-slider-end">${max?html}</div>
             </#if>
-            <input form="search-form" id="filter_range_${filter.id?html}" style="display:none;" class="range-slider-input" name="filter_range_${filter.id?html}" value="${filter.rangeInput?html}"/>
+            <input form="${form}" id="filter_range_${filter.id?html}" style="display:none;" class="range-slider-input" name="filter_range_${filter.id?html}" value="${filter.rangeInput?html}"/>
         </div>
     </div>
 </#macro>
@@ -246,15 +246,15 @@
     <label class="${additionalClass}" for="${valueId}" >${getValueLabel(label, count)?html}</label>
 </#macro>
 
-<#macro userSelectedInput filter>
+<#macro userSelectedInput filter form>
     <#if filter.inputText?has_content>
-        <button form="search-form" type="button" id="button_filter_input_${filter.id?html}" onclick="clearInput('filter_input_${filter.id?js_string?html}')" class="checked-search-input-label">${filter.name?html} : ${filter.inputText?html}</button>
+        <button form="${form}" type="button" id="button_filter_input_${filter.id?html}" onclick="clearInput('filter_input_${filter.id?js_string?html}')" class="checked-search-input-label">${filter.name?html} : ${filter.inputText?html}</button>
     </#if>
     <#assign from = filter.fromYear >
     <#assign to = filter.toYear >
     <#if from?has_content && to?has_content >
         <#assign range = i18n().from + " " + from + " " + i18n().to + " " + to >
-        <button form="search-form" type="button" id="button_filter_range_${filter.id?html}" onclick="clearInput('filter_range_${filter.id?js_string?html}')" class="checked-search-input-label">${filter.name?html} : ${range?html}</button>
+        <button form="${form}" type="button" id="button_filter_range_${filter.id?html}" onclick="clearInput('filter_range_${filter.id?js_string?html}')" class="checked-search-input-label">${filter.name?html} : ${range?html}</button>
     </#if>
 </#macro>
 

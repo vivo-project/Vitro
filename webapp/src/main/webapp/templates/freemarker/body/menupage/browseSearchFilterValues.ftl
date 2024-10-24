@@ -19,12 +19,27 @@
                             <#list additionalFilters as filterId>
                                 <#if filterGenericInfo.filters[filterId]?? >
                                     <#assign filter = filterGenericInfo.filters[filterId] >
-                                    <#if ( user.loggedIn || filter.public ) && !filter.hidden >
+                                    <#if ( user.loggedIn || filter.public ) && (!filter.hidden || !f.facetsRequired ) >
                                         <li class="filter-tab">
-                                            <a href="#" <#if filter.selected> class="selected" </#if> >${filter.name?html}</a>
-                                            <ul id="facet-values">
-                                                <@collapsedFacets filter />
-                                            </ul>
+                                            <a href="#" <#if filter.selected || (filters[filterId]?? && filters[filterId].selected)> class="selected" </#if> >${filter.name?html}</a>
+                                            <#if filter.type == "RangeFilter">
+                                                <ul>
+                                                    <#if filters[filterId]?? && filters[filterId].selected>
+                                                        <li class="li-selected">
+                                                            <a href="#" class="selected">
+                                                                <@sl.userSelectedInput filters[filterId] "filter-form" />
+                                                            </a>
+                                                        </li>
+                                                    </#if>
+                                                    <li>
+                                                        <@sl.rangeFilter filters[filterId] 'filter-form'/>
+                                                    </li>
+                                                </ul>
+                                            <#else>
+                                                <ul id="facet-values">
+                                                    <@filterFacets filter />
+                                                </ul>
+                                            </#if>
                                         </li>
                                     </#if>
                                 </#if>
@@ -65,51 +80,6 @@
     </ul>
 </#macro>
 
-<#macro collapsedFacets f>
-        <#assign selectedValue = "" >
-        <#assign valueNumber = 1>
-        <#list f.values?values as value>
-            <#if user.loggedIn || value.publiclyAvailable>
-                <#if value.selected>
-                    <#assign selectedValue = value.id >
-                </#if>
-                <#assign valueLabel = value.name >
-                <#if !(valueLabel?has_content)>
-                    <#assign valueLabel = value.id >
-                </#if>
-                <#if value.selected>
-                    <li id="${value.id?html}" class="li-selected">
-                        <a href="#" class="selected">
-                            <@sl.getInput f value sl.getValueID(f.id, valueNumber) valueNumber 'filter-form' />
-                            <@sl.getSelectedLabel sl.getValueID(filter.id, valueNumber)?html value f getCurrentCount(f value) />
-                        </a>
-                    </li>
-                <#else>
-                    <li id="${value.id?html}">
-                        <a href="#">
-                            <@sl.getInput f value sl.getValueID(f.id, valueNumber) valueNumber 'filter-form' />
-                            <@sl.getLabel sl.getValueID(f.id, valueNumber) value f getCurrentCount(f value) />
-                        </a>
-                    </li>
-                </#if>
-                <#assign valueNumber = valueNumber + 1>
-            </#if>
-        </#list>
-</#macro>
-
-<#function getCurrentCount f v>
-    <#if filters[f.id]??>
-        <#assign filter = filters[f.id]>
-        <#if filter.values[v.id]??>
-            <#return filter.values[v.id].count >
-        <#else>
-            <#return 0 />
-        </#if>
-    <#else>
-        <#return 0 />
-    </#if>
-</#function>
-
 <#macro filterFacets f>
     <#assign selectedValue = "" >
     <#assign valueNumber = 1>
@@ -141,6 +111,19 @@
         </#if>
     </#list>
 </#macro>
+
+<#function getCurrentCount f v>
+    <#if filters[f.id]??>
+        <#assign filter = filters[f.id]>
+        <#if filter.values[v.id]??>
+            <#return filter.values[v.id].count >
+        <#else>
+            <#return 0 />
+        </#if>
+    <#else>
+        <#return 0 />
+    </#if>
+</#function>
 
 <#macro alphabeticalIndexLinks>
     <#if languageAware >
@@ -217,5 +200,9 @@
 
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/search/search_results.js"></script>')}
 ${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/css/search/custom_filters.css"/>')}
+${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/css/nouislider.css"/>')}
+${headScripts.add('<script type="text/javascript" src="${urls.base}/js/nouislider.min.js"></script>')}
+${headScripts.add('<script type="text/javascript" src="${urls.base}/js/wNumb.min.js"></script>')}
+
 
 
