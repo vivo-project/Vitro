@@ -258,6 +258,7 @@ public class SearchFiltering {
                     Optional<Locale> locale = vreq != null ? Optional.of(vreq.getLocale()) : Optional.empty();
                     filter = createSearchFilter(filtersByField, solution, resultFilterId, resultFieldName, locale);
                 }
+                filter.setType(solution.get("filter_type"));
                 filter.setMulitlingual(solution.get("multilingual").asLiteral().getBoolean());
                 if (solution.get("value_id") == null) {
                     continue;
