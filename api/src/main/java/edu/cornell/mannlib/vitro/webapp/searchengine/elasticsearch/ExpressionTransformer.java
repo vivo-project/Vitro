@@ -163,7 +163,7 @@ public class ExpressionTransformer {
 
         if (value.startsWith("\"") && value.endsWith("\"")) {
             searchType = SearchType.PHRASE;
-        } else if (value.contains("TO")) {
+        } else if (value.contains("TO") && !value.equals("TO")) {
             if (value.equals("[*TO*]")) {
                 searchType = SearchType.EXISTS;
             } else {
