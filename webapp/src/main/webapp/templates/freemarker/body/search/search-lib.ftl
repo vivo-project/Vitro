@@ -55,7 +55,9 @@
                 <@printResultNumbers />
             </div>
             <div>
-                <@printHits />
+                <div>
+                    <@showHits />
+                </div>
                 <@printSorting />
             </div>
         </div> 
@@ -114,11 +116,11 @@
 </#macro>
 
 <#macro printSorting>
-    <#if sorting?has_content>
+    <#if sortOptions?has_content>
         <div>
             <select form="search-form" name="sort" id="search-form-sort" onchange="this.form.submit()" >
                 <#assign addDefaultOption = true>
-                <#list sorting as option>
+                <#list sortOptions?values as option>
                     <#if option.display>
                         <#if option.selected>
                             <option value="${option.id}" selected="selected">${i18n().search_results_sort_by(option.label)}</option>
@@ -136,9 +138,8 @@
     </#if>
 </#macro>
 
-<#macro printHits>
-    <div>
-    <select form="search-form" name="hitsPerPage" id="search-form-hits-per-page" onchange="this.form.submit()">
+<#macro showHits form="search-form">
+    <select form="${form}" name="hitsPerPage" id="${form}-hits-per-page" onchange="this.form.submit()">
         <#list hitsPerPageOptions as option>
             <#if option == hitsPerPage>
                 <option value="${option}" selected="selected">${i18n().search_results_per_page(option)}</option>
@@ -147,7 +148,6 @@
             </#if>
         </#list>
     </select>
-    </div>
 </#macro>
 
 <#macro searchFormGroupTab group active >
