@@ -15,7 +15,7 @@
             <section id="browse-by" role="region">
                 <nav role="navigation">
                     <ul id="browse-classes">
-                        <#if additionalFilters?? >
+                        <#if additionalFilters?? && additionalFilters?is_sequence>
                             <#list additionalFilters as filterId>
                                 <#if filterGenericInfo.filters[filterId]?? >
                                     <#assign filter = filterGenericInfo.filters[filterId] >
@@ -52,6 +52,10 @@
                 </nav>
                 <section id="individuals-in-class" role="region">
                     <@printPagingLinks />
+                    <div id="browsing-options">
+                        <@showSortOptions />
+                        <@sl.showHits "filter-form" />
+                    </div>
                     <@filteredResults />
                     <@printPagingLinks />
                 </section>
@@ -196,6 +200,30 @@
         style="display:none;" 
         ${checked} 
     >
+</#macro>
+
+<#macro showSortOptions>
+    <#if sortOptions?has_content && sortOptionIds?? && sortOptionIds?is_sequence>
+        <select form="filter-form" name="sort" id="filter-form-sort" onchange="this.form.submit()" >
+            <#assign addDefaultOption = true>
+            <#list sortOptionIds as sortOptionId>
+                <#if sortOptions[sortOptionId]??>
+                    <#assign option = sortOptions[sortOptionId]>
+                    <#if option.display>
+                        <#if option.selected>
+                            <option value="${option.id}" selected="selected">${i18n().search_results_sort_by(option.label)}</option>
+                            <#assign addDefaultOption = false>
+                        <#else>
+                            <option value="${option.id}" >${i18n().search_results_sort_by(option.label)}</option>
+                        </#if>
+                    </#if>
+                </#if>
+            </#list>
+            <#if addDefaultOption>
+                <option disabled selected value="" style="display:none">${i18n().search_results_sort_by('')}</option>
+            </#if>
+        </select>
+    </#if>
 </#macro>
 
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/search/search_results.js"></script>')}
