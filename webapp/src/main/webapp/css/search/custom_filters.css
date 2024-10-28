@@ -21,3 +21,22 @@
 .range-slider-start {
 	display: inline-block;
 }
+
+#filter-form-sort {
+	margin: 0px;
+	border-bottom: 0px;
+	border-top: 0px;
+	border-left: 0px;
+}
+
+#filter-form-hits-per-page {
+	margin: 0px;
+	border-bottom: 0px;
+	border-top: 0px;
+	border-left: 0px;
+}
+
+#browsing-options {
+	border-bottom: 1px solid #dde4e3;
+	border-top: 1px solid #dde4e3;
+}

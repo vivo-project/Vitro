@@ -274,7 +274,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                         SearchFiltering.getFiltersForTemplate(filterConfigurationsByField);
                 body.put("filters", filtersForTemplateById);
                 body.put("filterGroups", SearchFiltering.readFilterGroupsConfigurations(vreq, filtersForTemplateById));
-                body.put("sorting", sortConfigurations.values());
+                body.put("sortOptions", sortConfigurations);
                 body.put("emptySearch", isEmptySearchFilters(filterConfigurationsByField));
             }
 
