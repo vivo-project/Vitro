@@ -31,7 +31,7 @@
                                                             </a>
                                                         </li>
                                                     </#if>
-                                                    <li>
+                                                    <li <#if filter.selected || (filters[filterId]?? && filters[filterId].selected)> class="li-selected" </#if>>
                                                         <@sl.rangeFilter filters[filterId] 'filter-form'/>
                                                     </li>
                                                 </ul>
