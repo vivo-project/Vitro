@@ -80,7 +80,11 @@ public class ESDeleter {
 
     public void deleteByQuery(String queryString) throws SearchEngineException {
         String url = baseUrl + "/_delete_by_query";
-        SearchQuery query = new BaseSearchQuery().setQuery(queryString.replace("[", "").replace("]", "").replace("*", "0"));
+        queryString = queryString.replace(" ", "");
+        if (queryString.contains("*TO")) {
+            queryString = queryString.replace("[", "").replace("]", "").replace("*", "0");
+        }
+        SearchQuery query = new BaseSearchQuery().setQuery(queryString);
         String queryJson = new QueryConverter(query).asString();
 
         try {
