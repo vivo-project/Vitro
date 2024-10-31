@@ -102,7 +102,11 @@ public class QueryConverter {
         Map<String, Object> map = new HashMap<>();
         for (String name : fields.keySet()) {
             String sortOrder = fields.get(name).toString().toLowerCase();
-            map.put(name, sortOrder);
+            if (name.equals("score")) {
+                map.put("_score", sortOrder);
+            } else {
+                map.put(name, sortOrder);
+            }
         }
         return map;
     }
