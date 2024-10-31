@@ -33,7 +33,7 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 
-import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
+import edu.cornell.mannlib.vitro.webapp.application.VitroHomeDirectory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
@@ -121,8 +121,8 @@ public class FileGraphSetup implements ServletContextListener {
 	private Set<Path> getFilegraphPaths(ServletContext ctx, String... strings) {
 		StartupStatus ss = StartupStatus.getBean(ctx);
 
-		String homeDirProperty = ApplicationUtils.instance().getHomeDirectory().getPath().toString();
-		Path filegraphDir = Paths.get(homeDirProperty, strings);
+		String homeDirPath = VitroHomeDirectory.getHomeSrcPath(ctx);
+		Path filegraphDir = Paths.get(homeDirPath, strings);
 
 		Set<Path> paths = new TreeSet<>();
 		if (Files.isDirectory(filegraphDir)) {
