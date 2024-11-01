@@ -188,12 +188,13 @@ a.hidden-search-option {
   border-left: 0px !important;
 }
 
-.filter-tab.active > a {
+.filter-tab > a.active {
   background: linear-gradient(white 10%, #F1F1F1);
   border-bottom-color: #ddd !important;
 }
 
 .filter-tab > a {
+  color: #595b5b;
   border-right: 0px !important;
   border-top: 0px !important;
   border-left: 0px !important;
