@@ -30,6 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.CaptchaImplementation;
 import edu.cornell.mannlib.vitro.webapp.beans.CaptchaServiceBean;
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -102,7 +103,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
         String errorMsg = validateInput(webusername, webuseremail, comments, captchaInput, captchaId, vreq);
 
         if (errorMsg != null) {
-            return errorParametersNotValid(errorMsg, webusername, webuseremail, comments, vreq.getContextPath());
+            return errorParametersNotValid(errorMsg, webusername, webuseremail, comments, ContextPath.getPath(vreq));
         }
 
         String spamReason = checkForSpam(comments, formType);

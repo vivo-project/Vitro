@@ -14,6 +14,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationReques
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator.LoginNotPermitted;
@@ -151,14 +152,15 @@ public class UserAccountsUserController extends FreemarkerHttpServlet {
 	 * Bridge the gap.
 	 */
 	private String stripContextPath(VitroRequest vreq, String uri) {
-		if ((uri == null) || uri.isEmpty() || uri.equals(vreq.getContextPath())) {
+		String contextPath = ContextPath.getPath(vreq);
+        if ((uri == null) || uri.isEmpty() || uri.equals(contextPath)) {
 			return "/";
 		}
 		if (uri.contains("://")) {
 			return uri;
 		}
-		if (uri.startsWith(vreq.getContextPath() + '/')) {
-			return uri.substring(vreq.getContextPath().length());
+		if (uri.startsWith(contextPath + '/')) {
+			return uri.substring(contextPath.length());
 		}
 		return uri;
 	}

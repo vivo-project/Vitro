@@ -20,6 +20,7 @@ import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
@@ -84,7 +85,7 @@ public class OntologyEditController extends BaseEditController {
         // See OntologyDaoJena.ontologyFromOntologyResource() comments
         String realURI = OntologyDaoJena.adjustOntologyURI(o.getURI());
         request.setAttribute("realURI", realURI);
-        request.setAttribute("exportURL", request.getContextPath() + Controllers.EXPORT_RDF);
+        request.setAttribute("exportURL", ContextPath.getPath(request) + Controllers.EXPORT_RDF);
 
         request.setAttribute("epoKey",epo.getKey());
         request.setAttribute("title","Ontology Control Panel");

@@ -31,6 +31,7 @@ import org.apache.jena.ontology.OntModel;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -192,10 +193,10 @@ public class Authenticate extends VitroHttpServlet {
 
 		if (afterLoginUrl != null) {
 			bean.setAfterLoginUrl(afterLoginUrl);
-			bean.setLoginPageUrl(request.getContextPath() + Controllers.LOGIN);
+			bean.setLoginPageUrl(ContextPath.getPath(request) + Controllers.LOGIN);
 		} else if (doReturn) {
 			bean.setAfterLoginUrl(referrer);
-			bean.setLoginPageUrl(request.getContextPath() + Controllers.LOGIN);
+			bean.setLoginPageUrl(ContextPath.getPath(request) + Controllers.LOGIN);
 		} else {
 			bean.setAfterLoginUrl(referrer);
 			bean.setLoginPageUrl(referrer);
@@ -230,7 +231,7 @@ public class Authenticate extends VitroHttpServlet {
 		if (referrer != null) {
 			return referrer;
 		} else {
-			return request.getContextPath() + Controllers.LOGIN;
+			return ContextPath.getPath(request) + Controllers.LOGIN;
 		}
 	}
 

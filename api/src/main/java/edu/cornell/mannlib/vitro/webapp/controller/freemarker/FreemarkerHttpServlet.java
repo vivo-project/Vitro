@@ -26,6 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
@@ -485,7 +486,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
     }
 
     protected MainMenu getDisplayModelMenu(VitroRequest vreq){
-        String url = vreq.getRequestURI().substring(vreq.getContextPath().length());
+        String url = vreq.getRequestURI().substring(ContextPath.getPath(vreq).length());
         return vreq.getWebappDaoFactory().getMenuDao().getMainMenu(url);
     }
 

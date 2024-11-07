@@ -5,21 +5,19 @@ package edu.cornell.mannlib.vitro.webapp.filters;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class URLRewritingHttpServletResponse extends HttpServletResponseWrapper/*implements HttpServletResponse */{
 
@@ -28,15 +26,12 @@ public class URLRewritingHttpServletResponse extends HttpServletResponseWrapper/
 	private HttpServletResponse _response;
 	private ServletContext _context;
 	private WebappDaoFactory wadf;
-	private int contextPathDepth;
-	private Pattern slashPattern = Pattern.compile("/");
 
 	public URLRewritingHttpServletResponse(HttpServletResponse response, HttpServletRequest request, ServletContext context) {
 	    super(response);
 		this._response = response;
 		this._context = context;
-		this.wadf =	ModelAccess.on(context).getWebappDaoFactory();
-		this.contextPathDepth = slashPattern.split(request.getContextPath()).length-1;
+		this.wadf =	ModelAccess.getInstance().getWebappDaoFactory();
 	}
 
 	/** for testing. */
@@ -69,7 +64,6 @@ public class URLRewritingHttpServletResponse extends HttpServletResponseWrapper/
         if( log.isDebugEnabled() ){
             log.debug("START");
             log.debug("charEncoding: "  + this.getCharacterEncoding() );
-            log.debug("contextPathDepth," + contextPathDepth);
             log.debug("nsMap," + nsMap);
             log.debug("wadf.getDefaultNamespace(), " + wadf.getDefaultNamespace());
             log.debug("externallyLinkedNamespaces " + externallyLinkedNamespaces);
@@ -80,7 +74,6 @@ public class URLRewritingHttpServletResponse extends HttpServletResponseWrapper/
 	            inUrl,
 	            this.getCharacterEncoding(),
 	            /*wadf.getPortalDao().isSinglePortal()*/ true,
-	            contextPathDepth,
 	            nsMap,
 	            wadf.getDefaultNamespace(),
 	            externallyLinkedNamespaces
@@ -100,7 +93,6 @@ public class URLRewritingHttpServletResponse extends HttpServletResponseWrapper/
 	        String inUrl,
 	        String characterEncoding,
 	        Boolean isSInglePortal,
-	        int contextPathDepth,
 	        NamespaceMapper nsMap,
 	        String defaultNamespace,
 	        List<String> externalNamespaces) {

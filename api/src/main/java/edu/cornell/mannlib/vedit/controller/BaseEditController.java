@@ -31,6 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSets;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.EntityPolicyController;
 import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -222,7 +223,7 @@ public class BaseEditController extends VitroHttpServlet {
     }
 
     public String getDefaultLandingPage(HttpServletRequest request) {
-        return (request.getContextPath() + DEFAULT_LANDING_PAGE);
+        return (ContextPath.getPath(request) + DEFAULT_LANDING_PAGE);
     }
 
     protected static void addAccessAttributes(HttpServletRequest req, String entityURI, AccessObjectType aot) {

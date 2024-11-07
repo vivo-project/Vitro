@@ -28,6 +28,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
@@ -203,8 +204,8 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 		if (serverPort == 8080) {
 			urlBuf.append(":").append(serverPort);
 		}
-		if (req.getContextPath() != null) {
-			urlBuf.append(req.getContextPath());
+		if (ContextPath.getPath(req) != null) {
+			urlBuf.append(ContextPath.getPath(req));
 		}
 		viewJson.put("url", urlBuf.toString() + "/individual?uri={{id}}");
 		json.put("view", viewJson);

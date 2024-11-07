@@ -27,6 +27,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaOutputUtils;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
@@ -45,7 +46,7 @@ public class OntologyController extends VitroHttpServlet{
 		super.doGet(req, res);
 
         //get URL without hostname or servlet context
-        String url = req.getRequestURI().substring(req.getContextPath().length());
+        String url = req.getRequestURI().substring(ContextPath.getPath(req).length());
 
         String redirectURL = checkForRedirect ( url, req.getHeader("accept") );
 
@@ -218,11 +219,11 @@ public class OntologyController extends VitroHttpServlet{
 	        String hn = req.getHeader("Host");
 	        if (req.isSecure()) {
 	            res.setHeader("Location", res.encodeURL("https://" + hn
-	                    + req.getContextPath() + redirectURL));
+	                    + ContextPath.getPath(req) + redirectURL));
 	            log.info("doRedirect by using HTTPS");
 	        } else {
 	            res.setHeader("Location", res.encodeURL("http://" + hn
-	                    + req.getContextPath() + redirectURL));
+	                    + ContextPath.getPath(req) + redirectURL));
 	            log.info("doRedirect by using HTTP");
 	        }
 	       res.setStatus(res.SC_SEE_OTHER);
