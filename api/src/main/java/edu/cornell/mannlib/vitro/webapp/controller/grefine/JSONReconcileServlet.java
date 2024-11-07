@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.controller.grefine;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -70,6 +70,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 			throws ServletException, IOException {
 		super.doGet(req, resp);
 		resp.setContentType("application/json");
+		resp.setCharacterEncoding("UTF-8");
 		VitroRequest vreq = new VitroRequest(req);
 
 		try {
@@ -81,7 +82,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 						.toString() : vreq.getParameter("callback") + "("
 						+ qJson.toString() + ")";
 				// System.out.println("JSONReconcileServlet result: " + responseStr);
-				ServletOutputStream out = resp.getOutputStream();
+				PrintWriter out = resp.getWriter();
 				out.print(responseStr);
 			} else { // metadata
 				String defaultNamespace = null;
@@ -97,7 +98,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 				ObjectNode metaJson = getMetadata(req, resp, defaultNamespace, defaultTypeList, serverName, serverPort);
 				String callbackStr = (vreq.getParameter("callback") == null) ? ""
 						: vreq.getParameter("callback");
-				ServletOutputStream out = resp.getOutputStream();
+				PrintWriter out = resp.getWriter();
 				out.print(callbackStr + "(" + metaJson.toString() + ")");
 			}
 		} catch (Exception ex) {
