@@ -80,6 +80,10 @@ span#searchHelp {
     font-size:.825em;
     padding-right:32px
 }
+
+.tab a:hover {
+	text-decoration: none;
+}
 img#downloadIcon {
     cursor: pointer;
     margin-left: 6px;

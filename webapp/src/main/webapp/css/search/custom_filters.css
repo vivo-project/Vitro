@@ -1,0 +1,46 @@
+.li-selected>label {
+	background: url(../../images/arrowIcon.gif) 0px 5px no-repeat;
+	color: #2ea0cf;
+	padding-left: 16px;
+}
+
+.checked-search-input-label {
+	padding: 2px 5px 2px 5px;
+	border: 0px;
+	background-color: inherit;
+}
+
+.range-slider {
+	margin-bottom: 15px;
+}
+
+.range-slider-end {
+	display: inline-block;
+}
+
+.range-slider-start {
+	display: inline-block;
+}
+
+#filter-form-sort {
+	margin: 0px;
+	border-bottom: 0px;
+	border-top: 0px;
+	border-left: 0px;
+}
+
+#filter-form-hits-per-page {
+	margin: 0px;
+	border-bottom: 0px;
+	border-top: 0px;
+	border-left: 0px;
+}
+
+#browsing-options {
+	border-bottom: 1px solid #dde4e3;
+	border-top: 1px solid #dde4e3;
+}
+
+.facet-values label{
+	cursor:pointer;
+}
