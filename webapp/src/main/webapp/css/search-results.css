@@ -45,7 +45,7 @@
 	display: inline-block;
 }
 
-.tab > a {
+.tab > a:not(.more-facets-link):not(.less-facets-link){
 	padding: 10px 15px;
 	position: relative;
 	display: block;
@@ -255,5 +255,11 @@ a.hidden-search-option {
 }
 
 .extended-search-input-group {
-  display: none;
+	display: none;
+}
+
+#search-form-footer select {
+	border: 1px solid #e0dfdf;
+	margin-left: .5em;
+	height : 3em;
 }
