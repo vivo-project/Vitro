@@ -15,38 +15,14 @@
             <section id="browse-by" role="region">
                 <nav role="navigation">
                     <ul id="browse-classes">
-                        <#if additionalFilters?? && additionalFilters?is_sequence>
+                        <#if additionalFilters?has_content && additionalFilters?is_sequence >
                             <#list additionalFilters as filterId>
-                                <#if filterGenericInfo.filters[filterId]?? >
-                                    <#assign filter = filterGenericInfo.filters[filterId] >
-                                    <#if ( user.loggedIn || filter.public ) && (!filter.hidden || !f.facetsRequired ) >
-                                        <li class="filter-tab">
-                                            <a href="#" <#if filter.selected || (filters[filterId]?? && filters[filterId].selected)> class="selected" </#if> >${filter.name?html}</a>
-                                            <#if filter.type == "RangeFilter">
-                                                <ul>
-                                                    <#if filters[filterId]?? && filters[filterId].selected>
-                                                        <li class="li-selected">
-                                                            <a href="#" class="selected">
-                                                                <@sl.userSelectedInput filters[filterId] "filter-form" />
-                                                            </a>
-                                                        </li>
-                                                    </#if>
-                                                    <li <#if filter.selected || (filters[filterId]?? && filters[filterId].selected)> class="li-selected" </#if>>
-                                                        <@sl.rangeFilter filters[filterId] 'filter-form'/>
-                                                    </li>
-                                                </ul>
-                                            <#else>
-                                                <ul id="facet-values">
-                                                    <@filterFacets filter />
-                                                </ul>
-                                            </#if>
-                                        </li>
-                                    </#if>
-                                </#if>
+                                <@filterTab filterId />
                             </#list>
+                            <@filterTab searchFilter />
+                        <#else>
+                            <@filterFacets filterGenericInfo.filters[searchFilter] />
                         </#if>
-                        <div class="divider" style="border-top: 0.5rem solid #fff;margin: -2px;"></div>
-                        <@filterFacets filterGenericInfo.filters[searchFilter] />
                     </ul>
                     <@alphabeticalIndexLinks />
                 </nav>
@@ -71,6 +47,35 @@
     </script>
 
 </#if>
+
+<#macro filterTab filterId>
+    <#if filterGenericInfo.filters[filterId]?? >
+        <#assign filter = filterGenericInfo.filters[filterId] >
+        <#if ( user.loggedIn || filter.public ) && !filter.hidden >
+            <li class="filter-tab">
+                <a href="#">${filter.name?html}</a>
+                <#if filter.type == "RangeFilter">
+                    <ul>
+                        <#if filters[filterId]?? && filters[filterId].selected>
+                            <li class="li-selected">
+                                <a href="#" class="selected">
+                                    <@sl.userSelectedInput filters[filterId] "filter-form" />
+                                </a>
+                            </li>
+                        </#if>
+                        <li <#if filter.selected || (filters[filterId]?? && filters[filterId].selected)> class="li-selected" </#if>>
+                            <@sl.rangeFilter filters[filterId] 'filter-form'/>
+                        </li>
+                    </ul>
+                <#else>
+                    <ul class="facet-values">
+                        <@filterFacets filter />
+                    </ul>
+                </#if>
+            </li>
+        </#if>
+    </#if>
+</#macro>
 
 <#macro filteredResults>
     <ul role="list">

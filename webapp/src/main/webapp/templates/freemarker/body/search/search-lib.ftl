@@ -265,6 +265,7 @@
 <#macro getInput filter filterValue valueID valueNumber form="search-form">
     <#assign checked = "" >
     <#assign class = "" >
+    <#assign inputName = "filters_" + valueID >
     <#if filterValue.selected>
         <#assign checked = " checked=\"checked\" " >
         <#assign class = "selected-input" >
@@ -272,6 +273,7 @@
     <#assign type = "checkbox" >
     <#if !filter.multivalued>
         <#assign type = "radio" >
+        <#assign inputName = "filters_" + filter.id >
     </#if>
     <#assign filterName = filter.id >
     <#if filter.multivalued>
@@ -283,7 +285,7 @@
         type="${type}" 
         id="${valueID?html}" 
         value="${filter.id?html + ":" + filterValue.id?html}" 
-        name="filters_${valueID?html}" 
+        name="${inputName?html}" 
         style="display:none;" 
         ${checked} 
         class="${class}" 
