@@ -14,7 +14,7 @@
         <section id="noJavascriptContainer">
             <section id="browse-by" role="region">
                 <nav role="navigation">
-                    <ul id="browse-classes">
+                    <ul id="browse-filters">
                         <#if additionalFilters?has_content && additionalFilters?is_sequence >
                             <#list additionalFilters as filterId>
                                 <@filterTab filterId />
@@ -55,7 +55,7 @@
             <li class="filter-tab">
                 <a href="#">${filter.name?html}</a>
                 <#if filter.type == "RangeFilter">
-                    <ul>
+                    <ul class="facet-values">
                         <#if filters[filterId]?? && filters[filterId].selected>
                             <li class="li-selected">
                                 <a href="#" class="selected">
