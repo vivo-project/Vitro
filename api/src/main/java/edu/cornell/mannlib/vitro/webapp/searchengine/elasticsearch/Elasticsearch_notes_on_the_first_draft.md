@@ -107,12 +107,27 @@ curl -X PUT "localhost:9200/vivo?pretty" -H 'Content-Type: application/json' -d'
             "fielddata": true
           }
         }
+      },
+      {
+        "date_range_template": {
+          "match": "*_drsim",
+          "mapping": {
+            "type": "date_range",
+            "format": "strict_date_optional_time||epoch_millis"
+          }
+        }
       }
     ],
     "properties": { 
       "ALLTEXT": { 
         "type": "text",
-        "analyzer": "english"
+        "analyzer": "english",
+        "fields": {
+	    "keyword": {
+	      "type": "keyword",
+	      "ignore_above": 256
+	    }
+	  }
       }, 
       "ALLTEXTUNSTEMMED": { 
         "type": "text",
