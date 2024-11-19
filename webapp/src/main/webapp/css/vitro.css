@@ -525,9 +525,11 @@ table#table-listing td  a {
 /* ------------------------------------------------->  */
 /* TOOLTIP  ---------------------------------------->  */
 /* ------------------------------------------------->  */
-.vivoTooltip {
+.vivoTooltip.tooltip {
     opacity: 1;
+    --bs-tooltip-opacity: 1;
     max-width: 400px;
+    --bs-tooltip-max-width: 400px;
 }
 
 .vivoTooltip > .tooltip-inner {
