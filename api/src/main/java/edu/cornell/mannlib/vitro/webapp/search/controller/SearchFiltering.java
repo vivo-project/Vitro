@@ -1,6 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.search.controller;
 
 import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_PUBLIC_URI;
+import static edu.cornell.mannlib.vitro.webapp.search.controller.PagedSearchController.PARAM_QUERY_TEXT;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -167,6 +168,9 @@ public class SearchFiltering {
 
     protected static void addFiltersToQuery(SearchQuery query, Map<String, SearchFilter> filters) {
         for (SearchFilter searchFilter : filters.values()) {
+            if (PARAM_QUERY_TEXT.equals(searchFilter.getId())){
+                continue;
+            }
             if (searchFilter.isInput()) {
                 SearchFiltering.addInputFilter(query, searchFilter);
             } else if (searchFilter.isRange()) {
@@ -219,6 +223,12 @@ public class SearchFiltering {
                 if (values != null && values.length > 0) {
                     String filterId = paramFilterName.replace(SearchFiltering.FILTER_INPUT_PREFIX, "");
                     requestFilters.put(filterId, new LinkedList<String>(Arrays.asList(values[0])));
+                }
+            }
+            if (paramFilterName.equals(PARAM_QUERY_TEXT)) {
+                String[] values = vreq.getParameterValues(paramFilterName);
+                if (values != null && values.length > 0) {
+                    requestFilters.put(PARAM_QUERY_TEXT, new LinkedList<String>(Arrays.asList(values[0])));
                 }
             }
         }
