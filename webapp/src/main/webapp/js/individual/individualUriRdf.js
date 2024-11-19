@@ -12,7 +12,7 @@ $(document).ready(function(){
                 html: true,
                 sanitize: false,
                 trigger: "click",
-                customClass: "vivoTooltip",
+                customClass: "vitroTooltip",
                 fallbackPlacements: ['bottom', 'left', 'top', 'right']
 
             }
@@ -24,7 +24,7 @@ $(document).ready(function(){
                 html: true,
                 sanitize: false,
                 trigger: "click",
-                customClass: "vivoTooltip",
+                customClass: "vitroTooltip",
                 fallbackPlacements: ['bottom', 'left', 'top', 'right']
 
             }
@@ -36,7 +36,7 @@ $(document).ready(function(){
                 html: true,
                 sanitize: false,
                 trigger: "click",
-                customClass: "vivoTooltip",
+                customClass: "vitroTooltip",
                 fallbackPlacements: ['bottom', 'right', 'top', 'left']
             }
         },
