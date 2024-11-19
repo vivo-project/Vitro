@@ -168,7 +168,7 @@ public class SearchFiltering {
 
     protected static void addFiltersToQuery(SearchQuery query, Map<String, SearchFilter> filters) {
         for (SearchFilter searchFilter : filters.values()) {
-            if (PARAM_QUERY_TEXT.equals(searchFilter.getId())){
+            if (PARAM_QUERY_TEXT.equals(searchFilter.getId())) {
                 continue;
             }
             if (searchFilter.isInput()) {
