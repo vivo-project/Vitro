@@ -32,7 +32,7 @@ $(document).ready(function(){
         html: true,
         sanitize: false,
         trigger: "click",
-        customClass: "vivoTooltip downloadTip",
+        customClass: "vitroTooltip downloadTip",
         fallbackPlacements: ['right', 'bottom', 'top', 'left'],
         afterCreate: configSlider,
 
