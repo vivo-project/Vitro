@@ -4,7 +4,7 @@
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 
 :filter_group_search_filters  a    vitro-search:FilterGroup ;
-        vitro-search:contains      :filter_category , :filter_type , :filter_querytext;
+        vitro-search:contains      :filter_category , :filter_type ;
         vitro-search:id            "main" ;
         vitro-search:order         1 ;
         vitro-search:public        true .
@@ -50,6 +50,7 @@
         a                          vitro-search:Filter ;
         vitro-search:order         1 ;
         vitro-search:filterField   :field_querytext ;
+        vitro-search:userInput     true ;
         vitro-search:id            "querytext" ;
         vitro-search:public        true .
 
