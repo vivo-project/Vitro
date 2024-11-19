@@ -526,8 +526,8 @@ table#table-listing td  a {
 /* TOOLTIP  ---------------------------------------->  */
 /* ------------------------------------------------->  */
 .vivoTooltip {
-    opacity: 1 !important;
-    --bs-tooltip-max-width: 400px !important;
+    opacity: 1;
+    max-width: 400px;
 }
 
 .vivoTooltip > .tooltip-inner {
@@ -557,12 +557,14 @@ table#table-listing td  a {
     color: unset;
 }
 
-.downloadTip {
-    --bs-tooltip-max-width: 600px !important;
+div.vivoTooltip.downloadTip {
+    max-width: 600px;
+    --bs-tooltip-max-width: 600px;
 }
 
-.vivoTooltip-yellow {
-    --bs-tooltip-max-width: 500px !important;
+div.vivoTooltip.vivoTooltip-yellow {
+    max-width: 500px;
+    --bs-tooltip-max-width: 500px;
 }
 
 .vivoTooltip-yellow > .tooltip-inner {
