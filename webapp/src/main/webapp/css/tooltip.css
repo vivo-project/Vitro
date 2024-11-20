@@ -19,6 +19,7 @@
 
     color: #333;
     max-width: initial;
+    padding: 0.25rem;
 }
 
 .vitroTooltip > .tooltip-inner .close-footer {
