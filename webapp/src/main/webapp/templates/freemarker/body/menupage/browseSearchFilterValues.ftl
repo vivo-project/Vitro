@@ -1,11 +1,24 @@
 <#-- $This file is distributed under the terms of the license in LICENSE$ -->
 <#import "search-lib.ftl" as sl>
 
-<script>
-    let searchFormId = "filter-form";
-</script>
 <#-- <#assign additionalFilters = ["type"]> -->
 <#if filterGenericInfo.filters[searchFilter]??>
+
+    <script>
+        let searchFormId = "filter-form";
+        let urlsBase = "${urls.base}";
+        if (window.location.toString().indexOf("?") == -1){
+            var queryText = 'querytext=${querytext?js_string}';
+        } else {
+            var queryText = window.location.toString().split("?")[1];
+        }
+        //If main filter is not set, then set it to default value [* TO *]
+        if (!queryText.includes('filters_${searchFilter}')) {
+            queryText += "&filters_${searchFilter}=${searchFilter}:${"[* TO *]"?url}";
+        }
+        
+    </script>
+
     <section id="menupage-intro" role="region">
         <h2>${page.title}</h2>
     </section>
@@ -31,6 +44,7 @@
                     <div id="browsing-options">
                         <@showSortOptions />
                         <@sl.showHits "filter-form" />
+                        <img id="downloadIcon" alt="${i18n().download_results}" title="${i18n().download_results}" />
                     </div>
                     <@filteredResults />
                     <@printPagingLinks />
@@ -122,7 +136,7 @@
             </li>
         <#else>
             <#if zeroCount=false>
-                	<li id="${value.id?html}">
+                    <li id="${value.id?html}">
                     <a href="#">
                         <@sl.getInput f value sl.getValueID(f.id, idCounter) idCounter 'filter-form' />
                         <@sl.getLabel sl.getValueID(f.id, idCounter) value f resultsCount />
@@ -248,10 +262,16 @@
 </#macro>
 
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/search/search_results.js"></script>')}
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/searchDownload.js"></script>')}
 ${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/css/search/custom_filters.css"/>')}
 ${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/css/nouislider.css"/>')}
 ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/nouislider.min.js"></script>')}
 ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/wNumb.min.js"></script>')}
 
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/webjars/jquery-ui/jquery-ui.css" />',
+                  '<link rel="stylesheet" type="text/css" href="${urls.base}/css/jquery_plugins/qtip/jquery.qtip.min.css" />')}
 
+${headScripts.add('<script type="text/javascript" src="${urls.base}/webjars/jquery-ui/jquery-ui.js"></script>',
+                  '<script type="text/javascript" src="${urls.base}/js/jquery_plugins/qtip/jquery.qtip.min.js"></script>'
+                  )}
 
