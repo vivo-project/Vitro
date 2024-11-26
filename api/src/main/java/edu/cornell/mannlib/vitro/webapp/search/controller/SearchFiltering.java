@@ -24,7 +24,6 @@ import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import org.apache.commons.lang3.StringUtils;
@@ -313,8 +312,9 @@ public class SearchFiltering {
         return sortFilters(filtersByField);
     }
 
-    private static boolean isDisplay(QuerySolution solution, VitroRequest vreq, String limitVarName, String publicVarName) {
-        //Display if user is root
+    private static boolean isDisplay(QuerySolution solution, VitroRequest vreq, String limitVarName,
+            String publicVarName) {
+        // Display if user is root
         if (isRoot(vreq)) {
             return true;
         }
@@ -325,13 +325,13 @@ public class SearchFiltering {
         }
         RDFNode limitToRole = solution.get(limitVarName);
         Set<String> roles = getCurrentUserRoles(vreq);
-        //nodeLimit is not set and user is not Public, then display
+        // nodeLimit is not set and user is not Public, then display
         if (limitToRole == null && !roles.contains(ROLE_PUBLIC_URI)) {
             return true;
         }
-        //node limit is set and current user has that role
+        // node limit is set and current user has that role
         if (limitToRole != null && roles.contains(getNodeStringValue(limitToRole))) {
-           return true;
+            return true;
         }
         return false;
     }
