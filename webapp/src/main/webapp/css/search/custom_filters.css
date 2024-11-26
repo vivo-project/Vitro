@@ -106,3 +106,11 @@
 	padding-bottom: 10px;
 	padding-left: 4px;
 }
+
+.download-url {
+	padding: 5px 25px 5px;
+}
+
+#downloadIcon {
+	padding-left: 7px;
+}
