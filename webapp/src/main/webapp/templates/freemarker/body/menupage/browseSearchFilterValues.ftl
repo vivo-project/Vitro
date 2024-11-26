@@ -52,27 +52,37 @@
     <#if filterGenericInfo.filters[filterId]?? >
         <#assign filter = filterGenericInfo.filters[filterId] >
         <#if filter.display >
-            <li class="filter-tab">
-                <a href="#">${filter.name?html}</a>
-                <#if filter.type == "RangeFilter">
-                    <ul class="facet-values">
-                        <#if filters[filterId]?? && filters[filterId].selected>
-                            <li class="li-selected">
-                                <a href="#" class="selected">
-                                    <@sl.userSelectedInput filters[filterId] "filter-form" />
-                                </a>
-                            </li>
-                        </#if>
-                        <li <#if filter.selected || (filters[filterId]?? && filters[filterId].selected)> class="li-selected" </#if>>
-                            <@sl.rangeFilter filters[filterId] 'filter-form'/>
-                        </li>
-                    </ul>
-                <#else>
-                    <ul class="facet-values">
-                        <@filterFacets filter />
-                    </ul>
-                </#if>
+            <#assign filterValues><@getValues filter filterId /></#assign>
+            <#if filterValues?has_content>
+                <li class="filter-tab">
+                    <a href="#">${filter.name?html}</a>
+                    ${filterValues}
+                </li>
+            </#if>
+        </#if>
+    </#if>
+</#macro>
+
+<#macro getValues filter filterId>
+    <#if filter.type == "RangeFilter">
+        <ul class="facet-values">
+            <#if filters[filterId]?? && filters[filterId].selected>
+                <li class="li-selected">
+                    <a href="#" class="selected">
+                        <@sl.userSelectedInput filters[filterId] "filter-form" />
+                    </a>
+                </li>
+            </#if>
+            <li <#if filter.selected || (filters[filterId]?? && filters[filterId].selected)> class="li-selected" </#if>>
+                <@sl.rangeFilter filters[filterId] 'filter-form'/>
             </li>
+        </ul>
+    <#else>
+        <#assign facets><@filterFacets filter /></#assign>
+        <#if facets?has_content>
+            <ul class="facet-values">
+                ${facets}
+            </ul>
         </#if>
     </#if>
 </#macro>
@@ -111,12 +121,14 @@
                 </a>
             </li>
         <#else>
-            <li id="${value.id?html}">
-                <a href="#">
-                    <@sl.getInput f value sl.getValueID(f.id, idCounter) idCounter 'filter-form' />
-                    <@sl.getLabel sl.getValueID(f.id, idCounter) value f resultsCount />
-                </a>
-            </li>
+            <#if zeroCount=false>
+                	<li id="${value.id?html}">
+                    <a href="#">
+                        <@sl.getInput f value sl.getValueID(f.id, idCounter) idCounter 'filter-form' />
+                        <@sl.getLabel sl.getValueID(f.id, idCounter) value f resultsCount />
+                    </a>
+                </li>
+            </#if>
         </#if>
         <#assign idCounter = idCounter + 1>
     </#list>
