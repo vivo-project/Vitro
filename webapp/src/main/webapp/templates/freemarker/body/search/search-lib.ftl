@@ -34,7 +34,7 @@
         <div id="filter-groups" class="tabs">
             <#assign active = true>
             <#list filterGroups as group>
-                <#if ( user.loggedIn || group.public ) && !group.hidden >
+                <#if group.display >
                     <@searchFormGroupTab group active/>
                     <#assign active = false>
                 </#if>  
@@ -43,7 +43,7 @@
         <div class="tabs filter-area">
             <#assign active = true>
             <#list filterGroups as group>
-                <#if ( user.loggedIn || group.public ) && !group.hidden >
+                <#if group.display >
                       <@groupFilters group active/>
                       <#assign active = false>
                 </#if>
@@ -72,7 +72,7 @@
                     <#list group.filters as filterId>
                         <#if filters[filterId]??>
                             <#assign f = filters[filterId]>
-                            <#if ( user.loggedIn || f.public ) && !f.hidden >
+                            <#if f.display >
                                 <@searchFormFilterTab f assignedActive/>  
                                 <#if !assignedActive && (f.selected || emptySearch )>
                                     <#assign assignedActive = true>
@@ -87,7 +87,7 @@
                 <#list group.filters as filterId>
                     <#if filters[filterId]??>
                         <#assign f = filters[filterId]>
-                        <#if ( user.loggedIn || f.public ) && !f.hidden >
+                        <#if f.display >
                             <@printFilterValues f assignedActive emptySearch/>  
                             <#if !assignedActive && ( f.selected || emptySearch )>
                                 <#assign assignedActive = true>
@@ -105,7 +105,7 @@
         <#list filter.values?values as v>
             <#if v.selected>
                 <@getInput filter v getValueID(filter.id, valueNumber) valueNumber />
-                <#if user.loggedIn || filter.public>
+                <#if filter.display>
                     <@getSelectedLabel getValueID(filter.id, valueNumber)?html v filter v.count />
                 </#if>
             </#if>
@@ -185,7 +185,7 @@
                             <#assign additionalLabels = true>
                             <a class="more-facets-link" href="javascript:void(0);" onclick="expandSearchOptions(this)">${i18n().paging_link_more}</a>
                         </#if>
-                        <#if user.loggedIn || v.publiclyAvailable>
+                        <#if v.display>
                             <@getInput filter v getValueID(filter.id, valueNumber) valueNumber />
                             <@getLabel getValueID(filter.id, valueNumber)?html v filter v.count additionalLabels />
                         </#if>
