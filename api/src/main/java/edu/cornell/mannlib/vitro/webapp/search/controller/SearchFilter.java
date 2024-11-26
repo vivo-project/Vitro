@@ -28,7 +28,6 @@ public class SearchFilter {
     private String to = "";
     private String fromYear = "";
     private String toYear = "";
-    private boolean isPublic = false;
 
     private String min = "0";
     private String max = "2000";
@@ -48,7 +47,7 @@ public class SearchFilter {
     private String type = FILTER;
     private String rangeText = "";
     private String rangeInput = "";
-    private boolean hidden = false;
+    private boolean display = false;
     private Optional<Locale> locale;
     private boolean multilingual;
 
@@ -286,14 +285,6 @@ public class SearchFilter {
                 LinkedHashMap::new));
     }
 
-    public boolean isPublic() {
-        return isPublic;
-    }
-
-    public void setPublic(boolean isPublic) {
-        this.isPublic = isPublic;
-    }
-
     private class FilterValueComparator implements Comparator<Map.Entry<String, FilterValue>> {
         public int compare(Entry<String, FilterValue> obj1, Entry<String, FilterValue> obj2) {
             FilterValue first = obj1.getValue();
@@ -333,12 +324,12 @@ public class SearchFilter {
         return true;
     }
 
-    public void setHidden(boolean b) {
-        this.hidden = b;
+    public void setDisplay(boolean b) {
+        this.display = b;
     }
 
-    public boolean isHidden() {
-        return hidden;
+    public boolean isDisplay() {
+        return display;
     }
 
     public int getMoreLimit() {

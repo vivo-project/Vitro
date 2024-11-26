@@ -51,7 +51,7 @@
 <#macro filterTab filterId>
     <#if filterGenericInfo.filters[filterId]?? >
         <#assign filter = filterGenericInfo.filters[filterId] >
-        <#if ( user.loggedIn || filter.public ) && !filter.hidden >
+        <#if filter.display >
             <li class="filter-tab">
                 <a href="#">${filter.name?html}</a>
                 <#if filter.type == "RangeFilter">
@@ -89,36 +89,40 @@
     </ul>
 </#macro>
 
-<#macro filterFacets f>
-    <#assign selectedValue = "" >
-    <#assign valueNumber = 1>
+<#macro filterFacets f idStart=1 zeroCount=false>
+    <#assign idCounter = idStart >
     <#list f.values?values as value>
-        <#if user.loggedIn || value.publiclyAvailable>
-            <#if value.selected>
-                <#assign selectedValue = value.id >
-            </#if>
-            <#assign valueLabel = value.name >
-            <#if !(valueLabel?has_content)>
-                <#assign valueLabel = value.id >
-            </#if>
-            <#if value.selected>
-                <li id="${value.id?html}" class="li-selected">
-                    <a href="#" class="selected">
-                        <@sl.getInput f value sl.getValueID(f.id, valueNumber) valueNumber 'filter-form' />
-                        <@sl.getSelectedLabel sl.getValueID(f.id, valueNumber)?html value f getCurrentCount(f value) />
-                    </a>
-                </li>
-            <#else>
-                <li id="${value.id?html}">
-                    <a href="#">
-                        <@sl.getInput f value sl.getValueID(f.id, valueNumber) valueNumber 'filter-form' />
-                        <@sl.getLabel sl.getValueID(f.id, valueNumber) value f getCurrentCount(f value) />
-                    </a>
-                </li>
-            </#if>
-            <#assign valueNumber = valueNumber + 1>
+        <#if !value.display>
+            <#continue>
         </#if>
+        <#assign valueLabel = value.name >
+        <#assign resultsCount = getCurrentCount(f value) >
+        <#if (resultsCount == 0) != zeroCount>
+            <#continue>
+        </#if>
+        <#if !(valueLabel?has_content)>
+            <#assign valueLabel = value.id >
+        </#if>
+        <#if value.selected>
+            <li id="${value.id?html}" class="li-selected">
+                <a href="#" class="selected">
+                    <@sl.getInput f value sl.getValueID(f.id, idCounter) idCounter 'filter-form' />
+                    <@sl.getSelectedLabel sl.getValueID(f.id, idCounter)?html value f resultsCount />
+                </a>
+            </li>
+        <#else>
+            <li id="${value.id?html}">
+                <a href="#">
+                    <@sl.getInput f value sl.getValueID(f.id, idCounter) idCounter 'filter-form' />
+                    <@sl.getLabel sl.getValueID(f.id, idCounter) value f resultsCount />
+                </a>
+            </li>
+        </#if>
+        <#assign idCounter = idCounter + 1>
     </#list>
+    <#if zeroCount=false>
+        <@filterFacets f idCounter true />
+    </#if>
 </#macro>
 
 <#function getCurrentCount f v>
@@ -150,16 +154,16 @@
                      <@getAlphabetLabel sl.getValueID(indexFilter.id, 0) i18n().all />
                  </a>
             </li>
-            <#assign valueNumber = 1>
+            <#assign idCounter = 1>
             <#list i18n().browse_results_alphabetical_index?split(",") as c>
                 <#assign regexValue = "(" + c?lower_case?cap_first + "|" + c?lower_case + "|" + c?upper_case + ").*">
                 <li>
                     <a href="#" <#if indexFilter.inputText == regexValue > class="selected" </#if> >
-                        <@getAlphabetInput indexFilter regexValue sl.getValueID(indexFilter.id, valueNumber) />
-                        <@getAlphabetLabel sl.getValueID(indexFilter.id, valueNumber) c?upper_case />
+                        <@getAlphabetInput indexFilter regexValue sl.getValueID(indexFilter.id, idCounter) />
+                        <@getAlphabetLabel sl.getValueID(indexFilter.id, idCounter) c?upper_case />
                     </a>
                 </li>
-                <#assign valueNumber = valueNumber + 1>
+                <#assign idCounter = idCounter + 1>
             </#list>
             </ul>
         </nav>

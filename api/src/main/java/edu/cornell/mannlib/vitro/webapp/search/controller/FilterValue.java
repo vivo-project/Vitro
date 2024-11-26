@@ -14,18 +14,14 @@ public class FilterValue {
 
     private boolean isDefaultValue;
 
-    private boolean publiclyAvailable = true;
+    private boolean display = false;
 
-    public boolean isPubliclyAvailable() {
-        return publiclyAvailable;
+    public boolean isDisplay() {
+        return display;
     }
 
-    public void setPubliclyAvailable(RDFNode rdfNode) {
-        if (rdfNode != null && rdfNode.isLiteral()) {
-            publiclyAvailable = rdfNode.asLiteral().getBoolean();
-        } else {
-            publiclyAvailable = false;
-        }
+    public void setDisplay(boolean value) {
+        display = value;
     }
 
     public FilterValue(String id) {
