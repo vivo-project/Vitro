@@ -24,6 +24,7 @@ import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import org.apache.commons.lang3.StringUtils;
@@ -58,6 +59,7 @@ public class SearchFiltering {
             + "SELECT ?filter_id ?filter_type ?filter_label ?value_label ?value_id  ?field_name ?public ?filter_order "
             + "?value_order (STR(?isUriReq) as ?isUri ) ?multivalued ?input ?regex ?facet ?min ?max ?role "
             + "?value_public ?more_limit ?multilingual ?reverseFacetOrder\n"
+            + "?filterDisplayLimitRole ?valueDisplayLimitRole \n"
             + "WHERE {\n"
             + "    ?filter rdf:type search:Filter .\n"
             + "    ?filter rdfs:label ?filter_label .\n"
@@ -79,6 +81,7 @@ public class SearchFiltering {
             + "        OPTIONAL {\n"
             + "            ?value search:public ?value_public .\n"
             + "        }\n"
+            + "        OPTIONAL {?value search:limitDisplayTo ?valueDisplayLimitRole . }\n"
             + "    }\n"
             + "    OPTIONAL {\n"
             + "        ?field search:isLanguageSpecific ?f_multilingual  .\n"
@@ -94,6 +97,7 @@ public class SearchFiltering {
             + "    OPTIONAL {?filter search:public ?public }\n"
             + "    OPTIONAL {?filter search:to ?max }\n"
             + "    OPTIONAL {?filter search:moreLimit ?more_limit }\n"
+            + "    OPTIONAL {?filter search:limitDisplayTo ?filterDisplayLimitRole . }\n"
             + "    OPTIONAL {\n"
             + "        ?filter search:order ?f_order \n"
             + "        bind(?f_order as ?filter_order_found).\n"
@@ -108,17 +112,19 @@ public class SearchFiltering {
             + "PREFIX search: <https://vivoweb.org/ontology/vitro-search#>\n"
             + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
             + "SELECT ?group_id (STR(?group_l) AS ?group_label) ?filter_id ?order ?filter_order ?public\n"
+            + "?groupDisplayLimitRole\n"
             + "WHERE {\n"
             + "    ?filter_group rdf:type search:FilterGroup .\n"
             + "    ?filter_group search:contains ?filter .\n"
             + "    ?filter_group rdfs:label ?group_l .\n"
             + "    ?filter_group search:id ?group_id .\n"
-            + "    OPTIONAL { ?filter_group search:order ?order . } \n"
+            + "    OPTIONAL { ?filter_group search:order ?order .}\n"
             + "    ?filter search:id ?filter_id .\n"
             + "    OPTIONAL {?filter_group search:public ?public }\n"
-            + "    OPTIONAL{ ?filter search:order ?f_order .\n"
-            + "        bind(?f_order as ?filter_order_found).\n"
+            + "    OPTIONAL {?filter search:order ?f_order .\n"
+            + "        BIND(?f_order as ?filter_order_found).\n"
             + "    }\n"
+            + "    OPTIONAL {?filter_group search:limitDisplayTo ?groupDisplayLimitRole .}\n"
             + "    BIND(coalesce(?filter_order_found, 0) as ?filter_order)\n"
             + "}  ORDER BY ?order ?group_label ?filter_order";
 
@@ -133,8 +139,8 @@ public class SearchFiltering {
             + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
             + "PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n"
             + "PREFIX search: <https://vivoweb.org/ontology/vitro-search#> \n"
-            + "SELECT ( STR(?sort_label) as ?label ) ?id ?searchField " +
-            "?multilingual ?isAsc ?sort_order ?fallback ?display\n"
+            + "SELECT ( STR(?sort_label) as ?label ) ?id ?searchField "
+            + "?multilingual ?isAsc ?sort_order ?fallback ?display ?sortDisplayLimitRole\n"
             + "WHERE {\n"
             + "    ?sort rdf:type search:Sort . \n"
             + "    ?sort rdfs:label ?sort_label .\n"
@@ -161,6 +167,7 @@ public class SearchFiltering {
             + "        BIND(?s_order as ?sort_order_found).\n"
             + "    }\n"
             + "    OPTIONAL {?sort search:display ?display }\n"
+            + "    OPTIONAL {?sort search:limitDisplayTo ?sortDisplayLimitRole .}\n"
             + "    BIND(coalesce(?sort_order_found, 0) as ?sort_order)\n"
             + "    BIND(COALESCE(?f_order, false) as ?isAsc)\n"
             + "    BIND(COALESCE(?bind_multilingual, false) as ?multilingual)\n"
@@ -254,8 +261,9 @@ public class SearchFiltering {
             ResultSet results = qexec.execSelect();
             while (results.hasNext()) {
                 QuerySolution solution = results.nextSolution();
-                if (solution.get("filter_id") == null || solution.get("field_name") == null
-                        || solution.get("filter_type") == null) {
+                if (solution.get("filter_id") == null ||
+                    solution.get("field_name") == null ||
+                    solution.get("filter_type") == null) {
                     continue;
                 }
                 String resultFilterId = solution.get("filter_id").toString();
@@ -268,6 +276,9 @@ public class SearchFiltering {
                     Optional<Locale> locale = vreq != null ? Optional.of(vreq.getLocale()) : Optional.empty();
                     filter = createSearchFilter(filtersByField, solution, resultFilterId, resultFieldName, locale);
                 }
+                if (isDisplay(solution, vreq, "filterDisplayLimitRole", "public")) {
+                    filter.setDisplay(true);
+                }
                 filter.setType(solution.get("filter_type"));
                 filter.setMulitlingual(solution.get("multilingual").asLiteral().getBoolean());
                 if (solution.get("value_id") == null) {
@@ -279,10 +290,12 @@ public class SearchFiltering {
                     value = new FilterValue(valueId);
                     value.setName(solution.get("value_label"));
                     value.setOrder(solution.get("value_order"));
-                    value.setPubliclyAvailable(solution.get("value_public"));
                     filter.addValue(value);
                 }
                 value = filter.getValue(valueId);
+                if (isDisplay(solution, vreq, "valueDisplayLimitRole", "value_public")) {
+                    value.setDisplay(true);
+                }
                 RDFNode role = solution.get("role");
                 if (role != null && role.isResource()) {
                     String roleUri = role.asResource().getURI();
@@ -298,6 +311,39 @@ public class SearchFiltering {
             log.debug(getSpentTime(startTime) + "ms spent after FILTER QUERY request.");
         }
         return sortFilters(filtersByField);
+    }
+
+    private static boolean isDisplay(QuerySolution solution, VitroRequest vreq, String limitVarName, String publicVarName) {
+        //Display if user is root
+        if (isRoot(vreq)) {
+            return true;
+        }
+        //Display if public set to true
+        RDFNode nodePublic = solution.get(publicVarName);
+        if (nodePublic != null && nodePublic.isLiteral() && nodePublic.asLiteral().getBoolean()) {
+            return nodePublic.asLiteral().getBoolean();
+        }
+        RDFNode limitToRole = solution.get(limitVarName);
+        Set<String> roles = getCurrentUserRoles(vreq);
+        //nodeLimit is not set and user is not Public, then display
+        if (limitToRole == null && !roles.contains(ROLE_PUBLIC_URI)) {
+            return true;
+        }
+        //node limit is set and current user has that role
+        if (limitToRole != null && roles.contains(getNodeStringValue(limitToRole))) {
+           return true;
+        }
+        return false;
+    }
+
+    private static String getNodeStringValue(RDFNode node) {
+        String value;
+        if (node.isResource()) {
+            value = node.asResource().getURI();
+        } else {
+            value = node.asLiteral().getLexicalForm();
+        }
+        return value;
     }
 
     public static void addDefaultFilters(SearchQuery query, Set<String> currentRoles) {
@@ -347,8 +393,9 @@ public class SearchFiltering {
             ResultSet results = qexec.execSelect();
             while (results.hasNext()) {
                 QuerySolution solution = results.nextSolution();
-                if (solution.get("filter_id") == null || solution.get("group_label") == null
-                        || solution.get("group_id") == null) {
+                if (solution.get("filter_id") == null ||
+                    solution.get("group_label") == null ||
+                    solution.get("group_id") == null) {
                     continue;
                 }
                 String filterId = solution.get("filter_id").toString();
@@ -359,17 +406,12 @@ public class SearchFiltering {
                     group = groups.get(groupId);
                 } else {
                     group = new SearchFilterGroup(groupId, groupLabel);
-                    RDFNode publicNode = solution.get("public");
-                    if (publicNode != null) {
-                        group.setPublic(publicNode.asLiteral().getBoolean());
-                    }
                     groups.put(groupId, group);
                 }
-                group.addFilterId(filterId);
-                SearchFilter filter = filtersById.get(filterId);
-                if (filter != null && !filter.isHidden()) {
-                    group.setHidden(false);
+                if (isDisplay(solution, vreq, "groupDisplayLimitRole", "public")) {
+                    group.setDisplay(true);
                 }
+                group.addFilterId(filterId);
             }
         } finally {
             model.leaveCriticalSection();
@@ -460,12 +502,6 @@ public class SearchFiltering {
         if (inputRegex != null) {
             filter.setInputRegex(inputRegex.asLiteral().getBoolean());
         }
-
-        RDFNode publicNode = solution.get("public");
-        if (publicNode != null) {
-            filter.setPublic(publicNode.asLiteral().getBoolean());
-        }
-
         RDFNode facet = solution.get("facet");
         if (facet != null) {
             filter.setFacetsRequired(facet.asLiteral().getBoolean());
@@ -541,6 +577,7 @@ public class SearchFiltering {
                             } else {
                                 FilterValue value = new FilterValue(requestValue);
                                 value.setSelected(true);
+                                value.setDisplay(true);
                                 filter.addValue(value);
                             }
                         }
@@ -556,6 +593,14 @@ public class SearchFiltering {
             return Collections.singleton(ROLE_PUBLIC_URI);
         }
         return user.getPermissionSetUris();
+    }
+
+    public static boolean isRoot(VitroRequest vreq) {
+        UserAccount user = LoginStatusBean.getCurrentUser(vreq);
+        if (user == null) {
+            return false;
+        }
+        return user.isRootUser();
     }
 
     static boolean isEmptyValues(List<String> requestedValues) {
@@ -617,10 +662,6 @@ public class SearchFiltering {
             Entry<String, SearchFilter> entry = iterator.next();
             SearchFilter searchFilter = entry.getValue();
             searchFilter.removeValuesWithZeroCount();
-            if (searchFilter.isEmpty()) {
-                searchFilter.setHidden(true);
-            }
-
         }
         return filtersByField.values().stream().collect(Collectors.toMap(SearchFilter::getId, Function.identity()));
     }
