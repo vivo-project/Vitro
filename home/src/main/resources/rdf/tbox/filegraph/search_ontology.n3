@@ -163,4 +163,4 @@ search:moreLimit
         a                   <http://www.w3.org/2002/07/owl#DatatypeProperty> , <http://www.w3.org/2002/07/owl#FunctionalProperty> ;
         rdfs:domain         <https://vivoweb.org/ontology/vitro-search#Filter> ;
         rdfs:range          <http://www.w3.org/2001/XMLSchema#int> ;
-        rdfs:subPropertyOf  <http://www.w3.org/2002/07/owl#topDataProperty> .
+        .
