@@ -14,11 +14,17 @@ $("input:checkbox").on("click",function (e) {
     $('#' + searchFormId).submit();
 });
 
-function clearInput(elementId) {
-      let inputEl = document.getElementById(elementId);
+function clearInput(event, elementId) {
+      let inputElements = document.querySelectorAll('input[id='+ elementId + ']');
+      if (inputElements.length == 0){
+          inputElements = document.querySelectorAll('input[name=' + elementId + ']');
+          if (inputElements.length == 0){
+              return;
+          }
+      }
+      let inputEl = inputElements[0];
       inputEl.value = "";
-      let srcButton = document.getElementById("button_" + elementId);
-      srcButton.classList.add("unchecked-selected-search-input-label");
+      event.target.classList.add("unchecked-selected-search-input-label");
       $('#' + searchFormId).submit();
 }
 

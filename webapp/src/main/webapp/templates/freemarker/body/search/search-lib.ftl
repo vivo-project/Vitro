@@ -248,13 +248,17 @@
 
 <#macro userSelectedInput filter form>
     <#if filter.inputText?has_content>
-        <button form="${form}" type="button" id="button_filter_input_${filter.id?html}" onclick="clearInput('filter_input_${filter.id?js_string?html}')" class="checked-search-input-label">${filter.name?html} : ${filter.inputText?html}</button>
+        <#assign inputID = "filter_input_" + filter.id >
+        <#if filter.id == "querytext">
+            <#assign inputID = filter.id >
+        </#if>
+        <button form="${form}" type="button" id="button_filter_input_${filter.id?html}" onclick="clearInput(event,'${inputID?js_string?html}')" class="checked-search-input-label">${filter.name?html} : ${filter.inputText?html}</button>
     </#if>
     <#assign from = filter.fromYear >
     <#assign to = filter.toYear >
     <#if from?has_content && to?has_content >
         <#assign range = i18n().from + " " + from + " " + i18n().to + " " + to >
-        <button form="${form}" type="button" id="button_filter_range_${filter.id?html}" onclick="clearInput('filter_range_${filter.id?js_string?html}')" class="checked-search-input-label">${filter.name?html} : ${range?html}</button>
+        <button form="${form}" type="button" id="button_filter_range_${filter.id?html}" onclick="clearInput(event,'filter_range_${filter.id?js_string?html}')" class="checked-search-input-label">${filter.name?html} : ${range?html}</button>
     </#if>
 </#macro>
 

@@ -213,6 +213,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             if (log.isDebugEnabled()) {
                 log.debug(getSpentTime(startTime) + "ms spent after addFacetCountersFromRequest.");
             }
+            addFilterValueLabels(filterConfigurationsByField, vreq);
             SearchResultDocumentList docs = response.getResults();
             if (docs == null) {
                 log.error("Document list for a search was null");
@@ -309,6 +310,21 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         }
     }
 
+    private static void addFilterValueLabels(Map<String, SearchFilter> filterConfigurationsByField, VitroRequest vreq) {
+        for (SearchFilter filter : filterConfigurationsByField.values()) {
+            if (filter.isLocalizationRequired()) {
+                for (FilterValue value : filter.getValues().values()) {
+                    if (StringUtils.isBlank(value.getName())) {
+                        String label = SearchFiltering.getUriLabel(value.getId(), vreq);
+                        if (!StringUtils.isBlank(label)) {
+                            value.setName(label);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private static long getSpentTime(long startTime) {
         return (System.nanoTime() - startTime) / 1000000;
     }
@@ -339,7 +355,6 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                 continue;
             }
             List<Count> values = resultField.getValues();
-
             for (Count value : values) {
                 if (value.getCount() == 0) {
                     continue;
@@ -358,12 +373,6 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                     }
                     if (!SearchFiltering.isEmptyValues(requestedValues)) {
                         searchFilter.setSelected(true);
-                    }
-                }
-                if (searchFilter.isLocalizationRequired() && StringUtils.isBlank(filterValue.getName())) {
-                    String label = SearchFiltering.getUriLabel(value.getName(), vreq);
-                    if (!StringUtils.isBlank(label)) {
-                        filterValue.setName(label);
                     }
                 }
                 // COUNT should be from the real results of the query

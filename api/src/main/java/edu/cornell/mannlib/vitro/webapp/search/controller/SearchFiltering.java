@@ -657,12 +657,6 @@ public class SearchFiltering {
     }
 
     static Map<String, SearchFilter> getFiltersForTemplate(Map<String, SearchFilter> filtersByField) {
-        Iterator<Entry<String, SearchFilter>> iterator = filtersByField.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Entry<String, SearchFilter> entry = iterator.next();
-            SearchFilter searchFilter = entry.getValue();
-            searchFilter.removeValuesWithZeroCount();
-        }
         return filtersByField.values().stream().collect(Collectors.toMap(SearchFilter::getId, Function.identity()));
     }
 
