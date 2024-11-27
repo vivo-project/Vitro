@@ -113,17 +113,14 @@
     </ul>
 </#macro>
 
-<#macro filterFacets f idStart=1 zeroCount=false>
-    <#assign idCounter = idStart >
+<#macro filterFacets f >
+    <#assign idCounter = 1 >
     <#list f.values?values as value>
         <#if !value.display>
             <#continue>
         </#if>
         <#assign valueLabel = value.name >
         <#assign resultsCount = getCurrentCount(f value) >
-        <#if (resultsCount == 0) != zeroCount>
-            <#continue>
-        </#if>
         <#if !(valueLabel?has_content)>
             <#assign valueLabel = value.id >
         </#if>
@@ -135,8 +132,8 @@
                 </a>
             </li>
         <#else>
-            <#if zeroCount=false>
-                    <li id="${value.id?html}">
+            <#if resultsCount != 0>
+                <li id="${value.id?html}">
                     <a href="#">
                         <@sl.getInput f value sl.getValueID(f.id, idCounter) idCounter 'filter-form' />
                         <@sl.getLabel sl.getValueID(f.id, idCounter) value f resultsCount />
@@ -146,9 +143,6 @@
         </#if>
         <#assign idCounter = idCounter + 1>
     </#list>
-    <#if zeroCount=false>
-        <@filterFacets f idCounter true />
-    </#if>
 </#macro>
 
 <#function getCurrentCount f v>
