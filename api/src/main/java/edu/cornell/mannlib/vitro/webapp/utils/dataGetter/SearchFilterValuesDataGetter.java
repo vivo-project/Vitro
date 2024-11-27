@@ -48,11 +48,7 @@ public class SearchFilterValuesDataGetter extends DataGetterBase implements Data
     public Map<String, Object> getData(Map<String, Object> pageData) {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.putAll(vreq.getParameterMap());
-        Map<String, List<String>> requestFilters = new HashMap<>();
-        requestFilters.put(searchFilter, new ArrayList<String>(Arrays.asList(ANY_VALUE)));
-        Map<String, Object> defaultSearchResults = PagedSearchController.process(vreq, requestFilters).getMap();
-        responseMap.put("filterGenericInfo", defaultSearchResults);
-        requestFilters = SearchFiltering.getRequestFilters(vreq);
+        Map<String, List<String>> requestFilters = SearchFiltering.getRequestFilters(vreq);
         if (!isValidFilterValueProvided(requestFilters)) {
             requestFilters.put(searchFilter, new ArrayList<String>(Arrays.asList(ANY_VALUE)));
         }
