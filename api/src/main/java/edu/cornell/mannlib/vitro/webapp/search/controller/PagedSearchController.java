@@ -322,7 +322,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         for (SearchFilter filter : filterConfigurationsByField.values()) {
             if (filter.isLocalizationRequired()) {
                 for (FilterValue value : filter.getValues().values()) {
-                    if (StringUtils.isBlank(value.getName())) {
+                    if (StringUtils.isBlank(value.getName()) && !value.getId().contains(" ")) {
                         String label = SearchFiltering.getUriLabel(value.getId(), vreq);
                         if (!StringUtils.isBlank(label)) {
                             value.setName(label);
