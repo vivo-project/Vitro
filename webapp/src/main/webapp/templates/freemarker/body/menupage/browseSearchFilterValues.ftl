@@ -2,7 +2,7 @@
 <#import "search-lib.ftl" as sl>
 
 <#-- <#assign additionalFilters = ["type"]> -->
-<#if filterGenericInfo.filters[searchFilter]??>
+<#if filters[searchFilter]??>
 
     <script>
         let searchFormId = "filter-form";
@@ -34,7 +34,7 @@
                             </#list>
                             <@filterTab searchFilter />
                         <#else>
-                            <@filterFacets filterGenericInfo.filters[searchFilter] />
+                            <@filterFacets filters[searchFilter] />
                         </#if>
                     </ul>
                     <@alphabeticalIndexLinks />
@@ -63,10 +63,10 @@
 </#if>
 
 <#macro filterTab filterId>
-    <#if filterGenericInfo.filters[filterId]?? >
-        <#assign filter = filterGenericInfo.filters[filterId] >
+    <#if filters[filterId]?? >
+        <#assign filter = filters[filterId] >
         <#if filter.display >
-            <#assign filterValues><@getValues filter filterId /></#assign>
+            <#assign filterValues><@getValues filter /></#assign>
             <#if filterValues?has_content>
                 <li class="filter-tab">
                     <a href="#">${filter.name?html}</a>
@@ -77,18 +77,18 @@
     </#if>
 </#macro>
 
-<#macro getValues filter filterId>
+<#macro getValues filter>
     <#if filter.type == "RangeFilter">
         <ul class="facet-values">
-            <#if filters[filterId]?? && filters[filterId].selected>
+            <#if filter.selected>
                 <li class="li-selected">
                     <a href="#" class="selected">
-                        <@sl.userSelectedInput filters[filterId] "filter-form" />
+                        <@sl.userSelectedInput filter "filter-form" />
                     </a>
                 </li>
             </#if>
-            <li <#if filter.selected || (filters[filterId]?? && filters[filterId].selected)> class="li-selected" </#if>>
-                <@sl.rangeFilter filters[filterId] 'filter-form'/>
+            <li <#if filter.selected> class="li-selected" </#if>>
+                <@sl.rangeFilter filter 'filter-form'/>
             </li>
         </ul>
     <#else>
@@ -120,17 +120,19 @@
             <#continue>
         </#if>
         <#assign valueLabel = value.name >
-        <#assign resultsCount = getCurrentCount(f value) >
+        <#assign resultsCount = value.count >
         <#if !(valueLabel?has_content)>
             <#assign valueLabel = value.id >
         </#if>
         <#if value.selected>
-            <li id="${value.id?html}" class="li-selected">
-                <a href="#" class="selected">
-                    <@sl.getInput f value sl.getValueID(f.id, idCounter) idCounter 'filter-form' />
-                    <@sl.getSelectedLabel sl.getValueID(f.id, idCounter)?html value f resultsCount />
-                </a>
-            </li>
+            <#if value.id != "[* TO *]">
+                <li id="${value.id?html}" class="li-selected">
+                    <a href="#" class="selected">
+                        <@sl.getInput f value sl.getValueID(f.id, idCounter) idCounter 'filter-form' />
+                        <@sl.getSelectedLabel sl.getValueID(f.id, idCounter)?html value f resultsCount />
+                    </a>
+                </li>
+            </#if>
         <#else>
             <#if resultsCount != 0>
                 <li id="${value.id?html}">
@@ -145,27 +147,14 @@
     </#list>
 </#macro>
 
-<#function getCurrentCount f v>
-    <#if filters[f.id]??>
-        <#assign filter = filters[f.id]>
-        <#if filter.values[v.id]??>
-            <#return filter.values[v.id].count >
-        <#else>
-            <#return 0 />
-        </#if>
-    <#else>
-        <#return 0 />
-    </#if>
-</#function>
-
 <#macro alphabeticalIndexLinks>
     <#if languageAware >
         <#assign indexFilterName = "label_regex">
     <#else>
         <#assign indexFilterName = "raw_label_regex">
     </#if>
-    <#if filterGenericInfo.filters[indexFilterName]??>
-        <#assign indexFilter = filterGenericInfo.filters[indexFilterName]>
+    <#if filters[indexFilterName]??>
+        <#assign indexFilter = filters[indexFilterName]>
         <nav id="alpha-browse-container" role="navigation">
             <ul id="alpha-browse-individuals">
             <li>
