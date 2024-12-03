@@ -6,7 +6,9 @@ ${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/js/
 ${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/js/bootstrap/css/bootstrap-theme.min.css"/>')}
 ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/nouislider.min.js"></script>')}
 ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/wNumb.min.js"></script>')}
-${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap/js/bootstrap.min.js"></script>')}
+${headScripts.add('<script type="text/javascript" src="${urls.base}/js/tooltip/popper.min.js"></script>')}
+${headScripts.add('<script type="text/javascript" src="${urls.base}/js/tooltip/tooltip-utils.js"></script>')}
+${headScripts.add('<script type="text/javascript" src="${urls.base}/bootstrap-5.3.2/js/bootstrap.min.js"></script>')}
 
 <@searchForm  />
 
@@ -455,11 +457,9 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/bootstrap
 <!-- end contentsBrowseGroup -->
 
 ${stylesheets.add('<link rel="stylesheet" href="//code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />',
-  				  '<link rel="stylesheet" href="${urls.base}/css/search.css" />',
-                  '<link rel="stylesheet" type="text/css" href="${urls.base}/css/jquery_plugins/qtip/jquery.qtip.min.css" />')}
+  				  '<link rel="stylesheet" href="${urls.base}/css/search.css" />')}
 
 ${headScripts.add('<script src="//code.jquery.com/ui/1.10.3/jquery-ui.js"></script>',
-				  '<script type="text/javascript" src="${urls.base}/js/jquery_plugins/qtip/jquery.qtip.min.js"></script>',
                   '<script type="text/javascript" src="${urls.base}/js/tiny_mce/tiny_mce.js"></script>'
                   )}
 

@@ -147,7 +147,8 @@
     float:left;
 }
 a.close {
-    float: right;
+    display: block;
+    text-align: right;
     margin-right: .3em;
     font-size: .8em;
 }
@@ -512,4 +513,35 @@ table#table-listing td {
 }
 table#table-listing td  a {
 	word-wrap: break-word;
+}
+
+/* ------------------------------------------------->  */
+/* TOOLTIP  ---------------------------------------->  */
+/* ------------------------------------------------->  */
+.vivoTooltip {
+    opacity: 1 !important;
+    --bs-tooltip-max-width: 400px !important;
+}
+
+.vivoTooltip > .tooltip-inner {
+    background-color: #f1f2ee;
+    border: 1px solid #F1D031;
+    text-align: left;
+    border-radius: 0;
+}
+
+.vivoTooltip > .tooltip-inner h5 {
+    padding-bottom: 0;
+}
+
+.vivoTooltip > .tooltip-arrow::before {
+    --bs-tooltip-bg: #F1D031;
+}
+
+.tooltip:not(.vivoTooltip) > .tooltip-inner * {
+    color: unset;
+}
+
+.downloadTip {
+    --bs-tooltip-max-width: 600px !important;
 }
