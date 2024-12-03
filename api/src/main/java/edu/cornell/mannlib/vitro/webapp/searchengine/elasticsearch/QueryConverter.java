@@ -142,6 +142,7 @@ public class QueryConverter {
 
     private Map<String, Object> figureFullMap() {
         return tree() //
+                .put("track_total_hits", true)
                 .put("query", queryAndFilters) //
                 .put("from", ifPositive(query.getStart())) //
                 .put("highlight", highlighter)
