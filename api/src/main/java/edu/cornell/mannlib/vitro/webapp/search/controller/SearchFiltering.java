@@ -56,8 +56,8 @@ public class SearchFiltering {
             + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
             + "SELECT ?filter_id ?filter_type ?filter_label ?value_label ?value_id  ?field_name ?public ?filter_order "
             + "?value_order (STR(?isUriReq) as ?isUri ) ?multivalued ?input ?regex ?facet ?min ?max ?role "
-            + "?value_public ?more_limit ?multilingual ?reverseFacetOrder\n"
-            + "?filterDisplayLimitRole ?valueDisplayLimitRole \n"
+            + "?value_public ?more_limit ?multilingual ?isDescending\n"
+            + "?filterDisplayLimitRole ?valueDisplayLimitRole ?sortingObjectType \n"
             + "WHERE {\n"
             + "    ?filter rdf:type search:Filter .\n"
             + "    ?filter rdfs:label ?filter_label .\n"
@@ -90,7 +90,8 @@ public class SearchFiltering {
             + "    OPTIONAL {?filter search:userInput ?input }\n"
             + "    OPTIONAL {?filter search:userInputRegex ?regex }\n"
             + "    OPTIONAL {?filter search:facetResults ?facet }\n"
-            + "    OPTIONAL {?filter search:reverseFacetOrder ?reverseFacetOrder }\n"
+            + "    OPTIONAL {?filter search:reverseFacetOrder ?isDescending }\n"
+            + "    OPTIONAL {?filter search:sortValuesBy ?sortingObjectType }\n"
             + "    OPTIONAL {?filter search:from ?min }\n"
             + "    OPTIONAL {?filter search:public ?public }\n"
             + "    OPTIONAL {?filter search:to ?max }\n"
@@ -506,9 +507,14 @@ public class SearchFiltering {
             filter.setFacetsRequired(facet.asLiteral().getBoolean());
         }
 
-        RDFNode reverseFacetOrder = solution.get("reverseFacetOrder");
-        if (reverseFacetOrder != null) {
-            filter.setReverseFacetOrder(reverseFacetOrder.asLiteral().getBoolean());
+        RDFNode descendingOrder = solution.get("isDescending");
+        if (descendingOrder != null && descendingOrder.isLiteral()) {
+            filter.setDescendingValuesOrder(descendingOrder.asLiteral().getBoolean());
+        }
+
+        RDFNode sortingObject = solution.get("sortingObjectType");
+        if (sortingObject != null && sortingObject.isURIResource()) {
+            filter.setSortingObjectType(sortingObject.asResource().getURI());
         }
 
         RDFNode moreLimit = solution.get("more_limit");
