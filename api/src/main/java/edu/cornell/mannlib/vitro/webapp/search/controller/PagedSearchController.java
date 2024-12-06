@@ -266,7 +266,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                     log.debug(getSpentTime(startTime) + "ms spent before sorting filterConfigurationsByField values.");
                 }
                 for (Entry<String, SearchFilter> entry : filterConfigurationsByField.entrySet()) {
-                    entry.getValue().sortValues();
+                    entry.getValue().sortValues(vreq.getCollator());
                 }
                 if (log.isDebugEnabled()) {
                     log.debug(getSpentTime(startTime) + "ms spent after sorting filterConfigurationsByField values.");

@@ -117,3 +117,19 @@
 :field_querytext
         a                          vitro-search:SearchField ;
         vitro-search:indexField    "querytext" .
+
+#Sort by number of found results associated with value
+:hitsCount
+        a                          vitro-search:SortingObjectType .
+#Sort by label text
+:labelText
+        a                          vitro-search:SortingObjectType .
+#Sort by numbers in label
+:labelNumber
+        a                          vitro-search:SortingObjectType .
+#Sort by id text
+:idText
+        a                          vitro-search:SortingObjectType .
+#Sort by numbers in id
+:idNumber
+        a                          vitro-search:SortingObjectType .

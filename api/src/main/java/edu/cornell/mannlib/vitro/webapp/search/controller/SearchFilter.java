@@ -1,5 +1,8 @@
 package edu.cornell.mannlib.vitro.webapp.search.controller;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.VITRO_SEARCH_INDIVIDUAL;
+
+import java.text.Collator;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -15,12 +18,23 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.jena.rdf.model.RDFNode;
 
 public class SearchFilter {
 
     private static final String FILTER = "Filter";
     private static final String RANGE_FILTER = "RangeFilter";
+    private static final Log log = LogFactory.getLog(SearchFilter.class);
+
+    private enum SortOption {
+        hitsCount,
+        labelText,
+        labelNumber,
+        idText,
+        idNumber
+    }
 
     private String id;
     private String name = "";
@@ -43,13 +57,14 @@ public class SearchFilter {
     private Map<String, FilterValue> values = new LinkedHashMap<>();
     private boolean inputRegex = false;
     private boolean facetsRequired;
-    private boolean reverseFacetOrder;
+    private boolean descendingOrder;
     private String type = FILTER;
     private String rangeText = "";
     private String rangeInput = "";
     private boolean display = false;
     private Optional<Locale> locale;
     private boolean multilingual;
+    private SortOption sortingObjectType = SortOption.labelText;
 
     public String getRangeInput() {
         return rangeInput;
@@ -278,29 +293,80 @@ public class SearchFilter {
         this.toYear = getYear(toYear);
     }
 
-    public void sortValues() {
+    public void sortValues(Collator collator) {
         List<Entry<String, FilterValue>> list = new LinkedList<>(values.entrySet());
-        list.sort(new FilterValueComparator());
+        list.sort(new FilterValueComparator(collator));
         values = list.stream().collect(Collectors.toMap(Entry::getKey, Entry::getValue, (a, b) -> b,
                 LinkedHashMap::new));
     }
 
     private class FilterValueComparator implements Comparator<Map.Entry<String, FilterValue>> {
+
+        Collator collator;
+
+        public FilterValueComparator(Collator collator) {
+            this.collator = collator;
+        }
+
         public int compare(Entry<String, FilterValue> obj1, Entry<String, FilterValue> obj2) {
             FilterValue first = obj1.getValue();
             FilterValue second = obj2.getValue();
             // sort by order first
             int result = first.getOrder().compareTo(second.getOrder());
             if (result == 0) {
-                // order are equal, sort by name
-                result = first.getName().toLowerCase().compareTo(second.getName().toLowerCase());
-                if (result == 0) {
-                    // names are equal, sort by id
-                    result = first.getId().toLowerCase().compareTo(second.getId().toLowerCase());
-                }
-                if (reverseFacetOrder) {
+                result = compareByObjectType(first, second);
+                if (descendingOrder) {
                     result = -result;
                 }
+            }
+            return result;
+        }
+
+        private int compareByObjectType(FilterValue first, FilterValue second) {
+            int result;
+            switch (sortingObjectType) {
+                case hitsCount:
+                    result = Long.compare(first.getCount(), second.getCount());
+                    break;
+                case labelNumber:
+                    result = compareAsNumbers(first.getName(), second.getName());
+                    break;
+                case idText:
+                    result = collator.compare(first.getId(), second.getId());
+                    break;
+                case idNumber:
+                    result = compareAsNumbers(first.getId(), second.getId());
+                    break;
+                default:
+                    // labelText
+                    result = collator.compare(first.getName(), second.getName());
+            }
+            return result;
+        }
+
+        private int compareAsNumbers(String first, String second) {
+            int result;
+            Double firstDouble = parseDouble(first);
+            Double secondDouble = parseDouble(second);
+            result = firstDouble.compareTo(secondDouble);
+            return result;
+        }
+
+        private double parseDouble(String name) {
+            name = name
+                    //replace all but digits, dots or minuses
+                    .replaceAll("[^\\d.-]", "")
+                    //replace all minuses but the one at start
+                    .replaceAll("(?<!^)[-]", "")
+                    //replace all dots, but the first one
+                    .replaceFirst("\\.", "X")
+                    .replaceAll("\\.", "")
+                    .replaceFirst("X", ".");
+            double result = 0.0d;
+            try {
+                result = Double.parseDouble(name);
+            } catch (Exception e) {
+                log.error(e, e);
             }
             return result;
         }
@@ -344,7 +410,18 @@ public class SearchFilter {
         this.multilingual = multilingual;
     }
 
-    public void setReverseFacetOrder(boolean reverseFacetOrder) {
-        this.reverseFacetOrder = reverseFacetOrder;
+    public void setDescendingValuesOrder(boolean descendingOrder) {
+        this.descendingOrder = descendingOrder;
+    }
+
+    public void setSortingObjectType(String uri) {
+        if (uri.startsWith(VITRO_SEARCH_INDIVIDUAL)) {
+            String optionName = uri.substring(VITRO_SEARCH_INDIVIDUAL.length());
+            try {
+                sortingObjectType = SortOption.valueOf(optionName);
+            } catch (Exception e) {
+                log.error(e, e);
+            }
+        }
     }
 }
