@@ -64,28 +64,30 @@
 # ----------------------------
 #
 # Search engine module:
-#    The Solr-based implementation is the only standard option, but it can be
+#    The Solr-based implementation is the standard option and it can be
 #    wrapped in an "instrumented" wrapper, which provides additional logging
 #    and more rigorous life-cycle checking.
 #
 
-#:instrumentedSearchEngineWrapper
-#    a   vitroWebapp:searchengine.InstrumentedSearchEngineWrapper ,
-#        vitroWebapp:modules.searchEngine.SearchEngine ;
-#    :wraps :solrSearchEngine .
-
-#:solrSearchEngine
-#    a   vitroWebapp:searchengine.solr.SolrSearchEngine ,
-#        vitroWebapp:modules.searchEngine.SearchEngine .
-
 :instrumentedSearchEngineWrapper
     a   vitroWebapp:searchengine.InstrumentedSearchEngineWrapper ,
         vitroWebapp:modules.searchEngine.SearchEngine ;
-    :wraps :elasticSearchEngine .
+    :wraps :solrSearchEngine .
 
-:elasticSearchEngine
-    a   vitroWebapp:searchengine.elasticsearch.ElasticSearchEngine ,
+:solrSearchEngine
+    a   vitroWebapp:searchengine.solr.SolrSearchEngine ,
         vitroWebapp:modules.searchEngine.SearchEngine .
+
+# Alternatively, you can setup Elasticsearch engine in the same manner:
+
+#:instrumentedSearchEngineWrapper
+#    a   vitroWebapp:searchengine.InstrumentedSearchEngineWrapper ,
+#        vitroWebapp:modules.searchEngine.SearchEngine ;
+#    :wraps :elasticSearchEngine .
+
+#:elasticSearchEngine
+#    a   vitroWebapp:searchengine.elasticsearch.ElasticSearchEngine ,
+#        vitroWebapp:modules.searchEngine.SearchEngine .
 
 # ----------------------------
 #
