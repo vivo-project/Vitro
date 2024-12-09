@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpsBasicClientFactory;
 import org.apache.commons.logging.Log;
@@ -51,6 +52,12 @@ public class ESAdder {
             throws SearchEngineException {
         try {
             Map<String, List<Object>> map = convertDocToMap(doc);
+
+            if (map.containsKey(VitroSearchTermNames.NAME_RAW)) {
+                map.putIfAbsent(VitroSearchTermNames.AC_NAME_STEMMED, map.get(VitroSearchTermNames.NAME_RAW));
+                map.putIfAbsent(VitroSearchTermNames.AC_NAME_UNTOKENIZED, map.get(VitroSearchTermNames.NAME_RAW));
+            }
+
             String json = new ObjectMapper().writeValueAsString(map);
             if (json.contains("_drsim")) {
                 json = reformatDRSIMFields(json);
