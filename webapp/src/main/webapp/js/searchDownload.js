@@ -1,7 +1,6 @@
 /* $This file is distributed under the terms of the license in LICENSE$ */
 
 $(document).ready(function(){
-    // This function creates and styles bootstrap-popper tooltip that displays the resource uri and the rdf link when the user clicks the uri/rdf icon.
 
     function configSlider() {
         $( "#slider-vertical" ).slider({

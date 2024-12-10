@@ -7,7 +7,7 @@ function setTooltip(elementId, data) {
         if (trigger === 'click') {
 
             element.addEventListener('click', () => {
-                if (!tooltip) {
+                if (!tooltip || $('.tooltip').length == 0) {
                     tooltip = setupPopper(element, data);
                 } else {
                     tooltip?.remove();
