@@ -4,14 +4,14 @@
 /* ------------------------------------------------->  */
 /* TOOLTIP  ---------------------------------------->  */
 /* ------------------------------------------------->  */
-.vitroTooltip.tooltip {
+.vitroTooltip.tooltip  {
     opacity: 1;
-    --bs-tooltip-opacity: 1;
-    max-width: 400px;
-    --bs-tooltip-max-width: 400px;
 }
 
-.vitroTooltip > .tooltip-inner {
+.vitroTooltip.tooltip > .tooltip-inner {
+    opacity: 1;
+    max-width: 400px;
+
     background-color: #f1f2ee;
     border: 1px solid #F1D031;
     text-align: left;
@@ -36,6 +36,37 @@
 
 .vitroTooltip > .tooltip-arrow::before {
     --bs-tooltip-bg: #F1D031;
+}
+
+.tooltip[data-popper-placement^='top'] > #arrow {
+  bottom: -4px;
+}
+
+.tooltip[data-popper-placement^='bottom'] > #arrow {
+  top: -4px;
+}
+
+.tooltip[data-popper-placement^='left'] > #arrow {
+  right: -4px;
+}
+
+.tooltip[data-popper-placement^='right'] > #arrow {
+  left: -4px;
+}
+
+
+.tooltip > #arrow,
+.tooltip > #arrow::before {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  z-index: -1;
+}
+
+.tooltip > #arrow::before {
+  content: '';
+  transform: rotate(45deg);
+  background: #F1D031;
 }
 
 .tooltip:not(.vitroTooltip) > .tooltip-inner, .tooltip:not(.vitroTooltip) > .tooltip-inner * {

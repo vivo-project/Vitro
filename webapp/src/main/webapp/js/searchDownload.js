@@ -29,11 +29,9 @@ $(document).ready(function(){
                     	+'<p class ="download-url"><a id=xmlDownload href="' + urlsBase + '/search?' + queryText +'&amp;xml=1&amp;documentsNumber=500">download results in XML format</a></p>'
                     	+'<p class ="download-url"><a id=csvDownload href="' + urlsBase + '/search?' + queryText +'&amp;csv=1&amp;documentsNumber=500">download results in CSV format</a></p>'
                     	+'</div></div>',
-        html: true,
-        sanitize: false,
         trigger: "click",
         customClass: "vitroTooltip downloadTip",
-        fallbackPlacements: ['right', 'bottom', 'top', 'left'],
+        placements: ['right', 'bottom', 'top', 'left'],
         afterCreate: configSlider,
 
     })
