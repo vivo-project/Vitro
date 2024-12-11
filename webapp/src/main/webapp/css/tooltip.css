@@ -6,6 +6,7 @@
 /* ------------------------------------------------->  */
 .vitroTooltip.tooltip  {
     opacity: 1;
+    position: absolute;
 }
 
 .vitroTooltip.tooltip > .tooltip-inner {
@@ -20,6 +21,8 @@
     color: #333;
     max-width: initial;
     padding: 0.25rem;
+    position: relative;
+    z-index: 100;
 }
 
 .vitroTooltip > .tooltip-inner .close-footer {
@@ -38,33 +41,11 @@
     --bs-tooltip-bg: #F1D031;
 }
 
-.tooltip[data-popper-placement^='top'] > #arrow {
-  bottom: -4px;
-}
-
-.tooltip[data-popper-placement^='bottom'] > #arrow {
-  top: -4px;
-}
-
-.tooltip[data-popper-placement^='left'] > #arrow {
-  right: -4px;
-}
-
-.tooltip[data-popper-placement^='right'] > #arrow {
-  left: -4px;
-}
-
-
-.tooltip > #arrow,
-.tooltip > #arrow::before {
+.tooltip > .tooltip-arrow {
   position: absolute;
+  z-index: 50;
   width: 8px;
   height: 8px;
-  z-index: -1;
-}
-
-.tooltip > #arrow::before {
-  content: '';
   transform: rotate(45deg);
   background: #F1D031;
 }

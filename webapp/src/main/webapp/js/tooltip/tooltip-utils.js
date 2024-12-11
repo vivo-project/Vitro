@@ -111,7 +111,7 @@ function createTooltipElement(data) {
 
     const arrow = document.createElement('div');
     arrow.setAttribute('data-popper-arrow', '');
-    arrow.className = 'popover-arrow';
+    arrow.className = 'tooltip-arrow';
     tooltip.appendChild(arrow);
 
     const innerPopper = document.createElement('div');
