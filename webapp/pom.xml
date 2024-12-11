@@ -133,6 +133,36 @@
                                     </fileMappers>
                                     <outputDirectory>target/${project.artifactId}-${project.version}/webjars/fonts/open-sans/</outputDirectory>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.webjars.npm</groupId>
+                                    <artifactId>floating-ui__dom</artifactId>
+                                    <type>jar</type>
+                                    <includes>
+                                        META-INF/resources/webjars/floating-ui__dom/*/dist/**</includes>
+                                    <fileMappers>
+                                        <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                                            <pattern>^META-INF/resources/webjars/floating-ui__dom/[^/]+/dist/</pattern>
+                                            <replacement>./</replacement>
+                                        </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                                    </fileMappers>
+                                    <outputDirectory>
+                                        target/${project.artifactId}-${project.version}/webjars/floatingui/</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.webjars.npm</groupId>
+                                    <artifactId>floating-ui__core</artifactId>
+                                    <type>jar</type>
+                                    <includes>
+                                        META-INF/resources/webjars/floating-ui__core/*/dist/**</includes>
+                                    <fileMappers>
+                                        <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                                            <pattern>^META-INF/resources/webjars/floating-ui__core/[^/]+/dist/</pattern>
+                                            <replacement>./</replacement>
+                                        </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                                    </fileMappers>
+                                    <outputDirectory>
+                                        target/${project.artifactId}-${project.version}/webjars/floatingui/</outputDirectory>
+                                </artifactItem>
                             </artifactItems>
                             <overWriteReleases>true</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
@@ -157,6 +187,16 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>floating-ui__dom</artifactId>
+            <version>1.6.12</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>floating-ui__core</artifactId>
+            <version>1.6.8</version>
+        </dependency>
         <dependency>
             <groupId>org.webjars.npm</groupId>
             <artifactId>jquery-migrate</artifactId>
