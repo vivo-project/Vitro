@@ -79,24 +79,66 @@ function setupPopper(element, data) {
         $(this).closest('.tooltip').remove();
     });
 
-    Popper.createPopper(element, tooltip, {
-        placement: data.placements?.[0] || 'auto',
-        modifiers: [
-            {
-                name: 'offset',
-                options: {
-                  offset: [0, 10],
-                },
-            },
-            {
-                fallbackPlacements: data.placements || ['auto'],
-                name: 'arrow',
-                options: {
-                  padding: 5,
-                },
-            },
-        ],
+
+    let tooltip = document.createElement('div');
+            
+    let arrow = document.createElement('div');
+    arrow.setAttribute('data-popper-arrow', '')
+    arrow.className = 'popover-arrow';
+    arrow.id = 'arrow';
+    tooltip.appendChild(arrow);
+    tooltip.className = 'vitroTooltip tooltip ' + data.customClass;
+    document.body.appendChild(tooltip);
+
+    let innerPopper = document.createElement('div');
+    innerPopper.className = 'tooltip-inner';
+    innerPopper.innerHTML = data.title || 'TEST';
+    tooltip.appendChild(innerPopper);
+
+    $('.tooltip a.close').click(function(event) {
+        event.preventDefault();
+        $(this).closest('.tooltip').remove();
     });
+
+    const updatePosition = () => {
+        FloatingUIDOM.computePosition(element, tooltip, {
+            placement: data.placements?.[0] || 'auto',
+            middleware: [
+                FloatingUIDOM.offset(20),
+                data.placements ? FloatingUIDOM.flip({ fallbackPlacements: data.placements }) : autoPlacement(),
+                FloatingUIDOM.arrow({ element: arrow, padding: 5 }),
+            ],
+        }).then(({ x, y, placement, middlewareData }) => {
+            Object.assign(tooltip.style, {
+                left: `${x}px`,
+                top: `${y}px`,
+            });
+        
+            if (middlewareData.arrow) {
+                const { x: arrowX, y: arrowY } = middlewareData.arrow;
+                const staticSide = {
+                    top: 'bottom',
+                    right: 'left',
+                    bottom: 'top',
+                    left: 'right',
+                }[placement.split('-')[0]];
+                Object.assign(arrow.style, {
+                    left: arrowX != null ? `${arrowX}px` : '',
+                    top: arrowY != null ? `${arrowY}px` : '',
+                    [staticSide]: '-4px',
+                });
+            }
+        
+            tooltip.setAttribute('data-placement', placement);
+        });
+    };
+
+    updatePosition();
+    const cleanup = FloatingUIDOM.autoUpdate(
+        element,
+        tooltip,
+        updatePosition,
+    );
 
     if (data?.afterCreate) { data.afterCreate(); }
 
