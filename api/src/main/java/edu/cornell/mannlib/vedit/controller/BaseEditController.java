@@ -246,12 +246,6 @@ public class BaseEditController extends VitroHttpServlet {
             for (RoleInfo role : roles) {
                 RoleInfo roleCopy = role.clone();
                 roleInfos.add(roleCopy);
-                if (isPublicForbiddenOperation(operation)) {
-                    if (roleCopy.isPublic) {
-                        roleCopy.setEnabled(false);
-                        roleCopy.setGranted(false);
-                    }
-                }
             }
             getRolePolicyInformation(entityURI, aot, namedKeys, operation, roleInfos);
         }
@@ -357,10 +351,6 @@ public class BaseEditController extends VitroHttpServlet {
 
         getRolePolicyInformation(entityURI, aot, namedKeys, operation, roleInfos);
         req.setAttribute(PROPERTY_SUPPRESSIONS_NOT_RELATED, propertySuppressionsToRoles);
-    }
-
-    static boolean isPublicForbiddenOperation(AccessOperation operation) {
-        return operation.equals(AccessOperation.PUBLISH);
     }
 
     public static class RoleInfo {
