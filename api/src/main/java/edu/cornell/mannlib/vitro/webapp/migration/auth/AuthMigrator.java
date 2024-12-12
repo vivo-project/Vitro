@@ -32,6 +32,7 @@ import org.apache.jena.query.ResultSet;
 
 public class AuthMigrator implements ServletContextListener {
 
+    private static final long CURRENT_VERSION = 2;
     private static final Log log = LogFactory.getLog(AuthMigrator.class);
     protected static final Set<String> ALL_ROLES = new HashSet<String>(
             Arrays.asList(ROLE_ADMIN_URI, ROLE_CURATOR_URI, ROLE_EDITOR_URI, ROLE_SELF_EDITOR_URI, ROLE_PUBLIC_URI));
@@ -72,6 +73,10 @@ public class AuthMigrator implements ServletContextListener {
         if (!isMigrationRequired()) {
             return;
         }
+        runCompleteMigration(sce, begin);
+    }
+
+    private void runCompleteMigration(ServletContextEvent sce, long begin) {
         ServletContext ctx = sce.getServletContext();
         StartupStatus ss = StartupStatus.getBean(ctx);
         log.info("Started authorization configuration update");
@@ -97,7 +102,7 @@ public class AuthMigrator implements ServletContextListener {
         }
         migrateSimplePermissions();
         removeVersion(getVersion());
-        setVersion(1L);
+        setVersion(CURRENT_VERSION);
     }
 
     private void migrateSimplePermissions() {
@@ -112,7 +117,7 @@ public class AuthMigrator implements ServletContextListener {
     }
 
     private boolean isMigrationRequired() {
-        if (getVersion() == 0L) {
+        if (getVersion() < 1) {
             return true;
         }
         return false;
@@ -120,7 +125,6 @@ public class AuthMigrator implements ServletContextListener {
 
     protected long getVersion() {
         long version = 0L;
-
         try {
             ResultSet rs = RDFServiceUtils.sparqlSelectQuery(VERSION_QUERY, configurationRdfService);
             while (rs.hasNext()) {
