@@ -244,9 +244,6 @@ public class OperationController extends BaseEditController {
             String operationGroupName = ao.toString().toLowerCase();
             Set<String> selectedRoles = getSelectedRoles(request, operationGroupName);
             for (RoleInfo role : roles) {
-                if (role.isPublic() && isPublicForbiddenOperation(ao)) {
-                    continue;
-                }
                 if (selectedRoles.contains(role.getUri())) {
                     EntityPolicyController.grantAccess(entityUri, aot, ao, role.getUri());    
                 } else {
