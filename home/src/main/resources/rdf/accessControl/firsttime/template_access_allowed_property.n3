@@ -30,18 +30,22 @@
     access:hasDataSet :CuratorDisplayFauxDataPropertyDataSet ;
     access:hasDataSet :AdminDisplayFauxDataPropertyDataSet ;
 
+    access:hasDataSet :PublicPublishObjectPropertyDataSet ;
     access:hasDataSet :EditorPublishObjectPropertyDataSet ;
     access:hasDataSet :CuratorPublishObjectPropertyDataSet ;
     access:hasDataSet :AdminPublishObjectPropertyDataSet ;
 
+    access:hasDataSet :PublicPublishDataPropertyDataSet ;
     access:hasDataSet :EditorPublishDataPropertyDataSet ;
     access:hasDataSet :CuratorPublishDataPropertyDataSet ;
     access:hasDataSet :AdminPublishDataPropertyDataSet ;
 
+    access:hasDataSet :PublicPublishFauxObjectPropertyDataSet ;
     access:hasDataSet :EditorPublishFauxObjectPropertyDataSet ;
     access:hasDataSet :CuratorPublishFauxObjectPropertyDataSet ;
     access:hasDataSet :AdminPublishFauxObjectPropertyDataSet ;
 
+    access:hasDataSet :PublicPublishFauxDataPropertyDataSet ;
     access:hasDataSet :EditorPublishFauxDataPropertyDataSet ;
     access:hasDataSet :CuratorPublishFauxDataPropertyDataSet ;
     access:hasDataSet :AdminPublishFauxDataPropertyDataSet ;
@@ -1583,6 +1587,19 @@
 
 ### Publish object property data sets
 
+:PublicPublishObjectPropertyDataSet a access:DataSet ;
+    access:hasDataSetKey :PublicPublishObjectPropertyDataSetKey ;
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:ObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet :PublicPublishObjectPropertyValueSet .
+
+:PublicPublishObjectPropertyDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:ObjectProperty ;
+    access:hasKeyComponent access-individual:PublicRoleUri ;
+    access:hasKeyComponent access-individual:PublishOperation .
+
 :EditorPublishObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :EditorPublishObjectPropertyDataSetKey ;
     access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
@@ -1623,6 +1640,19 @@
     access:hasKeyComponent access-individual:PublishOperation .
 
 ### Publish data property data sets
+
+:PublicPublishDataPropertyDataSet a access:DataSet ;
+    access:hasDataSetKey :PublicPublishDataPropertyDataSetKey ;
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:DataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet :PublicPublishDataPropertyValueSet .
+
+:PublicPublishDataPropertyDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:DataProperty ;
+    access:hasKeyComponent access-individual:PublicRoleUri ;
+    access:hasKeyComponent access-individual:PublishOperation .
 
 :EditorPublishDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :EditorPublishDataPropertyDataSetKey ;
@@ -1665,6 +1695,19 @@
 
 ### Publish faux object property data sets
 
+:PublicPublishFauxObjectPropertyDataSet a access:DataSet ;
+    access:hasDataSetKey :PublicPublishFauxObjectPropertyDataSetKey ;
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxObjectPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet :PublicPublishFauxObjectPropertyValueSet .
+
+:PublicPublishFauxObjectPropertyDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:FauxObjectProperty ;
+    access:hasKeyComponent access-individual:PublicRoleUri ;
+    access:hasKeyComponent access-individual:PublishOperation .
+
 :EditorPublishFauxObjectPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :EditorPublishFauxObjectPropertyDataSetKey ;
     access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
@@ -1705,6 +1748,19 @@
     access:hasKeyComponent access-individual:PublishOperation .
 
 ### Publish faux data property data sets
+
+:PublicPublishFauxDataPropertyDataSet a access:DataSet ;
+    access:hasDataSetKey :PublicPublishFauxDataPropertyDataSetKey ;
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyValueSet ;
+    access:hasRelatedValueSet access-individual:FauxDataPropertyStatementValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet :PublicPublishFauxDataPropertyValueSet .
+
+:PublicPublishFauxDataPropertyDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:FauxDataProperty ;
+    access:hasKeyComponent access-individual:PublicRoleUri ;
+    access:hasKeyComponent access-individual:PublishOperation .
 
 :EditorPublishFauxDataPropertyDataSet a access:DataSet ;
     access:hasDataSetKey :EditorPublishFauxDataPropertyDataSetKey ;
@@ -1817,18 +1873,22 @@
     access:values :CuratorDisplayFauxDataPropertyValueSet ;
     access:values :AdminDisplayFauxDataPropertyValueSet ;
 
+    access:values :PublicPublishObjectPropertyValueSet ;
     access:values :EditorPublishObjectPropertyValueSet ;
     access:values :CuratorPublishObjectPropertyValueSet ;
     access:values :AdminPublishObjectPropertyValueSet ;
 
+    access:values :PublicPublishDataPropertyValueSet ;
     access:values :EditorPublishDataPropertyValueSet ;
     access:values :CuratorPublishDataPropertyValueSet ;
     access:values :AdminPublishDataPropertyValueSet ;
 
+    access:values :PublicPublishFauxObjectPropertyValueSet ;
     access:values :EditorPublishFauxObjectPropertyValueSet ;
     access:values :CuratorPublishFauxObjectPropertyValueSet ;
     access:values :AdminPublishFauxObjectPropertyValueSet ;
 
+    access:values :PublicPublishFauxDataPropertyValueSet ;
     access:values :EditorPublishFauxDataPropertyValueSet ;
     access:values :CuratorPublishFauxDataPropertyValueSet ;
     access:values :AdminPublishFauxDataPropertyValueSet ;
@@ -1917,18 +1977,22 @@
     access:values :CuratorDisplayFauxDataPropertyValueSet ;
     access:values :AdminDisplayFauxDataPropertyValueSet ;
 
+    access:values :PublicPublishObjectPropertyValueSet ;
     access:values :EditorPublishObjectPropertyValueSet ;
     access:values :CuratorPublishObjectPropertyValueSet ;
     access:values :AdminPublishObjectPropertyValueSet ;
 
+    access:values :PublicPublishDataPropertyValueSet ;
     access:values :EditorPublishDataPropertyValueSet ;
     access:values :CuratorPublishDataPropertyValueSet ;
     access:values :AdminPublishDataPropertyValueSet ;
 
+    access:values :PublicPublishFauxObjectPropertyValueSet ;
     access:values :EditorPublishFauxObjectPropertyValueSet ;
     access:values :CuratorPublishFauxObjectPropertyValueSet ;
     access:values :AdminPublishFauxObjectPropertyValueSet ;
 
+    access:values :PublicPublishFauxDataPropertyValueSet ;
     access:values :EditorPublishFauxDataPropertyValueSet ;
     access:values :CuratorPublishFauxDataPropertyValueSet ;
     access:values :AdminPublishFauxDataPropertyValueSet ;
@@ -2139,6 +2203,8 @@
 :AdminDisplayFauxDataPropertyValueSet a access:ValueSet ;
     access:containsElementsOfType access-individual:FauxDataProperty .
 
+:PublicPublishObjectPropertyValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:ObjectProperty .
 :EditorPublishObjectPropertyValueSet a access:ValueSet ;
     access:containsElementsOfType access-individual:ObjectProperty .
 :CuratorPublishObjectPropertyValueSet a access:ValueSet ;
@@ -2146,6 +2212,8 @@
 :AdminPublishObjectPropertyValueSet a access:ValueSet ;
     access:containsElementsOfType access-individual:ObjectProperty .
 
+:PublicPublishDataPropertyValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:DataProperty .
 :EditorPublishDataPropertyValueSet a access:ValueSet ;
     access:containsElementsOfType access-individual:DataProperty .
 :CuratorPublishDataPropertyValueSet a access:ValueSet ;
@@ -2153,6 +2221,8 @@
 :AdminPublishDataPropertyValueSet a access:ValueSet ;
     access:containsElementsOfType access-individual:DataProperty .
 
+:PublicPublishFauxObjectPropertyValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:FauxObjectProperty .
 :EditorPublishFauxObjectPropertyValueSet a access:ValueSet ;
     access:containsElementsOfType access-individual:FauxObjectProperty .
 :CuratorPublishFauxObjectPropertyValueSet a access:ValueSet ;
@@ -2160,6 +2230,8 @@
 :AdminPublishFauxObjectPropertyValueSet a access:ValueSet ;
     access:containsElementsOfType access-individual:FauxObjectProperty .
 
+:PublicPublishFauxDataPropertyValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:FauxDataProperty .
 :EditorPublishFauxDataPropertyValueSet a access:ValueSet ;
     access:containsElementsOfType access-individual:FauxDataProperty .
 :CuratorPublishFauxDataPropertyValueSet a access:ValueSet ;
