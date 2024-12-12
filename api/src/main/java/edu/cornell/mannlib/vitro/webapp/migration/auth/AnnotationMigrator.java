@@ -191,10 +191,7 @@ public class AnnotationMigrator {
                     EntityPolicyController.getDataValueStatements(entityUri, aot, ao, rolesToAdd, additions);
                     Set<String> rolesToRemove = new HashSet<>(ALL_ROLES);
                     rolesToRemove.removeAll(rolesToAdd);
-                    // Don't remove public publish and update data sets, as there are no public policies for that
-                    // operation
-                    // groups
-                    if (OperationGroup.PUBLISH_GROUP.equals(og) || OperationGroup.UPDATE_GROUP.equals(og)) {
+                    if (OperationGroup.UPDATE_GROUP.equals(og)) {
                         rolesToRemove.remove(ROLE_PUBLIC_URI);
                     }
                     if (!rolesToRemove.isEmpty()) {
