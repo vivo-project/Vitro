@@ -7,6 +7,7 @@ import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.Objects;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -53,7 +54,7 @@ public class SolrSmokeTest {
 		final StartupStatus ss = StartupStatus.getBean(sce.getServletContext());
 
 		String solrUrlString = SearchEngineUtil.getSearchEngineURLProperty();
-		if (solrUrlString.isEmpty()) {
+		if (Objects.isNull(solrUrlString) || solrUrlString.isEmpty()) {
 			ss.fatal(listener, "Can't connect to Solr search engine. "
 					+ "runtime.properties must contain a value for "
 					+ "vitro.local.searchengine.url (vitro.local.solr.url)");

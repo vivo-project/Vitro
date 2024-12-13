@@ -13,6 +13,10 @@ public class CustomQueryBuilder {
 
     private static final String MAX_FUZZY_EDITS = "2";
 
+    private CustomQueryBuilder() {
+    }
+
+
     public static Query buildQuery(SearchType queryType, String field, String value) {
         validateInput(field, value);
 
