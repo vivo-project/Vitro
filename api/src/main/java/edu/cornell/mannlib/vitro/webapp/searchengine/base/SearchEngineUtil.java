@@ -1,5 +1,9 @@
 package edu.cornell.mannlib.vitro.webapp.searchengine.base;
 
+import java.util.Objects;
+
+import javax.annotation.Nullable;
+
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -8,8 +12,13 @@ public class SearchEngineUtil {
 
     private static final Log log = LogFactory.getLog(SearchEngineUtil.class);
 
+    @Nullable
     public static String getSearchEngineURLProperty() {
         ConfigurationProperties config = ConfigurationProperties.getInstance();
+        if (Objects.isNull(config)) {
+            return null;
+        }
+
         if (config.getProperty("vitro.local.searchengine.url", "").isEmpty()) {
             return tryFetchLegacySolrConfiguration(config);
         }

@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Objects;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -83,7 +84,7 @@ public class SearchEngineSmokeTest implements ServletContextListener {
 
         String searchEngineUrlString = SearchEngineUtil.getSearchEngineURLProperty();
 
-        if (searchEngineUrlString.isEmpty()) {
+        if (Objects.isNull(searchEngineUrlString) || searchEngineUrlString.isEmpty()) {
             ss.fatal(this, "No search engine is configured");
         }
 
