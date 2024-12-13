@@ -39,6 +39,7 @@ public class VitroHomeDirectory {
 	private final Path path;
 	private final String discoveryMessage;
     private Set<String> excludedHomeFiles = new HashSet<>(Arrays.asList("rdf"));
+    private String homeSourcePath;
 
 
 	public VitroHomeDirectory(ServletContext ctx, Path path,
@@ -46,6 +47,7 @@ public class VitroHomeDirectory {
 		this.ctx = ctx;
 		this.path = path;
 		this.discoveryMessage = discoveryMessage;
+		setHomeSourcePath(ctx);
 	}
 
 	public ServletContext getCtx() {
@@ -59,6 +61,23 @@ public class VitroHomeDirectory {
 	public String getDiscoveryMessage() {
 		return discoveryMessage;
 	}
+
+    /**
+     * Get source home file directory path
+     * 
+     * @return source home files directory path
+     */
+    public String getSourcePath() {
+        return homeSourcePath;
+    }
+
+    private void setHomeSourcePath(ServletContext context) {
+        String location = "/WEB-INF/resources/home-files";
+        homeSourcePath = context.getRealPath(location);
+        if (homeSourcePath == null) {
+            throw new RuntimeException(String.format("Application home files not found in: %s", location));
+        }
+    }
 
 	/**
 	 * Find something that specifies the location of the Vitro home directory.
@@ -221,34 +240,30 @@ public class VitroHomeDirectory {
      * Populates home directory with home files, excluding the rdf directory
      */
     public void populate() {
-        File vhdDir = getPath().toFile();
+        File homeDestination = getPath().toFile();
 
-        if (!vhdDir.isDirectory() || vhdDir.list() == null) {
-            throw new RuntimeException("Application home dir is not a directory! " + vhdDir);
+        if (!homeDestination.isDirectory() || homeDestination.list() == null) {
+            throw new RuntimeException("Application home dir is not a directory! " + homeDestination);
         }
-        
-        if (!vhdDir.canWrite()) {
-            throw new RuntimeException("Application home dir is not writable! " + vhdDir);
+        if (!homeDestination.canWrite()) {
+            throw new RuntimeException("Application home dir is not writable! " + homeDestination);
         }
         try {
-            copy(vhdDir);
+            copy(homeDestination);
         } catch(Exception e) {
-            log.error(e, e);
-            throw new RuntimeException("Failed to copy home files! " + vhdDir);
+            throw new RuntimeException("Failed to copy home files! " + homeDestination, e);
         }
-        log.info("Copied home files to " + vhdDir.toPath());
-        
+        log.info("Copied home files to " + homeDestination.toPath());
     }
 
     /**
      * Create home directory
      */
-    private static void createHomeDirectory(Path vhdDir) {
+    private static void createHomeDirectory(Path homeDestination) {
         try {
-            vhdDir.toFile().mkdirs();
+            homeDestination.toFile().mkdirs();
         } catch (Exception e) {
-            log.error(e, e);
-            throw new RuntimeException("Failed to create home directory " + vhdDir);
+            throw new RuntimeException("Failed to create home directory " + homeDestination, e);
         }
     }
 
@@ -256,40 +271,16 @@ public class VitroHomeDirectory {
      * Copy file from home source to home destination
      */
     private void copy(File homeDestination) throws IOException {
-        File homeSrcPath = new File(getHomeSrcPath(ctx));
+        File homeSrcPath = new File(getSourcePath());
         File[] contents = homeSrcPath.listFiles();
         for (File child : contents) {
-            if (!isExcluded(child)) {
-                FileUtils.copyDirectory(child, homeDestination);
+            if (!excludedHomeFiles.contains(child.getName())) {
+                if (child.isDirectory()) {
+                    FileUtils.copyDirectoryToDirectory(child, homeDestination);
+                } else {
+                    FileUtils.copyFileToDirectory(child, homeDestination);
+                }
             }
         }
     }
-
-    /**
-     * Test if file name is excluded from copying
-     * 
-     * @return true if file should be excluded
-     */
-    private boolean isExcluded(File child) {
-        if (excludedHomeFiles.contains(child.getName())) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Get source home file directory path
-     * 
-     * @return source home files directory path
-     */
-    public static String getHomeSrcPath(ServletContext context) {
-        String location = "/WEB-INF/resources/home-files";
-        String realPath = context.getRealPath(location);
-        if (realPath == null) {
-            log.error("Application home files not found in: " + location);
-            throw new RuntimeException("Application home files not found in: " + location);
-        }
-        return realPath;
-    }
-    
 }

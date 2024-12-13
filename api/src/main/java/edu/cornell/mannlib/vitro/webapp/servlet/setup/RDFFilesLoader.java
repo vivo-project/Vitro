@@ -31,8 +31,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
-
-import edu.cornell.mannlib.vitro.webapp.application.VitroHomeDirectory;
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 
 import javax.servlet.ServletContext;
 
@@ -221,7 +220,7 @@ public class RDFFilesLoader {
 	}
 
 	private static String locateHomeDirectory(ServletContext ctx) {
-		return VitroHomeDirectory.getHomeSrcPath(ctx);
+		return ApplicationUtils.instance().getHomeDirectory().getSourcePath();
 	}
 
 	/**
