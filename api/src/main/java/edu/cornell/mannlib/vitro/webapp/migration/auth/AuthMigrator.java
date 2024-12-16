@@ -73,7 +73,30 @@ public class AuthMigrator implements ServletContextListener {
         if (!isMigrationRequired()) {
             return;
         }
-        runCompleteMigration(sce, begin);
+        long currentVersion = getVersion();
+        if (currentVersion == 0) {
+            runCompleteMigration(sce, begin);
+        } else if (currentVersion == 1) {
+            migratePublishPublicPermissions(sce, begin);
+        }
+    }
+
+    private void migratePublishPublicPermissions(ServletContextEvent sce, long begin) {
+        ServletContext ctx = sce.getServletContext();
+        StartupStatus ss = StartupStatus.getBean(ctx);
+        log.info("Started publish permissions authorization reconfiguration for public role");
+        convertPublicPublishPermissions();
+        ss.info(this, secondsSince(begin) + " seconds spent to reconfigure publish permissions for public role");
+        removeVersion(getVersion());
+        setVersion(CURRENT_VERSION);
+        log.info(String.format("Updated access control configuration to version %d", CURRENT_VERSION));
+        PolicyLoader.getInstance().loadPolicies();
+        log.info("Reloaded all policies after migration");
+    }
+
+    private void convertPublicPublishPermissions() {
+        AnnotationMigrator annotationMigrator = new AnnotationMigrator(contentRdfService, configurationRdfService);
+        annotationMigrator.updatePublicPublishPermissions();
     }
 
     private void runCompleteMigration(ServletContextEvent sce, long begin) {
@@ -103,6 +126,7 @@ public class AuthMigrator implements ServletContextListener {
         migrateSimplePermissions();
         removeVersion(getVersion());
         setVersion(CURRENT_VERSION);
+        log.info(String.format("Updated access control configuration to version %d", CURRENT_VERSION));
     }
 
     private void migrateSimplePermissions() {
@@ -117,7 +141,7 @@ public class AuthMigrator implements ServletContextListener {
     }
 
     private boolean isMigrationRequired() {
-        if (getVersion() < 1) {
+        if (getVersion() < CURRENT_VERSION) {
             return true;
         }
         return false;

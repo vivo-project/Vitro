@@ -20,6 +20,7 @@
     access:hasDataSet :CuratorUpdateClassDataSet ;
     access:hasDataSet :AdminUpdateClassDataSet ;
 
+    access:hasDataSet :PublicPublishClassDataSet ;
     access:hasDataSet :SelfEditorPublishClassDataSet ;
     access:hasDataSet :EditorPublishClassDataSet ;
     access:hasDataSet :CuratorPublishClassDataSet ;
@@ -251,6 +252,20 @@
     access:hasKeyComponent access-individual:AdminRoleUri ;
     access:hasKeyComponent access-individual:UpdateOperation .
 
+### Public publish class uri data sets
+
+:PublicPublishClassDataSet a access:DataSet ;
+    access:hasDataSetKey :PublicPublishClassDataSetKey ;
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ClassValueSet ;
+    access:hasRelatedValueSet access-individual:PublishOperationValueSet ;
+    access:hasRelatedValueSet :PublicPublishClassValueSet .
+
+:PublicPublishClassDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:Class ;
+    access:hasKeyComponent access-individual:PublicRoleUri ;
+    access:hasKeyComponent access-individual:PublishOperation .
+
 ### Self editor publish class uri data sets
 
 :SelfEditorPublishClassDataSet a access:DataSet ;
@@ -348,6 +363,7 @@
     access:values :EditorPublishClassValueSet ;
     access:values :EditorDisplayClassValueSet ;
     access:values :EditorUpdateClassValueSet ;
+    access:values :PublicPublishClassValueSet ;
     access:values :SelfEditorPublishClassValueSet ;
     access:values :SelfEditorDisplayClassValueSet ;
     access:values :SelfEditorUpdateClassValueSet ;
@@ -380,6 +396,9 @@
     access:containsElementsOfType access-individual:Class .
 
 :EditorUpdateClassValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:Class .
+
+:PublicPublishClassValueSet a access:ValueSet ;
     access:containsElementsOfType access-individual:Class .
 
 :SelfEditorPublishClassValueSet a access:ValueSet ;
