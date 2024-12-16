@@ -1,5 +1,11 @@
 package edu.cornell.mannlib.vitro.webapp.migration.auth;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType.CLASS;
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType.DATA_PROPERTY;
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType.FAUX_DATA_PROPERTY;
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType.FAUX_OBJECT_PROPERTY;
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType.OBJECT_PROPERTY;
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.OperationGroup.PUBLISH_GROUP;
 import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_ADMIN_URI;
 import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_CURATOR_URI;
 import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_EDITOR_URI;
@@ -89,6 +95,34 @@ public class AnnotationMigrator {
         PolicyLoader.getInstance().loadPolicies();
     }
 
+    protected void updatePublicPublishPermissions() {
+        Set<OperationGroup> group = Collections.singleton(PUBLISH_GROUP);
+        Set<String> role = Collections.singleton(ROLE_PUBLIC_URI);
+
+        log.info("Started annotation configuration conversion");
+        Map<String, Map<OperationGroup, Set<String>>> opConfigs = getObjectPropertyAnnotations();
+        log.info(String.format("Found %s object property annotation configurations", opConfigs.size()));
+        Map<String, Map<OperationGroup, Set<String>>> dpConfigs = getDataPropertyAnnotations();
+        log.info(String.format("Found %s data property annotation configurations", dpConfigs.size()));
+        Map<String, Map<OperationGroup, Set<String>>> classConfigs = getClassAnnotations();
+        log.info(String.format("Found %s class annotation configurations", classConfigs.size()));
+        Map<String, Map<OperationGroup, Set<String>>> fopConfigs = getFauxObjectPropertyAnnotations(opConfigs.keySet());
+        log.info(String.format("Found %s faux object property annotation configurations", fopConfigs.size()));
+        Map<String, Map<OperationGroup, Set<String>>> fdpConfigs = getFauxDataPropertyAnnotations(dpConfigs.keySet());
+        log.info(String.format("Found %s faux data property annotation configurations", fdpConfigs.size()));
+
+        Long values = updatePolicyDatasets(OBJECT_PROPERTY, group, role, opConfigs);
+        log.info(String.format("Added %d values in object property datasets.", values));
+        values = updatePolicyDatasets(DATA_PROPERTY, group, role, dpConfigs);
+        log.info(String.format("Added %d values in data property datasets.", values));
+        values = updatePolicyDatasets(CLASS, group, role, classConfigs);
+        log.info(String.format("Added %d values in class property datasets.", values));
+        values = updatePolicyDatasets(FAUX_OBJECT_PROPERTY, group, role, fopConfigs);
+        log.info(String.format("Added %d values in faux object property datasets.", values));
+        values = updatePolicyDatasets(FAUX_DATA_PROPERTY, group, role, fdpConfigs);
+        log.info(String.format("Added %d values in faux data property datasets.", values));
+    }
+
     protected Map<String, Map<OperationGroup, Set<String>>> getFauxDataPropertyAnnotations(Set<String> dataProperties) {
         String queryText = getAnnotationQuery(fauxTypeSpecificPatterns);
         return getFauxConfigurations(queryText, configurationRdfService, dataProperties);
@@ -162,7 +196,6 @@ public class AnnotationMigrator {
 
         String publishAnnotation = qs.getResource("publish").getURI();
         Set<String> publishRoles = new HashSet<>(showMap.get(publishAnnotation));
-        publishRoles.remove(ROLE_PUBLIC_URI);
 
         String updateAnnotation = qs.getResource("update").getURI();
         Set<String> updateRoles = new HashSet<>(showMap.get(updateAnnotation));
@@ -208,6 +241,33 @@ public class AnnotationMigrator {
         PolicyLoader.getInstance().updateAccessControlModel(additions.toString(), true);
         PolicyLoader.getInstance().updateAccessControlModel(removals.toString(), false);
         return new Long[] { getLineCount(additions.toString()), getLineCount(removals.toString()) };
+    }
+
+
+    private static long updatePolicyDatasets(AccessObjectType aot, Set<OperationGroup> ogs, Set<String> roles,
+            Map<String, Map<OperationGroup, Set<String>>> configs) {
+        StringBuilder additions = new StringBuilder();
+        for (String entityUri : configs.keySet()) {
+            Map<OperationGroup, Set<String>> groupMap = configs.get(entityUri);
+            Set<OperationGroup> currentOperationGroups = new HashSet<OperationGroup>(groupMap.keySet());
+            currentOperationGroups.retainAll(ogs);
+            for (OperationGroup og : currentOperationGroups) {
+                for (AccessOperation ao : OperationGroup.getOperations(og)) {
+                    Set<String> rolesToAdd = new HashSet<String>(groupMap.get(og));
+                    rolesToAdd.retainAll(roles);
+                    if (!rolesToAdd.isEmpty()) {
+                        log.info(String.format("Granted access to %s %s %s for roles %s", ao, aot, entityUri,
+                                rolesToString(rolesToAdd)));
+                    }
+                    EntityPolicyController.getDataValueStatements(entityUri, aot, ao, rolesToAdd, additions);
+                    log.debug(String.format(
+                            "Updated entity %s dataset for operation group %s access object type %s roles %s",
+                            entityUri, og, aot, rolesToAdd));
+                }
+            }
+        }
+        PolicyLoader.getInstance().updateAccessControlModel(additions.toString(), true);
+        return getLineCount(additions.toString());
     }
 
     private static Object rolesToString(Set<String> roles) {
