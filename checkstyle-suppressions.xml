@@ -48,7 +48,6 @@
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]application[\\/]ApplicationSetup\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]application[\\/]ApplicationUtils\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]application[\\/]BuildProperties\.java" checks="."/>
-    <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]application[\\/]VitroHomeDirectory\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]auth[\\/]identifier[\\/]ActiveIdentifierBundleFactories\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]auth[\\/]identifier[\\/]ArrayIdentifierBundle\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]auth[\\/]identifier[\\/]Identifier\.java" checks="."/>
