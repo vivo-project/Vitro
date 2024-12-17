@@ -1,5 +1,8 @@
 package edu.cornell.mannlib.vitro.webapp.search.controller;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.VITRO_SEARCH_INDIVIDUAL;
+
+import java.text.Collator;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -8,17 +11,30 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.jena.rdf.model.RDFNode;
 
 public class SearchFilter {
 
     private static final String FILTER = "Filter";
     private static final String RANGE_FILTER = "RangeFilter";
+    private static final Log log = LogFactory.getLog(SearchFilter.class);
+
+    private enum SortOption {
+        hitsCount,
+        labelText,
+        labelNumber,
+        idText,
+        idNumber
+    }
 
     private String id;
     private String name = "";
@@ -26,7 +42,6 @@ public class SearchFilter {
     private String to = "";
     private String fromYear = "";
     private String toYear = "";
-    private boolean isPublic = false;
 
     private String min = "0";
     private String max = "2000";
@@ -40,15 +55,16 @@ public class SearchFilter {
     private boolean selected = false;
     private boolean input = false;
     private Map<String, FilterValue> values = new LinkedHashMap<>();
-
     private boolean inputRegex = false;
-
     private boolean facetsRequired;
-
+    private boolean descendingOrder;
     private String type = FILTER;
     private String rangeText = "";
     private String rangeInput = "";
-    private boolean hidden = false;
+    private boolean display = false;
+    private Optional<Locale> locale;
+    private boolean multilingual;
+    private SortOption sortingObjectType = SortOption.labelText;
 
     public String getRangeInput() {
         return rangeInput;
@@ -62,8 +78,9 @@ public class SearchFilter {
         return rangeText;
     }
 
-    public SearchFilter(String id) {
+    public SearchFilter(String id, Optional<Locale> locale) {
         this.id = id;
+        this.locale = locale;
     }
 
     public String getName() {
@@ -87,6 +104,13 @@ public class SearchFilter {
     }
 
     public String getField() {
+        if (multilingual) {
+            if (locale.isPresent()) {
+                return locale.get().toLanguageTag() + field;
+            } else {
+                return Locale.getDefault().toLanguageTag() + field;
+            }
+        }
         return field;
     }
 
@@ -269,32 +293,82 @@ public class SearchFilter {
         this.toYear = getYear(toYear);
     }
 
-    public void sortValues() {
+    public void sortValues(Collator collator) {
         List<Entry<String, FilterValue>> list = new LinkedList<>(values.entrySet());
-        list.sort(new FilterValueComparator());
-        values = list.stream()
-                .collect(Collectors.toMap(Entry::getKey, Entry::getValue, (a, b) -> b, LinkedHashMap::new));
-    }
-
-    public boolean isPublic() {
-        return isPublic;
-    }
-
-    public void setPublic(boolean isPublic) {
-        this.isPublic = isPublic;
+        list.sort(new FilterValueComparator(collator));
+        values = list.stream().collect(Collectors.toMap(Entry::getKey, Entry::getValue, (a, b) -> b,
+                LinkedHashMap::new));
     }
 
     private class FilterValueComparator implements Comparator<Map.Entry<String, FilterValue>> {
+
+        Collator collator;
+
+        public FilterValueComparator(Collator collator) {
+            this.collator = collator;
+        }
+
         public int compare(Entry<String, FilterValue> obj1, Entry<String, FilterValue> obj2) {
-            FilterValue filter1 = obj1.getValue();
-            FilterValue filter2 = obj2.getValue();
-            int result = filter1.getOrder().compareTo(filter2.getOrder());
+            FilterValue first = obj1.getValue();
+            FilterValue second = obj2.getValue();
+            // sort by order first
+            int result = first.getOrder().compareTo(second.getOrder());
             if (result == 0) {
-                // order are equal, sort by name
-                return filter1.getName().toLowerCase().compareTo(filter2.getName().toLowerCase());
-            } else {
-                return result;
+                result = compareByObjectType(first, second);
+                if (descendingOrder) {
+                    result = -result;
+                }
             }
+            return result;
+        }
+
+        private int compareByObjectType(FilterValue first, FilterValue second) {
+            int result;
+            switch (sortingObjectType) {
+                case hitsCount:
+                    result = Long.compare(first.getCount(), second.getCount());
+                    break;
+                case labelNumber:
+                    result = compareAsNumbers(first.getName(), second.getName());
+                    break;
+                case idText:
+                    result = collator.compare(first.getId(), second.getId());
+                    break;
+                case idNumber:
+                    result = compareAsNumbers(first.getId(), second.getId());
+                    break;
+                default:
+                    // labelText
+                    result = collator.compare(first.getName(), second.getName());
+            }
+            return result;
+        }
+
+        private int compareAsNumbers(String first, String second) {
+            int result;
+            Double firstDouble = parseDouble(first);
+            Double secondDouble = parseDouble(second);
+            result = firstDouble.compareTo(secondDouble);
+            return result;
+        }
+
+        private double parseDouble(String name) {
+            name = name
+                    //replace all but digits, dots or minuses
+                    .replaceAll("[^\\d.-]", "")
+                    //replace all minuses but the one at start
+                    .replaceAll("(?<!^)[-]", "")
+                    //replace all dots, but the first one
+                    .replaceFirst("\\.", "X")
+                    .replaceAll("\\.", "")
+                    .replaceFirst("X", ".");
+            double result = 0.0d;
+            try {
+                result = Double.parseDouble(name);
+            } catch (Exception e) {
+                log.error(e, e);
+            }
+            return result;
         }
     }
 
@@ -316,12 +390,12 @@ public class SearchFilter {
         return true;
     }
 
-    public void setHidden(boolean b) {
-        this.hidden = b;
+    public void setDisplay(boolean b) {
+        this.display = b;
     }
 
-    public boolean isHidden() {
-        return hidden;
+    public boolean isDisplay() {
+        return display;
     }
 
     public int getMoreLimit() {
@@ -330,5 +404,24 @@ public class SearchFilter {
 
     public void setMoreLimit(int moreLimit) {
         this.moreLimit = moreLimit;
+    }
+
+    public void setMulitlingual(boolean multilingual) {
+        this.multilingual = multilingual;
+    }
+
+    public void setDescendingValuesOrder(boolean descendingOrder) {
+        this.descendingOrder = descendingOrder;
+    }
+
+    public void setSortingObjectType(String uri) {
+        if (uri.startsWith(VITRO_SEARCH_INDIVIDUAL)) {
+            String optionName = uri.substring(VITRO_SEARCH_INDIVIDUAL.length());
+            try {
+                sortingObjectType = SortOption.valueOf(optionName);
+            } catch (Exception e) {
+                log.error(e, e);
+            }
+        }
     }
 }

@@ -79,6 +79,7 @@
             <select id="typeSelect"  name="typeSelect" >
                 <option value="" selected="selected">${i18n().select_type}</option>
                 <option value="browseClassGroup">${i18n().browse_class_group}</option>
+                <option value="searchFilterValues">${i18n().browse_search_filter_facets}</option>
                 <option value="fixedHtml">${i18n().fixed_html}</option>
                 <option value="sparqlQuery">${i18n().sparql_query_results}</option>
                 <option value="searchIndividuals">${i18n().search_individual_results}</option>
@@ -177,6 +178,7 @@
 <script>
     var i18nStrings = {
         browseClassGroup: '${i18n().browse_class_group?js_string}',
+        browseSearchFilterValues: '${i18n().browse_search_filter_facets?js_string}',
         fixedHtml: '${i18n().fixed_html?js_string}',
         sparqlResults: '${i18n().sparql_query_results?js_string}',
         searchIndividuals: '${i18n().search_individual_results?js_string}',
