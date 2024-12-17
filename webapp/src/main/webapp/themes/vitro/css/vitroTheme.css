@@ -1473,3 +1473,8 @@ form.customForm #requiredLegend {
     font-style: italic;
     margin-top: .5em;
 }
+
+.show {
+    display: block;
+    background-color: inherit;
+}

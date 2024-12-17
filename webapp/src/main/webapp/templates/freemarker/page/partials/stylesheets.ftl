@@ -4,6 +4,7 @@
 
 <!-- vitro base styles (application-wide) -->
 <link rel="stylesheet" href="${urls.base}/css/vitro.css" />
+<link rel="stylesheet" href="${urls.base}/css/tooltip.css" />
 
 ${stylesheets.list()}
 
