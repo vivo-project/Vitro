@@ -75,7 +75,7 @@ public class VitroHomeDirectory {
         String location = "/WEB-INF/resources/home-files";
         homeSourcePath = context.getRealPath(location);
         if (homeSourcePath == null) {
-            throw new RuntimeException(String.format("Application home files not found in: %s", location));
+            throw new IllegalStateException(String.format("Application home files not found in: %s", location));
         }
     }
 
@@ -243,15 +243,15 @@ public class VitroHomeDirectory {
         File homeDestination = getPath().toFile();
 
         if (!homeDestination.isDirectory() || homeDestination.list() == null) {
-            throw new RuntimeException("Application home dir is not a directory! " + homeDestination);
+            throw new IllegalStateException("Application home dir is not a directory! " + homeDestination);
         }
         if (!homeDestination.canWrite()) {
-            throw new RuntimeException("Application home dir is not writable! " + homeDestination);
+            throw new IllegalStateException("Application home dir is not writable! " + homeDestination);
         }
         try {
             copy(homeDestination);
         } catch(Exception e) {
-            throw new RuntimeException("Failed to copy home files! " + homeDestination, e);
+            throw new IllegalStateException("Failed to copy home files! " + homeDestination, e);
         }
         log.info("Copied home files to " + homeDestination.toPath());
     }
@@ -263,7 +263,7 @@ public class VitroHomeDirectory {
         try {
             homeDestination.toFile().mkdirs();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to create home directory " + homeDestination, e);
+            throw new IllegalStateException("Failed to create home directory " + homeDestination, e);
         }
     }
 
@@ -274,12 +274,13 @@ public class VitroHomeDirectory {
         File homeSrcPath = new File(getSourcePath());
         File[] contents = homeSrcPath.listFiles();
         for (File child : contents) {
-            if (!excludedHomeFiles.contains(child.getName())) {
-                if (child.isDirectory()) {
-                    FileUtils.copyDirectoryToDirectory(child, homeDestination);
-                } else {
-                    FileUtils.copyFileToDirectory(child, homeDestination);
-                }
+            if (excludedHomeFiles.contains(child.getName())) {
+                continue;
+            }
+            if (child.isDirectory()) {
+                FileUtils.copyDirectoryToDirectory(child, homeDestination);
+            } else {
+                FileUtils.copyFileToDirectory(child, homeDestination);
             }
         }
     }
