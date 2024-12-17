@@ -34,7 +34,7 @@ function setupClickTrigger(element, data) {
 
     element.addEventListener('click', () => {
         if (!tooltip || document.querySelectorAll('.tooltip').length === 0) {
-            tooltip = setupPopper(element, data);
+            tooltip = setupTooltip(element, data);
         } else {
             tooltip = removeTooltip(tooltip);
         }
@@ -55,7 +55,7 @@ function setupHoverTrigger(element, data) {
     const showTooltip = () => {
         clearTimeout(timeout);
         if (!tooltip || document.querySelectorAll('.tooltip').length === 0) {
-            tooltip = setupPopper(element, data);
+            tooltip = setupTooltip(element, data);
             tooltip.addEventListener('mouseenter', () => clearTimeout(timeout));
             tooltip.addEventListener('mouseleave', () => timeout = setTimeout(() => {tooltip = removeTooltip(tooltip)}, 300));
         }
@@ -87,7 +87,7 @@ function removeTooltip(tooltip) {
     return tooltip
 }
 
-function setupPopper(element, data) {
+function setupTooltip(element, data) {
     const tooltip = createTooltipElement(data);
     document.body.appendChild(tooltip);
     setupCloseButtonHandler(tooltip);
@@ -110,14 +110,14 @@ function createTooltipElement(data) {
     tooltip.className = `vitroTooltip tooltip ${data.customClass}`;
 
     const arrow = document.createElement('div');
-    arrow.setAttribute('data-popper-arrow', '');
+    arrow.setAttribute('data-tooltip-arrow', '');
     arrow.className = 'tooltip-arrow';
     tooltip.appendChild(arrow);
 
-    const innerPopper = document.createElement('div');
-    innerPopper.className = 'tooltip-inner';
-    innerPopper.innerHTML = data.title || 'TEST';
-    tooltip.appendChild(innerPopper);
+    const innerTooltip = document.createElement('div');
+    innerTooltip.className = 'tooltip-inner';
+    innerTooltip.innerHTML = data.title || 'TEST';
+    tooltip.appendChild(innerTooltip);
 
     return tooltip;
 }
@@ -131,7 +131,7 @@ function setupCloseButtonHandler(tooltip) {
 }
 
 function updateTooltipPosition(element, tooltip, data) {
-    const arrow = tooltip.querySelector('[data-popper-arrow]');
+    const arrow = tooltip.querySelector('[data-tooltip-arrow]');
 
     FloatingUIDOM.computePosition(element, tooltip, {
         placement: data.placements?.[0] || 'auto',
