@@ -283,17 +283,7 @@
     <#if filter.multivalued>
         <#assign filterName = filterName + "_" + valueNumber >
     </#if>
-
-    <input 
-        form="${form}" 
-        type="${type}" 
-        id="${valueID?html}" 
-        value="${filter.id?html + ":" + filterValue.id?html}" 
-        name="${inputName?html}" 
-        style="display:none;" 
-        ${checked} 
-        class="${class}" 
-    >
+    <input form="${form}" type="${type}" id="${valueID?html}" value="${filter.id?html + ":" + filterValue.id?html}" name="${inputName?html}" style="display:none;" ${checked} <#if class?has_content>class="${class}"</#if> >
 </#macro>
 
 <#function getValueID id number>
