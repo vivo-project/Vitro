@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -106,7 +107,7 @@ public class UpdateKnowledgeBase {
 			settings.setInferenceOntModelSelector(ModelAccess.on(ctx).getOntModelSelector(INFERENCES_ONLY));
 			settings.setUnionOntModelSelector(ModelAccess.on(ctx).getOntModelSelector());
 
-		    Path homeDir = ApplicationUtils.instance().getHomeDirectory().getPath();
+		    Path homeDir = Paths.get(ApplicationUtils.instance().getHomeDirectory().getSourcePath());
 			settings.setDisplayModel(ModelAccess.on(ctx).getOntModel(DISPLAY));
 			OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(oldTBoxModelDir()));
 			settings.setOldTBoxModel(oldTBoxModel);
