@@ -38,8 +38,8 @@
 
 
 
-${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/smoothness/jquery-ui-1.12.1.css" />')}
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/smoothness/jquery-ui-1.13.2.css" />')}
 
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/utils.js"></script>',
-              '<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.12.1.min.js"></script>')}
+              '<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.13.2.min.js"></script>')}
 

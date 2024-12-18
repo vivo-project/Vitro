@@ -135,7 +135,7 @@ dojo.lang.extend(dojo.widget.html.DropdownButton, {
 	_onClickButton: function(e) {
 		if ( this.a ) {
 			if ( this.a.click ) {
-				this.a.click();
+				this.a.on("click", );
 			} else if ( this.a.href ) {
 				location.href = this.a.href;
 			}
