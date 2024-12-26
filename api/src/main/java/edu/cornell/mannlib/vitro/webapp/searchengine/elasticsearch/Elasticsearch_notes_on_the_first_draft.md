@@ -66,107 +66,190 @@ git clone -b feature/elasticsearchExperiments https://github.com/j2blake/Vitro.g
 ```
 curl -X PUT "localhost:9200/vivo?pretty" -H 'Content-Type: application/json' -d'
 {
-  "settings": {
-    "index": {
-      "analysis": {
-        "analyzer": {
-          "default": {
-            "type": "english"
+  "settings":{
+    "index":{
+      "analysis":{
+        "tokenizer":{
+          "keyword_tokenizer":{
+            "type":"keyword"
+          },
+          "whitespace_tokenizer":{
+            "type":"whitespace"
+          }
+        },
+        "filter":{
+          "lowercase_filter":{
+            "type":"lowercase"
+          },
+          "edgengram_filter":{
+            "type":"edge_ngram",
+            "min_gram":2,
+            "max_gram":25
+          },
+          "word_delimiter_filter":{
+            "type":"word_delimiter",
+            "generate_word_parts":true,
+            "generate_number_parts":true,
+            "catenate_words":false,
+            "catenate_numbers":false,
+            "catenate_all":false,
+            "split_on_case_change":true
+          },
+          "porter_stem_filter":{
+            "type":"snowball",
+            "language":"English"
+          }
+        },
+        "analyzer":{
+          "default":{
+            "type":"english"
+          },
+          "edgengram_untokenized":{
+            "type":"custom",
+            "tokenizer":"keyword_tokenizer",
+            "filter":[
+              "lowercase_filter",
+              "edgengram_filter"
+            ]
+          },
+          "edgengram_untokenized_query":{
+            "type":"custom",
+            "tokenizer":"keyword_tokenizer",
+            "filter":[
+              "lowercase_filter"
+            ]
+          },
+          "edgengram_stemmed":{
+            "type":"custom",
+            "tokenizer":"whitespace_tokenizer",
+            "filter":[
+              "word_delimiter_filter",
+              "lowercase_filter",
+              "porter_stem_filter",
+              "edgengram_filter"
+            ]
+          },
+          "edgengram_stemmed_query":{
+            "type":"custom",
+            "tokenizer":"whitespace_tokenizer",
+            "filter":[
+              "word_delimiter_filter",
+              "lowercase_filter",
+              "porter_stem_filter"
+            ]
+          },
+          "sort_field_analyzer":{
+            "type":"custom",
+            "tokenizer":"keyword",
+            "filter":[
+              "lowercase"
+            ]
           }
         }
       }
     }
   },
-  "mappings": {
-    "dynamic_templates": [
+  "mappings":{
+    "dynamic_templates":[
       {
-        "field_sort_template": {
-          "match": "*_label_sort",
-          "mapping": {
-            "type": "text",
-            "fields": {
-              "keyword": {
-                "type": "keyword"
+        "field_sort_template":{
+          "match":"*_label_sort",
+          "mapping":{
+            "type":"text",
+            "fields":{
+              "keyword":{
+                "type":"keyword"
               }
             },
-            "fielddata": true
+            "fielddata":true,
+            "analyzer":"sort_field_analyzer"
           }
         }
       },
       {
-        "field_ss_template": {
-          "match": "*_ss",
-          "mapping": {
-            "type": "text",
-            "fields": {
-              "keyword": {
-                "type": "keyword",
-                "ignore_above": 256
+        "field_ss_template":{
+          "match":"*_ss",
+          "mapping":{
+            "type":"text",
+            "fields":{
+              "keyword":{
+                "type":"keyword",
+                "ignore_above":256
               }
             },
-            "fielddata": true
+            "fielddata":true
           }
         }
       },
       {
-        "date_range_template": {
-          "match": "*_drsim",
-          "mapping": {
-            "type": "date_range",
-            "format": "strict_date_optional_time||epoch_millis"
+        "date_range_template":{
+          "match":"*_drsim",
+          "mapping":{
+            "type":"date_range",
+            "format":"strict_date_optional_time||epoch_millis"
           }
         }
       }
     ],
-    "properties": { 
-      "ALLTEXT": { 
-        "type": "text",
-        "analyzer": "english",
-        "fields": {
-	    "keyword": {
-	      "type": "keyword",
-	      "ignore_above": 256
-	    }
-	  }
-      }, 
-      "ALLTEXTUNSTEMMED": { 
-        "type": "text",
-        "analyzer": "standard"
-      }, 
-      "DocId": {
-        "type": "keyword"  
-      }, 
-      "classgroup": {
-        "type": "keyword"  
-      }, 
-      "type": {
-        "type": "keyword"  
-      }, 
-      "mostSpecificTypeURIs": {
-        "type": "keyword"  
-      }, 
-      "indexedTime": { 
-        "type": "long" 
+    "properties":{
+      "ALLTEXT":{
+        "type":"text",
+        "analyzer":"english",
+        "fields":{
+          "keyword":{
+            "type":"keyword",
+            "ignore_above":256
+          }
+        }
       },
-      "nameRaw": { 
-        "type": "keyword" 
+      "ALLTEXTUNSTEMMED":{
+        "type":"text",
+        "analyzer":"standard"
       },
-      "URI": { 
-        "type": "keyword" 
+      "DocId":{
+        "type":"keyword"
       },
-      "THUMBNAIL": { 
-        "type": "integer" 
+      "classgroup":{
+        "type":"keyword"
       },
-      "THUMBNAIL_URL": { 
-        "type": "keyword" 
+      "type":{
+        "type":"keyword"
       },
-      "nameLowercaseSingleValued": {
-        "type": "text",
-        "analyzer": "standard",
-        "fielddata": true
+      "mostSpecificTypeURIs":{
+        "type":"keyword"
       },
-      "BETA" : {
-        "type" : "float"
+      "indexedTime":{
+        "type":"long"
+      },
+      "nameRaw":{
+        "type":"keyword"
+      },
+      "URI":{
+        "type":"keyword"
+      },
+      "THUMBNAIL":{
+        "type":"integer"
+      },
+      "THUMBNAIL_URL":{
+        "type":"keyword"
+      },
+      "nameLowercaseSingleValued":{
+        "type":"text",
+        "analyzer":"standard",
+        "fielddata":true
+      },
+      "BETA":{
+        "type":"float"
+      },
+      "acNameUntokenized":{
+        "type":"text",
+        "analyzer":"edgengram_untokenized",
+        "search_analyzer":"edgengram_untokenized_query"
+      },
+      "acNameStemmed":{
+        "type":"text",
+        "analyzer":"edgengram_stemmed",
+        "search_analyzer":"edgengram_stemmed_query"
       }
     }
   }
