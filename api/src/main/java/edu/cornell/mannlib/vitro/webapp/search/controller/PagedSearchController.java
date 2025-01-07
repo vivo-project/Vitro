@@ -371,7 +371,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                 FilterValue filterValue = searchFilter.getValue(valueName);
                 if (filterValue == null) {
                     filterValue = new FilterValue(valueName);
-                    filterValue.setDisplay(true);
+                    filterValue.setDisplayed(true);
                     searchFilter.addValue(filterValue);
                 }
                 if (requestFiltersById.containsKey(searchFilter.getId())) {

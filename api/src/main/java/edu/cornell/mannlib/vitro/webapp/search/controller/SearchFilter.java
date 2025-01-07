@@ -61,7 +61,7 @@ public class SearchFilter {
     private String type = FILTER;
     private String rangeText = "";
     private String rangeInput = "";
-    private boolean display = false;
+    private boolean displayed = false;
     private Optional<Locale> locale;
     private boolean multilingual;
     private SortOption sortingObjectType = SortOption.labelText;
@@ -390,12 +390,12 @@ public class SearchFilter {
         return true;
     }
 
-    public void setDisplay(boolean b) {
-        this.display = b;
+    public void setDisplayed(boolean b) {
+        this.displayed = b;
     }
 
-    public boolean isDisplay() {
-        return display;
+    public boolean isDisplayed() {
+        return displayed;
     }
 
     public int getMoreLimit() {

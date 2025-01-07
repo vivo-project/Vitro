@@ -14,14 +14,14 @@ public class FilterValue {
 
     private boolean isDefaultValue;
 
-    private boolean display = false;
+    private boolean displayed = false;
 
-    public boolean isDisplay() {
-        return display;
+    public boolean isDisplayed() {
+        return displayed;
     }
 
-    public void setDisplay(boolean value) {
-        display = value;
+    public void setDisplayed(boolean value) {
+        displayed = value;
     }
 
     public FilterValue(String id) {
@@ -72,7 +72,7 @@ public class FilterValue {
         this.selected = value;
     }
 
-    public boolean getSelected() {
+    public boolean isSelected() {
         return selected;
     }
 
