@@ -69,14 +69,14 @@ public class ProcessSearchFilterValuesDataGetterN3 extends ProcessDataGetterAbst
 
     public List<String> retrieveUrisOnForm(int counter) {
         List<String> urisOnForm = new ArrayList<String>();
-        urisOnForm.add(getVarName("filterUri", counter));
+        urisOnForm.add(getVarName(searchFilterVarBase, counter));
         urisOnForm.add(getVarName(classTypeVarBase, counter));
         return urisOnForm;
     }
 
     public List<FieldVTwo> retrieveFields(int counter) {
         List<FieldVTwo> fields = new ArrayList<FieldVTwo>();
-        fields.add(new FieldVTwo().setName(getVarName("filterUri", counter)));
+        fields.add(new FieldVTwo().setName(getVarName(searchFilterVarBase, counter)));
         fields.add(new FieldVTwo().setName(getVarName(classTypeVarBase, counter)));
         return fields;
     }
@@ -86,7 +86,7 @@ public class ProcessSearchFilterValuesDataGetterN3 extends ProcessDataGetterAbst
     }
 
     public List<String> getUriVarNamesBase() {
-        return Arrays.asList("filterUri", classTypeVarBase);
+        return Arrays.asList(searchFilterVarBase, classTypeVarBase);
     }
 
     public String getClassType() {
@@ -108,7 +108,7 @@ public class ProcessSearchFilterValuesDataGetterN3 extends ProcessDataGetterAbst
             ResultSet results = qe.execSelect();
             while (results.hasNext()) {
                 QuerySolution qs = results.nextSolution();
-                Resource classGroupResource = qs.getResource("filterUri");
+                Resource classGroupResource = qs.getResource(searchFilterVarBase);
                 // Put both literals in existing literals
                 existingUriValues.put(this.getVarName(searchFilterVarBase, counter),
                         new ArrayList<String>(Arrays.asList(classGroupResource.getURI())));
@@ -144,7 +144,7 @@ public class ProcessSearchFilterValuesDataGetterN3 extends ProcessDataGetterAbst
             ResultSet results = qe.execSelect();
             while (results.hasNext()) {
                 QuerySolution qs = results.nextSolution();
-                Resource filterUri = qs.getResource("filterUri");
+                Resource filterUri = qs.getResource(searchFilterVarBase);
                 Literal name = qs.getLiteral("filterName");
                 jObject.put("searchFilterUri", filterUri.getURI());
                 jObject.put("searchFilterName", name.getLexicalForm());

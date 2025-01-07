@@ -34,7 +34,7 @@
         <div id="filter-groups" class="tabs">
             <#assign active = true>
             <#list filterGroups as group>
-                <#if group.display >
+                <#if group.displayed >
                     <@searchFormGroupTab group active/>
                     <#assign active = false>
                 </#if>  
@@ -43,7 +43,7 @@
         <div class="tabs filter-area">
             <#assign active = true>
             <#list filterGroups as group>
-                <#if group.display >
+                <#if group.displayed >
                       <@groupFilters group active/>
                       <#assign active = false>
                 </#if>
@@ -72,7 +72,7 @@
                     <#list group.filters as filterId>
                         <#if filters[filterId]??>
                             <#assign f = filters[filterId]>
-                            <#if f.display >
+                            <#if f.displayed >
                                 <@searchFormFilterTab f assignedActive/>  
                                 <#if !assignedActive && (f.selected || emptySearch )>
                                     <#assign assignedActive = true>
@@ -87,7 +87,7 @@
                 <#list group.filters as filterId>
                     <#if filters[filterId]??>
                         <#assign f = filters[filterId]>
-                        <#if f.display >
+                        <#if f.displayed >
                             <@printFilterValues f assignedActive emptySearch/>  
                             <#if !assignedActive && ( f.selected || emptySearch )>
                                 <#assign assignedActive = true>
@@ -105,7 +105,7 @@
         <#list filter.values?values as v>
             <#if v.selected>
                 <@getInput filter v getValueID(filter.id, valueNumber) valueNumber />
-                <#if filter.display>
+                <#if filter.displayed>
                     <@getSelectedLabel getValueID(filter.id, valueNumber)?html v filter v.count />
                 </#if>
             </#if>
@@ -121,7 +121,7 @@
             <select form="search-form" name="sort" id="search-form-sort" onchange="this.form.submit()" >
                 <#assign addDefaultOption = true>
                 <#list sortOptions?values as option>
-                    <#if option.display>
+                    <#if option.displayed>
                         <#if option.selected>
                             <option value="${option.id}" selected="selected">${i18n().search_results_sort_by(option.label)}</option>
                             <#assign addDefaultOption = false>
@@ -185,7 +185,7 @@
                             <#assign additionalLabels = true>
                             <a class="more-facets-link" href="javascript:void(0);" onclick="expandSearchOptions(this)">${i18n().paging_link_more}</a>
                         </#if>
-                        <#if v.display>
+                        <#if v.displayed>
                             <@getInput filter v getValueID(filter.id, valueNumber) valueNumber />
                             <@getLabel getValueID(filter.id, valueNumber)?html v filter v.count additionalLabels />
                         </#if>
