@@ -183,7 +183,7 @@ public class SearchFiltering {
                 SearchFiltering.addRangeFilter(query, searchFilter);
             }
             for (FilterValue fv : searchFilter.getValues().values()) {
-                if (fv.isDefault() || fv.getSelected()) {
+                if (fv.isDefault() || fv.isSelected()) {
                     if (ANY_VALUE.equals(fv.getId())) {
                         query.addFilterQuery(searchFilter.getField() + ":" + ANY_VALUE );
                     } else {
@@ -276,7 +276,7 @@ public class SearchFiltering {
                     filter = createSearchFilter(filtersByField, solution, resultFilterId, resultFieldName, locale);
                 }
                 if (isDisplay(solution, vreq, "filterDisplayLimitRole", "public")) {
-                    filter.setDisplay(true);
+                    filter.setDisplayed(true);
                 }
                 filter.setType(solution.get("filter_type"));
                 filter.setMulitlingual(solution.get("multilingual").asLiteral().getBoolean());
@@ -293,7 +293,7 @@ public class SearchFiltering {
                 }
                 value = filter.getValue(valueId);
                 if (isDisplay(solution, vreq, "valueDisplayLimitRole", "value_public")) {
-                    value.setDisplay(true);
+                    value.setDisplayed(true);
                 }
                 RDFNode role = solution.get("role");
                 if (role != null && role.isResource()) {
@@ -355,7 +355,7 @@ public class SearchFiltering {
                 SearchFiltering.addRangeFilter(query, searchFilter);
             }
             for (FilterValue fv : searchFilter.getValues().values()) {
-                if (fv.isDefault() || fv.getSelected()) {
+                if (fv.isDefault()) {
                     query.addFilterQuery(searchFilter.getField() + ":\"" + fv.getId() + "\"");
                 }
             }
@@ -409,7 +409,7 @@ public class SearchFiltering {
                     groups.put(groupId, group);
                 }
                 if (isDisplay(solution, vreq, "groupDisplayLimitRole", "public")) {
-                    group.setDisplay(true);
+                    group.setDisplayed(true);
                 }
                 group.addFilterId(filterId);
             }
@@ -459,7 +459,7 @@ public class SearchFiltering {
                     }
                     RDFNode display = solution.get("display");
                     if (display != null) {
-                        config.setDisplay(display.asLiteral().getBoolean());
+                        config.setDisplayed(display.asLiteral().getBoolean());
                     }
                     sortConfigurations.put(id, config);
                 }
@@ -582,7 +582,7 @@ public class SearchFiltering {
                             } else {
                                 FilterValue value = new FilterValue(requestValue);
                                 value.setSelected(true);
-                                value.setDisplay(true);
+                                value.setDisplayed(true);
                                 filter.addValue(value);
                             }
                         }
