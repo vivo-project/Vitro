@@ -14,7 +14,7 @@ public class SortConfiguration {
     private String label = "";
     private int order = 0;
     private String fallback;
-    private boolean display = false;
+    private boolean displayed = false;
 
     public SortConfiguration(String id, String label, String field) {
         this.id = id;
@@ -97,11 +97,11 @@ public class SortConfiguration {
         this.fallback = id;
     }
 
-    public void setDisplay(boolean display) {
-        this.display = display;
+    public void setDisplayed(boolean display) {
+        this.displayed = display;
     }
 
-    public boolean isDisplay() {
-        return display;
+    public boolean isDisplayed() {
+        return displayed;
     }
 }

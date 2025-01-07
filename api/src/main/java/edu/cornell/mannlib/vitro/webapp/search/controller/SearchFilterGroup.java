@@ -6,7 +6,7 @@ public class SearchFilterGroup {
 
     private String id;
     private String label;
-    private boolean display = false;
+    private boolean displayed = false;
 
     private LinkedHashSet<String> filters = new LinkedHashSet<>();
 
@@ -43,12 +43,12 @@ public class SearchFilterGroup {
         this.label = label;
     }
 
-    public boolean isDisplay() {
-        return display;
+    public boolean isDisplayed() {
+        return displayed;
     }
 
-    public void setDisplay(boolean display) {
-        this.display = display;
+    public void setDisplayed(boolean display) {
+        this.displayed = display;
     }
 
 }
