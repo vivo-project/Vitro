@@ -6,14 +6,10 @@ public class FilterValue {
 
     private String id;
     private String name = "";
-    private int order;
-
+    private int rank;
     private long count;
-
     private boolean selected = false;
-
     private boolean isDefaultValue;
-
     private boolean displayed = false;
 
     public boolean isDisplayed() {
@@ -46,13 +42,13 @@ public class FilterValue {
         }
     }
 
-    public Integer getOrder() {
-        return order;
+    public Integer getRank() {
+        return rank;
     }
 
-    public void setOrder(RDFNode rdfNode) {
+    public void setRank(RDFNode rdfNode) {
         if (rdfNode != null) {
-            order = rdfNode.asLiteral().getInt();
+            rank = rdfNode.asLiteral().getInt();
         }
     }
 

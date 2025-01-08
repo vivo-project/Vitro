@@ -516,7 +516,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             log.error(String.format("Sort field is not set for '%s'", conf.getId()));
             return;
         }
-        query.addSortField(field, conf.getSortOrder());
+        query.addSortField(field, conf.getSortDirection());
         if (sortOptions.containsKey(conf.getFallback())) {
             addSortField(vreq, query, sortOptions.get(conf.getFallback()), sortOptions, appliedSortOptions);
         }
