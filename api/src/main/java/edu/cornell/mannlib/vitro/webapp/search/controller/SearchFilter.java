@@ -17,6 +17,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery.Order;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,7 +47,7 @@ public class SearchFilter {
     private String min = "0";
     private String max = "2000";
     private int moreLimit = 30;
-    private int order = 0;
+    private int rank = 0;
     private String field = "";
     private String endField = "";
     private String inputText = "";
@@ -57,14 +58,14 @@ public class SearchFilter {
     private Map<String, FilterValue> values = new LinkedHashMap<>();
     private boolean inputRegex = false;
     private boolean facetsRequired;
-    private boolean descendingOrder;
+    private Order valueSortDirection = Order.ASC;
     private String type = FILTER;
     private String rangeText = "";
     private String rangeInput = "";
     private boolean displayed = false;
     private Optional<Locale> locale;
     private boolean multilingual;
-    private SortOption sortingObjectType = SortOption.labelText;
+    private SortOption sortOption = SortOption.labelText;
 
     public String getRangeInput() {
         return rangeInput;
@@ -93,14 +94,14 @@ public class SearchFilter {
         }
     }
 
-    public void setOrder(RDFNode rdfNode) {
+    public void setRank(RDFNode rdfNode) {
         if (rdfNode != null) {
-            order = rdfNode.asLiteral().getInt();
+            rank = rdfNode.asLiteral().getInt();
         }
     }
 
-    public Integer getOrder() {
-        return order;
+    public Integer getRank() {
+        return rank;
     }
 
     public String getField() {
@@ -312,10 +313,10 @@ public class SearchFilter {
             FilterValue first = obj1.getValue();
             FilterValue second = obj2.getValue();
             // sort by order first
-            int result = first.getOrder().compareTo(second.getOrder());
+            int result = first.getRank().compareTo(second.getRank());
             if (result == 0) {
                 result = compareByObjectType(first, second);
-                if (descendingOrder) {
+                if (valueSortDirection.equals(Order.DESC)) {
                     result = -result;
                 }
             }
@@ -324,7 +325,7 @@ public class SearchFilter {
 
         private int compareByObjectType(FilterValue first, FilterValue second) {
             int result;
-            switch (sortingObjectType) {
+            switch (sortOption) {
                 case hitsCount:
                     result = Long.compare(first.getCount(), second.getCount());
                     break;
@@ -410,15 +411,19 @@ public class SearchFilter {
         this.multilingual = multilingual;
     }
 
-    public void setDescendingValuesOrder(boolean descendingOrder) {
-        this.descendingOrder = descendingOrder;
+    public void setValueSortDirection(boolean isDescending) {
+        if (isDescending) {
+            this.valueSortDirection = Order.DESC;
+        } else {
+            this.valueSortDirection = Order.ASC;
+        }
     }
 
-    public void setSortingObjectType(String uri) {
+    public void setSortOption(String uri) {
         if (uri.startsWith(VITRO_SEARCH_INDIVIDUAL)) {
             String optionName = uri.substring(VITRO_SEARCH_INDIVIDUAL.length());
             try {
-                sortingObjectType = SortOption.valueOf(optionName);
+                sortOption = SortOption.valueOf(optionName);
             } catch (Exception e) {
                 log.error(e, e);
             }

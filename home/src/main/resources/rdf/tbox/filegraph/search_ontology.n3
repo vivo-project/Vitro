@@ -41,6 +41,8 @@ search:PublicParameter  a             owl:Class .
 
 search:SearchField  a                 owl:Class .
 
+search:SortDirection  a               owl:Class .
+
 search:SortingObjectType  a           owl:Class .
 
 search:FilterValue  a                 owl:Class ;
@@ -62,10 +64,6 @@ search:multivalued  a                 owl:DatatypeProperty , owl:FunctionalPrope
         rdfs:domain                   search:SearchField ;
         rdfs:range                    xsd:boolean .
 
-search:isAscending  a                 owl:DatatypeProperty , owl:FunctionalProperty ;
-        rdfs:domain                   search:Sort ;
-        rdfs:range                    xsd:boolean .
-
 search:indexField  a                  owl:DatatypeProperty , owl:FunctionalProperty ;
         rdfs:domain                   search:SearchField ;
         rdfs:range                    xsd:string .
@@ -83,6 +81,15 @@ search:isLanguageSpecific
         rdfs:domain                   search:SearchField ;
         rdfs:range                    xsd:boolean .
 
+search:direction  a                   owl:ObjectProperty , owl:FunctionalProperty ;
+        rdfs:domain                   [ rdf:type owl:Class ;
+                                        owl:unionOf ( 
+                                            search:Sort
+                                            search:Filter
+                                        )
+                                      ] ;
+        rdfs:range                    search:SortDirection .
+
 search:filterField  a                 owl:ObjectProperty , owl:FunctionalProperty ;
         rdfs:domain                   search:Filter ;
         rdfs:range                    search:SearchField .
@@ -91,7 +98,7 @@ search:isUriValues  a                 owl:DatatypeProperty , owl:FunctionalPrope
         rdfs:domain                   search:Filter ;
         rdfs:range                    xsd:boolean .
 
-search:order  a                       owl:FunctionalProperty , owl:DatatypeProperty ;
+search:rank  a                        owl:FunctionalProperty , owl:DatatypeProperty ;
         rdfs:domain                   search:PublicParameter ;
         rdfs:range                    xsd:integer .
 

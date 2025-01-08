@@ -6,7 +6,7 @@
 :filter_group_search_filters  a    vitro-search:FilterGroup ;
         vitro-search:contains      :filter_category , :filter_type ;
         vitro-search:id            "main" ;
-        vitro-search:order         1 ;
+        vitro-search:rank          1 ;
         vitro-search:public        true .
 
 :filter_type  a                    vitro-search:Filter ;
@@ -14,7 +14,7 @@
         vitro-search:filterField   :field_type ;
         vitro-search:id            "type" ;
         vitro-search:isUriValues   true ;
-        vitro-search:order         30 ;
+        vitro-search:rank          30 ;
         vitro-search:public        false .
 
 :filter_category
@@ -48,44 +48,50 @@
 
 :filter_querytext
         a                          vitro-search:Filter ;
-        vitro-search:order         1 ;
+        vitro-search:rank          1 ;
         vitro-search:filterField   :field_querytext ;
         vitro-search:userInput     true ;
         vitro-search:id            "querytext" ;
         vitro-search:public        true .
 
+:ascending
+        a                          vitro-search:SortDirection .
+
+:descending
+        a                          vitro-search:SortDirection .
+
 :sort_title_desc  a                vitro-search:Sort ;
-        vitro-search:isAscending   false ;
+        vitro-search:direction     :descending  ;
         vitro-search:hasFallback   :sort_name_raw_desc ;
-        vitro-search:order         30 ;
+        vitro-search:rank          30 ;
         vitro-search:sortField     :field_label_sort ;
         vitro-search:display       true ;
         vitro-search:id            "titledesc" .
 
 :sort_title_asc  a                 vitro-search:Sort ;
-        vitro-search:isAscending   true ;
+        vitro-search:direction     :ascending  ;
         vitro-search:hasFallback   :sort_name_raw_asc ;
-        vitro-search:order         20 ;
+        vitro-search:rank          20 ;
         vitro-search:sortField     :field_label_sort ;
         vitro-search:display       true ;
         vitro-search:id            "titleasc" .
 
 :sort_name_raw_desc  a             vitro-search:Sort ;
-        vitro-search:isAscending   false ;
-        vitro-search:order         50 ;
+        vitro-search:direction     :descending  ;
+        vitro-search:rank          50 ;
         vitro-search:sortField     :field_name_raw ;
         vitro-search:id            "name_raw_desc" .
 
 :sort_name_raw_asc  a                vitro-search:Sort ;
-        vitro-search:isAscending   true ;
-        vitro-search:order         40 ;
+        vitro-search:direction     :ascending  ;
+        vitro-search:rank          40 ;
         vitro-search:sortField     :field_name_raw ;
         vitro-search:id            "name_raw_asc" .
 
 :sort_by_relevance a                vitro-search:Sort ;
         vitro-search:sortField     :field_score ;
         vitro-search:display       true ;
-        vitro-search:order         60 ;
+        vitro-search:rank          60 ;
         vitro-search:id            "relevance" .
 
 :field_score
