@@ -65,7 +65,7 @@
 <#macro filterTab filterId>
     <#if filters[filterId]?? >
         <#assign filter = filters[filterId] >
-        <#if filter.display >
+        <#if filter.displayed>
             <#assign filterValues><@getValues filter /></#assign>
             <#if filterValues?has_content>
                 <li class="filter-tab">
@@ -116,7 +116,7 @@
 <#macro filterFacets f >
     <#assign idCounter = 1 >
     <#list f.values?values as value>
-        <#if !value.display>
+        <#if !value.displayed>
             <#continue>
         </#if>
         <#assign valueLabel = value.name >
@@ -227,7 +227,7 @@
             <#list sortOptionIds as sortOptionId>
                 <#if sortOptions[sortOptionId]??>
                     <#assign option = sortOptions[sortOptionId]>
-                    <#if option.display>
+                    <#if option.displayed>
                         <#if option.selected>
                             <option value="${option.id}" selected="selected">${i18n().search_results_sort_by(option.label)}</option>
                             <#assign addDefaultOption = false>
