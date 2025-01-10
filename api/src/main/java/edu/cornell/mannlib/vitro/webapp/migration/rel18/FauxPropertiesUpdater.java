@@ -78,8 +78,7 @@ public class FauxPropertiesUpdater {
 	}
 
 	private boolean locateFile() {
-		String homePath = ApplicationUtils.instance().getHomeDirectory()
-				.getPath().toString();
+		String homePath = ApplicationUtils.instance().getHomeDirectory().getSourcePath();
 		propertyConfigPath = Paths.get(homePath, PATH_TO_PROPERTY_CONFIG);
 		if (Files.exists(propertyConfigPath)) {
 			return true;
