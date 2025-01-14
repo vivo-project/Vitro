@@ -21,6 +21,7 @@ import edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.SelectF
 import edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.SelectFromGraphDistributor;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
@@ -30,6 +31,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import edu.cornell.mannlib.vitro.webapp.dao.DataDistributorDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ReportingDao;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.RequestModelAccess;
 import edu.cornell.mannlib.vitro.webapp.reporting.AbstractTemplateReport;
 import edu.cornell.mannlib.vitro.webapp.reporting.DataDistributorEndpoint;
 import edu.cornell.mannlib.vitro.webapp.reporting.DataSource;
@@ -392,9 +395,10 @@ public class ReportingController extends FreemarkerHttpServlet {
         try {
             // Set the content type for this report
             response.setContentType(report.getContentType());
-
+            UserAccount account = PolicyHelper.getUserAccount(vreq);
+            RequestModelAccess rma = ModelAccess.on(vreq);
             // Generate the report directly into the output stream
-            report.generateReport(response.getOutputStream());
+            report.generateReport(response.getOutputStream(), rma, account);
         } catch (IOException | ReportGeneratorException e) {
             log.error("Unable to generate the report", e);
         }
@@ -445,7 +449,7 @@ public class ReportingController extends FreemarkerHttpServlet {
                 response.setContentType("text/xml");
 
                 // Get the xml from the report
-                Document xml = ((XmlGenerator) report).generateXml();
+                Document xml = ((XmlGenerator) report).generateXml(ModelAccess.on(vreq), PolicyHelper.getUserAccount(vreq));
 
                 // Create an xml serializer
                 DOMImplementationRegistry registry = DOMImplementationRegistry.newInstance();

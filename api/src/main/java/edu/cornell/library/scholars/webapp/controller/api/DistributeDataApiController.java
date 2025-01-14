@@ -75,6 +75,10 @@ public class DistributeDataApiController extends VitroApiServlet {
             action = action.substring(1);
         }
 
+        return findDistributorUri(model, action);
+    }
+
+    public static String findDistributorUri(Model model, String action) throws NoSuchActionException {
         List<String> uris = createSelectQueryContext(model, DISTRIBUTOR_FOR_SPECIFIED_ACTION)
                 .bindVariableToPlainLiteral("action", action).execute().toStringFields("distributor").flatten();
         Collections.sort(uris);
@@ -94,6 +98,15 @@ public class DistributeDataApiController extends VitroApiServlet {
             throws ActionFailedException {
         try {
             return new ConfigurationBeanLoader(model, req).loadInstance(distributorUri, DataDistributor.class);
+        } catch (ConfigurationBeanLoaderException e) {
+            throw new ActionFailedException("Failed to instantiate the DataDistributor: " + distributorUri, e);
+        }
+    }
+
+    public static DataDistributor instantiateDistributor(String distributorUri, Model model)
+            throws ActionFailedException {
+        try {
+            return new ConfigurationBeanLoader(model).loadInstance(distributorUri, DataDistributor.class);
         } catch (ConfigurationBeanLoaderException e) {
             throw new ActionFailedException("Failed to instantiate the DataDistributor: " + distributorUri, e);
         }

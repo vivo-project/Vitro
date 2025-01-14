@@ -16,6 +16,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.RequestModelAccess;
 import org.docx4j.Docx4J;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
@@ -39,7 +41,7 @@ public class OpenDopeWordReport extends AbstractTemplateReport implements XmlGen
      * Xml document is required for passing to the Docx4j library
      */
     @Override
-    public Document generateXml() throws ReportGeneratorException {
+    public Document generateXml(RequestModelAccess request, UserAccount account) throws ReportGeneratorException {
         try {
             DocumentBuilder xmlBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document xmlDoc = xmlBuilder.newDocument();
@@ -50,7 +52,7 @@ public class OpenDopeWordReport extends AbstractTemplateReport implements XmlGen
             // Execute all datasources
             for (DataSource dataSource : dataSources) {
                 // Get the result of the datasource
-                String body = dataSource.getBody(new HashMap<>());
+                String body = dataSource.getBody(new HashMap<>(), request, account);
 
                 // Load the JSON document
                 JsonFactory factory = new JsonFactory();
@@ -111,9 +113,9 @@ public class OpenDopeWordReport extends AbstractTemplateReport implements XmlGen
     }
 
     @Override
-    public void generateReport(OutputStream outputStream) throws ReportGeneratorException {
+    public void generateReport(OutputStream outputStream, RequestModelAccess request, UserAccount account) throws ReportGeneratorException {
         // Get the XML
-        Document xmlDoc = generateXml();
+        Document xmlDoc = generateXml(request, account);
         try {
             // Create a word processing package from the template
             WordprocessingMLPackage wordMLPackage = Docx4J.load(new ByteArrayInputStream(template));
