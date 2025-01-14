@@ -168,9 +168,9 @@ public class UploadedFileHelper {
 
 			ApplicationBean applicationBean = applicationDao.getApplicationBean();
 			if (predicateUri.endsWith("#portalLogo")) {
-				applicationBean.setLogoUrl(null));
+				applicationBean.setLogoUrl(null);
 			} else if (predicateUri.endsWith("#portalLogoSmall")) {
-				applicationBean.setLogoSmallUrl(null));
+				applicationBean.setLogoSmallUrl(null);
 			}
 			applicationDao.updateApplicationBean(applicationBean);
 
