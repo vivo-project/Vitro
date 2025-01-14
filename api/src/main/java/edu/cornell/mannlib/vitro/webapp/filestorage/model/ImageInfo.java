@@ -36,6 +36,11 @@ public class ImageInfo {
 	 */
 	public static ImageInfo instanceFromEntityUri(
 			WebappDaoFactory webappDaoFactory, Individual entity) {
+		return instanceFromEntityUriAtPredicate(webappDaoFactory, entity, null);
+	}
+
+	public static ImageInfo instanceFromEntityUriAtPredicate(
+			WebappDaoFactory webappDaoFactory, Individual entity, String predicateUri) {
 		if (webappDaoFactory == null) {
 			throw new NullPointerException("webappDaoFactory may not be null.");
 		}
@@ -46,7 +51,14 @@ public class ImageInfo {
 
 		IndividualDao individualDao = webappDaoFactory.getIndividualDao();
 
-		String mainImageUri = entity.getMainImageUri();
+		String mainImageUri;
+
+		if (predicateUri == null) {
+			mainImageUri = entity.getMainImageUri();
+		} else {
+			mainImageUri = entity.getDataValue(predicateUri);
+		}
+
 		if (mainImageUri == null) {
 			log.debug("Entity '" + entity.getURI()
 					+ "' had no associated main image.");

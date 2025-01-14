@@ -31,6 +31,8 @@ public class ApplicationBean {
 
     // Default initializations, which may be overwritten in the AppBeanMapper
     // but are otherwise not changed there
+    private String    individualUri;
+
     private boolean   initialized             = false;
     private String    sessionIdStr            = null;
     private String    applicationName         = DEFAULT_APPLICATION_NAME;
@@ -48,6 +50,17 @@ public class ApplicationBean {
     private String    copyrightURL;
     private String    copyrightAnchor;
     private String    themeDir;
+    private String    themePrimaryColorLighter;
+    private String    themePrimaryColor;
+    private String    themePrimaryColorDarker;
+    private String    themeBannerColor;
+    private String    themeSecondaryColor;
+    private String    themeAccentColor;
+    private String    themeTextColor;
+    private String    themeLinkColor;
+
+    private String    logoUrl;
+    private String    logoSmallUrl;
 
     public String toString() {
         String output = "Application Bean Contents:\n";
@@ -63,6 +76,10 @@ public class ApplicationBean {
     }
 
     /*************************** SET functions ****************************/
+
+    public void setIndividualUri( String string_val ) {
+        individualUri = string_val;
+    }
 
     public void setSessionIdStr( String string_val ) {
         sessionIdStr = string_val;
@@ -116,7 +133,51 @@ public class ApplicationBean {
 		themeDir = string_val;
 	}
 
+    public void setThemePrimaryColorLighter(String string_val) {
+        themePrimaryColorLighter = string_val;
+    }
+
+    public void setThemePrimaryColor(String string_val) {
+        themePrimaryColor = string_val;
+    }
+
+    public void setThemePrimaryColorDarker(String string_val) {
+        themePrimaryColorDarker = string_val;
+    }
+
+    public void setThemeBannerColor(String string_val) {
+        themeBannerColor = string_val;
+    }
+
+    public void setThemeSecondaryColor(String string_val) {
+        themeSecondaryColor = string_val;
+    }
+
+    public void setThemeAccentColor(String string_val) {
+        themeAccentColor = string_val;
+    }
+
+    public void setThemeTextColor(String string_val) {
+        themeTextColor = string_val;
+    }
+
+    public void setThemeLinkColor(String string_val) {
+        themeLinkColor = string_val;
+    }
+
+    public void setLogoUrl(String string_val) {
+        logoUrl = string_val;
+    }
+
+    public void setLogoSmallUrl(String string_val) {
+        logoSmallUrl = string_val;
+    }
+
     /*************************** GET functions ****************************/
+
+    public String getIndividualUri() {
+        return individualUri;
+    }
 
     public String getSessionIdStr() {
         return sessionIdStr;
@@ -164,6 +225,46 @@ public class ApplicationBean {
 
     public String getCopyrightAnchor() {
         return copyrightAnchor;
+    }
+
+    public String getThemePrimaryColorLighter() {
+        return themePrimaryColorLighter;
+    }
+
+    public String getThemePrimaryColor() {
+        return themePrimaryColor;
+    }
+
+    public String getThemePrimaryColorDarker() {
+        return themePrimaryColorDarker;
+    }
+
+    public String getThemeBannerColor() {
+        return themeBannerColor;
+    }
+
+    public String getThemeSecondaryColor() {
+        return themeSecondaryColor;
+    }
+
+    public String getThemeAccentColor() {
+        return themeAccentColor;
+    }
+
+    public String getThemeTextColor() {
+        return themeTextColor;
+    }
+
+    public String getThemeLinkColor() {
+        return themeLinkColor;
+    }
+
+    public String getLogoUrl() {
+        return logoUrl;
+    }
+
+    public String getLogoSmallUrl() {
+        return logoSmallUrl;
     }
 
     // TODO deprecate or remove the following three legacy methods?

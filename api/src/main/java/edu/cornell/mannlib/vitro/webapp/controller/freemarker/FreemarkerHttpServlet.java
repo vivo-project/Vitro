@@ -476,6 +476,18 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
         map.put("headScripts", new Tags().wrap());
         map.put("metaTags", new Tags().wrap());
 
+        map.put("themePrimaryColorLighter", vreq.getAppBean().getThemePrimaryColorLighter());
+        map.put("themePrimaryColor", vreq.getAppBean().getThemePrimaryColor());
+        map.put("themePrimaryColorDarker", vreq.getAppBean().getThemePrimaryColorDarker());
+        map.put("themeBannerColor", vreq.getAppBean().getThemeBannerColor());
+        map.put("themeSecondaryColor", vreq.getAppBean().getThemeSecondaryColor());
+        map.put("themeAccentColor", vreq.getAppBean().getThemeAccentColor());
+        map.put("themeTextColor", vreq.getAppBean().getThemeTextColor());
+        map.put("themeLinkColor", vreq.getAppBean().getThemeLinkColor());
+
+        map.put("logoUrl", vreq.getAppBean().getLogoUrl());
+        map.put("logoSmallUrl", vreq.getAppBean().getLogoSmallUrl());
+
         return map;
     }
 

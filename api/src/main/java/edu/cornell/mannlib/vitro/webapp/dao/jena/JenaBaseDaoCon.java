@@ -90,12 +90,23 @@ public class JenaBaseDaoCon {
 
     protected  OntClass           PORTAL = _constModel.createClass(VitroVocabulary.PORTAL);
     protected  DatatypeProperty   APPLICATION_THEMEDIR = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_THEMEDIR);
+    protected  DatatypeProperty   APPLICATION_THEMEPRIMARYCOLORLIGHTER = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_THEMEPRIMARYCOLORLIGHTER);
+    protected  DatatypeProperty   APPLICATION_THEMEPRIMARYCOLOR = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_THEMEPRIMARYCOLOR);
+    protected  DatatypeProperty   APPLICATION_THEMEPRIMARYCOLORDARKER = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_THEMEPRIMARYCOLORDARKER);
+    protected  DatatypeProperty   APPLICATION_THEMEBANNERCOLOR = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_THEMEBANNERCOLOR);
+    protected  DatatypeProperty   APPLICATION_THEMESECONDARYCOLOR = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_THEMESECONDARYCOLOR);
+    protected  DatatypeProperty   APPLICATION_THEMEACCENTCOLOR = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_THEMEACCENTCOLOR);
+    protected  DatatypeProperty   APPLICATION_THEMETEXTCOLOR = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_THEMETEXTCOLOR);
+    protected  DatatypeProperty   APPLICATION_THEMELINKCOLOR = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_THEMELINKCOLOR);
     protected  DatatypeProperty   APPLICATION_CONTACTMAIL = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_CONTACTMAIL);
     protected  DatatypeProperty   APPLICATION_CORRECTIONMAIL = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_CORRECTIONMAIL);
     protected  DatatypeProperty   APPLICATION_ABOUTTEXT = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_ABOUTTEXT);
     protected  DatatypeProperty   APPLICATION_ACKNOWLEGETEXT = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_ACKNOWLEGETEXT);
     protected  DatatypeProperty   APPLICATION_COPYRIGHTURL = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_COPYRIGHTURL);
     protected  DatatypeProperty   APPLICATION_COPYRIGHTANCHOR = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_COPYRIGHTANCHOR);
+
+    protected  DatatypeProperty   APPLICATION_LOGOURL = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_LOGOURL);
+    protected  DatatypeProperty   APPLICATION_LOGOSMALLURL = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_LOGOSMALLURL);
 
     protected AnnotationProperty  ONTOLOGY_PREFIX_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.ONTOLOGY_PREFIX_ANNOT);
 

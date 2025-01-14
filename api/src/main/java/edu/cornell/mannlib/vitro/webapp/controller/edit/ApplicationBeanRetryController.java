@@ -11,6 +11,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,6 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 
 public class ApplicationBeanRetryController extends BaseEditController {
 
@@ -89,6 +91,9 @@ public class ApplicationBeanRetryController extends BaseEditController {
         request.setAttribute("title","Site Information");
         request.setAttribute("_action",action);
         request.setAttribute("unqualifiedClassName","ApplicationBean");
+
+        request.setAttribute("updateLogoUrl", UrlBuilder.getUrl("uploadImages", new ParamMap("entityUri", applicationForEditing.getIndividualUri(), "photoType", "portalLogo")));
+        request.setAttribute("updateSmallLogoUrl", UrlBuilder.getUrl("uploadImages", new ParamMap("entityUri", applicationForEditing.getIndividualUri(), "photoType", "portalLogoSmall")));
         setRequestAttributes(request,epo);
 
         try {
