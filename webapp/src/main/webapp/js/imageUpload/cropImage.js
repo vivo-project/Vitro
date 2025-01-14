@@ -1,18 +1,62 @@
 /* $This file is distributed under the terms of the license in LICENSE$ */
 
+function enforceAspectRatio(c) {
+	const aspectRatio = c.w / c.h;
+
+	if (aspectRatio < 1) {				
+		c.w = c.h; // Force 1:1		
+		if (this.setSelect) this?.setSelect([c.x, c.y, c.x + c.w, c.y + c.h]);
+
+	} else if (aspectRatio > 7.5) {
+		c.h = c.w / 7.45; // Force 1:2
+		if (this.setSelect) this?.setSelect([c.x, c.y, c.x + c.w, c.y + c.h]);
+	}
+
+	return;
+}
+
+
 (function($) {
 
 	$(window).on("load", function(){
 
+
+
+		var urlParams = new URLSearchParams(window.location.search);
+		var photoType = urlParams.get('photoType');
+		let aspectRatio = 1;
+		let minSize = [ 115, 115 ]
+
+		let checkRatio = undefined
+		if (photoType === 'portalLogo') {
+			aspectRatio = undefined
+			minSize = [ 48, 48 ]
+			checkRatio = enforceAspectRatio
+		}
+
+		
 		var jcrop_api = $.Jcrop('#cropbox',{
 			/*onChange: showPreview,*/
 			onSelect: showPreview,
 			setSelect:   [ 0, 0, 115, 115 ],
-			minSize: [ 115, 115 ],
+			minSize: minSize,
 			boxWidth: 650,
-			aspectRatio: 1
+			onChange: onCropChange,
+			onSelect: onCropSelect,
+			aspectRatio: aspectRatio
 
 		});
+
+
+		function onCropChange(c) {			
+			checkRatio?.call(this,c)
+		}
+
+		function onCropSelect(c) {
+			checkRatio?.call(this,c)
+			showPreview(c)
+		}
+
 
 
 

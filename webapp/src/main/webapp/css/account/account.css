@@ -274,7 +274,7 @@ section.proxy-profile h4 {
     float: right;
     margin-right: 1em;
     margin-bottom: 1em;
-    background-color: #317e95;
+    background-color: var(--secondary-color, #317e95);
 }
 #add-relation input.pos-submit:hover {
     background-color: #87b4c1;

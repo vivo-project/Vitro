@@ -704,7 +704,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
             List<DataPropertyStatement> stmts = sparqlForDataPropertyStatements(
                     propertyUri);
             if (stmts != null && stmts.size() > 0) {
-                return stmts.get(0).getData();
+                return stmts.get(stmts.size()-1).getData();
             }
         }
         return null; // not found
