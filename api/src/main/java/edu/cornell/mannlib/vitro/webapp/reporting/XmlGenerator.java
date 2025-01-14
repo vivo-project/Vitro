@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.reporting;
 
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.RequestModelAccess;
 import org.w3c.dom.Document;
 
 /**
@@ -9,5 +11,5 @@ import org.w3c.dom.Document;
  * document
  */
 public interface XmlGenerator {
-    Document generateXml() throws ReportGeneratorException;
+    Document generateXml(RequestModelAccess request, UserAccount account) throws ReportGeneratorException;
 }

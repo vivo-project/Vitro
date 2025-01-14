@@ -16,6 +16,8 @@ import com.haulmont.yarg.structure.ReportOutputType;
 import com.haulmont.yarg.structure.impl.BandBuilder;
 import com.haulmont.yarg.structure.impl.ReportBuilder;
 import com.haulmont.yarg.structure.impl.ReportTemplateBuilder;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.RequestModelAccess;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -26,7 +28,8 @@ public abstract class AbstractYARGTemplateReport extends AbstractTemplateReport 
     /**
      * Generate the report
      */
-    protected void generateReport(OutputStream outputStream, String name, ReportOutputType type) {
+    protected void generateReport(OutputStream outputStream, String name, ReportOutputType type,
+            RequestModelAccess request, UserAccount account) {
         // Create a new report builder and template
         ReportBuilder reportBuilder = new ReportBuilder();
         ReportTemplateBuilder reportTemplateBuilder = new ReportTemplateBuilder();
@@ -48,7 +51,7 @@ public abstract class AbstractYARGTemplateReport extends AbstractTemplateReport 
         Map<String, Object> params = new HashMap<String, Object>();
         for (DataSource dataSource : getDataSources()) {
             // Get the output of the datasource
-            String body = dataSource.getBody(new HashMap<>());
+            String body = dataSource.getBody(new HashMap<>(), request, account);
             if (!StringUtils.isEmpty(body)) {
                 // Bind the output to the name given in the datasource configuration
                 params.put(dataSource.getOutputName(), body);

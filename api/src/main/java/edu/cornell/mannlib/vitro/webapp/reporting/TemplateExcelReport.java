@@ -5,6 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.reporting;
 import java.io.OutputStream;
 
 import com.haulmont.yarg.structure.ReportOutputType;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.RequestModelAccess;
 
 /**
  * Generate an Excel report using the YARG template processor
@@ -17,7 +19,7 @@ public class TemplateExcelReport extends AbstractYARGTemplateReport {
     }
 
     @Override
-    public void generateReport(OutputStream outputStream) throws ReportGeneratorException {
-        generateReport(outputStream, "report.xlsx", ReportOutputType.xlsx);
+    public void generateReport(OutputStream outputStream, RequestModelAccess request, UserAccount account) throws ReportGeneratorException {
+        generateReport(outputStream, "report.xlsx", ReportOutputType.xlsx, request, account);
     }
 }

@@ -5,61 +5,44 @@ package edu.cornell.mannlib.vitro.webapp.reporting;
 import static edu.cornell.mannlib.vitro.webapp.dao.ReportingDao.PROPERTY_DISTRIBUTORNAME;
 import static edu.cornell.mannlib.vitro.webapp.dao.ReportingDao.PROPERTY_DISTRIBUTORRANK;
 import static edu.cornell.mannlib.vitro.webapp.dao.ReportingDao.PROPERTY_OUTPUTNAME;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
 
-import java.io.IOException;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
+import java.io.ByteArrayOutputStream;
 import java.util.Map;
 
-import javax.net.ssl.SSLContext;
-
+import edu.cornell.library.scholars.webapp.controller.api.DistributeDataApiController;
+import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor;
+import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContextImpl;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.RequestModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.jena.rdf.model.Model;
+
 
 /**
  * Defines a datasource for the report
  */
 public class DataSource {
+
+    private static final Log log = LogFactory.getLog(DataSource.class);
     private String distributorName;
     private String outputName;
     private int rank;
 
-    public String getBody(Map<String, String[]> parameterMap) {
-        // Currently, only supporting the default endpoint. Eventually, this might be
-        // configurable
-        // so that the api of other installations can be used in a report
-        DataDistributorEndpoint endpoint = DataDistributorEndpoint.getDefault();
-        URI myUri = endpoint.generateUri(distributorName, null);
-
+    public String getBody(Map<String, String[]> parameters, RequestModelAccess request, UserAccount account) {
+        Model model = request.getOntModel(DISPLAY);
         try {
-            SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, (certificate, authType) -> true)
-                    .build();
-            HttpClient httpClient = HttpClients.custom().setSSLContext(sslContext)
-                    .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE).build();
-            HttpResponse sourceResponse = httpClient.execute(new HttpGet(myUri));
-            return IOUtils.toString(sourceResponse.getEntity().getContent(), StandardCharsets.UTF_8);
-        } catch (NoSuchAlgorithmException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (KeyManagementException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (KeyStoreException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            String uri = DistributeDataApiController.findDistributorUri(model, distributorName);
+            DataDistributor instance = DistributeDataApiController.instantiateDistributor(uri, model);
+            instance.init(new DataDistributorContextImpl(request, parameters, account));
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            instance.writeOutput(baos);
+            return baos.toString();
+        } catch (Exception e) {
+            log.error(e, e);
         }
-
         return null;
     }
 

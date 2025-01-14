@@ -5,6 +5,9 @@ package edu.cornell.mannlib.vitro.webapp.reporting;
 import java.io.OutputStream;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.RequestModelAccess;
+
 /**
  * Interface for all reports
  */
@@ -31,7 +34,7 @@ public interface ReportGenerator {
      * @param outputStream Stream to write report into
      * @throws ReportGeneratorException
      */
-    void generateReport(OutputStream outputStream) throws ReportGeneratorException;
+    void generateReport(OutputStream outputStream, RequestModelAccess request, UserAccount account) throws ReportGeneratorException;
 
     void setIsPersistent(boolean isPersistent);
 
