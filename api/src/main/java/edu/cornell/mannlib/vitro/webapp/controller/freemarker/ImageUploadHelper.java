@@ -296,17 +296,27 @@ public class ImageUploadHelper {
 	 * If this entity already had a main image, remove it. If the image and the
 	 * thumbnail are no longer used by anyone, throw them away.
 	 */
+
+	void removeExistingImageAtPredicate(Individual person, String predicateUri) {
+		uploadedFileHelper.removeMainImage(person, predicateUri);
+	}
+
 	void removeExistingImage(Individual person) {
-		uploadedFileHelper.removeMainImage(person);
+		removeExistingImageAtPredicate(person, null);
 	}
 
 	/**
 	 * Store the image on the entity, and the thumbnail on the image.
 	 */
+	void storeImageFilesAtPredicate(Individual entity, FileInfo newImage,
+						 FileInfo thumbnail, String predicateUri) {
+		uploadedFileHelper.setImagesOnEntityAtPredicate(entity.getURI(), newImage,
+				thumbnail, predicateUri);
+	}
+
 	void storeImageFiles(Individual entity, FileInfo newImage,
 			FileInfo thumbnail) {
-		uploadedFileHelper.setImagesOnEntity(entity.getURI(), newImage,
-				thumbnail);
+		storeImageFilesAtPredicate(entity, newImage, thumbnail, null);
 	}
 
 	/**
