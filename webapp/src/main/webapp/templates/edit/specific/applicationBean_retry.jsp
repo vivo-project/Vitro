@@ -40,6 +40,10 @@
             <form:option name="ThemeDir" />
         </select>
 
+        <br><br>
+        <a href="${siteStyleUrl}">Change CSS Styles</a>
+        <br><br>
+
         <label>Copyright text<span class="note"> used in footer (e.g., name of your institution)</span></label>
         <input type="text" name="CopyrightAnchor" value="<form:value name="CopyrightAnchor"/>" ${longField} maxlength="120" size="40" />
         <c:set var="CopyrightAnchorError"><form:error name="CopyrightAnchor"/></c:set>
