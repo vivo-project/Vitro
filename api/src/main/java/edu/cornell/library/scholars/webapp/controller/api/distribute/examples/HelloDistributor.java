@@ -2,11 +2,11 @@
 
 package edu.cornell.library.scholars.webapp.controller.api.distribute.examples;
 
-import edu.cornell.library.scholars.webapp.controller.api.distribute.AbstractDataDistributor;
-import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContext;
-
 import java.io.IOException;
 import java.io.OutputStream;
+
+import edu.cornell.library.scholars.webapp.controller.api.distribute.AbstractDataDistributor;
+import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContext;
 
 /**
  * A simple example of a data distributor. It sends a greeting.
@@ -46,7 +46,7 @@ public class HelloDistributor extends AbstractDataDistributor {
     public void writeOutput(OutputStream output)
             throws DataDistributorException {
         try {
-            if (parameters.containsKey(NAME_PARAMETER_KEY)) {
+            if (parameters.containsKey(NAME_PARAMETER_KEY))  {
                 output.write(String
                         .format("Hello, %s!",
                                 parameters.get(NAME_PARAMETER_KEY)[0])

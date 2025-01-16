@@ -2,6 +2,21 @@
 
 package edu.cornell.library.scholars.webapp.controller.api.distribute.decorator;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.script.Invocable;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import javax.servlet.ServletContext;
+
 import edu.cornell.library.scholars.webapp.controller.api.distribute.AbstractDataDistributor;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContext;
@@ -9,15 +24,6 @@ import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import javax.script.Invocable;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-import javax.servlet.ServletContext;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Wrap a data distributor with a JavaScript function that will transform its

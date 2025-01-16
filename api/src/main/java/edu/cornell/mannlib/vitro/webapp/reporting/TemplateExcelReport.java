@@ -19,7 +19,8 @@ public class TemplateExcelReport extends AbstractYARGTemplateReport {
     }
 
     @Override
-    public void generateReport(OutputStream outputStream, RequestModelAccess request, UserAccount account) throws ReportGeneratorException {
+    public void generateReport(OutputStream outputStream, RequestModelAccess request, UserAccount account)
+            throws ReportGeneratorException {
         generateReport(outputStream, "report.xlsx", ReportOutputType.xlsx, request, account);
     }
 }

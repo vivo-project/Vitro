@@ -19,7 +19,8 @@ public class TemplateWordReport extends AbstractYARGTemplateReport {
     }
 
     @Override
-    public void generateReport(OutputStream outputStream, RequestModelAccess request, UserAccount account) throws ReportGeneratorException {
+    public void generateReport(OutputStream outputStream, RequestModelAccess request, UserAccount account)
+            throws ReportGeneratorException {
         generateReport(outputStream, "report.docx", ReportOutputType.docx, request, account);
     }
 }

@@ -34,7 +34,8 @@ public interface ReportGenerator {
      * @param outputStream Stream to write report into
      * @throws ReportGeneratorException
      */
-    void generateReport(OutputStream outputStream, RequestModelAccess request, UserAccount account) throws ReportGeneratorException;
+    void generateReport(OutputStream outputStream, RequestModelAccess request, UserAccount account)
+            throws ReportGeneratorException;
 
     void setIsPersistent(boolean isPersistent);
 

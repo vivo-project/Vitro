@@ -2,14 +2,6 @@
 
 package edu.cornell.library.scholars.webapp.controller.api.distribute.file;
 
-import edu.cornell.library.scholars.webapp.controller.api.distribute.AbstractDataDistributor;
-import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContext;
-import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
-import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -19,6 +11,14 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import edu.cornell.library.scholars.webapp.controller.api.distribute.AbstractDataDistributor;
+import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContext;
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>
@@ -86,38 +86,41 @@ public class SelectingFileDistributor extends AbstractDataDistributor {
 
     private FileFinder fileFinder;
 
-    @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#parameterName", minOccurs = 1, maxOccurs = 1)
+    @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#parameterName", minOccurs = 1,
+            maxOccurs = 1)
     public void setParameterName(String name) {
         parameterName = name;
     }
 
-    @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#parameterPattern", minOccurs = 1, maxOccurs = 1)
+    @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#parameterPattern", minOccurs = 1,
+            maxOccurs = 1)
     public void setParameterPattern(String pattern) {
         parameterParser = Pattern.compile(pattern);
     }
 
-    @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#filepathTemplate", minOccurs = 1, maxOccurs = 1)
+    @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#filepathTemplate", minOccurs = 1,
+            maxOccurs = 1)
     public void setFilepathTemplate(String template) {
         filepathTemplate = template;
     }
 
-    @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#contentType", minOccurs = 1, maxOccurs = 1)
+    @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#contentType", minOccurs = 1,
+            maxOccurs = 1)
     public void setContentType(String cType) {
         contentType = cType;
     }
 
-    @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#emptyResponse", minOccurs = 1, maxOccurs = 1)
+    @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#emptyResponse", minOccurs = 1,
+            maxOccurs = 1)
     public void setEmptyResponse(String response) {
         emptyResponse = response;
     }
 
     @Override
-    public void init(DataDistributorContext context)
-            throws DataDistributorException {
+    public void init(DataDistributorContext context) throws DataDistributorException {
         super.init(context);
-        fileFinder = new FileFinder(parameters, parameterName, parameterParser,
-                filepathTemplate,
-                ApplicationUtils.instance().getHomeDirectory().getPath());
+        fileFinder = new FileFinder(parameters, parameterName, parameterParser, filepathTemplate, ApplicationUtils
+                .instance().getHomeDirectory().getPath());
     }
 
     @Override
@@ -126,8 +129,7 @@ public class SelectingFileDistributor extends AbstractDataDistributor {
     }
 
     @Override
-    public void writeOutput(OutputStream output)
-            throws DataDistributorException {
+    public void writeOutput(OutputStream output) throws DataDistributorException {
         try {
             File file = fileFinder.find();
             if (file != null && file.isFile()) {
@@ -156,8 +158,7 @@ public class SelectingFileDistributor extends AbstractDataDistributor {
         private final String filepathTemplate;
         private final Path home;
 
-        public FileFinder(Map<String, String[]> parameters,
-                String parameterName, Pattern parameterParser,
+        public FileFinder(Map<String, String[]> parameters, String parameterName, Pattern parameterParser,
                 String filepathTemplate, Path home) {
             this.parameters = parameters;
             this.parameterName = parameterName;
@@ -181,13 +182,14 @@ public class SelectingFileDistributor extends AbstractDataDistributor {
                 log.debug("Parameter value: =" + Arrays.asList(values));
             }
             if (values == null || values.length == 0) {
-                log.warn("No value provided for request parameter '"
-                        + parameterName + "'");
+                log.warn("No value provided for request parameter '" + parameterName + "'");
                 return null;
             }
             if (values.length > 1) {
-                log.warn("Multiple values provided for request parameter '"
-                        + parameterName + "': " + Arrays.deepToString(values));
+                log.warn("Multiple values provided for request parameter '" +
+                        parameterName +
+                        "': " +
+                        Arrays.deepToString(values));
                 return null;
             }
             return values[0];
@@ -195,14 +197,15 @@ public class SelectingFileDistributor extends AbstractDataDistributor {
 
         private File doPatternMatching(String parameter) {
             Matcher m = parameterParser.matcher(parameter);
-            log.debug("Pattern matching: value=" + parameter + ", parser="
-                    + parameterParser + ", match=" + m);
+            log.debug("Pattern matching: value=" + parameter + ", parser=" + parameterParser + ", match=" + m);
             if (m.find()) {
                 return substituteIntoFilepath(m);
             } else {
-                log.warn("Failed to parse the request parameter: '"
-                        + parameterParser + "' doesn't match '" + parameter
-                        + "'");
+                log.warn("Failed to parse the request parameter: '" +
+                        parameterParser +
+                        "' doesn't match '" +
+                        parameter +
+                        "'");
                 return null;
             }
 
