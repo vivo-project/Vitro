@@ -25,8 +25,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Template based report that uses the Docx4j library to process Word templates
- * that have the OpenDOPE controls embedded in them.
+ * Template based report that uses the Docx4j library to process Word templates that have the OpenDOPE controls embedded
+ * in them.
  */
 public class OpenDopeWordReport extends AbstractTemplateReport implements XmlGenerator {
     /**
@@ -113,7 +113,8 @@ public class OpenDopeWordReport extends AbstractTemplateReport implements XmlGen
     }
 
     @Override
-    public void generateReport(OutputStream outputStream, RequestModelAccess request, UserAccount account) throws ReportGeneratorException {
+    public void generateReport(OutputStream outputStream, RequestModelAccess request, UserAccount account)
+            throws ReportGeneratorException {
         // Get the XML
         Document xmlDoc = generateXml(request, account);
         try {

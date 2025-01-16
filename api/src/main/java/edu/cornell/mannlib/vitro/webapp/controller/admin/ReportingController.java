@@ -449,7 +449,8 @@ public class ReportingController extends FreemarkerHttpServlet {
                 response.setContentType("text/xml");
 
                 // Get the xml from the report
-                Document xml = ((XmlGenerator) report).generateXml(ModelAccess.on(vreq), PolicyHelper.getUserAccount(vreq));
+                Document xml = ((XmlGenerator) report).generateXml(ModelAccess.on(vreq), PolicyHelper.getUserAccount(
+                        vreq));
 
                 // Create an xml serializer
                 DOMImplementationRegistry registry = DOMImplementationRegistry.newInstance();
@@ -463,7 +464,8 @@ public class ReportingController extends FreemarkerHttpServlet {
                 serializer.write(xml, output);
                 return true;
             }
-        } catch (IOException | ReportGeneratorException | IllegalAccessException | InstantiationException
+        } catch (IOException | ReportGeneratorException
+                | IllegalAccessException | InstantiationException
                 | ClassNotFoundException e) {
             log.error("Unable to generate the xml", e);
         }
