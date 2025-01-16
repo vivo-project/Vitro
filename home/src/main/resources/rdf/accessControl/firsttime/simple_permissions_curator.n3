@@ -12,6 +12,7 @@
     access:value simplePermission:PageViewableCurator ;
 
     # permissions for EDITOR and above.
+    access:value simplePermission:ExecuteReports ;
     access:value simplePermission:DoBackEndEditing ;
     access:value simplePermission:SeeIndividualEditingPanel ;
     access:value simplePermission:SeeRevisionInfo ;
