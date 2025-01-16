@@ -64,7 +64,7 @@
 
    <#if customCssPath?? && customCssPath != "null">
        <button
-       style="font-weight: normal !important; color: white !important; background-color: #b40000 !important; font-size: 16px !important; display: inline !important; visibility: visible !important; opacity: 1 !important; z-index: 10 !important;"
+       style="font-weight: normal !important; color: white !important; background-color: #b40000 !important; font-size: 16px !important; display: inline !important; visibility: visible !important; opacity: 1 !important; z-index: 10 !important; width: 201px !important; height: 31px !important;"
         id="resetAction" type="button" class="button red" onclick="resetStyles()">Remove Custom CSS</button>
        <a href="${customCssPath}" download="custom.css" class="button blue">Download Custom CSS</a>
    </#if>
