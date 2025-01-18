@@ -521,3 +521,19 @@ table#table-listing td {
 table#table-listing td  a {
 	word-wrap: break-word;
 }
+
+/* ADMIN PANEL */
+
+.advancedThemeColor {
+    display: none;
+}
+
+.themeColorReset {
+    opacity: 0.5;
+}
+
+.themeColorPickerWrapper{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
