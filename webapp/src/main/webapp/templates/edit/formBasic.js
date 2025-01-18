@@ -54,6 +54,17 @@ const defaultColorPalete = {
         "ThemeAccentColor": "#749a02",
         "ThemeTextColor": "#5f6464",
         "ThemeLinkColor": "#2485ae"
+    },
+
+    "themes/vitro/": {
+        "ThemePrimaryColorLighter": "#62b6d7",
+        "ThemePrimaryColor": "#47b6d0",
+        "ThemePrimaryColorDarker": "#006279",
+        "ThemeBannerColor": "#012d3d",
+        "ThemeSecondaryColor": "#398aac",
+        "ThemeAccentColor": "#0ea5c8",
+        "ThemeTextColor": "#595B5B",
+        "ThemeLinkColor": "#47b6d0"
     }
 
 };
