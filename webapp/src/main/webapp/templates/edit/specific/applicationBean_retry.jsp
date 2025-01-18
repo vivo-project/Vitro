@@ -120,6 +120,11 @@
                 </div>
             </div>
 
+            <div class="advancedThemeColor">
+                <br>
+                <a id="hideAdvancedColorsButton" href="#">Hide advanced color settings</a>
+            </div>
+
             <div>
                 <br>
                 <a id="advancedColorsButton" href="#">Show advanced color settings</a>
