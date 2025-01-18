@@ -27,33 +27,55 @@ function adjustHexColor(hex, percent) {
     return newHex;
 }
 
-
-document.addEventListener('DOMContentLoaded', function() {
-    const resetPrimaryColorLink = document.getElementById('resetPrimaryColorLink');
+const resetPrimaryColorLink = document.getElementById('resetPrimaryColorLink');
 
     
-    let primaryColorChanged = false;
-    let isShowedAdvancedColors = false;
+let primaryColorChanged = false;
+let isShowedAdvancedColors = false;
 
-    const colorPallete = {
-        "ThemePrimaryColorLighter": "--primary-color-lighter",
-        "ThemePrimaryColor": "--primary-color",
-        "ThemePrimaryColorDarker": "--primary-color-darker",
-        "ThemeBannerColor": "--banner-color",
-        "ThemeSecondaryColor": "--secondary-color",
-        "ThemeAccentColor": "--accent-color",
-        "ThemeTextColor": "--text-color",
-        "ThemeLinkColor": "--link-color"
+const colorPallete = {
+    "ThemePrimaryColorLighter": "--primary-color-lighter",
+    "ThemePrimaryColor": "--primary-color",
+    "ThemePrimaryColorDarker": "--primary-color-darker",
+    "ThemeBannerColor": "--banner-color",
+    "ThemeSecondaryColor": "--secondary-color",
+    "ThemeAccentColor": "--accent-color",
+    "ThemeTextColor": "--text-color",
+    "ThemeLinkColor": "--link-color"
+};
+
+const defaultColorPalete = {
+    "themes/wilma/": {
+        "ThemePrimaryColorLighter": "#7bb3cb",
+        "ThemePrimaryColor": "#2485ae",
+        "ThemePrimaryColorDarker": "#064d68",
+        "ThemeBannerColor": "#023048",
+        "ThemeSecondaryColor": "#398aac",
+        "ThemeAccentColor": "#749a02",
+        "ThemeTextColor": "#5f6464",
+        "ThemeLinkColor": "#2485ae"
     }
 
-    const resetLinks = {
-        "resetPrimaryColorLink": ["ThemePrimaryColorLighter", "ThemePrimaryColor", "ThemePrimaryColorDarker"],
-        "resetBannerColorLink": ["ThemeBannerColor"],
-        "resetSecondaryColorLink": ["ThemeSecondaryColor"],
-        "resetAccentColorLink": ["ThemeAccentColor"],
-        "resetTextColorLink": ["ThemeTextColor"],
-        "resetLinkColorLink": ["ThemeLinkColor"],
-    }
+};
+
+
+const resetLinks = {
+    "resetPrimaryColorLink": ["ThemePrimaryColorLighter", "ThemePrimaryColor", "ThemePrimaryColorDarker"],
+    "resetBannerColorLink": ["ThemeBannerColor"],
+    "resetSecondaryColorLink": ["ThemeSecondaryColor"],
+    "resetAccentColorLink": ["ThemeAccentColor"],
+    "resetTextColorLink": ["ThemeTextColor"],
+    "resetLinkColorLink": ["ThemeLinkColor"],
+};
+
+function getDefaultColorValue(element) {
+    let theme = document.getElementById('ThemeDir').value;
+    return defaultColorPalete[theme]?.[element] || "#FF00FF";
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+
 
     // Hide 
     Object.keys(resetLinks).forEach(element => {
@@ -81,8 +103,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Auto setup light/dark variations
             if (this.id == 'ThemePrimaryColor'){
-                document.getElementById('ThemePrimaryColorLighter').value = adjustHexColor(colorValue, 20);
-                document.getElementById('ThemePrimaryColorDarker').value = adjustHexColor(colorValue, -20);
+                document.getElementById('ThemePrimaryColorLighter').value = adjustHexColor(colorValue, 40);
+                document.getElementById('ThemePrimaryColorDarker').value = adjustHexColor(colorValue, -40);
 
                 document.getElementById('ThemePrimaryColorLighter').dispatchEvent(new Event('input'));
                 document.getElementById('ThemePrimaryColorDarker').dispatchEvent(new Event('input'));
@@ -98,18 +120,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     
     }
-
-
-
-
-
-    // resetPrimaryColorLink.addEventListener('click', function() {
-    //     const themePrimaryColorInput = document.getElementById('ThemePrimaryColor');
-    //     resetPrimaryColorLink.style.display = 'none'
-    //     themePrimaryColorInput.value = null;
-    //     document.documentElement.style.setProperty('--primary-color', 'unset');
-    // });
-
     
     // Link reset button
     for (const [resetLinkId, inputIds] of Object.entries(resetLinks)) {
@@ -118,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
             event.preventDefault();
             inputIds.forEach(function(inputId) {
                 const colorInput = document.getElementById(inputId);
-                colorInput.value = null;
+                colorInput.value = getDefaultColorValue(inputId);
                 document.getElementById(inputId + "Hidden").setAttribute("name", inputId)
                 document.getElementById(inputId).setAttribute("name", null)
 
@@ -132,7 +142,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    
     // Initial show/hide reset links
     for (const [inputId, cssVar] of Object.entries(colorPallete)) {
 
@@ -140,27 +149,37 @@ document.addEventListener('DOMContentLoaded', function() {
             if (inputIds.includes(inputId)) {
                 const colorInput = document.getElementById(inputId);
                 
+                const resetLink = document.getElementById(resetLinkId);
                 if (colorInput.getAttribute("initial-value") != "null") {
-                    const resetLink = document.getElementById(resetLinkId);
                     resetLink.style.display = "";
                     document.getElementById(inputId + "Hidden").setAttribute("name", null)
                     document.getElementById(inputId).setAttribute("name", inputId)
+                } else {
+                    resetLink.click();
                 }
             }
         }
     }
-
-
     
     // Advanced button
     const advancedThemeColors = document.querySelectorAll('.advancedThemeColor');
     const advancedColorsButton = document.getElementById('advancedColorsButton');
+    const hideAdvancedColorsButton = document.getElementById('hideAdvancedColorsButton');
     advancedColorsButton.addEventListener('click', function(event) {
         isShowedAdvancedColors = true;
         advancedColorsButton.style.display = 'none'
         event.preventDefault();
         advancedThemeColors.forEach(function(advancedThemeColor) {
             advancedThemeColor.style.display = 'block';
+        });
+    });
+
+    hideAdvancedColorsButton.addEventListener('click', function(event) {
+        isShowedAdvancedColors = false;
+        advancedColorsButton.style.display = 'block'
+        event.preventDefault();
+        advancedThemeColors.forEach(function(advancedThemeColor) {
+            advancedThemeColor.style.display = 'none';
         });
     });
 
