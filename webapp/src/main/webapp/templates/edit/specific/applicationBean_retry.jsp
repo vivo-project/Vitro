@@ -130,6 +130,11 @@
                 <a id="advancedColorsButton" href="#">Show advanced color settings</a>
                 <br>
             </div>
+
+            <br>
+            <div>
+                <button type="button" id="resetStylesButton" class="themeColorResetButton">Reset colors</button>
+            </div>
         </div>
 
 
