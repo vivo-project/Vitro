@@ -65,6 +65,16 @@ const defaultColorPalete = {
         "ThemeAccentColor": "#0ea5c8",
         "ThemeTextColor": "#595B5B",
         "ThemeLinkColor": "#47b6d0"
+    },
+    "themes/tenderfoot/": {
+        "ThemePrimaryColorLighter": "#8bb9cc",
+        "ThemePrimaryColor": "#3E8BAA",
+        "ThemePrimaryColorDarker": "#0c0cb5",
+        "ThemeBannerColor": "#013049",
+        "ThemeSecondaryColor": "#93c3d4",
+        "ThemeAccentColor": "#3446A0",
+        "ThemeTextColor": "#595B5B",
+        "ThemeLinkColor": "#2485ae"
     }
 
 };
