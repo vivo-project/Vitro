@@ -528,8 +528,8 @@ table#table-listing td  a {
     display: none;
 }
 
-.themeColorReset {
-    opacity: 0.5;
+.themeColorReset > span {
+    color: #888;
 }
 
 .themeColorPickerWrapper{
