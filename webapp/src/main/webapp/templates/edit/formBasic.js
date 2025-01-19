@@ -171,6 +171,16 @@
             "ThemeAccentColor": "#3446A0",
             "ThemeTextColor": "#595B5B",
             "ThemeLinkColor": "#2485ae"
+        },
+        "themes/nemo/": {
+            "ThemePrimaryColorLighter": "#337ab7",
+            "ThemePrimaryColor": "#064d68",
+            "ThemePrimaryColorDarker": "#023447",
+            "ThemeBannerColor": "#064d68",
+            "ThemeSecondaryColor": "#064d68",
+            "ThemeAccentColor": "#8BAB2E",
+            "ThemeTextColor": "#333",
+            "ThemeLinkColor": "#064d68"
         }
     
     };
