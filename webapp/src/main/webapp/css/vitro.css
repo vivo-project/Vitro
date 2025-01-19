@@ -532,6 +532,15 @@ table#table-listing td  a {
     color: #888;
 }
 
+.themeColorResetButton {
+    background: #ff3737;
+    color: white;
+    border-radius: 4px;
+    padding: 3px 8px;
+    border: 1px solid red;
+    cursor: pointer;
+}
+
 .themeColorPickerWrapper{
     display: flex;
     align-items: center;
