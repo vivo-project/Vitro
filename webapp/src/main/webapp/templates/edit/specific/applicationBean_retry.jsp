@@ -154,6 +154,21 @@
         <a href="${updateLogoUrl}">Change LOGO</a>
         <br>
         <br>
+
+        <label>Logo Small Url (Mobile view)</label>
+        <input type="text" name="LogoSmallUrl" value="<form:value name="LogoSmallUrl"/>" ${longField} maxlength="120" size="40" />
+        <c:set var="LogoSmallUrl"><form:error name="LogoSmallUrl"/></c:set>
+        <c:if test="${!empty LogoSmallUrlError}">
+            <span class="notice"><c:out value="${LogoSmallUrlError}"/></span>
+        </c:if>
+
+        <br>
+        <img src="<form:value name="LogoSmallUrl"/>" alt="" srcset="">
+        <a href="${updateLogoSmallUrl}">Change Small LOGO</a>
+        <br>
+        <br>
+
+        <br>
         <!-- <c:set var="AccentColorError"><form:error name="AccentColor"/></c:set>
         <c:if test="${!empty AccentColorError}">
             <span class="notice"><c:out value="${AccentColorError}"/></span>
