@@ -1,19 +1,28 @@
 /* $This file is distributed under the terms of the license in LICENSE$ */
 
-function enforceAspectRatio(c) {
+function enforceAspectRatio(c, maxAspectRatio) {
 	const aspectRatio = c.w / c.h;
 
 	if (aspectRatio < 1) {				
 		c.w = c.h; // Force 1:1		
 		if (this.setSelect) this?.setSelect([c.x, c.y, c.x + c.w, c.y + c.h]);
 
-	} else if (aspectRatio > 7.5) {
-		c.h = c.w / 7.45; // Force 1:2
+	} else if (aspectRatio > maxAspectRatio) {
+		c.h = c.w / (maxAspectRatio - 0.05); // Force 1:maxAspectRatio
 		if (this.setSelect) this?.setSelect([c.x, c.y, c.x + c.w, c.y + c.h]);
 	}
 
 	return;
 }
+
+function enforceAspectRatioSmall(c) {
+	enforceAspectRatio.call(this, c, 3);
+}
+
+function enforceAspectRatioLarge(c) {
+	enforceAspectRatio.call(this, c, 7.5);
+}
+
 
 
 (function($) {
@@ -31,7 +40,11 @@ function enforceAspectRatio(c) {
 		if (photoType === 'portalLogo') {
 			aspectRatio = undefined
 			minSize = [ 48, 48 ]
-			checkRatio = enforceAspectRatio
+			checkRatio = enforceAspectRatioLarge
+		} else if (photoType === 'portalLogoSmall') {
+			aspectRatio = undefined
+			minSize = [ 48, 48 ]
+			checkRatio = enforceAspectRatioSmall
 		}
 
 		
