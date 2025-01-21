@@ -150,7 +150,7 @@
         </c:if>
 
         <br>
-        <img src="<form:value name="LogoUrl"/>" alt="" srcset="">
+        <img class="logoImgPreview" src="<form:value name="LogoUrl"/>" alt="" srcset="">
         <a href="${updateLogoUrl}">Change LOGO</a>
         <br>
         <br>
@@ -163,7 +163,7 @@
         </c:if>
 
         <br>
-        <img src="<form:value name="LogoSmallUrl"/>" alt="" srcset="">
+        <img class="logoImgPreview" src="<form:value name="LogoSmallUrl"/>" alt="" srcset="">
         <a href="${updateLogoSmallUrl}">Change Small LOGO</a>
         <br>
         <br>
