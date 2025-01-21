@@ -56,6 +56,9 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	public static final int THUMBNAIL_HEIGHT = 200;
 	public static final int THUMBNAIL_WIDTH = 200;
 
+	public static final int THUMBNAIL_LOGO_HEIGHT = 300;
+	public static final int THUMBNAIL_LOGO_WIDTH = 1000;
+
 	/** The form field that tells what we are doing: uploading? deleting? */
 	public static final String PARAMETER_ACTION = "action";
 
@@ -307,13 +310,18 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 				? VitroVocabulary.VITRO_PUBLIC + customImageAttribute
 				: null;
 
+		String thumbnailType = "USER_THUMBNAIL";
+		if (customImageAttribute.equals("portalLogo") || customImageAttribute.equals("portalLogoSmall")) {
+			thumbnailType = "LOGO";
+		}
+
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
 				vreq.getUnfilteredWebappDaoFactory(), getServletContext());
 
 		try {
 			CropRectangle crop = validateCropCoordinates(vreq);
 			FileInfo newImage = helper.getNewImageInfo(vreq);
-			FileInfo thumbnail = helper.generateThumbnail(crop, newImage);
+			FileInfo thumbnail = helper.generateThumbnail(crop, newImage, thumbnailType);
 
 			helper.removeExistingImageAtPredicate(entity, customImageAttributeUri);
 			helper.storeImageFilesAtPredicate(entity, newImage, thumbnail, customImageAttributeUri);

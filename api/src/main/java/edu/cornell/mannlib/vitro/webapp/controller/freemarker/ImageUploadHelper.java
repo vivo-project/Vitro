@@ -2,10 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
-import static edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.PARAMETER_UPLOADED_FILE;
-import static edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.THUMBNAIL_HEIGHT;
-import static edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.THUMBNAIL_WIDTH;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,6 +30,8 @@ import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor.CropRectangle;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor.Dimensions;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor.ImageProcessorException;
+
+import static edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.*;
 
 /**
  * Handle the mechanics of validating, storing, and deleting file images.
@@ -244,7 +242,7 @@ public class ImageUploadHelper {
 	 * Crop the main image to create the thumbnail, and put it into the file
 	 * storage system.
 	 */
-	FileInfo generateThumbnail(CropRectangle crop, FileInfo newImage) {
+	FileInfo generateThumbnail(CropRectangle crop, FileInfo newImage, String thumbnailType) {
 		InputStream mainStream = null;
 		InputStream thumbStream = null;
 		try {
@@ -253,13 +251,23 @@ public class ImageUploadHelper {
 			mainStream = fileStorage.getInputStream(mainBytestreamUri,
 					mainFilename);
 
-			thumbStream = ApplicationUtils
-					.instance()
-					.getImageProcessor()
-					.cropAndScale(mainStream, crop,
-							new Dimensions(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT));
+			String mimeType;
+			if ("LOGO".equalsIgnoreCase(thumbnailType)) {
+				thumbStream = ApplicationUtils
+						.instance()
+						.getImageProcessor()
+						.cropAndScale(mainStream, crop,
+								new Dimensions(1000, 1000), true);
+				mimeType = RECOGNIZED_FILE_TYPES.get(".png");
+			} else {
+				thumbStream = ApplicationUtils
+						.instance()
+						.getImageProcessor()
+						.cropAndScale(mainStream, crop,
+								new Dimensions(THUMBNAIL_LOGO_WIDTH, THUMBNAIL_LOGO_HEIGHT));
+				mimeType = RECOGNIZED_FILE_TYPES.get(".jpg");
+			}
 
-			String mimeType = RECOGNIZED_FILE_TYPES.get(".jpg");
 			String filename = createThumbnailFilename(mainFilename);
 			FileInfo fileInfo = uploadedFileHelper.createFile(filename,
 					mimeType, thumbStream);

@@ -15,6 +15,7 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.MemoryCacheImageInputStream;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.awt.image.ColorConvertOp;
@@ -76,14 +77,30 @@ public class IIOImageProcessor implements ImageProcessor {
 	 */
 	@Override
 	public InputStream cropAndScale(InputStream mainImageStream,
-			CropRectangle crop, Dimensions limits)
+									CropRectangle crop, Dimensions limits)
+			throws ImageProcessorException, IOException {
+		return cropAndScale(mainImageStream, crop, limits, false);
+	}
+
+
+	@Override
+	public InputStream cropAndScale(InputStream mainImageStream,
+			CropRectangle crop, Dimensions limits, boolean isTransparent)
 			throws ImageProcessorException, IOException {
 		try {
 			ImageInputStream stream = new MemoryCacheImageInputStream(mainImageStream);
 			BufferedImage mainImage = ImageIO.read(stream);
 
-			BufferedImage bufferedImage = new BufferedImage(mainImage.getWidth(), mainImage.getHeight(), BufferedImage.TYPE_3BYTE_BGR); // BufferedImage.TYPE_INT_RGB
-			new ColorConvertOp(null).filter(mainImage, bufferedImage);
+			BufferedImage bufferedImage;
+			if (isTransparent) {
+				bufferedImage = new BufferedImage(mainImage.getWidth(), mainImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+				Graphics2D g = bufferedImage.createGraphics();
+				g.drawImage(mainImage, 0, 0, null);
+				g.dispose();
+			} else {
+				bufferedImage = new BufferedImage(mainImage.getWidth(), mainImage.getHeight(), BufferedImage.TYPE_3BYTE_BGR); // BufferedImage.TYPE_INT_RGB
+				new ColorConvertOp(null).filter(mainImage, bufferedImage);
+			}
 
 			log.debug("initial image: " + imageSize(bufferedImage));
 
@@ -108,8 +125,13 @@ public class IIOImageProcessor implements ImageProcessor {
 			BufferedImage croppedImage = cropImage(scaledImage, scaledCrop);
 			log.debug("cropped image: " + imageSize(croppedImage));
 
-			byte[] jpegBytes = encodeAsJpeg(croppedImage);
-			return new ByteArrayInputStream(jpegBytes);
+			byte[] imageBytes;
+			if (isTransparent) {
+				imageBytes = encodeAsPng(croppedImage);
+			} else {
+				imageBytes = encodeAsJpeg(croppedImage);
+			}
+			return new ByteArrayInputStream(imageBytes);
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to scale the image", e);
 		}
@@ -181,4 +203,13 @@ public class IIOImageProcessor implements ImageProcessor {
 		writer.dispose();
 		return bytes.toByteArray();
 	}
+	private byte[] encodeAsPng(BufferedImage image) throws IOException {
+		ImageWriter writer = ImageIO.getImageWritersByFormatName("png").next();
+		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+		writer.setOutput(new MemoryCacheImageOutputStream(bytes));
+		writer.write(new IIOImage(image, null, null));
+		writer.dispose();
+		return bytes.toByteArray();
+	}
 }
+

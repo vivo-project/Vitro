@@ -546,3 +546,10 @@ table#table-listing td  a {
     align-items: center;
     gap: 5px;
 }
+
+.logoImgPreview {
+    max-width: 100%;
+    height: 50px;
+    object-fit: contain;
+    display: block;
+}

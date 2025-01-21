@@ -8,7 +8,7 @@ function enforceAspectRatio(c, maxAspectRatio) {
 		if (this.setSelect) this?.setSelect([c.x, c.y, c.x + c.w, c.y + c.h]);
 
 	} else if (aspectRatio > maxAspectRatio) {
-		c.h = c.w / (maxAspectRatio - 0.05); // Force 1:maxAspectRatio
+		c.h = c.w / (maxAspectRatio - maxAspectRatio*0.007); // Force 1:maxAspectRatio
 		if (this.setSelect) this?.setSelect([c.x, c.y, c.x + c.w, c.y + c.h]);
 	}
 
