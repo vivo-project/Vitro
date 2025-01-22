@@ -12,10 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.junit.Test;
-
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor.DataDistributorException;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
+import org.junit.Test;
 import stubs.edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContextStub;
 
 /**

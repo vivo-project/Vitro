@@ -8,11 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor.DataDistributorException;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContext;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 
 /**
  * TODO
@@ -55,7 +54,7 @@ public class GraphBuilderStub implements GraphBuilder {
     @Override
     public void setBuilderName(String name) {
         // TODO Auto-generated method stub
-        
+
     }
 
 }

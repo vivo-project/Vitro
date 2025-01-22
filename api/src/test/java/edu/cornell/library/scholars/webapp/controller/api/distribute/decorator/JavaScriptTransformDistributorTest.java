@@ -13,20 +13,18 @@ import java.io.Writer;
 
 import javax.script.ScriptException;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.cornell.library.scholars.webapp.controller.api.distribute.AbstractDataDistributor;
+import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor.DataDistributorException;
+import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContext;
+import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import edu.cornell.library.scholars.webapp.controller.api.distribute.AbstractDataDistributor;
-import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor.DataDistributorException;
-import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContext;
-import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import stubs.edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContextStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.modules.ApplicationStub;
 import stubs.javax.servlet.ServletContextStub;
