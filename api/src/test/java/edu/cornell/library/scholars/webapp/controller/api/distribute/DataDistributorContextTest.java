@@ -13,9 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
-
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
+import org.junit.Test;
 
 /**
  * TODO
@@ -38,8 +37,7 @@ public class DataDistributorContextTest extends AbstractTestClass {
         HashMap<String, List<String>> map = new HashMap<>();
         map.put("nameZero", new ArrayList<>());
         map.put("nameOne", new ArrayList<>(Arrays.asList("valueOne")));
-        map.put("nameTwo",
-                new ArrayList<>(Arrays.asList("valueTwoA", "valueTwoB")));
+        map.put("nameTwo", new ArrayList<>(Arrays.asList("valueTwoA", "valueTwoB")));
         return map;
     }
 
@@ -63,12 +61,10 @@ public class DataDistributorContextTest extends AbstractTestClass {
     }
 
     @SuppressWarnings("deprecation")
-    private void assertEqualArrayMaps(Map<String, String[]> a1,
-            Map<String, String[]> a2) {
+    private void assertEqualArrayMaps(Map<String, String[]> a1, Map<String, String[]> a2) {
         assertEquals("key sets should be equals", a1.keySet(), a2.keySet());
         for (String key : a1.keySet()) {
-            assertEquals("array values for '" + key + "'", a1.get(key),
-                    a2.get(key));
+            assertEquals("array values for '" + key + "'", a1.get(key), a2.get(key));
         }
     }
 }
