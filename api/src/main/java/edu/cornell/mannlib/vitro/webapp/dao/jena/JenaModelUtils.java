@@ -492,7 +492,7 @@ public class JenaModelUtils {
      * @param toRemove containing statements to be removed
      * @param removeFrom from which statements should be removed
      */
-    public static void removeUsingSparqlConstruct(Model toRemove, Model removeFrom) {
+    private static void removeUsingSparqlConstruct(Model toRemove, Model removeFrom) {
         if(toRemove.isEmpty()) {
         	return;
         }
@@ -572,7 +572,7 @@ public class JenaModelUtils {
         for(Statement stmt : stmts) {
             Triple t = stmt.asTriple();
             String lineWithoutVars = getLine(t, false);
-            if (lines.contains(lineWithoutVars)) {
+            if (lines.contains(lineWithoutVars) && !isLinked(stmt, stmts)) {
                 continue;
             } else {
                 lines.add(lineWithoutVars);
@@ -589,6 +589,17 @@ public class JenaModelUtils {
                 }
             }
         }
+    }
+
+    private static boolean isLinked(Statement stmt, List<Statement> stmts) {
+        RDFNode s = stmt.getSubject();
+        RDFNode o = stmt.getObject();
+        for (Statement st : stmts) {
+            if (st.getSubject().equals(o) || st.getObject().equals(s)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static String getLine(Triple t, boolean createBlankNodeVariables) {
