@@ -17,7 +17,7 @@ public class JenaModelUtilsTest {
     public void removeUsingSparqlConstructTest() {
         Model removeFrom = getModel();
         Model toRemove = getModel();
-        JenaModelUtils.removeUsingSparqlConstruct(toRemove, removeFrom);
+        JenaModelUtils.removeWithBlankNodesAsVariables(toRemove, removeFrom);
         assertTrue(removeFrom.isEmpty());
     }
 

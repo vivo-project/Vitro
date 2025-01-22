@@ -1,5 +1,8 @@
 package edu.cornell.mannlib.vitro.webapp.tboxreasoner.impl.jfact;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.StringReader;
 
 import org.apache.jena.ontology.OntModel;
@@ -16,8 +19,6 @@ import org.junit.Test;
 import org.semanticweb.owlapi.util.SAXParsers;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
-import edu.cornell.mannlib.vitro.webapp.migration.auth.AnnotationMigrator;
-import edu.cornell.mannlib.vitro.webapp.migration.auth.ArmMigrator;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ReasonerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.impl.BasicTBoxReasonerDriver;
 
@@ -34,7 +35,8 @@ public class JFactTBoxReasonerTest {
 			"         \r\n" + 
 			"         rdfs:subClassOf [ rdf:type owl:Class ;\r\n" + 
 			"                           owl:intersectionOf ( <http://vivo.mydomain.edu/individual/class_a>\r\n" + 
-			"                                                <http://vivo.mydomain.edu/individual/class_b>\r\n" + 
+			"                                                <http://vivo.mydomain.edu/individual/class_b>\r\n" +
+			"                                                <http://vivo.mydomain.edu/individual/class_c>\r\n" +
 			"                                              )\r\n" + 
 			"                         ] .\r\n" + 
 			"\r\n" + 
@@ -89,9 +91,11 @@ public class JFactTBoxReasonerTest {
 		waitForTBoxReasoning(driver);
 		// Confirm that union model now contains inferred triples
 		Assert.assertTrue(tboxUnion.size() > additions.size());
+		assertFalse(tboxAssertions.isEmpty());
 		JenaModelUtils.removeWithBlankNodesAsVariables(subtractions, tboxAssertions.getBaseModel());
 		tboxAssertions.getBaseModel().notifyEvent(new EditEvent(null, false));
 		waitForTBoxReasoning(driver);
+		assertTrue(tboxAssertions.isEmpty());
 		// Confirm that no statements related to classes a, b or c remain in the
 		// TBox union model.  (The inference model may not be completely empty, because
 		// the reasoner may supply unrelated triples related to OWL and RDFS vocabulary.)
