@@ -8,13 +8,12 @@ import static edu.cornell.mannlib.vitro.testing.ModelUtilitiesTestHelper.modelTo
 import static edu.cornell.mannlib.vitro.testing.ModelUtilitiesTestHelper.objectProperty;
 import static org.junit.Assert.assertEquals;
 
+import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor.DataDistributorException;
+import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
 import org.junit.Before;
 import org.junit.Test;
-
-import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor.DataDistributorException;
-import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import stubs.edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContextStub;
 
 /**
@@ -159,7 +158,7 @@ public class ConstructQueryGraphBuilderTest extends AbstractTestClass {
                 dataProperty(AUTHOR1, HAS_NAME, NAME1),
                 objectProperty(BOOK1, HAS_AUTHOR, AUTHOR1));
     }
-    
+
     @Test
     public void bindBookUriWithMultipleQueries() throws DataDistributorException {
         setQueries(MULTI_QUERY_1, MULTI_QUERY_2);

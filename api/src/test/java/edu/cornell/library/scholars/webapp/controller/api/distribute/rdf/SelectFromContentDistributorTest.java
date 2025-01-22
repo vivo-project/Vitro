@@ -15,19 +15,17 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.jena.rdf.model.Model;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor.DataDistributorException;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
+import org.apache.jena.rdf.model.Model;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import stubs.edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContextStub;
 
 /**

@@ -16,12 +16,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.jena.rdf.model.Model;
-import org.junit.Test;
-
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor.DataDistributorException;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContext;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
+import org.apache.jena.rdf.model.Model;
+import org.junit.Test;
 import stubs.edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContextStub;
 
 /**

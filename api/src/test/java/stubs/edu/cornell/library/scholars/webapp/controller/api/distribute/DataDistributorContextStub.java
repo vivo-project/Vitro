@@ -2,24 +2,23 @@
 
 package stubs.edu.cornell.library.scholars.webapp.controller.api.distribute;
 
-import static edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContext.*;
+import static edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContext.deepCopyParameters;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.jena.rdf.model.Model;
 
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContext;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.RequestModelAccess;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
+import org.apache.jena.rdf.model.Model;
 import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.RequestModelAccessStub;
 
 /**
- * A minimal implementation. Additional tests may want to set more values into
- * the RequestModelAccessStub.
+ * A minimal implementation. Additional tests may want to set more values into the RequestModelAccessStub.
  */
 public class DataDistributorContextStub implements DataDistributorContext {
-	// ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
     // Stub infrastructure
     // ----------------------------------------------------------------------
 
@@ -34,9 +33,9 @@ public class DataDistributorContextStub implements DataDistributorContext {
         this.parameters = deepCopyParameters(map);
         return this;
     }
-    
+
     public DataDistributorContextStub setParameter(String name, String value) {
-        parameters.put(name, new String[]{value});
+        parameters.put(name, new String[] { value });
         return this;
     }
 

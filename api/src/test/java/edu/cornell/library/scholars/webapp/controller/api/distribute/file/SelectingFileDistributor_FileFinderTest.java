@@ -6,7 +6,6 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,12 +17,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import edu.cornell.library.scholars.webapp.controller.api.distribute.file.SelectingFileDistributor.FileFinder;
+import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
-
-import edu.cornell.library.scholars.webapp.controller.api.distribute.file.SelectingFileDistributor.FileFinder;
-import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 
 /**
  * TODO
@@ -31,16 +29,14 @@ import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 public class SelectingFileDistributor_FileFinderTest extends AbstractTestClass {
     private static final Path SCHOLARS_HOME = Paths
             .get("//scholars/home/directory");
-    
+
     private static final String NAME_NONE = "noValue";
 
     private static final String NAME_MULTIPLE = "multiValue";
-    private static final String[] VALUE_MULTIPLE = { "first_value",
-            "second_value" };
+    private static final String[] VALUE_MULTIPLE = { "first_value", "second_value" };
 
     private static final String NAME_SINGLE = "oneValue";
-    private static final String[] VALUE_SINGLE = {
-            "how much wood would a woodchuck chuck" };
+    private static final String[] VALUE_SINGLE = { "how much wood would a woodchuck chuck" };
 
     private static final Pattern ANY_MATCHER = Pattern.compile("whatever");
     private static final String ANY_TEMPLATE = "/whatever";
@@ -51,15 +47,12 @@ public class SelectingFileDistributor_FileFinderTest extends AbstractTestClass {
     private static final String PATH_TEMPLATE_ONE_SUB = "/users/scholars/\\0";
     private static final File RESULT_ALL = new File("/users/scholars/would");
 
-    private static final Pattern MATCH_TWO_GROUPS = Pattern
-            .compile("(how).*(would)");
+    private static final Pattern MATCH_TWO_GROUPS = Pattern.compile("(how).*(would)");
     private static final String PATH_TEMPLATE_TWO_SUB = "/users/scholars/\\1/\\2";
-    private static final File RESULT_TWO_GROUPS = new File(
-            "/users/scholars/how/would");
+    private static final File RESULT_TWO_GROUPS = new File("/users/scholars/how/would");
 
     private static final String PATH_TEMPLATE_MULTI_SUB = "/users/scholars/\\2/\\1/\\2";
-    private static final File RESULT_MULTI_SUB = new File(
-            "/users/scholars/would/how/would");
+    private static final File RESULT_MULTI_SUB = new File("/users/scholars/would/how/would");
 
     private Map<String, String[]> parameters;
     private File actual;

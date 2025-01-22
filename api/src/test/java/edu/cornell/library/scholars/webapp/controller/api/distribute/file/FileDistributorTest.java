@@ -11,12 +11,6 @@ import java.lang.reflect.Field;
 
 import javax.servlet.ServletContext;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor.ActionFailedException;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor.DataDistributorException;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContext;
@@ -33,6 +27,11 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.modules.tboxreasoner.TBoxReasonerModule;
 import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ConfigurationTripleSource;
 import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ContentTripleSource;
+import org.apache.commons.io.FileUtils;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccessFactoryStub;
 import stubs.javax.servlet.ServletContextStub;
 import stubs.javax.servlet.http.HttpServletRequestStub;
@@ -99,7 +98,7 @@ public class FileDistributorTest extends AbstractTestClass {
         createTheDistributor(NO_SUCH_FILE, SOME_TYPE);
         assertResults(SOME_TYPE, SOME_DATA);
     }
-    
+
     // ----------------------------------------------------------------------
     // Helper methods
     // ----------------------------------------------------------------------
@@ -113,7 +112,6 @@ public class FileDistributorTest extends AbstractTestClass {
             ctx.setRealPath("/WEB-INF/resources/home-files", NO_SUCH_FILE);
             instanceField.set(null, new ApplicationStub(
                     new VitroHomeDirectory(ctx, home.toPath(), null)));
-            
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }

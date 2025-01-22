@@ -12,12 +12,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import org.junit.Test;
-
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor.DataDistributorException;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor.MissingParametersException;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.QueryHolder;
+import org.junit.Test;
 import stubs.javax.servlet.http.HttpServletRequestStub;
 
 /**
@@ -30,7 +29,7 @@ import stubs.javax.servlet.http.HttpServletRequestStub;
  * 
  * null query throws NPE
  * 
- * missing parameter throws MissingPE, 
+ * missing parameter throws MissingPE,
  * multiple parameter values throws MissingPE
  * 
  * show binding of zero/zero, one/one, zero/three, three/zero
@@ -40,7 +39,7 @@ import stubs.javax.servlet.http.HttpServletRequestStub;
 public class VariableBinderTest extends AbstractTestClass {
     private static final Map<String, String[]> NO_PARAMETERS = Collections.emptyMap();
     private static final QueryHolder BASIC_QUERY = new QueryHolder("SELECT * WHERE { ?s ?p ?o }");
-    
+
     private static final String URI_1_NAME = "uri_1";
     private static final String URI_1_VALUE = "http://test/uri_1";
     private static final String URI_2_NAME = "uri_2";
@@ -70,7 +69,7 @@ public class VariableBinderTest extends AbstractTestClass {
     // ----------------------------------------------------------------------
     // The tests
     // ----------------------------------------------------------------------
-    
+
     @Test
     public void nullParameters_throwsException() {
         expectException(NullPointerException.class, "parameters");
@@ -97,7 +96,7 @@ public class VariableBinderTest extends AbstractTestClass {
         binder = new VariableBinder(NO_PARAMETERS);
         binder.bindValuesToQuery(set(), set(), null);
     }
-    
+
     @Test
     public void missingParameterValue_throwsException() throws DataDistributorException {
         expectException(MissingParametersException.class, "is required");
@@ -108,10 +107,10 @@ public class VariableBinderTest extends AbstractTestClass {
     @Test
     public void multipleParameterValues_throwsException() throws DataDistributorException {
         expectException(MissingParametersException.class, "multiple values");
-        
+
         Map<String, String[]> pMap = new HashMap<>();
         pMap.put(LITERAL_3_NAME, new String[] {LITERAL_1_VALUE, LITERAL_3_VALUE});
-        
+
         binder = new VariableBinder(pMap);
         binder.bindValuesToQuery(set(), set(LITERAL_3_NAME), BASIC_QUERY);
     }

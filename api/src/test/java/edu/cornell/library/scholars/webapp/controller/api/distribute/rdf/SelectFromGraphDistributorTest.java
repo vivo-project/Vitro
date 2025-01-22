@@ -6,9 +6,8 @@ import static edu.cornell.mannlib.vitro.testing.ModelUtilitiesTestHelper.dataPro
 import static edu.cornell.mannlib.vitro.testing.ModelUtilitiesTestHelper.model;
 import static edu.cornell.mannlib.vitro.testing.ModelUtilitiesTestHelper.objectProperty;
 
-import org.junit.Before;
-
 import edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.GraphBuilderStub;
+import org.junit.Before;
 import stubs.edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContextStub;
 
 /**
