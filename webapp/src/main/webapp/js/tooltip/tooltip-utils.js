@@ -78,7 +78,6 @@ function setupHoverTrigger(element, data) {
 function removeTooltip(tooltip) {
     if (tooltip) {
         if (tooltip.cleanup) {
-            console.log("Cleanup");
             tooltip.cleanup();
         }
         tooltip.remove();
@@ -116,7 +115,7 @@ function createTooltipElement(data) {
 
     const innerTooltip = document.createElement('div');
     innerTooltip.className = 'tooltip-inner';
-    innerTooltip.innerHTML = data.title || 'TEST';
+    innerTooltip.innerHTML = data.title;
     tooltip.appendChild(innerTooltip);
 
     return tooltip;
