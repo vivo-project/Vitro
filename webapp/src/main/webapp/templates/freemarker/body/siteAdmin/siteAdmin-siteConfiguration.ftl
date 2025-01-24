@@ -27,6 +27,10 @@
                 <li role="listitem"><a href="${siteConfig.siteInfo}" title="${i18n().site_information}">${i18n().site_information}</a></li>
             </#if>
 
+             <#if siteConfig.userRoles?has_content>
+                <li role="listitem"><a href="${siteConfig.userRoles}" title="${i18n().user_roles}">${i18n().user_roles}</a></li>
+             </#if>
+
              <#if siteConfig.userAccounts?has_content>
                 <li role="listitem"><a href="${siteConfig.userAccounts}" title="${i18n().user_accounts}">${i18n().user_accounts}</a></li>
              </#if>
