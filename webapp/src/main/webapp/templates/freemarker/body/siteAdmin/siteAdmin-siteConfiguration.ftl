@@ -35,6 +35,10 @@
                 <li role="listitem"><a href="${siteConfig.manageReports}" title="${i18n().manage_reports}">${i18n().manage_reports}</a></li>
             </#if>
 
+             <#if siteConfig.userRoles?has_content>
+                <li role="listitem"><a href="${siteConfig.userRoles}" title="${i18n().user_roles}">${i18n().user_roles}</a></li>
+             </#if>
+
              <#if siteConfig.userAccounts?has_content>
                 <li role="listitem"><a href="${siteConfig.userAccounts}" title="${i18n().user_accounts}">${i18n().user_accounts}</a></li>
              </#if>
