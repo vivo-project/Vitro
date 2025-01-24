@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.permissions;
 
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.NamedAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorizationRequest;
@@ -23,6 +22,7 @@ public class SimplePermission {
     public static final SimplePermission MANAGE_OWN_PROXIES = new SimplePermission("ManageOwnProxies");
     public static final SimplePermission MANAGE_PROXIES = new SimplePermission("ManageProxies");
     public static final SimplePermission MANAGE_SEARCH_INDEX = new SimplePermission("ManageSearchIndex");
+    public static final SimplePermission MANAGE_ROLES = new SimplePermission("ManageRoles");
     public static final SimplePermission MANAGE_USER_ACCOUNTS = new SimplePermission("ManageUserAccounts");
     public static final SimplePermission QUERY_FULL_MODEL = new SimplePermission("QueryFullModel");
     public static final SimplePermission QUERY_USER_ACCOUNTS_MODEL = new SimplePermission("QueryUserAccountsModel");
@@ -38,7 +38,7 @@ public class SimplePermission {
     public static final SimplePermission USE_SPARQL_QUERY_PAGE = new SimplePermission("UseSparqlQueryPage");
     public static final SimplePermission USE_SPARQL_QUERY_API = new SimplePermission("UseSparqlQueryApi");
     public static final SimplePermission USE_SPARQL_UPDATE_API = new SimplePermission("UseSparqlUpdateApi");
-    
+
     // ----------------------------------------------------------------------
     // These instances are "catch all" permissions to cover poorly defined
     // groups of actions until better definitions were found. Don't add usages
@@ -56,7 +56,7 @@ public class SimplePermission {
     // e.g. this page is viewable only by admins, this page is viewable to anyone
     // who is logged in, etc.
     // ----------------------------------------------------------------------
-    
+
     public static final SimplePermission PAGE_VIEWABLE_ADMIN = new SimplePermission("PageViewableAdmin");
     public static final SimplePermission PAGE_VIEWABLE_CURATOR = new SimplePermission("PageViewableCurator");
     public static final SimplePermission PAGE_VIEWABLE_LOGGEDIN = new SimplePermission("PageViewableLoggedIn");
@@ -68,7 +68,7 @@ public class SimplePermission {
     
     public SimpleAuthorizationRequest ACTION;
     private String uri;
-    
+
     public String getUri() {
         return uri;
     }
