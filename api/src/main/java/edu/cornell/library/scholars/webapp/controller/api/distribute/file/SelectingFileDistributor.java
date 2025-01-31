@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -217,7 +218,7 @@ public class SelectingFileDistributor extends AbstractDataDistributor {
                 path = path.replace("\\" + i, m.group(i));
             }
             log.debug("Substitute: " + filepathTemplate + " becomes " + path);
-            return home.resolve(path).toFile();
+            return Paths.get(home.toString(), path).toFile();
         }
 
     }
