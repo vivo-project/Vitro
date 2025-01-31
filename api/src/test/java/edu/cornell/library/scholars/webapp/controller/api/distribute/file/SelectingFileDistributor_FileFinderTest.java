@@ -28,7 +28,7 @@ import org.junit.Test;
  */
 public class SelectingFileDistributor_FileFinderTest extends AbstractTestClass {
     private static final Path SCHOLARS_HOME = Paths
-            .get("//scholars/home/directory");
+            .get("/scholars/home/directory");
 
     private static final String NAME_NONE = "noValue";
 
