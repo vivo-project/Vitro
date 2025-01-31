@@ -45,14 +45,14 @@ public class SelectingFileDistributor_FileFinderTest extends AbstractTestClass {
 
     private static final Pattern MATCH_ALL = Pattern.compile("would");
     private static final String PATH_TEMPLATE_ONE_SUB = "/users/scholars/\\0";
-    private static final File RESULT_ALL = new File("/users/scholars/would");
+    private static final File RESULT_ALL = new File("/scholars/home/directory/users/scholars/would");
 
     private static final Pattern MATCH_TWO_GROUPS = Pattern.compile("(how).*(would)");
     private static final String PATH_TEMPLATE_TWO_SUB = "/users/scholars/\\1/\\2";
-    private static final File RESULT_TWO_GROUPS = new File("/users/scholars/how/would");
+    private static final File RESULT_TWO_GROUPS = new File("/scholars/home/directory/users/scholars/how/would");
 
     private static final String PATH_TEMPLATE_MULTI_SUB = "/users/scholars/\\2/\\1/\\2";
-    private static final File RESULT_MULTI_SUB = new File("/users/scholars/would/how/would");
+    private static final File RESULT_MULTI_SUB = new File("/scholars/home/directory/users/scholars/would/how/would");
 
     private Map<String, String[]> parameters;
     private File actual;
