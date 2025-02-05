@@ -13,7 +13,7 @@ import javax.servlet.ServletContextListener;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-
+import edu.cornell.mannlib.vitro.webapp.application.VitroHomeDirectory.HomeSourceException;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
@@ -57,6 +57,8 @@ public class ApplicationSetup implements ServletContextListener {
 
 			ApplicationUtils.setInstance(app);
 			ss.info(this, "Application is configured.");
+		} catch(HomeSourceException e) {
+			ss.fatal(this, e.getMessage());
 		} catch (Exception e) {
 			ss.fatal(this, "Failed to initialize the Application.", e);
 		}

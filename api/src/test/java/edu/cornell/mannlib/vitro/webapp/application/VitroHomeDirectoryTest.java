@@ -26,11 +26,10 @@ public class VitroHomeDirectoryTest {
     @Test
     public void testGetHomeSrcPath() {
         ServletContextStub sc = new ServletContextStub();
-        String expectedPath = "/opt/tomcat/webapp/app/WEB-INF/resources/home-files";
-        sc.setRealPath("/WEB-INF/resources/home-files", expectedPath);
+        sc.setRealPath("/WEB-INF/resources/home-files", src.getRoot().getAbsolutePath());
         VitroHomeDirectory vhd = new VitroHomeDirectory(sc, dst.getRoot().toPath(), "");
         String realPath = vhd.getSourcePath();
-        assertEquals(expectedPath, realPath);
+        assertEquals(src.getRoot().getAbsolutePath(), realPath);
     }
 
     @Test
