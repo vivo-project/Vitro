@@ -60,7 +60,7 @@ public class FileDistributorTest extends AbstractTestClass {
     private ModelAccessFactoryStub mafs;
 
     @Before
-    public void setupData() {
+    public void setupData() throws IOException {
         mafs = new ModelAccessFactoryStub();
         setVitroHomeDirectory(homeFolder.getRoot());
     }
@@ -109,7 +109,7 @@ public class FileDistributorTest extends AbstractTestClass {
                     .getDeclaredField("instance");
             instanceField.setAccessible(true);
             ServletContextStub ctx = new ServletContextStub();
-            ctx.setRealPath("/WEB-INF/resources/home-files", NO_SUCH_FILE);
+            ctx.setRealPath("/WEB-INF/resources/home-files", home.getAbsolutePath());
             instanceField.set(null, new ApplicationStub(
                     new VitroHomeDirectory(ctx, home.toPath(), null)));
         } catch (Exception e) {
