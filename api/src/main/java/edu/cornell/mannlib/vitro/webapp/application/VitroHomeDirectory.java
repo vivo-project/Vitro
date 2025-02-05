@@ -74,6 +74,26 @@ public class VitroHomeDirectory {
         if (homeSourcePath == null) {
             throw new IllegalStateException(String.format("Application home files not found in: %s", location));
         }
+        File homeSource = new File(homeSourcePath);
+        if (!homeSource.exists()) {
+            throw new HomeSourceException(context, "doesn't exist.");
+        }
+        if (!homeSource.canRead()) {
+            throw new HomeSourceException(context, "can't be read.");
+        }
+        if (!homeSource.isDirectory()) {
+            throw new HomeSourceException(context, "is not a directory.");
+        }
+    }
+
+    public class HomeSourceException extends RuntimeException {
+        public HomeSourceException(ServletContext context, String cause) {
+            super(String.format("Home source directory %s " +
+                    cause +
+                    "<br>" +
+                    "Try to remove deployed tomcat application directory %s and restart tomcat.", homeSourcePath,
+                    context.getRealPath("/")));
+        }
     }
 
     /**
