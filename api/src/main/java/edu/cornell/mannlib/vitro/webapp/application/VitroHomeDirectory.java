@@ -91,7 +91,7 @@ public class VitroHomeDirectory {
             super(String.format("Home source directory %s " +
                     cause +
                     "<br>" +
-                    "Try to remove deployed tomcat application directory %s and restart tomcat.", homeSourcePath,
+                    "Try to remove deployed Tomcat application directory %s and restart Tomcat.", homeSourcePath,
                     context.getRealPath("/")));
         }
     }
