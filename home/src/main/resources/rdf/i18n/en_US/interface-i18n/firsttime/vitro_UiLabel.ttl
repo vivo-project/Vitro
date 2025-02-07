@@ -6537,20 +6537,6 @@ uil-data:dd_config_run.Vitro
         uil:hasApp       "Vitro" ;
         uil:hasKey       "dd_config_run" .
 
-uil-data:dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.decorator.JavaScriptTransformDistributor.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        rdfs:label       "JavaScript Transfrom Distributor"@en-US ;
-        uil:hasApp       "Vitro" ;
-        uil:hasKey       "dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.decorator.JavaScriptTransformDistributor" .
-
-uil-data:dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.examples.HelloDistributor.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        rdfs:label       "Hello Distributor"@en-US ;
-        uil:hasApp       "Vitro" ;
-        uil:hasKey       "dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.examples.HelloDistributor" .
-
 uil-data:dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.file.FileDistributor.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
@@ -6599,13 +6585,6 @@ uil-data:dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute
         rdfs:label       "Drill Down Graph Builder"@en-US ;
         uil:hasApp       "Vitro" ;
         uil:hasKey       "dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.DrillDownGraphBuilder" .
-
-uil-data:dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.EmptyGraphBuilder.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        rdfs:label       "Empty Graph Builder"@en-US ;
-        uil:hasApp       "Vitro" ;
-        uil:hasKey       "dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.EmptyGraphBuilder" .
 
 uil-data:dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.IteratingGraphBuilder.Vitro
         rdf:type         owl:NamedIndividual ;
