@@ -6,10 +6,13 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.auth.checks.UserOnThread;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange.Operation;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import org.apache.commons.lang3.StringUtils;
 
 public class ChangeSetImpl implements ChangeSet {
 
@@ -120,4 +123,14 @@ public class ChangeSetImpl implements ChangeSet {
 				+ ", preChangeEvents=" + preChangeEvents
 				+ ", postChangeEvents=" + postChangeEvents + "]";
 	}
+
+    @Override
+    public void setUserFromThread() {
+        String userId = UserOnThread.get();
+        if (StringUtils.isNotBlank(userId)) {
+            for (ModelChange modelChange : modelChanges) {
+                modelChange.setUserId(userId);
+            }
+        }
+    }
 }

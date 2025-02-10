@@ -159,6 +159,7 @@ public interface ChangeSet {
      */
     public List<Object> getPostChangeEvents();
 
+    public void setUserFromThread();
 
 
 }
