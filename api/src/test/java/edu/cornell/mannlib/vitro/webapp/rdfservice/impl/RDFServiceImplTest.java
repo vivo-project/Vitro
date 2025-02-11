@@ -15,7 +15,7 @@ public class RDFServiceImplTest {
 
     @Test
     public void getConcurrentGraphUrisTest() throws RDFServiceException, InterruptedException {
-        Dataset testDataSet = DatasetFactory.createGeneral();
+        Dataset testDataSet = DatasetFactory.create();
         Model m1 = VitroModelFactory.createModel();
         testDataSet.addNamedModel("test:init1", m1);
         Model m2 = VitroModelFactory.createModel();
