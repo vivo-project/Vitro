@@ -11,10 +11,12 @@ import java.io.FileReader;
 
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.ontology.OntModel;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Selector;
 import org.apache.jena.rdf.model.SimpleSelector;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdf.model.impl.PropertyImpl;
+import org.apache.jena.vocabulary.RDFS;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -35,6 +37,7 @@ public class TranslationConverterTest {
 	private static final String INIT_N3_FILE = "src/test/resources/edu/cornell/mannlib/vitro/webapp/i18n/TranslationConverterTest/modelInitContent.n3";
 	ServletContextStub ctx = new ServletContextStub();
 	private OntModel model;
+	private boolean debug = false;
 	
     @Before
     public void init() {
@@ -76,13 +79,29 @@ public class TranslationConverterTest {
 
 		assertTrue(n3TranslationValueIsOverwrittenByProperty(model));
 
-		assertEquals(3, getCount(HAS_THEME, WILMA));
-		assertEquals(6, getCount(HAS_APP, VITRO));
+		assertEquals(4, getCount(HAS_THEME, WILMA));
+		assertEquals(7, getCount(HAS_APP, VITRO));
 		assertEquals(3, getCount(HAS_APP, VIVO));
-		// printResultModel();
+		
+		checkTranslationLabelWithUri();
+		if (debug) {
+		    printResultModel();
+		}
 	}
 
-	private void printResultModel() {
+	private void checkTranslationLabelWithUri() {
+	    Selector selector = new SimpleSelector(null, new PropertyImpl(HAS_KEY), "translation_with_uri");
+        StmtIterator it = model.listStatements(selector);
+        assertTrue(it.hasNext());
+        Resource subject = it.next().getSubject();
+        Selector labelSelector = new SimpleSelector(subject, RDFS.label, (Object) null);
+        StmtIterator it2 = model.listStatements(labelSelector);
+        assertTrue(it2.hasNext());
+        String labelText = it2.next().getObject().asLiteral().getLexicalForm();
+        assertTrue(labelText.contains("?uri"));
+    }
+
+    private void printResultModel() {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		model.write(baos, "N3");
 		System.out.println(baos.toString());
