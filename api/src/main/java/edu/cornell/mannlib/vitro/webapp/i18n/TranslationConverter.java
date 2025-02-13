@@ -243,6 +243,7 @@ public class TranslationConverter {
 		ParameterizedSparqlString pss = new ParameterizedSparqlString();
 		pss.setCommandText(TEMPLATE_LABEL);
 		pss.setIri("uri", uri);
+		pss = new ParameterizedSparqlString(pss.toString());
 		pss.setLiteral("label", label, langTag);
 		return pss.toString();
 	}
@@ -252,12 +253,13 @@ public class TranslationConverter {
 		ParameterizedSparqlString pss = new ParameterizedSparqlString();
 		pss.setCommandText(template);
 		pss.setIri("uri", createUUID());
-		pss.setLiteral("label", label, langTag);
 		pss.setLiteral("key", key);
 		pss.setLiteral("application", application);
 		if (!StringUtils.isBlank(theme)) {
 			pss.setLiteral("theme", theme);
 		}
+		pss = new ParameterizedSparqlString(pss.toString());
+		pss.setLiteral("label", label, langTag);
 		return pss.toString();
 	}
 
