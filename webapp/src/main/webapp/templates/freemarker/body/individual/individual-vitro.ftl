@@ -104,6 +104,8 @@
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/individual/individual.css" />')}
 
 ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/tiny_mce/tiny_mce.js"></script>')}
+${headScripts.add('<script type="text/javascript" src="${urls.base}/webjars/floatingui/floating-ui.core.umd.js"></script>')}
+${headScripts.add('<script type="text/javascript" src="${urls.base}/webjars/floatingui/floating-ui.dom.umd.js"></script>')}
 
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/imageUpload/imageUploadUtils.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/fileUpload/fileUploadUtils.js"></script>',
