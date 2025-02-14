@@ -164,7 +164,6 @@
 :RoleDisplayObjectPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-    access:value rdfs:label ;
     access:containsElementsOfType access-individual:ObjectProperty .
 
 #Role PublishObjectProperty data set template
@@ -193,7 +192,7 @@
 :RolePublishObjectPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-    access:value rdfs:label ;
+    access:value <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ;
     access:containsElementsOfType access-individual:ObjectProperty .
 
 #Role AddObjectProperty data set template
@@ -222,7 +221,6 @@
 :RoleAddObjectPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-    access:value rdfs:label ;
     access:containsElementsOfType access-individual:ObjectProperty .
 
 #Role DropObjectProperty data set template
@@ -251,7 +249,6 @@
 :RoleDropObjectPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-    access:value rdfs:label ;
     access:containsElementsOfType access-individual:ObjectProperty .
 
 #Role EditObjectProperty data set template
@@ -280,7 +277,6 @@
 :RoleEditObjectPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-    access:value rdfs:label ;
     access:containsElementsOfType access-individual:ObjectProperty .
 
 #Role DisplayDataProperty data set template
@@ -310,6 +306,9 @@
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
 #    access:value access-individual:defaultUri ;
+    access:value <http://www.w3.org/2000/01/rdf-schema#label> ;
+    access:value <http://vitro.mannlib.cornell.edu/ns/vitro/public#filename> ;
+    access:value <http://vitro.mannlib.cornell.edu/ns/vitro/public#mimeType> ;
     access:containsElementsOfType access-individual:DataProperty .
 
 #Role PublishDataProperty data set template
@@ -338,7 +337,7 @@
 :RolePublishDataPropertyEntityValueSetTemplate a access:ValueSetTemplate ;
     access:relatedCheck :AccessObjectUriContainsInDataSet ;
     access:relatedCheck :StatementPredicateEquals ;
-#    access:value access-individual:defaultUri ;
+    access:value <http://www.w3.org/2000/01/rdf-schema#label> ;
     access:containsElementsOfType access-individual:DataProperty .
 
 #Role AddDataProperty data set template
