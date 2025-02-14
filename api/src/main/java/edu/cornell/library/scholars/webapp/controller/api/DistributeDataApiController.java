@@ -53,7 +53,6 @@ public class DistributeDataApiController extends VitroApiServlet {
 
             String uri = findDistributorForAction(req, model);
             DataDistributor instance = instantiateDistributor(req, uri, model);
-            setCorsHeaders(req, resp);
             runIt(req, resp, instance);
         } catch (NoSuchActionException e) {
             do400BadRequest(e.getMessage(), resp);
@@ -126,11 +125,6 @@ public class DistributeDataApiController extends VitroApiServlet {
             instance.close();
             throw new ActionFailedException(e);
         }
-    }
-
-    private void setCorsHeaders(HttpServletRequest req, HttpServletResponse resp) {
-        log.debug("Setting CORS header for every request.");
-        resp.setHeader("Access-Control-Allow-Origin", "*");
     }
 
     private void do400BadRequest(String message, HttpServletResponse resp) throws IOException {
