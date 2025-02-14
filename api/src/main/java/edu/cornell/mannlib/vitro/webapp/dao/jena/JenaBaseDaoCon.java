@@ -96,6 +96,7 @@ public class JenaBaseDaoCon {
     protected  DatatypeProperty   APPLICATION_ACKNOWLEGETEXT = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_ACKNOWLEGETEXT);
     protected  DatatypeProperty   APPLICATION_COPYRIGHTURL = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_COPYRIGHTURL);
     protected  DatatypeProperty   APPLICATION_COPYRIGHTANCHOR = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_COPYRIGHTANCHOR);
+    protected  DatatypeProperty   APPLICATION_CUSTOMCSSPATH = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_CUSTOMCSSPATH);
 
     protected AnnotationProperty  ONTOLOGY_PREFIX_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.ONTOLOGY_PREFIX_ANNOT);
 

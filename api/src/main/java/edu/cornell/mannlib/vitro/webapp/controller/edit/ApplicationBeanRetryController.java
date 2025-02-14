@@ -11,6 +11,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.SiteStyleController;
 import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -89,6 +90,7 @@ public class ApplicationBeanRetryController extends BaseEditController {
         request.setAttribute("title","Site Information");
         request.setAttribute("_action",action);
         request.setAttribute("unqualifiedClassName","ApplicationBean");
+        request.setAttribute("siteStyleUrl", SiteStyleController.URL_HERE);
         setRequestAttributes(request,epo);
 
         try {
