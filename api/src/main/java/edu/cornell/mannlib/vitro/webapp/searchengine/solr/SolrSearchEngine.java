@@ -10,6 +10,8 @@ import java.util.Collection;
 
 import javax.servlet.ServletContext;
 
+import edu.cornell.mannlib.vitro.webapp.searchengine.base.SearchEngineUtil;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.SearchEngineSmokeTest;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
 import org.apache.solr.client.solrj.SolrClient;
@@ -19,7 +21,6 @@ import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
@@ -44,10 +45,9 @@ public class SolrSearchEngine implements SearchEngine {
 	@Override
 	public void startup(Application application, ComponentStartupStatus css) {
 		ServletContext ctx = application.getServletContext();
-		String solrServerUrlString = ConfigurationProperties.getBean(ctx)
-				.getProperty("vitro.local.solr.url");
+		String solrServerUrlString = SearchEngineUtil.getSearchEngineURLProperty();
 		if (solrServerUrlString == null) {
-			css.fatal("Could not find vitro.local.solr.url in "
+			css.fatal("Could not find vitro.local.searchengine.url in "
 					+ "runtime.properties.  Vitro application needs the URL of "
 					+ "a solr server that it can use to index its data. It "
 					+ "should be something like http://localhost:${port}"
