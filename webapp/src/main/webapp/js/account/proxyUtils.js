@@ -4,13 +4,13 @@ $(document).ready(function(){
     // Get the i18n variables from the template
     $.extend(this, i18nStrings);
      //Remove initial value of input text 'Select an existing last name'
-    $('input[name="proxySelectorAC"]').click(function(){
+    $('input[name="proxySelectorAC"]').on("click", function(){
         $(this).val('');
         $("span[name='proxySelectorSearchStatus']").text('')
     });
 
     //Alert when user doesn't select an editor and a profile after submitting from for relating proxy-profiles
-    $('input[name="createRelationship"]').click(function(){
+    $('input[name="createRelationship"]').on("click", function(){
         var $proxyUri = $('#add-relation input[name="proxyUri"]').val();
         var $profileUri = $('#add-relation input[name="profileUri"]').val();
 

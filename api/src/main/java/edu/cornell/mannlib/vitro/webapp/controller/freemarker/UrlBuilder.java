@@ -71,7 +71,7 @@ public class UrlBuilder {
 
     public enum Css {
         CUSTOM_FORM("/edit/forms/css/customForm.css"),
-        JQUERY_UI("/js/jquery-ui/css/smoothness/jquery-ui-1.12.1.css");
+        JQUERY_UI("/js/jquery-ui/css/smoothness/jquery-ui-1.13.2.css");
 
         private final String path;
 
@@ -90,9 +90,9 @@ public class UrlBuilder {
 
     public enum JavaScript {
         CUSTOM_FORM_UTILS("/js/customFormUtils.js"),
-        JQUERY("/js/jquery-1.12.4.min.js"),
-        JQUERY_MIGRATE("/js/jquery-migrate-1.4.1.js"),
-        JQUERY_UI("/js/jquery-ui/js/jquery-ui-1.12.1.min.js"),
+        JQUERY("/js/jquery-3.7.1.min.js"),
+        JQUERY_MIGRATE("/js/jquery-migrate-3.4.1.js"),
+        JQUERY_UI("/js/jquery-ui/js/jquery-ui-1.13.2.min.js"),
         UTILS("/js/utils.js");
 
         private final String path;
