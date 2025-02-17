@@ -31,7 +31,6 @@ import org.apache.jena.ontology.OntModel;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.webapp.auth.checks.UserOnThread;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
@@ -470,8 +469,8 @@ public class Authenticate extends VitroHttpServlet {
 	private void transitionToLoggedIn(HttpServletRequest request,
 			UserAccount user) throws LoginNotPermitted {
 		log.debug("Completed login: " + user.getEmailAddress());
-		try(UserOnThread userInfo = new UserOnThread(user.getUri())){
-		getAuthenticator(request).recordLoginAgainstUserAccount(user,
+		try(UserOnThread uot = new UserOnThread(user.getUri())){
+			getAuthenticator(request).recordLoginAgainstUserAccount(user,
 				AuthenticationSource.INTERNAL);
 		}
 	}
