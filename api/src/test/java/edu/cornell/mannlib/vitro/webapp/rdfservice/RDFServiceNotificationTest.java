@@ -6,17 +6,22 @@ import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.auth.checks.UserOnThread;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.listeners.StatementListener;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelChangedListener;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.junit.Before;
@@ -81,6 +86,22 @@ public class RDFServiceNotificationTest {
         }
         ChangeSet cs = createChangeSet(rdfServiceModel, editorUri, null, TEST_TRIPLE);
         rdfServiceModel.changeSetUpdate(cs);
+    }
+
+    @Test
+    public void testModelNotification() throws RDFServiceException {
+        OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+        RDFServiceModel rdfService = new RDFServiceModel(model);
+        String editorUri = "test:user-id";
+        rdfService.registerListener(new TestListener());
+        RDFServiceGraph graph = new RDFServiceGraph(rdfService);
+        Model rdfServiceModel = VitroModelFactory.createModelForGraph(graph);
+        try (UserOnThread userInfo = new UserOnThread(editorUri)) {
+            rdfServiceModel.read(new StringReader(TEST_TRIPLE), null, "n3");
+        }
+        assertTrue(modelChanges.size() > 0);
+        assertTrue(editorUri.equals(modelChanges.get(0).getUserId()));
+        assertEquals(null, UserOnThread.get());
     }
 
     private ChangeSet createChangeSet(RDFServiceModel rdfServiceModel, String editorUri, String additions,
