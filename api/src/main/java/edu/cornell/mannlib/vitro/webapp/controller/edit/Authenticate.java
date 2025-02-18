@@ -469,7 +469,7 @@ public class Authenticate extends VitroHttpServlet {
 	private void transitionToLoggedIn(HttpServletRequest request,
 			UserAccount user) throws LoginNotPermitted {
 		log.debug("Completed login: " + user.getEmailAddress());
-		try(UserOnThread uot = new UserOnThread(user.getUri())){
+		try (UserOnThread uot = new UserOnThread(user.getUri())) {
 			getAuthenticator(request).recordLoginAgainstUserAccount(user,
 				AuthenticationSource.INTERNAL);
 		}

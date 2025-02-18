@@ -11,7 +11,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.directwebremoting.WebContext;
 import org.directwebremoting.WebContextFactory;
-
+import edu.cornell.mannlib.vitro.webapp.auth.checks.UserOnThread;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -86,14 +86,19 @@ public class PropertyDWR {
         WebContext ctx = WebContextFactory.get();
         HttpServletRequest req = ctx.getHttpServletRequest();
         VitroRequest vreq = new VitroRequest(req);
-        return vreq.getUnfilteredWebappDaoFactory().getPropertyInstanceDao().insertProp(prop);
+        try (UserOnThread uot = new UserOnThread(vreq)) {
+            return vreq.getUnfilteredWebappDaoFactory().getPropertyInstanceDao().insertProp(prop);
+        }
     }
 
     public int deleteProp(String subjectUri, String predicateUri, String objectUri){
         WebContext ctx = WebContextFactory.get();
         HttpServletRequest req = ctx.getHttpServletRequest();
         VitroRequest vreq = new VitroRequest(req);
-        vreq.getUnfilteredWebappDaoFactory().getPropertyInstanceDao().deleteObjectPropertyStatement(subjectUri, predicateUri, objectUri);
+        try (UserOnThread uot = new UserOnThread(vreq)) {
+            vreq.getUnfilteredWebappDaoFactory().getPropertyInstanceDao().deleteObjectPropertyStatement(subjectUri,
+                    predicateUri, objectUri);
+        }
         return 0;
     }
 

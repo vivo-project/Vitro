@@ -26,7 +26,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
-
+import edu.cornell.mannlib.vitro.webapp.auth.checks.UserOnThread;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena;
@@ -303,7 +303,7 @@ public class ProcessRdfForm {
         cs.addRemoval(retractionsInputStream,
                 RDFServiceUtils.getSerializationFormatFromJenaString("N3"), graphUri, editorUri);
 
-        try {
+        try (UserOnThread uot = new UserOnThread(editorUri)) {
             rdfService.changeSetUpdate(cs);
         } catch (RDFServiceException e) {
             log.error(e, e);

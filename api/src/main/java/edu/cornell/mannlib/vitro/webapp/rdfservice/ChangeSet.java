@@ -46,7 +46,6 @@ public interface ChangeSet {
 	 * @param serializationFormat - format of the serialized RDF model
 	 * @param graphURI - URI of the graph to which the RDF model should be added
 	 */
-	@Deprecated
 	public void addAddition(InputStream model,
 			                RDFService.ModelSerializationFormat serializationFormat,
 			                String graphURI);
@@ -58,7 +57,6 @@ public interface ChangeSet {
 	 * @param serializationFormat - format of the serialized RDF model
 	 * @param graphURI - URI of the graph from which the RDF model should be removed
 	 */
-	@Deprecated
 	public void addRemoval(InputStream model,
 			               RDFService.ModelSerializationFormat serializationFormat,
 			               String graphURI);

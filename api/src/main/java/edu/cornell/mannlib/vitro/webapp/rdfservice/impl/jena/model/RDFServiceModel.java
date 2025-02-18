@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model;
 
 import java.io.ByteArrayInputStream;
-import java.util.Iterator;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
