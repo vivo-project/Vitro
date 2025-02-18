@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import edu.cornell.mannlib.vitro.webapp.auth.checks.UserOnThread;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.AbstractPageHandler.Message;
@@ -69,7 +69,9 @@ public class ManageProxiesController extends FreemarkerHttpServlet {
 		ManageProxiesEditPage page = new ManageProxiesEditPage(vreq);
 
 		if (page.isValid()) {
-			page.applyEdits();
+		    try (UserOnThread uot = new UserOnThread(vreq)) {
+		        page.applyEdits();
+		    }
 			Message.setMessage(vreq, new SuccessMessage());
 		} else {
 			Message.setMessage(vreq, new FailureMessage());

@@ -33,6 +33,7 @@ import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.modify.UsingList;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
+import edu.cornell.mannlib.vitro.webapp.auth.checks.UserOnThread;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -129,7 +130,7 @@ public class SparqlUpdateApiController extends VitroApiServlet {
 		SearchIndexer indexer = ApplicationUtils.instance().getSearchIndexer();
 		Dataset ds = new RDFServiceDataset(vreq.getUnfilteredRDFService());
 		GraphStore graphStore = GraphStoreFactory.create(ds);
-	    try {
+		try (UserOnThread uot = new UserOnThread(req)) {
 	        if(indexer != null) {
 	            indexer.pause();
 	        }

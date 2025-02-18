@@ -74,7 +74,7 @@ public class UserAccountsAdminController extends FreemarkerHttpServlet {
 		if (page.isBogus()) {
 			return showHomePage(vreq, page.getBogusMessage());
 		} else if (page.isSubmit() && page.isValid()) {
-		    try(UserOnThread uot = new UserOnThread(vreq)){
+		    try (UserOnThread uot = new UserOnThread(vreq)) {
 		        page.updateAccount();
 		    }
 
