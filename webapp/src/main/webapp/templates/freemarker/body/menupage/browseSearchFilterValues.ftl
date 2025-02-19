@@ -106,7 +106,7 @@
         <#if individuals??>
             <#list individuals as individual>
                 <li class="individual" role="listitem">
-                    <@shortView uri=individual.uri viewContext="index" />
+                    <@shortView uri=individual.uri viewContext="browse" />
                 </li>
             </#list>
         </#if>
