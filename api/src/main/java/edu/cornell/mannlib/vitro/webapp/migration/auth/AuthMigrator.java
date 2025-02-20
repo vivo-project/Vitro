@@ -70,24 +70,24 @@ public class AuthMigrator implements ServletContextListener {
         modelAccess = ModelAccess.getInstance();
         initialize(modelAccess.getRDFService(WhichService.CONTENT),
                 modelAccess.getRDFService(WhichService.CONFIGURATION));
-        if (!isMigrationRequired()) {
+        long version = getVersion();
+        if (!isMigrationRequired(version)) {
             return;
         }
-        long currentVersion = getVersion();
-        if (currentVersion == 0) {
-            runCompleteMigration(sce, begin);
-        } else if (currentVersion == 1) {
-            migratePublishPublicPermissions(sce, begin);
+        if (version == 0) {
+            runCompleteMigration(sce, begin, version);
+        } else if (version == 1) {
+            migratePublishPublicPermissions(sce, begin, version);
         }
     }
 
-    private void migratePublishPublicPermissions(ServletContextEvent sce, long begin) {
+    private void migratePublishPublicPermissions(ServletContextEvent sce, long begin, long version) {
         ServletContext ctx = sce.getServletContext();
         StartupStatus ss = StartupStatus.getBean(ctx);
         log.info("Started publish permissions authorization reconfiguration for public role");
         convertPublicPublishPermissions();
         ss.info(this, secondsSince(begin) + " seconds spent to reconfigure publish permissions for public role");
-        removeVersion(getVersion());
+        removeVersion(version);
         setVersion(CURRENT_VERSION);
         log.info(String.format("Updated access control configuration to version %d", CURRENT_VERSION));
         PolicyLoader.getInstance().loadPolicies();
@@ -99,11 +99,11 @@ public class AuthMigrator implements ServletContextListener {
         annotationMigrator.updatePublicPublishPermissions();
     }
 
-    private void runCompleteMigration(ServletContextEvent sce, long begin) {
+    private void runCompleteMigration(ServletContextEvent sce, long begin, long version) {
         ServletContext ctx = sce.getServletContext();
         StartupStatus ss = StartupStatus.getBean(ctx);
         log.info("Started authorization configuration update");
-        convertAuthorizationConfiguration();
+        convertAuthorizationConfiguration(version);
         log.info("Finished authorization configuration update");
         ss.info(this, secondsSince(begin) + " seconds to migrate auth models");
         log.info("Reload all policies after migration");
@@ -115,7 +115,7 @@ public class AuthMigrator implements ServletContextListener {
         configurationRdfService = configuration;
     }
 
-    protected void convertAuthorizationConfiguration() {
+    protected void convertAuthorizationConfiguration(long version) {
         OntModel userAccountsModel = modelAccess.getOntModelSelector().getUserAccountsModel();
         ArmMigrator armMigrator = new ArmMigrator(contentRdfService, configurationRdfService, userAccountsModel);
         if (armMigrator.isArmConfiguation()) {
@@ -124,7 +124,7 @@ public class AuthMigrator implements ServletContextListener {
             migrateAnnotationConfiguation();
         }
         migrateSimplePermissions();
-        removeVersion(getVersion());
+        removeVersion(version);
         setVersion(CURRENT_VERSION);
         log.info(String.format("Updated access control configuration to version %d", CURRENT_VERSION));
     }
@@ -140,8 +140,8 @@ public class AuthMigrator implements ServletContextListener {
         annotationMigrator.migrateConfiguration();
     }
 
-    private boolean isMigrationRequired() {
-        if (getVersion() < CURRENT_VERSION) {
+    private boolean isMigrationRequired(long version) {
+        if (version < CURRENT_VERSION) {
             return true;
         }
         return false;
