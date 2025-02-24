@@ -56,6 +56,9 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	public static final int THUMBNAIL_HEIGHT = 200;
 	public static final int THUMBNAIL_WIDTH = 200;
 
+	public static final int THUMBNAIL_LOGO_HEIGHT = 300;
+	public static final int THUMBNAIL_LOGO_WIDTH = 1000;
+
 	/** The form field that tells what we are doing: uploading? deleting? */
 	public static final String PARAMETER_ACTION = "action";
 
@@ -150,17 +153,17 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 			AccessOperation ao;
 			if (ACTION_DELETE.equals(action)
 					|| ACTION_DELETE_EDIT.equals(action)) {
-			    ao = AccessOperation.DROP;
+				ao = AccessOperation.DROP;
 				ra = new ObjectPropertyStatementAccessObject(vreq.getJenaOntModel(),
 						entity.getURI(), indMainImage,
 						imageUri);
 			} else if (imageUri != null) {
-			    ao = AccessOperation.EDIT;
+				ao = AccessOperation.EDIT;
 				ra = new ObjectPropertyStatementAccessObject(vreq.getJenaOntModel(),
 						entity.getURI(), indMainImage,
 						imageUri);
 			} else {
-			    ao = AccessOperation.ADD;
+				ao = AccessOperation.ADD;
 				ra = new ObjectPropertyStatementAccessObject(vreq.getJenaOntModel(),
 						entity.getURI(), indMainImage,
 						AccessObject.SOME_URI);
@@ -237,12 +240,17 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 * Show the first screen in the upload process: Add or Replace.
 	 */
 	private ResponseValues doIntroScreen(VitroRequest vreq, Individual entity) {
-		ImageInfo imageInfo = ImageInfo.instanceFromEntityUri(
-				vreq.getUnfilteredWebappDaoFactory(), entity);
+		String customImageAttribute = vreq.getParameter("photoType");
+		String customImageAttributeUri = (customImageAttribute != null)
+				? VitroVocabulary.VITRO_PUBLIC + customImageAttribute
+				: null;
+
+		ImageInfo imageInfo = ImageInfo.instanceFromEntityUriAtPredicate(
+				vreq.getUnfilteredWebappDaoFactory(), entity, customImageAttributeUri);
 		if (imageInfo == null) {
-			return showAddImagePage(vreq, entity);
+			return showAddImagePage(vreq, entity, customImageAttribute);
 		} else {
-			return showReplaceImagePage(vreq, entity, imageInfo);
+			return showReplaceImagePage(vreq, entity, imageInfo, customImageAttribute);
 		}
 	}
 
@@ -251,6 +259,8 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 * image (and thumbnail), and attach the new main image.
 	 */
 	private ResponseValues doUploadImage(VitroRequest vreq, Individual entity) {
+		String customImageAttribute = vreq.getParameter("photoType");
+
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
 				vreq.getUnfilteredWebappDaoFactory(), getServletContext());
 
@@ -266,7 +276,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 
 			// Go to the cropping page.
 			return showCropImagePage(vreq, entity,
-					fileInfo.getBytestreamAliasUrl(), size);
+					fileInfo.getBytestreamAliasUrl(), size, customImageAttribute);
 		} catch (UserMistakeException e) {
 			return showErrorMessage(vreq, entity, e.formatMessage(vreq));
 		}
@@ -295,16 +305,26 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private ResponseValues doCreateThumbnail(VitroRequest vreq,
 			Individual entity) {
+		String customImageAttribute = vreq.getParameter("photoType");
+		String customImageAttributeUri = (customImageAttribute != null)
+				? VitroVocabulary.VITRO_PUBLIC + customImageAttribute
+				: null;
+
+		String thumbnailType = "USER_THUMBNAIL";
+		if (customImageAttribute.equals("portalLogo") || customImageAttribute.equals("portalLogoSmall")) {
+			thumbnailType = "LOGO";
+		}
+
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
 				vreq.getUnfilteredWebappDaoFactory(), getServletContext());
 
 		try {
 			CropRectangle crop = validateCropCoordinates(vreq);
 			FileInfo newImage = helper.getNewImageInfo(vreq);
-			FileInfo thumbnail = helper.generateThumbnail(crop, newImage);
+			FileInfo thumbnail = helper.generateThumbnail(crop, newImage, thumbnailType);
 
-			helper.removeExistingImage(entity);
-			helper.storeImageFiles(entity, newImage, thumbnail);
+			helper.removeExistingImageAtPredicate(entity, customImageAttributeUri);
+			helper.storeImageFilesAtPredicate(entity, newImage, thumbnail, customImageAttributeUri);
 
 			return showExitPage(vreq, entity);
 		} catch (UserMistakeException e) {
@@ -317,10 +337,15 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 * page.
 	 */
 	private ResponseValues doDeleteImage(VitroRequest vreq, Individual entity) {
+		String customImageAttribute = vreq.getParameter("photoType");
+		String customImageAttributeUri = (customImageAttribute != null)
+				? VitroVocabulary.VITRO_PUBLIC + customImageAttribute
+				: null;
+
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
 				vreq.getUnfilteredWebappDaoFactory(), getServletContext());
 
-		helper.removeExistingImage(entity);
+		helper.removeExistingImageAtPredicate(entity, customImageAttributeUri);
 
 		return showExitPage(vreq, entity);
 	}
@@ -330,12 +355,17 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 * screen.
 	 */
 	private ResponseValues doDeleteThenEdit(VitroRequest vreq, Individual entity) {
+		String customImageAttribute = vreq.getParameter("photoType");
+		String customImageAttributeUri = (customImageAttribute != null)
+				? VitroVocabulary.VITRO_PUBLIC + customImageAttribute
+				: null;
+
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
 				vreq.getUnfilteredWebappDaoFactory(), getServletContext());
 
-		helper.removeExistingImage(entity);
+		helper.removeExistingImageAtPredicate(entity, customImageAttributeUri);
 
-		return showAddImagePage(vreq, entity);
+		return showAddImagePage(vreq, entity, customImageAttribute);
 	}
 
 	/**
@@ -392,18 +422,21 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 * The individual has no image - go to the Add Image page.
 	 *
 	 * @param entity
-	 *            if this is null, then all URLs lead to the welcome page.
+	 *               if this is null, then all URLs lead to the welcome page.
 	 */
 	private TemplateResponseValues showAddImagePage(VitroRequest vreq,
-			Individual entity) {
+			Individual entity, String imageAttribute) {
 
-		String formAction = (entity == null) ? "" : formAction(entity.getURI(),
-				ACTION_UPLOAD);
-		String cancelUrl = (entity == null) ? "" : exitPageUrl(vreq,
-				entity.getURI());
-		String placeholderUrl = (entity == null) ? "" : UrlBuilder
-				.getUrl(PlaceholderUtil.getPlaceholderImagePathForIndividual(
-						vreq, entity.getURI()));
+		String formAction = (entity == null) ? ""
+				: formAction(entity.getURI(),
+						ACTION_UPLOAD, imageAttribute);
+		String cancelUrl = (entity == null) ? ""
+				: exitPageUrl(vreq,
+						entity.getURI());
+		String placeholderUrl = (entity == null) ? ""
+				: UrlBuilder
+						.getUrl(PlaceholderUtil.getPlaceholderImagePathForIndividual(
+								vreq, entity.getURI()));
 
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_NEW);
 
@@ -422,19 +455,21 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private TemplateResponseValues showAddImagePageWithError(VitroRequest vreq,
 			Individual entity, String message) {
-		return showAddImagePage(vreq, entity).put(BODY_ERROR_MESSAGE, message);
+		String customImageAttribute = vreq.getParameter("photoType");
+
+		return showAddImagePage(vreq, entity, customImageAttribute).put(BODY_ERROR_MESSAGE, message);
 	}
 
 	/**
 	 * The individual has an image - go to the Replace Image page.
 	 */
 	private TemplateResponseValues showReplaceImagePage(VitroRequest vreq,
-			Individual entity, ImageInfo imageInfo) {
+			Individual entity, ImageInfo imageInfo, String imageAttribute) {
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_REPLACE);
 		rv.put(BODY_THUMBNAIL_URL, UrlBuilder.getUrl(imageInfo.getThumbnail()
 				.getBytestreamAliasUrl()));
-		rv.put(BODY_DELETE_URL, formAction(entity.getURI(), ACTION_DELETE_EDIT));
-		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_UPLOAD));
+		rv.put(BODY_DELETE_URL, formAction(entity.getURI(), ACTION_DELETE_EDIT, imageAttribute));
+		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_UPLOAD, imageAttribute));
 		rv.put(BODY_CANCEL_URL, exitPageUrl(vreq, entity.getURI()));
 		rv.put(BODY_TITLE, figureReplacePageTitle(vreq, entity));
 		rv.put(BODY_MAX_FILE_SIZE, MAXIMUM_FILE_SIZE / (1024 * 1024));
@@ -449,8 +484,10 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	private TemplateResponseValues showReplaceImagePageWithError(
 			VitroRequest vreq, Individual entity, ImageInfo imageInfo,
 			String message) {
+		String customImageAttribute = vreq.getParameter("photoType");
+
 		TemplateResponseValues rv = showReplaceImagePage(vreq, entity,
-				imageInfo);
+				imageInfo, customImageAttribute);
 		rv.put(BODY_ERROR_MESSAGE, message);
 		return rv;
 	}
@@ -459,12 +496,12 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 * We got their main image - go to the Crop Image page.
 	 */
 	private TemplateResponseValues showCropImagePage(VitroRequest vreq,
-			Individual entity, String imageUrl, Dimensions dimensions) {
+			Individual entity, String imageUrl, Dimensions dimensions, String imageAttribute) {
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_CROP);
 		rv.put(BODY_MAIN_IMAGE_URL, UrlBuilder.getUrl(imageUrl));
 		rv.put(BODY_MAIN_IMAGE_HEIGHT, dimensions.height);
 		rv.put(BODY_MAIN_IMAGE_WIDTH, dimensions.width);
-		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_SAVE));
+		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_SAVE, imageAttribute));
 		rv.put(BODY_CANCEL_URL, exitPageUrl(vreq, entity.getURI()));
 		rv.put(BODY_TITLE, figureCropPageTitle(vreq, entity));
 		return rv;
@@ -509,9 +546,9 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 * back to this controller, along with the desired action and the Entity
 	 * URI.
 	 */
-	private String formAction(String entityUri, String action) {
+	private String formAction(String entityUri, String action, String imageAttribute) {
 		ParamMap params = new ParamMap(PARAMETER_ENTITY_URI, entityUri,
-				PARAMETER_ACTION, action);
+				PARAMETER_ACTION, action, "photoType", imageAttribute);
 		return UrlBuilder.getPath(URL_HERE, params);
 	}
 
