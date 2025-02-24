@@ -1,0 +1,117 @@
+.li-selected> a > label::before {
+	content: url(../../images/arrowIcon.gif);
+	color: #2ea0cf;
+	padding-right: 2px;
+	margin-left: -12px;
+}
+
+.checked-search-input-label {
+	padding: 2px 5px 2px 5px;
+	border: 0px;
+	background-color: inherit;
+}
+
+.range-slider {
+	margin-bottom: 15px;
+}
+
+.range-slider-end {
+	display: inline-block;
+}
+
+.range-slider-start {
+	display: inline-block;
+}
+
+#filter-form-sort {
+	margin: 0px;
+	border-bottom: 0px;
+	border-top: 0px;
+	border-left: 0px;
+	height: 3em;
+	border-radius: unset;
+}
+
+#filter-form-hits-per-page {
+	margin: 0px;
+	border-bottom: 0px;
+	border-top: 0px;
+	border-left: 0px;
+	height: 3em;
+	border-radius: unset;
+}
+
+#browsing-options {
+	border-bottom: 1px solid #dde4e3;
+	border-top: 1px solid #dde4e3;
+}
+
+.display-title {
+	font-size: small;
+	display: block;
+}
+
+#browse-filters {
+	width: 271px;
+	float: left;
+	background-color: #f1f2ee;
+}
+
+#browse-filters>li:not(:last-child) {
+	border-bottom: 1px dotted #dde4e3;
+}
+
+#browse-filters>li {
+	margin-left: 10px;
+	margin-right: 10px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+#browse-filters li a {
+	padding-left: 10px;
+	text-decoration: none;
+	display: block;
+}
+
+#browse-filters li a label {
+	display: block;
+	margin: 0px;
+}
+
+.facet-values {
+	padding-left: 10px;
+}
+
+.facet-values li {
+	padding-top: 10px;
+}
+
+.facet-values label{
+	cursor:pointer;
+}
+
+.filter-tab > a:focus {
+	color: unset;
+	text-decoration: none;
+}
+
+.facet-values > li > a > label:hover {
+	color: #2ea0cf;
+}
+
+.range-filter {
+	padding-right: 16px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	padding-left: 4px;
+}
+
+.download-url {
+	padding: 5px 25px 5px;
+}
+
+#downloadIcon {
+	padding-left: 7px;
+	font-size: 14px;
+}
