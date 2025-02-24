@@ -46,6 +46,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
@@ -68,7 +69,7 @@ public class EntityRetryController extends BaseEditController {
         }
 
         VitroRequest vreq = new VitroRequest(request);
-        String siteAdminUrl = vreq.getContextPath() + Controllers.SITE_ADMIN;
+        String siteAdminUrl = ContextPath.getPath(vreq) + Controllers.SITE_ADMIN;
 
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);
@@ -332,7 +333,7 @@ public class EntityRetryController extends BaseEditController {
                 }
             } else {
                 try {
-                	String siteAdminUrl = request.getContextPath() + Controllers.SITE_ADMIN;
+                	String siteAdminUrl = ContextPath.getPath(request) + Controllers.SITE_ADMIN;
                     response.sendRedirect(siteAdminUrl);
                 } catch (IOException e) {
                     log.error("EntityInsertPageForwarder could not redirect to about page.");

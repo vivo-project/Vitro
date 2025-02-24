@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -34,7 +35,7 @@ public class LogoutRedirector {
 		if ((referringUri == null)
 				|| (getRestrictedPageUris(request).contains(referringUri))) {
 			log.debug("Sending to home page.");
-			return request.getContextPath();
+			return ContextPath.getPath(request);
 		} else {
 			log.debug("Sending back to referring page.");
 			return referrer;
@@ -43,7 +44,7 @@ public class LogoutRedirector {
 
 	private static String figureUriFromUrl(HttpServletRequest request,
 			String referrer) {
-		String postContext = breakBeforeContextPath(request.getContextPath(),
+		String postContext = breakBeforeContextPath(ContextPath.getPath(request),
 				referrer);
 		String uri = removeQueryString(postContext);
 		log.debug("referrer='" + referrer + "', uri='" + uri + "'");

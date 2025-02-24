@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
@@ -107,7 +108,7 @@ public class StartupStatusDisplayFilter implements Filter {
 	}
 
 	private String getContextPath() {
-		String cp = ctx.getContextPath();
+		String cp = ContextPath.getPath(ctx);
 		if ((cp == null) || cp.isEmpty()) {
 			return "The application";
 		} else {

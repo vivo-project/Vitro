@@ -6,6 +6,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -17,7 +18,7 @@ public class FreemarkerSetup implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent event) {
 		ServletContext sc = event.getServletContext();
         FreemarkerComponentGenerator.setServletContext(sc);
-		UrlBuilder.contextPath = sc.getContextPath();
+		UrlBuilder.contextPath = ContextPath.getPath(sc);
 
 		log.info("Freemarker templating system initialized.");
 	}

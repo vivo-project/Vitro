@@ -1,9 +1,10 @@
 <%-- $This file is distributed under the terms of the license in LICENSE$ --%>
 
+<%@ page import="edu.cornell.mannlib.vitro.webapp.config.ContextPath"%>
 <%
 
 request.setAttribute("dwrDisabled", Boolean.FALSE);
-String context = request.getContextPath();
+String context = ContextPath.getPath(request);
 
 %>
 
