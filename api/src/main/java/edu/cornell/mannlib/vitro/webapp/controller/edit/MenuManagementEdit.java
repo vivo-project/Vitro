@@ -24,7 +24,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.shared.Lock;
-
+import edu.cornell.mannlib.vitro.webapp.auth.checks.UserOnThread;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
@@ -51,15 +51,15 @@ public class MenuManagementEdit extends VitroHttpServlet {
 
     	String command = getCommand(vreq);
     	if(command != null) {
-    		processCommand(command, vreq, resp);
+    	    try (UserOnThread uot = new UserOnThread(vreq)) {
+    	        processCommand(command, vreq, resp);
+    	    }
     	} else {
     		log.error("Command is null");
     	}
         //Need to redirect correctly
     	if(!isReorder(command)){
     		resp.sendRedirect(rawRequest.getContextPath() + REDIRECT_URL);
-    	} else {
-
     	}
     }
 

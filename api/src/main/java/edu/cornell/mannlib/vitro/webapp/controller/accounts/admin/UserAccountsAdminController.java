@@ -6,8 +6,9 @@ import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import edu.cornell.mannlib.vitro.webapp.auth.checks.UserOnThread;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -73,7 +74,9 @@ public class UserAccountsAdminController extends FreemarkerHttpServlet {
 		if (page.isBogus()) {
 			return showHomePage(vreq, page.getBogusMessage());
 		} else if (page.isSubmit() && page.isValid()) {
-			page.updateAccount();
+		    try (UserOnThread uot = new UserOnThread(vreq)) {
+		        page.updateAccount();
+		    }
 
 			UserAccountsListPage.Message.showUpdatedAccount(vreq,
 					page.getUpdatedAccount(), page.wasPasswordEmailSent());

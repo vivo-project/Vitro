@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-
+import edu.cornell.mannlib.vitro.webapp.auth.checks.UserOnThread;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
@@ -88,7 +88,7 @@ public class DumpRestoreController extends FreemarkerHttpServlet {
 			resp.sendError(HttpServletResponse.SC_FORBIDDEN);
 		}
 
-		try {
+		try (UserOnThread uot = new UserOnThread(req)) {
 			if (ACTION_RESTORE.equals(req.getPathInfo())) {
 				long tripleCount = new RestoreModelsAction(req, resp)
 						.restoreModels();

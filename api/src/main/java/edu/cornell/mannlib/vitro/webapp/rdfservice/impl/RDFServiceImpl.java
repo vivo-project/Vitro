@@ -150,6 +150,7 @@ public abstract class RDFServiceImpl implements RDFService {
         if (registeredListeners.isEmpty() && registeredJenaListeners.isEmpty()) {
             return;
         }
+        changeSet.setUserFromThread();
         for (ModelChange modelChange : changeSet.getModelChanges()) {
             notifyListeners(modelChange);
         }
