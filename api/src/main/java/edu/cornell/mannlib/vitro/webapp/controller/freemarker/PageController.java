@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.ServletContext;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.NamedAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
@@ -40,8 +40,10 @@ import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetterUtils;
  *
  * See implementations of PageDataGetter for more variables.
  */
-@WebServlet(name = "PageController", urlPatterns = "/pageController")
+@WebServlet(name = "PageController", urlPatterns = {"/pageController", PageController.PAGE_NOT_FOUND})
 public class PageController extends FreemarkerHttpServlet{
+    static final String PAGE_NOT_FOUND = "/page_not_found";
+
     private static final Log log = LogFactory.getLog(PageController.class);
 
     protected final static String DEFAULT_TITLE = "Page";
@@ -197,6 +199,9 @@ public class PageController extends FreemarkerHttpServlet{
         // Check if there is a page URI in the request.
         // This would have been added by a servlet Filter.
         String pageURI = (String) vreq.getAttribute("pageURI");
+        if (DispatcherType.ERROR.equals(vreq.getDispatcherType())) {
+            pageURI = vreq.getWebappDaoFactory().getPageDao().getPageMappings().get(PAGE_NOT_FOUND);
+        }
         return pageURI;
     }
 
