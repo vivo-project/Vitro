@@ -63,6 +63,9 @@ public class SimplePermission {
     public static final SimplePermission PAGE_VIEWABLE_EDITOR = new SimplePermission("PageViewableEditor");
     public static final SimplePermission PAGE_VIEWABLE_PUBLIC = new SimplePermission("PageViewablePublic");
     
+    public static final SimplePermission MANAGE_DATA_DISTRIBUTORS = new SimplePermission("ManageDataDistributors");
+    public static final SimplePermission EXECUTE_REPORTS = new SimplePermission("ExecuteReports");
+    public static final SimplePermission MANAGE_REPORTS = new SimplePermission("ManageReports");
     
     public SimpleAuthorizationRequest ACTION;
     private String uri;
