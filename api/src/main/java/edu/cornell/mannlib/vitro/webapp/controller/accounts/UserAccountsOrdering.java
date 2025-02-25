@@ -9,7 +9,7 @@ public class UserAccountsOrdering {
 	public enum Direction {
 		ASCENDING("ASC"), DESCENDING("DESC");
 
-		public static Direction DEFAULT_DIRECTION = ASCENDING;
+		public static Direction DEFAULT_DIRECTION = DESCENDING;
 
 		public static Direction fromKeyword(String keyword) {
 			if (keyword == null) {
@@ -37,7 +37,7 @@ public class UserAccountsOrdering {
 				"status"), ROLE("ps"), LOGIN_COUNT("count"), LAST_LOGIN_TIME(
 				"lastLogin");
 
-		public static Field DEFAULT_FIELD = EMAIL;
+		public static Field DEFAULT_FIELD = LAST_LOGIN_TIME;
 
 		public static Field fromName(String name) {
 			if (name == null) {

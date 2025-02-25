@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts;
 
-import static edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering.DEFAULT_ORDERING;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
@@ -32,6 +31,9 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 	private static final String N3_DATA_FILENAME = "UserAccountsSelectorTest.n3";
 
 	private static final String NS_MINE = "http://vivo.mydomain.edu/individual/";
+
+    private static final UserAccountsOrdering DEFAULT_ORDERING = new UserAccountsOrdering(
+            Field.EMAIL, Direction.ASCENDING);
 
 	private static OntModel ontModel;
 
