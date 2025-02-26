@@ -22,12 +22,10 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorization
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.NotFoundException;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
-import edu.cornell.mannlib.vitro.webapp.controller.individual.IndividualRequestInfo.Type;
-import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 
 /**
  * Handles requests for entity information.
@@ -36,8 +34,6 @@ import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 public class IndividualController extends FreemarkerHttpServlet {
 	private static final Log log = LogFactory
 			.getLog(IndividualController.class);
-
-	private static final String TEMPLATE_HELP = "individual-help.ftl";
 
 	@Deprecated
 	private static final String PROPERTY_EXTENDED_LOD = "serveExtendedLinkedData";
@@ -82,7 +78,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 				 * If we can't figure out what individual you want, or if there
 				 * is no such individual, show an informative error page.
 				 */
-				return doNotFound(vreq);
+				throw new NotFoundException();
 			case BYTESTREAM_REDIRECT:
 				/*
 				 * If the Individual requested is a FileBytestream, redirect
@@ -113,6 +109,8 @@ public class IndividualController extends FreemarkerHttpServlet {
 				return new IndividualResponseBuilder(vreq,
 						requestInfo.getIndividual()).assembleResponse();
 			}
+		} catch (NotFoundException e) {
+			throw e;
 		} catch (Throwable e) {
 			log.error(e, e);
 			return new ExceptionResponseValues(e);
@@ -142,15 +140,6 @@ public class IndividualController extends FreemarkerHttpServlet {
 	private IndividualRequestInfo analyzeTheRequest(VitroRequest vreq) {
 		return new IndividualRequestAnalyzer(vreq,
 				new IndividualRequestAnalysisContextImpl(vreq)).analyze();
-	}
-
-	private ResponseValues doNotFound(VitroRequest vreq) {
-		Map<String, Object> body = new HashMap<String, Object>();
-		body.put("title", I18n.text(vreq, "individual_not_found"));
-		body.put("errorMessage", I18n.text(vreq, "individual_not_found_msg"));
-
-		return new TemplateResponseValues(TEMPLATE_HELP, body,
-				HttpServletResponse.SC_NOT_FOUND);
 	}
 
 	private boolean useExtendedLOD(HttpServletRequest req) {

@@ -109,6 +109,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
 
 	        doResponse(vreq, response, responseValues);
 
+    	} catch (NotFoundException e) {
+    	    response.sendError(HttpServletResponse.SC_NOT_FOUND);
     	} catch (Throwable e) {
     	    if (e instanceof IOException || e instanceof ServletException) {
     	        try {
