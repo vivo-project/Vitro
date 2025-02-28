@@ -12,6 +12,7 @@ public class VitroVocabulary {
     public static final String VITRO_AUTH = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#";
     public static final String VITRO_PUBLIC = "http://vitro.mannlib.cornell.edu/ns/vitro/public#";
     public static final String VITRO_PUBLIC_ONTOLOGY = "http://vitro.mannlib.cornell.edu/ns/vitro/public";
+    public static final String VITRO_SEARCH_INDIVIDUAL ="https://vivoweb.org/ontology/vitro-search-individual/";
     // TODO change the following before 1.6 release
     public static final String PROPERTY_CONFIG_DATA = "http://vitro.mannlib.cornell.edu/ns/vitro/siteConfig/";
 

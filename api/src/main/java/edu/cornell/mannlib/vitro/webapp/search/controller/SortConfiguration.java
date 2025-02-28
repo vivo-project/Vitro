@@ -1,5 +1,8 @@
 package edu.cornell.mannlib.vitro.webapp.search.controller;
 
+import static edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery.Order.ASC;
+import static edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery.Order.DESC;
+
 import java.util.Locale;
 
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery.Order;
@@ -9,12 +12,12 @@ public class SortConfiguration {
     private String id = "";
     private String field = "";
     private boolean multilingual = false;
-    private boolean ascOrder = false;
+    private Order sortDirection = DESC;
     private boolean selected = false;
     private String label = "";
-    private int order = 0;
+    private int rank = 0;
     private String fallback;
-    private boolean display = false;
+    private boolean displayed = false;
 
     public SortConfiguration(String id, String label, String field) {
         this.id = id;
@@ -62,15 +65,16 @@ public class SortConfiguration {
         return field;
     }
 
-    public Order getSortOrder() {
-        if (ascOrder) {
-            return Order.ASC;
-        }
-        return Order.DESC;
+    public Order getSortDirection() {
+        return sortDirection;
     }
 
-    public void setAscOrder(boolean ascOrder) {
-        this.ascOrder = ascOrder;
+    public void setSortDirection(boolean isAscending) {
+        if (isAscending) {
+            sortDirection = ASC;
+        } else {
+            sortDirection = DESC;
+        }
     }
 
     public boolean isSelected() {
@@ -81,12 +85,12 @@ public class SortConfiguration {
         this.selected = selected;
     }
 
-    public int getOrder() {
-        return order;
+    public int getRank() {
+        return rank;
     }
 
-    public void setOrder(int order) {
-        this.order = order;
+    public void setRank(int rank) {
+        this.rank = rank;
     }
 
     public String getFallback() {
@@ -97,11 +101,11 @@ public class SortConfiguration {
         this.fallback = id;
     }
 
-    public void setDisplay(boolean display) {
-        this.display = display;
+    public void setDisplayed(boolean display) {
+        this.displayed = display;
     }
 
-    public boolean isDisplay() {
-        return display;
+    public boolean isDisplayed() {
+        return displayed;
     }
 }

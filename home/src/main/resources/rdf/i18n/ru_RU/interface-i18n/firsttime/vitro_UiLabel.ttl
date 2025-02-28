@@ -6445,3 +6445,29 @@ uil-data:password_reset_admin_notification_email_html.Vitro
         uil:hasApp       "Vitro" ;
         uil:hasKey       "password_reset_admin_notification_email_html" ;
         uil:hasPackage   "Vitro-languages" .
+
+uil-data:browse_results_alphabetical_index.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "а,б,в,г,д,е,ё,ж,з,и,ӣ,к,л,м,н,о,п,р,с,т,у,ф,х,ц,ч,ш,щ,э,ю,я"@ru-RU ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "browse_results_alphabetical_index" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:browse_search_filter_facets.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Отображение результатов поискового фильтра"@ru-RU ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "browse_search_filter_facets" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:select_search_filter_to_browse.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Выберите фильтр"@ru-RU ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "select_search_filter_to_browse" ;
+        uil:hasPackage   "Vitro-languages" .
+
+
