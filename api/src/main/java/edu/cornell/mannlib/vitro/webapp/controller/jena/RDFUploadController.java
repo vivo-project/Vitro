@@ -34,6 +34,7 @@ import org.apache.jena.shared.JenaException;
 import org.apache.jena.shared.Lock;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.checks.UserOnThread;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -434,7 +435,7 @@ public class RDFUploadController extends JenaIngestController {
         ChangeSet cs = makeChangeSet(rdfService);
         cs.addAddition(in, RDFServiceUtils.getSerializationFormatFromJenaString(
                         language), modelName, userId);
-        try {
+        try (UserOnThread uot = new UserOnThread(userId)) {
             rdfService.changeSetUpdate(cs);
         } catch (RDFServiceException e) {
             throw new RuntimeException(e);
@@ -446,7 +447,7 @@ public class RDFUploadController extends JenaIngestController {
         ChangeSet cs = makeChangeSet(rdfService);
         cs.addRemoval(in, RDFServiceUtils.getSerializationFormatFromJenaString(
                         language), modelName, userId);
-        try {
+        try (UserOnThread uot = new UserOnThread(userId)) {
             rdfService.changeSetUpdate(cs);
         } catch (RDFServiceException e) {
             throw new RuntimeException(e);

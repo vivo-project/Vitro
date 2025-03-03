@@ -36,6 +36,7 @@ import edu.cornell.mannlib.vedit.validator.ValidationObject;
 import edu.cornell.mannlib.vedit.validator.Validator;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
+import edu.cornell.mannlib.vitro.webapp.auth.checks.UserOnThread;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.EntityPolicyController;
 import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
@@ -132,11 +133,12 @@ public class OperationController extends BaseEditController {
             }
 
             String action = getAction(request);
-
-            boolean status = performEdit(epo, newObj, action);
-            if (status == FAILURE) {
-            	retry(request, response, epo);
-            	return;
+            try (UserOnThread uot = new UserOnThread(request)) {
+                boolean status = performEdit(epo, newObj, action);
+                if (status == FAILURE) {
+                    retry(request, response, epo);
+                    return;
+                }
             }
 
             // If contains restrictions
@@ -214,7 +216,9 @@ public class OperationController extends BaseEditController {
         if (aot == null) {
             return;
         }
-        updateUriSuppressions(request, aot, entityUri);
+        try (UserOnThread uot = new UserOnThread(request)) {
+            updateUriSuppressions(request, aot, entityUri);
+        }
     }
 
     private void updatePermissions(HttpServletRequest request) {
@@ -231,10 +235,12 @@ public class OperationController extends BaseEditController {
         if (aot == null) {
             return;
         }
-        updateEntityPermissions(request, entityUri, aot);
-        updateTypeSuppressions(request, aot, entityUri);
-        updateNotRelatedTypeSuppressions(request, aot, entityUri);
-        updateNotRelatedPropertySuppressions(request, aot, entityUri);
+        try (UserOnThread uot = new UserOnThread(request)) {
+            updateEntityPermissions(request, entityUri, aot);
+            updateTypeSuppressions(request, aot, entityUri);
+            updateNotRelatedTypeSuppressions(request, aot, entityUri);
+            updateNotRelatedPropertySuppressions(request, aot, entityUri);
+        }
     }
 
     private void updateEntityPermissions(HttpServletRequest request, String entityUri, AccessObjectType aot) {
