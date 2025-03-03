@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.GraphBuilder;
+import edu.cornell.mannlib.vitro.webapp.auth.checks.UserOnThread;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
@@ -148,7 +149,9 @@ public class DataDistributorConfigController extends FreemarkerHttpServlet {
         DataDistributorDao ddDao = vreq.getWebappDaoFactory().getDataDistributorDao();
 
         // A delete is simply an update with an empty model
-        ddDao.updateModel(uri, ModelFactory.createDefaultModel());
+        try (UserOnThread uot = new UserOnThread(vreq)) {
+            ddDao.updateModel(uri, ModelFactory.createDefaultModel());
+        }
 
         return new RedirectResponseValues(REDIRECT_PATH);
     }
@@ -163,7 +166,7 @@ public class DataDistributorConfigController extends FreemarkerHttpServlet {
 
         if (model != null && !model.isEmpty()) {
             // Get the class of the object
-            Class objectClass = ddDao.getClassFromModel(model);
+            Class<?> objectClass = ddDao.getClassFromModel(model);
 
             // If we are processing a submitted form
             if (!StringUtils.isEmpty(vreq.getParameter("submitted"))) {
@@ -171,7 +174,9 @@ public class DataDistributorConfigController extends FreemarkerHttpServlet {
                 Model requestModel = getModelFromRequest(vreq, uri, objectClass);
 
                 // Update the model in the triple store with the submitted form
-                ddDao.updateModel(uri, requestModel);
+                try (UserOnThread uot = new UserOnThread(vreq)) {
+                    ddDao.updateModel(uri, requestModel);
+                }
 
                 // Redirect to the list
                 return new RedirectResponseValues(REDIRECT_PATH);
@@ -206,7 +211,7 @@ public class DataDistributorConfigController extends FreemarkerHttpServlet {
 
     private ResponseValues processAdd(VitroRequest vreq) {
         // Get the class from the parameter
-        Class objectClass = findClass(vreq.getParameter("addType"));
+        Class<?> objectClass = findClass(vreq.getParameter("addType"));
 
         if (objectClass != null) {
             // If we are processing a submitted form
@@ -220,7 +225,9 @@ public class DataDistributorConfigController extends FreemarkerHttpServlet {
                 Model requestModel = getModelFromRequest(vreq, uri, objectClass);
 
                 // Update the model in the triple store with the submitted form
-                ddDao.updateModel(uri, requestModel);
+                try (UserOnThread uot = new UserOnThread(vreq)) {
+                    ddDao.updateModel(uri, requestModel);
+                }
 
                 // Redirect to the list
                 return new RedirectResponseValues(REDIRECT_PATH);
@@ -264,7 +271,7 @@ public class DataDistributorConfigController extends FreemarkerHttpServlet {
         }
     }
 
-    private ResponseValues makeResponseValues(VitroRequest vreq, Class objectClass, Map<String, Object> bodyMap) {
+    private ResponseValues makeResponseValues(VitroRequest vreq, Class<?> objectClass, Map<String, Object> bodyMap) {
         bodyMap.put("properties", getPropertyMethodsFor(objectClass));
         bodyMap.put("objectClass", objectClass);
 
@@ -283,8 +290,8 @@ public class DataDistributorConfigController extends FreemarkerHttpServlet {
         return new TemplateResponseValues(EDIT_TEMPLATE_NAME, bodyMap);
     }
 
-    private Class findClass(String name) {
-        Class objectClass = null;
+    private Class<?> findClass(String name) {
+        Class<?> objectClass = null;
 
         if (!StringUtils.isEmpty(name)) {
             if (name.contains(".")) {
@@ -308,7 +315,7 @@ public class DataDistributorConfigController extends FreemarkerHttpServlet {
     /**
      * Convert the submitted values into a Jena model
      */
-    private Model getModelFromRequest(VitroRequest vreq, String subjectUri, Class objectClass) {
+    private Model getModelFromRequest(VitroRequest vreq, String subjectUri, Class<?> objectClass) {
         Model model = ModelFactory.createDefaultModel();
 
         // The subject uri passed will be the subject of all statements in this model
@@ -353,9 +360,9 @@ public class DataDistributorConfigController extends FreemarkerHttpServlet {
         return model;
     }
 
-    private final Map<Class, Collection<PropertyType.PropertyMethod>> propertyMethodsMap = new HashMap<>();
+    private final Map<Class<?>, Collection<PropertyType.PropertyMethod>> propertyMethodsMap = new HashMap<>();
 
-    private Collection<PropertyType.PropertyMethod> getPropertyMethodsFor(Class objectClass) {
+    private Collection<PropertyType.PropertyMethod> getPropertyMethodsFor(Class<?> objectClass) {
         if (!propertyMethodsMap.containsKey(objectClass)) {
             addPropetyMethodsFor(objectClass);
         }
@@ -370,6 +377,7 @@ public class DataDistributorConfigController extends FreemarkerHttpServlet {
                 Map<String, PropertyType.PropertyMethod> propertyMethods = wrapped.getPropertyMethods();
                 propertyMethodsMap.put(objectClass, propertyMethods.values());
             } catch (InstanceWrapper.InstanceWrapperException e) {
+                log.error(e, e);
             }
         }
     }

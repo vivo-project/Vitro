@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.SelectFromContentDistributor;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.SelectFromGraphDistributor;
+import edu.cornell.mannlib.vitro.webapp.auth.checks.UserOnThread;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
@@ -233,7 +234,9 @@ public class ReportingController extends FreemarkerHttpServlet {
                 report.setUri(uri);
 
                 // Update the model in the triple store with the submitted form
-                reportDao.updateReport(uri, report);
+                try (UserOnThread uot = new UserOnThread(vreq)) {
+                    reportDao.updateReport(uri, report);
+                }
 
                 // Redirect to the list
                 return new RedirectResponseValues(REDIRECT_PATH);
@@ -279,7 +282,9 @@ public class ReportingController extends FreemarkerHttpServlet {
                 }
 
                 // Update the model in the triple store with the submitted form
-                reportDao.updateReport(uri, submittedReport);
+                try (UserOnThread uot = new UserOnThread(vreq)) {
+                    reportDao.updateReport(uri, submittedReport);
+                }
 
                 // Redirect to the list
                 return new RedirectResponseValues(REDIRECT_PATH);
@@ -308,7 +313,9 @@ public class ReportingController extends FreemarkerHttpServlet {
         ReportingDao reportingDao = vreq.getWebappDaoFactory().getReportingDao();
 
         // A delete is simply an update with an empty model
-        reportingDao.deleteReport(uri);
+        try (UserOnThread uot = new UserOnThread(vreq)) {
+            reportingDao.deleteReport(uri);
+        }
 
         return new RedirectResponseValues(REDIRECT_PATH);
     }
