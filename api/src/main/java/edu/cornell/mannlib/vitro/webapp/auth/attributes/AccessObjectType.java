@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.auth.attributes;
 public enum AccessObjectType {
     CLASS,
     NAMED_OBJECT,
+    DATA_DISTRIBUTOR,
     DATA_PROPERTY,
     OBJECT_PROPERTY,
     DATA_PROPERTY_STATEMENT,

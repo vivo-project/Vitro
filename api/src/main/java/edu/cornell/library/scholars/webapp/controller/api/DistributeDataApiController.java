@@ -2,6 +2,7 @@
 
 package edu.cornell.library.scholars.webapp.controller.api;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation.EXECUTE;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
 import static edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.SparqlQueryRunner.createSelectQueryContext;
 
@@ -24,6 +25,8 @@ import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistrib
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor.NoSuchActionException;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor.NotAuthorizedException;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContextImpl;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.DataDistributorAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.controller.api.VitroApiServlet;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
@@ -52,6 +55,9 @@ public class DistributeDataApiController extends VitroApiServlet {
             Model model = ModelAccess.on(req).getOntModel(DISPLAY);
 
             String uri = findDistributorForAction(req, model);
+            if (!PolicyHelper.isAuthorizedForActions(req, new DataDistributorAccessObject(uri), EXECUTE)) {
+                throw new NotAuthorizedException();
+            }
             DataDistributor instance = instantiateDistributor(req, uri, model);
             runIt(req, resp, instance);
         } catch (NoSuchActionException e) {
