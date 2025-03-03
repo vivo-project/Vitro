@@ -1,0 +1,20 @@
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#681b68c6-4d8d-432c-9617-7d1ce0cb2191-ds302d5dc7-e5bc-474a-9e45-9126815c6348>
+        a       <java:edu.cornell.mannlib.vitro.webapp.reporting.DataSource> ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#distributorName>
+                "dataSource" ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#distributorRank>
+                "1"^^xsd:int ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#outputName>
+                "dataSource" .
+
+<http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#04625c19-6090-466f-a8e5-66d29cc3553f>
+        a       <java:edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor> , <java:edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.SelectFromContentDistributor> ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#actionName>
+                "dataSource" ;
+        <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#query>
+                "PREFIX rdfs:     <http://www.w3.org/2000/01/rdf-schema#>\r\nSELECT ?uri ?object\r\nWHERE\r\n{\r\n      ?uri rdfs:label ?object\r\n}" .

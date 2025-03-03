@@ -2,271 +2,309 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils.configuration;
 
-import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDfloat;
-import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDstring;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.datatypes.xsd.impl.RDFLangString;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import static org.apache.jena.datatypes.xsd.XSDDatatype.*;
+
 /**
  * An enumeration of the types of properties that the ConfigurationBeanLoader
  * will support.
- *
+ * <p>
  * Also, classes that represent the Java methods and RDF statements associated
  * with those types.
  */
 public enum PropertyType {
-	RESOURCE {
-		@Override
-		public PropertyStatement buildPropertyStatement(Statement s) {
-			return new ResourcePropertyStatement(s.getPredicate().getURI(), s
-					.getObject().asResource().getURI());
-		}
+    RESOURCE {
+        @Override
+        public PropertyStatement buildPropertyStatement(Statement s) {
+            return new ResourcePropertyStatement(s.getPredicate().getURI(), s
+                    .getObject().asResource().getURI());
+        }
 
-		@Override
-		protected PropertyMethod buildPropertyMethod(Method method,
-				Property annotation) {
-			return new ResourcePropertyMethod(method, annotation);
-		}
+        @Override
+        protected PropertyMethod buildPropertyMethod(Method method,
+                                                     Property annotation) {
+            return new ResourcePropertyMethod(method, annotation);
+        }
 
-	},
-	STRING {
-		@Override
-		public PropertyStatement buildPropertyStatement(Statement s) {
-			return new StringPropertyStatement(s.getPredicate().getURI(), s
-					.getObject().asLiteral().getString());
-		}
+    },
+    STRING {
+        @Override
+        public PropertyStatement buildPropertyStatement(Statement s) {
+            return new StringPropertyStatement(s.getPredicate().getURI(), s
+                    .getObject().asLiteral().getString());
+        }
 
-		@Override
-		protected PropertyMethod buildPropertyMethod(Method method,
-				Property annotation) {
-			return new StringPropertyMethod(method, annotation);
-		}
-	},
-	FLOAT {
-		@Override
-		public PropertyStatement buildPropertyStatement(Statement s) {
-			return new FloatPropertyStatement(s.getPredicate().getURI(), s
-					.getObject().asLiteral().getFloat());
-		}
+        @Override
+        protected PropertyMethod buildPropertyMethod(Method method,
+                                                     Property annotation) {
+            return new StringPropertyMethod(method, annotation);
+        }
+    },
+    FLOAT {
+        @Override
+        public PropertyStatement buildPropertyStatement(Statement s) {
+            return new FloatPropertyStatement(s.getPredicate().getURI(), s
+                    .getObject().asLiteral().getFloat());
+        }
 
-		@Override
-		protected PropertyMethod buildPropertyMethod(Method method,
-				Property annotation) {
-			return new FloatPropertyMethod(method, annotation);
-		}
-	};
+        @Override
+        protected PropertyMethod buildPropertyMethod(Method method,
+                                                     Property annotation) {
+            return new FloatPropertyMethod(method, annotation);
+        }
+    },
+    INTEGER {
+        @Override
+        public PropertyStatement buildPropertyStatement(Statement s) {
+            return new IntegerPropertyStatement(s.getPredicate().getURI(), s
+                    .getObject().asLiteral().getInt());
+        }
 
-	public static PropertyType typeForObject(RDFNode object)
-			throws PropertyTypeException {
-		if (object.isURIResource()) {
-			return RESOURCE;
-		}
-		if (object.isLiteral()) {
-			Literal literal = object.asLiteral();
-			RDFDatatype datatype = literal.getDatatype();
-			if (datatype == null || datatype.equals(XSDstring) || datatype.equals(RDFLangString.rdfLangString)) {
-				return STRING;
-			}
-			if (datatype.equals(XSDfloat)) {
-				return FLOAT;
-			}
-		}
-		throw new PropertyTypeException("Unsupported datatype on object: "
-				+ object);
-	}
+        @Override
+        protected PropertyMethod buildPropertyMethod(Method method,
+                                                     Property annotation) {
+            return new IntegerPropertyMethod(method, annotation);
+        }
+    };
 
-	public static PropertyType typeForParameterType(Class<?> parameterType)
-			throws PropertyTypeException {
-		if (Float.TYPE.equals(parameterType)) {
-			return FLOAT;
-		}
-		if (String.class.equals(parameterType)) {
-			return STRING;
-		}
-		if (!parameterType.isPrimitive()) {
-			return RESOURCE;
-		}
-		throw new PropertyTypeException(
-				"Unsupported parameter type on method: " + parameterType);
-	}
+    public static PropertyType typeForObject(RDFNode object)
+            throws PropertyTypeException {
+        if (object.isURIResource()) {
+            return RESOURCE;
+        }
+        if (object.isLiteral()) {
+            Literal literal = object.asLiteral();
+            RDFDatatype datatype = literal.getDatatype();
+            if (datatype == null || datatype.equals(XSDstring) || datatype.equals(RDFLangString.rdfLangString)) {
+                return STRING;
+            }
+            if (datatype.equals(XSDfloat)) {
+                return FLOAT;
+            }
+            if (datatype.equals(XSDint) || datatype.equals(XSDinteger)) {
+                return INTEGER;
+            }
+        }
+        throw new PropertyTypeException("Unsupported datatype on object: "
+                + object);
+    }
 
-	public static PropertyStatement createPropertyStatement(Statement s)
-			throws PropertyTypeException {
-		PropertyType type = PropertyType.typeForObject(s.getObject());
-		return type.buildPropertyStatement(s);
-	}
+    public static PropertyType typeForParameterType(Class<?> parameterType)
+            throws PropertyTypeException {
+        if (Float.TYPE.equals(parameterType)) {
+            return FLOAT;
+        }
+        if (Integer.class.equals(parameterType)) {
+            return INTEGER;
+        }
+        if (String.class.equals(parameterType)) {
+            return STRING;
+        }
+        if (!parameterType.isPrimitive()) {
+            return RESOURCE;
+        }
+        throw new PropertyTypeException(
+                "Unsupported parameter type on method: " + parameterType);
+    }
 
-	public static PropertyMethod createPropertyMethod(Method method,
-			Property annotation) throws PropertyTypeException {
-		Class<?> parameterType = method.getParameterTypes()[0];
-		PropertyType type = PropertyType.typeForParameterType(parameterType);
-		return type.buildPropertyMethod(method, annotation);
-	}
+    public static PropertyStatement createPropertyStatement(Statement s)
+            throws PropertyTypeException {
+        PropertyType type = PropertyType.typeForObject(s.getObject());
+        return type.buildPropertyStatement(s);
+    }
 
-	protected abstract PropertyStatement buildPropertyStatement(Statement s);
+    public static PropertyMethod createPropertyMethod(Method method,
+                                                      Property annotation) throws PropertyTypeException {
+        Class<?> parameterType = method.getParameterTypes()[0];
+        PropertyType type = PropertyType.typeForParameterType(parameterType);
+        return type.buildPropertyMethod(method, annotation);
+    }
 
-	protected abstract PropertyMethod buildPropertyMethod(Method method,
-			Property annotation);
+    protected abstract PropertyStatement buildPropertyStatement(Statement s);
 
-	public static abstract class PropertyStatement {
-		private final PropertyType type;
-		private final String predicateUri;
+    protected abstract PropertyMethod buildPropertyMethod(Method method,
+                                                          Property annotation);
 
-		public PropertyStatement(PropertyType type, String predicateUri) {
-			this.type = type;
-			this.predicateUri = predicateUri;
-		}
+    public static abstract class PropertyStatement {
+        private final PropertyType type;
+        private final String predicateUri;
 
-		public PropertyType getType() {
-			return type;
-		}
+        public PropertyStatement(PropertyType type, String predicateUri) {
+            this.type = type;
+            this.predicateUri = predicateUri;
+        }
 
-		public String getPredicateUri() {
-			return predicateUri;
-		}
+        public PropertyType getType() {
+            return type;
+        }
 
-		public abstract Object getValue();
-	}
+        public String getPredicateUri() {
+            return predicateUri;
+        }
 
-	public static class ResourcePropertyStatement extends PropertyStatement {
-		private final String objectUri;
+        public abstract Object getValue();
+    }
 
-		public ResourcePropertyStatement(String predicateUri, String objectUri) {
-			super(RESOURCE, predicateUri);
-			this.objectUri = objectUri;
-		}
+    public static class ResourcePropertyStatement extends PropertyStatement {
+        private final String objectUri;
 
-		@Override
-		public String getValue() {
-			return objectUri;
-		}
-	}
+        public ResourcePropertyStatement(String predicateUri, String objectUri) {
+            super(RESOURCE, predicateUri);
+            this.objectUri = objectUri;
+        }
 
-	public static class StringPropertyStatement extends PropertyStatement {
-		private final String string;
+        @Override
+        public String getValue() {
+            return objectUri;
+        }
+    }
 
-		public StringPropertyStatement(String predicateUri, String string) {
-			super(STRING, predicateUri);
-			this.string = string;
-		}
+    public static class StringPropertyStatement extends PropertyStatement {
+        private final String string;
 
-		@Override
-		public String getValue() {
-			return string;
-		}
-	}
+        public StringPropertyStatement(String predicateUri, String string) {
+            super(STRING, predicateUri);
+            this.string = string;
+        }
 
-	public static class FloatPropertyStatement extends PropertyStatement {
-		private final float f;
+        @Override
+        public String getValue() {
+            return string;
+        }
+    }
 
-		public FloatPropertyStatement(String predicateUri, float f) {
-			super(FLOAT, predicateUri);
-			this.f = f;
-		}
+    public static class FloatPropertyStatement extends PropertyStatement {
+        private final float f;
 
-		@Override
-		public Float getValue() {
-			return f;
-		}
-	}
+        public FloatPropertyStatement(String predicateUri, float f) {
+            super(FLOAT, predicateUri);
+            this.f = f;
+        }
 
-	public static abstract class PropertyMethod {
-		protected final PropertyType type;
-		protected final Method method;
-		protected final String propertyUri;
-		protected final int minOccurs;
-		protected final int maxOccurs;
+        @Override
+        public Float getValue() {
+            return f;
+        }
+    }
 
-		// Add cardinality values here! Final, with getters.
-		public PropertyMethod(PropertyType type, Method method,
-				Property annotation) {
-			this.type = type;
-			this.method = method;
-			this.propertyUri = annotation.uri();
-			this.minOccurs = annotation.minOccurs();
-			this.maxOccurs = annotation.maxOccurs();
-			checkCardinalityBounds();
-		}
+    public static class IntegerPropertyStatement extends PropertyStatement {
+        private final int i;
 
-		private void checkCardinalityBounds() {
-			// This is where we check for negative values or out of order.
-		}
+        public IntegerPropertyStatement(String predicateUri, int i) {
+            super(INTEGER, predicateUri);
+            this.i = i;
+        }
 
-		public Method getMethod() {
-			return method;
-		}
+        @Override
+        public Integer getValue() {
+            return i;
+        }
+    }
 
-		public Class<?> getParameterType() {
-			return method.getParameterTypes()[0];
-		}
+    public static abstract class PropertyMethod {
+        protected final PropertyType type;
+        protected final Method method;
+        protected final String propertyUri;
+        protected final int minOccurs;
+        protected final int maxOccurs;
 
-		public String getPropertyUri() {
-			return propertyUri;
-		}
+        // Add cardinality values here! Final, with getters.
+        public PropertyMethod(PropertyType type, Method method,
+                              Property annotation) {
+            this.type = type;
+            this.method = method;
+            this.propertyUri = annotation.uri();
+            this.minOccurs = annotation.minOccurs();
+            this.maxOccurs = annotation.maxOccurs();
+            checkCardinalityBounds();
+        }
 
-		public int getMinOccurs() {
-			return minOccurs;
-		}
+        private void checkCardinalityBounds() {
+            // This is where we check for negative values or out of order.
+        }
 
-		public int getMaxOccurs() {
-			return maxOccurs;
-		}
+        public Method getMethod() {
+            return method;
+        }
 
-		public void confirmCompatible(PropertyStatement ps)
-				throws PropertyTypeException {
-			if (type != ps.getType()) {
-				throw new PropertyTypeException(
-						"Can't apply statement of type " + ps.getType()
-								+ " to a method of type " + type);
-			}
-		}
+        public Class<?> getParameterType() {
+            return method.getParameterTypes()[0];
+        }
 
-		public void invoke(Object instance, Object value)
-				throws PropertyTypeException {
-			try {
-				method.invoke(instance, value);
-			} catch (IllegalAccessException | IllegalArgumentException
-					| InvocationTargetException e) {
-				throw new PropertyTypeException("Property method failed.", e);
-			}
-		}
+        public String getPropertyUri() {
+            return propertyUri;
+        }
 
-	}
+        public int getMinOccurs() {
+            return minOccurs;
+        }
 
-	public static class ResourcePropertyMethod extends PropertyMethod {
-		public ResourcePropertyMethod(Method method, Property annotation) {
-			super(RESOURCE, method, annotation);
-		}
-	}
+        public int getMaxOccurs() {
+            return maxOccurs;
+        }
 
-	public static class StringPropertyMethod extends PropertyMethod {
-		public StringPropertyMethod(Method method, Property annotation) {
-			super(STRING, method, annotation);
-		}
-	}
+        public void confirmCompatible(PropertyStatement ps)
+                throws PropertyTypeException {
+            if (type != ps.getType()) {
+                throw new PropertyTypeException(
+                        "Can't apply statement of type " + ps.getType()
+                                + " to a method of type " + type);
+            }
+        }
 
-	public static class FloatPropertyMethod extends PropertyMethod {
-		public FloatPropertyMethod(Method method, Property annotation) {
-			super(FLOAT, method, annotation);
-		}
-	}
+        public void invoke(Object instance, Object value)
+                throws PropertyTypeException {
+            try {
+                method.invoke(instance, value);
+            } catch (IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException e) {
+                throw new PropertyTypeException("Property method failed.", e);
+            }
+        }
 
-	public static class PropertyTypeException extends Exception {
-		public PropertyTypeException(String message) {
-			super(message);
-		}
+    }
 
-		public PropertyTypeException(String message, Throwable cause) {
-			super(message, cause);
-		}
+    public static class ResourcePropertyMethod extends PropertyMethod {
+        public ResourcePropertyMethod(Method method, Property annotation) {
+            super(RESOURCE, method, annotation);
+        }
+    }
 
-	}
+    public static class StringPropertyMethod extends PropertyMethod {
+        public StringPropertyMethod(Method method, Property annotation) {
+            super(STRING, method, annotation);
+        }
+    }
+
+    public static class FloatPropertyMethod extends PropertyMethod {
+        public FloatPropertyMethod(Method method, Property annotation) {
+            super(FLOAT, method, annotation);
+        }
+    }
+
+    public static class IntegerPropertyMethod extends PropertyMethod {
+        public IntegerPropertyMethod(Method method, Property annotation) {
+            super(INTEGER, method, annotation);
+        }
+    }
+
+    public static class PropertyTypeException extends Exception {
+        public PropertyTypeException(String message) {
+            super(message);
+        }
+
+        public PropertyTypeException(String message, Throwable cause) {
+            super(message, cause);
+        }
+
+    }
 
 }
