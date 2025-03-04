@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONFIGURATION;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -10,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +26,8 @@ import edu.cornell.mannlib.vitro.webapp.auth.checks.CheckFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.rules.AccessRule;
 import edu.cornell.mannlib.vitro.webapp.auth.rules.AccessRuleFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
@@ -1036,4 +1041,57 @@ public class PolicyLoader {
         return rolePatterns;
     }
 
+    private static final String OPERATION_AND_ROLE_BY_ACCESS_OBJECT_TYPE_QUERY = ""
+            + "PREFIX auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#>\n"
+            + "PREFIX access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
+            + "SELECT DISTINCT ?dataSetKey ?operationId ?roleId ?valueInSet \n"
+            + "WHERE {\n"
+            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
+            + "     ?aot access:id ?aotId .\n"
+            + "     ?dataSetKey a access:DataSetKey ;\n"
+            + "     access:hasKeyComponent ?aot ;\n"
+            + "     access:hasKeyComponent ?operation ;\n"
+            + "     access:hasKeyComponent ?role ;\n"
+            + "     access:hasKeyComponent ?keyComponent .\n"
+            + "     ?operation a access:Operation .\n"
+            + "     ?operation access:id ?operationId .\n"
+            + "     ?role a access:SubjectRoleUri ."
+            + "     ?role access:id ?roleId .\n"
+            + "     ?dataSet access:hasDataSetKey ?dataSetKey .\n"
+            + "     ?dataSet access:hasRelatedValueSet ?valueSet .\n"
+            + "     ?valueSet access:containsElementsOfType ?aot .\n"
+            + "     BIND(EXISTS{ ?valueSet access:value ?value } AS ?valueInSet )  .\n"
+            + "  }\n"
+            + "} GROUP BY ?dataSetKey ?operationId ?roleId ?valueInSet \n"
+            + "HAVING(COUNT(?keyComponent) = 3)\n"
+            + "ORDER BY ?operation ?role ";
+
+    public static Map<String, Map<String, Boolean>> get3ComponentDataSetsByAccessObjectType(AccessObjectType type,
+            String entityURI) {
+        RDFService rdfService = ModelAccess.getInstance().getRDFService(CONFIGURATION);
+        ParameterizedSparqlString pss = new ParameterizedSparqlString(OPERATION_AND_ROLE_BY_ACCESS_OBJECT_TYPE_QUERY);
+        pss.setLiteral("aotId", type.toString());
+        pss.setIri("value", entityURI);
+        final String queryText = pss.toString();
+        debug("SPARQL Query to get uri of role value patterns:\n %s", queryText);
+        Map<String, Map<String, Boolean>> operations = new LinkedHashMap<>();
+        try {
+            rdfService.sparqlSelectQuery(queryText, new ResultSetConsumer() {
+                @Override
+                protected void processQuerySolution(QuerySolution qs) {
+                    String operationId = qs.getLiteral("operationId").getLexicalForm();
+                    String roleId = qs.getLiteral("roleId").getLexicalForm();
+                    Boolean isInSet = qs.getLiteral("valueInSet").getBoolean();
+                    Map<String, Boolean> roles = operations.getOrDefault(operationId, new LinkedHashMap<>());
+                    if (!operations.containsKey(operationId)) {
+                        operations.put(operationId, roles);
+                    }
+                    roles.put(roleId, isInSet);
+                }
+            });
+        } catch (RDFServiceException e) {
+            log.error(e, e);
+        }
+        return operations;
+    }
 }

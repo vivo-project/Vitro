@@ -30,6 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSets;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.EntityPolicyController;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyLoader;
 import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
@@ -228,26 +229,26 @@ public class BaseEditController extends VitroHttpServlet {
     protected static void addAccessAttributes(HttpServletRequest req, String entityURI, AccessObjectType aot) {
         // Add the permissionsEntityURI (if we are creating a new property, this will be empty)
         req.setAttribute(ENTITY_URI_ATTRIBUTE_NAME, entityURI);
-        String[] namedKeys = new String[0];
         // Get the available permission sets
         List<PermissionSet> permissionSets = buildListOfSelectableRoles(ModelAccess.on(req).getWebappDaoFactory());
-        List<RoleInfo> roles = new ArrayList<>();
+        Map<String, RoleInfo> roles = new HashMap<>();
 
         for (PermissionSet permissionSet : permissionSets) {
-            roles.add(new RoleInfo(permissionSet));
+            roles.put(permissionSet.getUri(), new RoleInfo(permissionSet));
         }
-        List<AccessOperation> accessOperations = AccessOperation.getOperations(aot);
         // Operation, list of roles>
         Map<String, List<RoleInfo>> operationsToRoles = new LinkedHashMap<>();
-        for (AccessOperation operation : accessOperations) {
+        Map<String, Map<String, Boolean>> operations = PolicyLoader.get3ComponentDataSetsByAccessObjectType(aot,
+                entityURI);
+        for (String operation : operations.keySet()) {
+            Map<String, Boolean> roleValues = operations.get(operation);
             List<RoleInfo> roleInfos = new LinkedList<>();
-            String operationName = StringUtils.capitalize(operation.toString().toLowerCase());
-            operationsToRoles.put(operationName, roleInfos);
-            for (RoleInfo role : roles) {
-                RoleInfo roleCopy = role.clone();
-                roleInfos.add(roleCopy);
+            operationsToRoles.put(operation, roleInfos);
+            for (String roleUri : roleValues.keySet()) {
+                RoleInfo roleInfo = roles.get(roleUri).clone();
+                roleInfo.setGranted(roleValues.get(roleUri));
+                roleInfos.add(roleInfo);
             }
-            getRolePolicyInformation(entityURI, aot, namedKeys, operation, roleInfos);
         }
         req.setAttribute(OPERATIONS_TO_ROLES, operationsToRoles);
     }
