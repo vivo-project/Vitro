@@ -36,6 +36,12 @@ access-individual:NamedObject a access:ObjectType ;
 access-individual:IndividualAccessObject a access:ObjectType ;
     access:id "INDIVIDUAL" .
 
+access-individual:DataDistributor a access:ObjectType ;
+    access:id "DATA_DISTRIBUTOR" .
+
+access-individual:ReportGenerator a access:ObjectType ;
+    access:id "REPORT_GENERATOR" .
+
 #Object type value containers
 
 access-individual:ObjectPropertyValueSet a access:ValueSet ;
@@ -64,6 +70,12 @@ access-individual:FauxDataPropertyStatementValueSet a access:ValueSet ;
 
 access-individual:ClassValueSet a access:ValueSet ;
     access:value access-individual:Class .
+
+access-individual:ReportGeneratorValueSet a access:ValueSet ;
+    access:value access-individual:ReportGenerator .
+
+access-individual:DataDistributorValueSet a access:ValueSet ;
+    access:value access-individual:DataDistributor .
 
 access-individual:IndividualValueSet a access:ValueSet ;
     access:value access-individual:IndividualAccessObject .

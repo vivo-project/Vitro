@@ -1,4 +1,7 @@
 <#-- $This file is distributed under the terms of the license in LICENSE$ -->
+
+<#import "permissions.ftl" as p>
+
 <#if objectClass??>
     <h2>${i18n()["dd_config_" + objectClass.name]}</h2>
 </#if>
@@ -30,6 +33,9 @@
                 <@fieldForProperty property />
             </#if>
         </#list>
+		<div>
+			<@p.listOperationPermissions operationsToRoles />
+		</div>
         <#if readOnly??>
             <a href="${submitUrlBase}">cancel</a>
         <#else>
