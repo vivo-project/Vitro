@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts;
 
-import static edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering.DEFAULT_ORDERING;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
@@ -33,6 +32,9 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 
 	private static final String NS_MINE = "http://vivo.mydomain.edu/individual/";
 
+    private static final UserAccountsOrdering ACCOUNTS_ORDERING = new UserAccountsOrdering(
+            Field.EMAIL, Direction.ASCENDING);
+
 	private static OntModel ontModel;
 
 	@BeforeClass
@@ -58,7 +60,7 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 	@Test(expected = NullPointerException.class)
 	public void modelIsNull() {
 		UserAccountsSelector.select(null,
-				criteria(10, 1, DEFAULT_ORDERING, "", ""));
+				criteria(10, 1, ACCOUNTS_ORDERING, "", ""));
 	}
 
 	@Test(expected = NullPointerException.class)
@@ -72,7 +74,7 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 
 	@Test
 	public void checkAllFields() {
-		selectOnCriteria(1, 10, DEFAULT_ORDERING, "", "");
+		selectOnCriteria(1, 10, ACCOUNTS_ORDERING, "", "");
 		assertSelectedUris(10, "user10");
 
 		UserAccount acct = selection.getUserAccounts().get(0);
@@ -97,7 +99,7 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 
 	@Test
 	public void checkFieldsForRootUser() {
-		selectOnCriteria(1, 8, DEFAULT_ORDERING, "", "");
+		selectOnCriteria(1, 8, ACCOUNTS_ORDERING, "", "");
 		assertSelectedUris(10, "user08");
 
 		UserAccount acct = selection.getUserAccounts().get(0);
@@ -123,32 +125,32 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 
 	@Test
 	public void showFirstPageOfFifteen() {
-		selectOnCriteria(15, 1, DEFAULT_ORDERING, "", "");
+		selectOnCriteria(15, 1, ACCOUNTS_ORDERING, "", "");
 		assertSelectedUris(10, "user01", "user02", "user03", "user04",
 				"user05", "user06", "user07", "user08", "user09", "user10");
 	}
 
 	@Test
 	public void showFirstPageOfOne() {
-		selectOnCriteria(1, 1, DEFAULT_ORDERING, "", "");
+		selectOnCriteria(1, 1, ACCOUNTS_ORDERING, "", "");
 		assertSelectedUris(10, "user01");
 	}
 
 	@Test
 	public void showFirstPageOfFive() {
-		selectOnCriteria(5, 1, DEFAULT_ORDERING, "", "");
+		selectOnCriteria(5, 1, ACCOUNTS_ORDERING, "", "");
 		assertSelectedUris(10, "user01", "user02", "user03", "user04", "user05");
 	}
 
 	@Test
 	public void showSecondPageOfSeven() {
-		selectOnCriteria(7, 2, DEFAULT_ORDERING, "", "");
+		selectOnCriteria(7, 2, ACCOUNTS_ORDERING, "", "");
 		assertSelectedUris(10, "user08", "user09", "user10");
 	}
 
 	@Test
 	public void showTenthPageOfThree() {
-		selectOnCriteria(3, 10, DEFAULT_ORDERING, "", "");
+		selectOnCriteria(3, 10, ACCOUNTS_ORDERING, "", "");
 		assertSelectedUris(10);
 	}
 
@@ -264,20 +266,20 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 
 	@Test
 	public void filterAgainstRole1() {
-		selectOnCriteria(20, 1, DEFAULT_ORDERING, NS_MINE + "role1", "");
+		selectOnCriteria(20, 1, ACCOUNTS_ORDERING, NS_MINE + "role1", "");
 		assertSelectedUris(6, "user01", "user02", "user03", "user05", "user06",
 				"user09");
 	}
 
 	@Test
 	public void filterAgainstRole2() {
-		selectOnCriteria(20, 1, DEFAULT_ORDERING, NS_MINE + "role2", "");
+		selectOnCriteria(20, 1, ACCOUNTS_ORDERING, NS_MINE + "role2", "");
 		assertSelectedUris(2, "user03", "user10");
 	}
 
 	@Test
 	public void filterAgainstNoSuchRole() {
-		selectOnCriteria(20, 1, DEFAULT_ORDERING, "BogusRole", "");
+		selectOnCriteria(20, 1, ACCOUNTS_ORDERING, "BogusRole", "");
 		assertSelectedUris(0);
 	}
 
@@ -287,13 +289,13 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 
 	@Test
 	public void searchTermFoundInAllThreeFields() {
-		selectOnCriteria(20, 1, DEFAULT_ORDERING, "", "bob");
+		selectOnCriteria(20, 1, ACCOUNTS_ORDERING, "", "bob");
 		assertSelectedUris(3, "user02", "user05", "user10");
 	}
 
 	@Test
 	public void searchTermNotFound() {
-		selectOnCriteria(20, 1, DEFAULT_ORDERING, "", "bogus");
+		selectOnCriteria(20, 1, ACCOUNTS_ORDERING, "", "bogus");
 		assertSelectedUris(0);
 	}
 
@@ -303,7 +305,7 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 	 */
 	@Test
 	public void searchTermContainsSpecialRegexCharacters() {
-		selectOnCriteria(20, 1, DEFAULT_ORDERING, "", "b.b");
+		selectOnCriteria(20, 1, ACCOUNTS_ORDERING, "", "b.b");
 		assertSelectedUris(0);
 	}
 
@@ -313,7 +315,7 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 
 	@Test
 	public void searchWithFilter() {
-		selectOnCriteria(20, 1, DEFAULT_ORDERING, NS_MINE + "role1", "bob");
+		selectOnCriteria(20, 1, ACCOUNTS_ORDERING, NS_MINE + "role1", "bob");
 		assertSelectedUris(2, "user02", "user05");
 	}
 
