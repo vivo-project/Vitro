@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.admin;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType.REPORT_GENERATOR;
+
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
@@ -19,6 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.SelectFromContentDistributor;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.SelectFromGraphDistributor;
+import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.checks.UserOnThread;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
@@ -220,18 +224,15 @@ public class ReportingController extends FreemarkerHttpServlet {
     private ResponseValues processAdd(VitroRequest vreq) {
         // Get the class from the parameter
         Class objectClass = findClass(vreq.getParameter("addType"));
-
+        // Generate a unique ID for the object
+        String uri = SETUP_URI_BASE + UUID.randomUUID().toString();
         if (objectClass != null) {
             // If we are processing a submitted form
             if (!StringUtils.isEmpty(vreq.getParameter("submitted"))) {
                 ReportingDao reportDao = vreq.getWebappDaoFactory().getReportingDao();
 
-                // Generate a unique ID for the object
-                String uri = SETUP_URI_BASE + UUID.randomUUID().toString();
-
                 // Generate a model from the submitted form
                 ReportGenerator report = getReportFromRequest(vreq, uri, objectClass);
-                report.setUri(uri);
 
                 // Update the model in the triple store with the submitted form
                 try (UserOnThread uot = new UserOnThread(vreq)) {
@@ -255,7 +256,7 @@ public class ReportingController extends FreemarkerHttpServlet {
         }
 
         // Create the response
-        return makeEditFormResponseValues(vreq, objectClass, bodyMap);
+        return makeEditFormResponseValues(vreq, objectClass, bodyMap, uri);
     }
 
     private ResponseValues processEdit(VitroRequest vreq) {
@@ -301,7 +302,7 @@ public class ReportingController extends FreemarkerHttpServlet {
             }
 
             // Create the response
-            return makeEditFormResponseValues(vreq, report.getClass(), bodyMap);
+            return makeEditFormResponseValues(vreq, report.getClass(), bodyMap, uri);
         }
 
         return null;
@@ -339,6 +340,9 @@ public class ReportingController extends FreemarkerHttpServlet {
 
         // Add DataSources
         String[] dsIndices = vreq.getParameterValues("dataSourceIndex");
+        if (dsIndices == null) {
+            log.error("No data sources was provided.");
+        }
         for (String dsIdx : dsIndices) {
             DataSource dataSource = new DataSource();
 
@@ -368,7 +372,7 @@ public class ReportingController extends FreemarkerHttpServlet {
     }
 
     private ResponseValues makeEditFormResponseValues(VitroRequest vreq, Class objectClass,
-            Map<String, Object> bodyMap) {
+            Map<String, Object> bodyMap, String uri) {
         bodyMap.put("objectClass", objectClass);
 
         DataDistributorDao ddDao = vreq.getWebappDaoFactory().getDataDistributorDao();
@@ -386,6 +390,8 @@ public class ReportingController extends FreemarkerHttpServlet {
 
         bodyMap.put("datadistributors", distributors);
         bodyMap.put("submitUrlBase", SUBMIT_URL_BASE);
+        Map<String, Object> accessMap = BaseEditController.getAccessAttributes(vreq, uri, REPORT_GENERATOR);
+        bodyMap.putAll(accessMap);
 
         return new TemplateResponseValues(EDIT_TEMPLATE_NAME, bodyMap);
     }

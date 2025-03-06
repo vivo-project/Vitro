@@ -227,8 +227,15 @@ public class BaseEditController extends VitroHttpServlet {
     }
 
     protected static void addAccessAttributes(HttpServletRequest req, String entityURI, AccessObjectType aot) {
+        Map<String, Object> bodyMap = getAccessAttributes(req, entityURI, aot);
+        req.setAttribute(ENTITY_URI_ATTRIBUTE_NAME, bodyMap.get(ENTITY_TYPE_ATTRIBUTE_NAME));
+        req.setAttribute(OPERATIONS_TO_ROLES, bodyMap.get(OPERATIONS_TO_ROLES));
+    }
+
+    public static Map<String, Object> getAccessAttributes(HttpServletRequest req, String entityURI,
+            AccessObjectType aot) {
+        Map<String, Object> bodyMap = new HashMap<>();
         // Add the permissionsEntityURI (if we are creating a new property, this will be empty)
-        req.setAttribute(ENTITY_URI_ATTRIBUTE_NAME, entityURI);
         // Get the available permission sets
         List<PermissionSet> permissionSets = buildListOfSelectableRoles(ModelAccess.on(req).getWebappDaoFactory());
         Map<String, RoleInfo> roles = new HashMap<>();
@@ -250,7 +257,9 @@ public class BaseEditController extends VitroHttpServlet {
                 roleInfos.add(roleInfo);
             }
         }
-        req.setAttribute(OPERATIONS_TO_ROLES, operationsToRoles);
+        bodyMap.put(ENTITY_URI_ATTRIBUTE_NAME, entityURI);
+        bodyMap.put(OPERATIONS_TO_ROLES, operationsToRoles);
+        return bodyMap;
     }
 
     private static void getRolePolicyInformation(String entityURI, AccessObjectType aot, String[] namedKeys,

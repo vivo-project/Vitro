@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.admin;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType.DATA_DISTRIBUTOR;
+
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -19,6 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.GraphBuilder;
+import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.checks.UserOnThread;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -203,7 +207,7 @@ public class DataDistributorConfigController extends FreemarkerHttpServlet {
             }
 
             // Create the response
-            return makeResponseValues(vreq, objectClass, bodyMap);
+            return makeResponseValues(vreq, objectClass, bodyMap, uri);
         }
 
         return null;
@@ -211,15 +215,14 @@ public class DataDistributorConfigController extends FreemarkerHttpServlet {
 
     private ResponseValues processAdd(VitroRequest vreq) {
         // Get the class from the parameter
+        String uri = SETUP_URI_BASE + UUID.randomUUID().toString();
+
         Class<?> objectClass = findClass(vreq.getParameter("addType"));
 
         if (objectClass != null) {
             // If we are processing a submitted form
             if (!StringUtils.isEmpty(vreq.getParameter("submitted"))) {
                 DataDistributorDao ddDao = vreq.getWebappDaoFactory().getDataDistributorDao();
-
-                // Generate a unique ID for the object
-                String uri = SETUP_URI_BASE + UUID.randomUUID().toString();
 
                 // Generate a model from the submitted form
                 Model requestModel = getModelFromRequest(vreq, uri, objectClass);
@@ -236,12 +239,11 @@ public class DataDistributorConfigController extends FreemarkerHttpServlet {
             Map<String, Object> bodyMap = new HashMap<>();
             Map<String, Object> fieldMap = new HashMap<>();
             bodyMap.put("addType", vreq.getParameter("addType"));
-
             // Adding a new object, so pass an empty field map to the UI for a blank form
             bodyMap.put("fields", fieldMap);
 
             // Create the response
-            return makeResponseValues(vreq, objectClass, bodyMap);
+            return makeResponseValues(vreq, objectClass, bodyMap, uri);
         }
 
         return null;
@@ -271,7 +273,7 @@ public class DataDistributorConfigController extends FreemarkerHttpServlet {
         }
     }
 
-    private ResponseValues makeResponseValues(VitroRequest vreq, Class<?> objectClass, Map<String, Object> bodyMap) {
+    private ResponseValues makeResponseValues(VitroRequest vreq, Class<?> objectClass, Map<String, Object> bodyMap, String uri) {
         bodyMap.put("properties", getPropertyMethodsFor(objectClass));
         bodyMap.put("objectClass", objectClass);
 
@@ -286,7 +288,8 @@ public class DataDistributorConfigController extends FreemarkerHttpServlet {
         bodyMap.put("graphbuilders", ddDao.getAllGraphBuilders());
 
         bodyMap.put("submitUrlBase", SUBMIT_URL_BASE);
-
+        Map<String, Object> accessMap = BaseEditController.getAccessAttributes(vreq, uri, DATA_DISTRIBUTOR);
+        bodyMap.putAll(accessMap);
         return new TemplateResponseValues(EDIT_TEMPLATE_NAME, bodyMap);
     }
 
