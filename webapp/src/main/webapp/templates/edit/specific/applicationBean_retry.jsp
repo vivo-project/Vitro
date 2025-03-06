@@ -39,104 +39,10 @@
         <select id="ThemeDir" name="ThemeDir">
             <form:option name="ThemeDir" />
         </select>
-
-
-        <!-- <div class="themePreferences" style="display: hidden;"> -->
-        <div class="themePreferences">
-            <label for="ThemePrimaryColor">Primary Color</label>
-            <div class="themeColorPickerWrapper">
-
-                <div class="advancedThemeColor">
-                    <input type="hidden" id="ThemePrimaryColorLighterHidden" name="ThemePrimaryColorLighter" value="null" />
-                    <input type="color" id="ThemePrimaryColorLighter" name="" value="<form:value name="ThemePrimaryColorLighter"/>" initial-value="<form:value name="ThemePrimaryColorLighter"/>" />
-                    <div>
-                        <small>Lighter</small>
-                    </div>
-                </div>
-
-                <div>
-                    <input type="hidden" id="ThemePrimaryColorHidden" name="ThemePrimaryColorLighter" value="null" />
-                    <input type="color" id="ThemePrimaryColor" name="" value="<form:value name="ThemePrimaryColor"/>" initial-value="<form:value name="ThemePrimaryColor"/>" />
-                    <div class="advancedThemeColor">
-                        <small>Base</small>
-                    </div>
-                </div>
-
-                <div class="advancedThemeColor">
-                    <input type="hidden" id="ThemePrimaryColorDarkerHidden" name="ThemePrimaryColorLighter" value="null" />
-                    <input type="color" id="ThemePrimaryColorDarker" name="" value="<form:value name="ThemePrimaryColorDarker"/>" initial-value="<form:value name="ThemePrimaryColorDarker"/>" />
-                    <div>
-                        <small>Darker</small>
-                    </div>
-                </div>
-                <a href="#" class="themeColorReset" id="resetPrimaryColorLink"><span>reset</span></a>
-
-        
-            </div>
-            
-            <div class="advancedThemeColor">
-                <label for="ThemeBannerColor">Banner Color</label>
-                <div class="themeColorPickerWrapper">
-                    <input type="hidden" id="ThemeBannerColorHidden" name="ThemeBannerColor" value="null" />
-                    <input type="color" id="ThemeBannerColor" name="" value="<form:value name="ThemeBannerColor"/>" initial-value="<form:value name="ThemeBannerColor"/>" />
-                    <a href="#" class="themeColorReset" id="resetBannerColorLink"><span>reset</span></a>
-                </div>
-            </div>
-            
-
-            <div>
-                <label for="ThemeSecondaryColor">Secondary Color</label>
-                <div class="themeColorPickerWrapper">
-                    <input type="hidden" id="ThemeSecondaryColorHidden" name="ThemeSecondaryColor" value="null" />
-                    <input type="color" id="ThemeSecondaryColor" name="" value="<form:value name="ThemeSecondaryColor"/>" initial-value="<form:value name="ThemeSecondaryColor"/>" />
-                    <a href="#" class="themeColorReset" id="resetSecondaryColorLink"><span>reset</span></a>
-                </div>
-            </div>
-
-            <div>
-                <label for="ThemeAccentColor">Accent Color</label>
-                <div class="themeColorPickerWrapper">
-                    <input type="hidden" id="ThemeAccentColorHidden" name="ThemeAccentColor" value="null" />
-                    <input type="color" id="ThemeAccentColor" name="" value="<form:value name="ThemeAccentColor"/>" initial-value="<form:value name="ThemeAccentColor"/>" />
-                    <a href="#" class="themeColorReset" id="resetAccentColorLink"><span>reset</span></a>
-                </div>
-            </div>
-
-            <div class="advancedThemeColor">
-                <label for="ThemeTextColor">Text Color</label>
-                <div class="themeColorPickerWrapper">
-                    <input type="hidden" id="ThemeTextColorHidden" name="ThemeTextColor" value="null" />
-                    <input type="color" id="ThemeTextColor" name="" value="<form:value name="ThemeTextColor"/>" initial-value="<form:value name="ThemeTextColor"/>" />
-                    <a href="#" class="themeColorReset" id="resetTextColorLink"><span>reset</span></a>
-                </div>
-            </div>
-
-            <div class="advancedThemeColor">
-                <label for="ThemeLinkColor">Link Color</label>
-                <div class="themeColorPickerWrapper">
-                    <input type="hidden" id="ThemeLinkColorHidden" name="ThemeLinkColor" value="null" />
-                    <input type="color" id="ThemeLinkColor" name="" value="<form:value name="ThemeLinkColor"/>" initial-value="<form:value name="ThemeLinkColor"/>" />
-                    <a href="#" class="themeColorReset" id="resetLinkColorLink"><span>reset</span></a>
-                </div>
-            </div>
-
-            <div class="advancedThemeColor">
-                <br>
-                <a id="hideAdvancedColorsButton" href="#">Hide advanced color settings</a>
-            </div>
-
-            <div>
-                <br>
-                <a id="advancedColorsButton" href="#">Show advanced color settings</a>
-                <br>
-            </div>
-
-            <br>
-            <div>
-                <button type="button" id="resetStylesButton" class="themeColorResetButton">Reset colors</button>
-            </div>
-        </div>
-
+        <span id="themeChangeIndicator" style="display: none;" class="note">Theme colors is modified</span>
+        <br />
+        <a id="changeColorsButton" href="#">Change theme branding colors</a>
+        <br>
 
         <br>
         <label>Banner Logo</label>
@@ -150,8 +56,10 @@
         </c:if>
 
         <br>
+        
         <img class="logoImgPreview" src="<form:value name="LogoUrl"/>" alt="" srcset="">
-        <a href="${updateLogoUrl}">Change LOGO</a>
+        
+        <a href="${updateLogoUrl}">Upload LOGO</a>
         <br>
         <br>
 
@@ -164,7 +72,7 @@
 
         <br>
         <img class="logoImgPreview" src="<form:value name="LogoSmallUrl"/>" alt="" srcset="">
-        <a href="${updateLogoSmallUrl}">Change Small LOGO</a>
+        <a href="${updateLogoSmallUrl}">Upload Small LOGO</a>
         <br>
         <br>
 
