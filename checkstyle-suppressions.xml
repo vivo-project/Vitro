@@ -362,6 +362,7 @@
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]controller[\\/]freemarker[\\/]ShowObjectPropertyHierarchyController\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]controller[\\/]freemarker[\\/]SimpleReasonerRecomputeController\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]controller[\\/]freemarker[\\/]SiteAdminController\.java" checks="."/>
+    <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]controller[\\/]freemarker[\\/]SiteBrandingController\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]controller[\\/]freemarker[\\/]StaticPageController\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]controller[\\/]freemarker[\\/]TemplateProcessingHelper\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]controller[\\/]freemarker[\\/]TestController\.java" checks="."/>

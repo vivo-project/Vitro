@@ -106,4 +106,13 @@ $(document).ready(function(){
              }
 
        });
+
+    let colorSchemeEditor = localStorage.getItem('colorSchemeEditor');
+    if (colorSchemeEditor) {
+        let colorSchemeEditorData = JSON.parse(colorSchemeEditor);
+        if (colorSchemeEditorData.enabled) {
+            $.getScript('./js/brandingColors.js');
+        }
+    }
+
 });

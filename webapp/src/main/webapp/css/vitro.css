@@ -549,7 +549,7 @@ table#table-listing td  a {
 
 .logoImgPreview {
     max-width: 100%;
-    height: 50px;
+    max-height: 50px;
     object-fit: contain;
     display: block;
 }
