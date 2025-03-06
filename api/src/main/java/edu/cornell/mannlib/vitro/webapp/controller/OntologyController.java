@@ -12,7 +12,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -26,7 +25,6 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.Lock;
 
-import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaOutputUtils;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
@@ -157,7 +155,7 @@ public class OntologyController extends VitroHttpServlet{
 
         if( ! found ){
             //respond to HTTP outside of critical section
-            doNotFound(req,res);
+            res.sendError(HttpServletResponse.SC_NOT_FOUND);
         } else {
         	JenaOutputUtils.setNameSpacePrefixes(newModel,vreq.getWebappDaoFactory());
             res.setContentType(rdfFormat.getMediaType());
@@ -227,27 +225,5 @@ public class OntologyController extends VitroHttpServlet{
 	        }
 	       res.setStatus(res.SC_SEE_OTHER);
 	    }
-
-
-	private void doNotFound(HttpServletRequest req, HttpServletResponse res)
-    throws IOException, ServletException {
-        VitroRequest vreq = new VitroRequest(req);
-
-        ApplicationBean appBean = vreq.getAppBean();
-
-        //set title before we do the highlighting so we don't get markup in it.
-        req.setAttribute("title","not found");
-        res.setStatus(HttpServletResponse.SC_NOT_FOUND);
-
-        String css = "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\""
-            + appBean.getThemeDir() + "css/entity.css\"/>"
-            + "<script language='JavaScript' type='text/javascript' src='js/toggle.js'></script>";
-        req.setAttribute("css",css);
-
-		JSPPageHandler.renderBasicPage(req, res, "/"+Controllers.ENTITY_NOT_FOUND_JSP);
-    }
-
-
-
 
 }

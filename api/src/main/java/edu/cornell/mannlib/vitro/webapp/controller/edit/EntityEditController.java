@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,7 +40,7 @@ public class EntityEditController extends BaseEditController {
 
 	private static final Log log = LogFactory.getLog(EntityEditController.class.getName());
 
-    public void doGet (HttpServletRequest request, HttpServletResponse response) {
+    public void doGet (HttpServletRequest request, HttpServletResponse response) throws IOException {
 		if (!isAuthorizedToDisplayPage(request, response,
 				SimplePermission.DO_BACK_END_EDITING.ACTION)) {
         	return;
@@ -52,15 +53,8 @@ public class EntityEditController extends BaseEditController {
         //Individual ent = vreq.getWebappDaoFactory().getIndividualDao().getIndividualByURI(entURI);
         Individual ent = vreq.getUnfilteredAssertionsWebappDaoFactory().getIndividualDao().getIndividualByURI(entURI);
         if (ent == null) {
-        	try {
-        		request.setAttribute("title","Individual Not Found");
-        		request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+application.getThemeDir()+"css/edit.css\"/>");
-                JSPPageHandler.renderBasicPage(request, response, "/jenaIngest/notfound.jsp");
-            } catch (Exception e) {
-                log.error("EntityEditController could not forward to view.");
-                log.error(e.getMessage());
-                log.error(e.getStackTrace());
-            }
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
         }
 
         Individual inferredEnt = vreq.getUnfilteredWebappDaoFactory().getIndividualDao().getIndividualByURI(entURI);
@@ -192,7 +186,7 @@ public class EntityEditController extends BaseEditController {
 
     }
 
-    public void doPost (HttpServletRequest request, HttpServletResponse response) {
+    public void doPost (HttpServletRequest request, HttpServletResponse response) throws IOException {
     	log.trace("Please don't POST to the "+this.getClass().getName()+". Use GET instead as there should be no change of state.");
         doGet(request,response);
     }
