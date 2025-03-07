@@ -63,24 +63,6 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
 	        		appInd, APPLICATION_COPYRIGHTANCHOR));
             application.setCopyrightURL(getPropertyStringValue(
             		appInd, APPLICATION_COPYRIGHTURL));
-            application.setThemeDir(getPropertyStringValue(
-            		appInd, APPLICATION_THEMEDIR));
-			application.setThemePrimaryColorLighter(getPropertyStringValue(
-					appInd, APPLICATION_THEMEPRIMARYCOLORLIGHTER));
-			application.setThemePrimaryColor(getPropertyStringValue(
-					appInd, APPLICATION_THEMEPRIMARYCOLOR));
-			application.setThemePrimaryColorDarker(getPropertyStringValue(
-					appInd, APPLICATION_THEMEPRIMARYCOLORDARKER));
-			application.setThemeBannerColor(getPropertyStringValue(
-					appInd, APPLICATION_THEMEBANNERCOLOR));
-			application.setThemeSecondaryColor(getPropertyStringValue(
-					appInd, APPLICATION_THEMESECONDARYCOLOR));
-			application.setThemeAccentColor(getPropertyStringValue(
-					appInd, APPLICATION_THEMEACCENTCOLOR));
-			application.setThemeTextColor(getPropertyStringValue(
-					appInd, APPLICATION_THEMETEXTCOLOR));
-			application.setThemeLinkColor(getPropertyStringValue(
-					appInd, APPLICATION_THEMELINKCOLOR));
 			application.setLogoUrl(getPropertyStringValue(
 					appInd, APPLICATION_LOGOURL));
 			application.setLogoSmallUrl(getPropertyStringValue(
@@ -125,30 +107,6 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
             updatePropertyStringValue(
             		appInd, APPLICATION_THEMEDIR,
             		    application.getThemeDir(), ontModel);
-			updatePropertyStringValue(
-					appInd, APPLICATION_THEMEPRIMARYCOLORLIGHTER,
-					application.getThemePrimaryColorLighter(), ontModel);
-			updatePropertyStringValue(
-					appInd, APPLICATION_THEMEPRIMARYCOLOR,
-					application.getThemePrimaryColor(), ontModel);
-			updatePropertyStringValue(
-					appInd, APPLICATION_THEMEPRIMARYCOLORDARKER,
-					application.getThemePrimaryColorDarker(), ontModel);
-			updatePropertyStringValue(
-					appInd, APPLICATION_THEMEBANNERCOLOR,
-					application.getThemeBannerColor(), ontModel);
-			updatePropertyStringValue(
-					appInd, APPLICATION_THEMESECONDARYCOLOR,
-					application.getThemeSecondaryColor(), ontModel);
-			updatePropertyStringValue(
-					appInd, APPLICATION_THEMEACCENTCOLOR,
-					application.getThemeAccentColor(), ontModel);
-			updatePropertyStringValue(
-					appInd, APPLICATION_THEMETEXTCOLOR,
-					application.getThemeTextColor(), ontModel);
-			updatePropertyStringValue(
-					appInd, APPLICATION_THEMELINKCOLOR,
-					application.getThemeLinkColor(), ontModel);
 			updatePropertyStringValue(
 					appInd, APPLICATION_LOGOURL,
 					application.getLogoUrl(), ontModel);
