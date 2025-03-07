@@ -17,6 +17,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -51,6 +55,8 @@ import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 import freemarker.template.utility.DeepUnwrap;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.rdf.model.*;
 
 public class FreemarkerHttpServlet extends VitroHttpServlet  {
 
@@ -450,6 +456,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
 
         map.put("siteName", vreq.getAppBean().getApplicationName());
 
+        map.putAll(getBrandingColors(vreq.getAppBean().getThemeDir()));
+
         map.put("urls", buildRequestUrls(vreq));
 
         map.put("menu", getDisplayModelMenu(vreq));
@@ -474,7 +482,33 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
         map.put("headScripts", new Tags().wrap());
         map.put("metaTags", new Tags().wrap());
 
+
+        map.put("logoUrl", vreq.getAppBean().getLogoUrl());
+        map.put("logoSmallUrl", vreq.getAppBean().getLogoSmallUrl());
+
         return map;
+    }
+
+    private Map<String, String> getBrandingColors(String currentTheme) {
+        ContextModelAccess cma = ModelAccess.getInstance();
+        OntModel displayModel = cma.getOntModel(ModelNames.DISPLAY);
+
+        Resource s = ResourceFactory.createResource(VitroVocabulary.vitroURI + currentTheme);
+        StmtIterator iter = displayModel.listStatements(s, null, (RDFNode) null);
+
+        Map<String, String> colorParams = new HashMap<>();
+
+        while (iter.hasNext()) {
+            Statement stmt = iter.nextStatement();
+            Property property = stmt.getPredicate();
+            RDFNode object = stmt.getObject();
+
+            if (object.isLiteral()) {
+                String propertyName = property.getURI().contains("#") ? property.getURI().split("#")[1] : property.getURI();
+                colorParams.put(propertyName, object.asLiteral().getString());
+            }
+        }
+        return  colorParams;
     }
 
     private String normalizeServletName(String name) {

@@ -31,6 +31,8 @@ public class ApplicationBean {
 
     // Default initializations, which may be overwritten in the AppBeanMapper
     // but are otherwise not changed there
+    private String    individualUri;
+
     private boolean   initialized             = false;
     private String    sessionIdStr            = null;
     private String    applicationName         = DEFAULT_APPLICATION_NAME;
@@ -49,6 +51,9 @@ public class ApplicationBean {
     private String    copyrightAnchor;
     private String    themeDir;
 
+    private String    logoUrl;
+    private String    logoSmallUrl;
+
     public String toString() {
         String output = "Application Bean Contents:\n";
         output += "  initialized from DB:    [" + initialized             + "]\n";
@@ -63,6 +68,10 @@ public class ApplicationBean {
     }
 
     /*************************** SET functions ****************************/
+
+    public void setIndividualUri( String string_val ) {
+        individualUri = string_val;
+    }
 
     public void setSessionIdStr( String string_val ) {
         sessionIdStr = string_val;
@@ -116,7 +125,19 @@ public class ApplicationBean {
 		themeDir = string_val;
 	}
 
+    public void setLogoUrl(String string_val) {
+        logoUrl = string_val;
+    }
+
+    public void setLogoSmallUrl(String string_val) {
+        logoSmallUrl = string_val;
+    }
+
     /*************************** GET functions ****************************/
+
+    public String getIndividualUri() {
+        return individualUri;
+    }
 
     public String getSessionIdStr() {
         return sessionIdStr;
@@ -164,6 +185,14 @@ public class ApplicationBean {
 
     public String getCopyrightAnchor() {
         return copyrightAnchor;
+    }
+
+    public String getLogoUrl() {
+        return logoUrl;
+    }
+
+    public String getLogoSmallUrl() {
+        return logoSmallUrl;
     }
 
     // TODO deprecate or remove the following three legacy methods?
