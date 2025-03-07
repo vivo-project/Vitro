@@ -50,14 +50,6 @@ public class ApplicationBean {
     private String    copyrightURL;
     private String    copyrightAnchor;
     private String    themeDir;
-    private String    themePrimaryColorLighter;
-    private String    themePrimaryColor;
-    private String    themePrimaryColorDarker;
-    private String    themeBannerColor;
-    private String    themeSecondaryColor;
-    private String    themeAccentColor;
-    private String    themeTextColor;
-    private String    themeLinkColor;
 
     private String    logoUrl;
     private String    logoSmallUrl;
@@ -133,38 +125,6 @@ public class ApplicationBean {
 		themeDir = string_val;
 	}
 
-    public void setThemePrimaryColorLighter(String string_val) {
-        themePrimaryColorLighter = string_val;
-    }
-
-    public void setThemePrimaryColor(String string_val) {
-        themePrimaryColor = string_val;
-    }
-
-    public void setThemePrimaryColorDarker(String string_val) {
-        themePrimaryColorDarker = string_val;
-    }
-
-    public void setThemeBannerColor(String string_val) {
-        themeBannerColor = string_val;
-    }
-
-    public void setThemeSecondaryColor(String string_val) {
-        themeSecondaryColor = string_val;
-    }
-
-    public void setThemeAccentColor(String string_val) {
-        themeAccentColor = string_val;
-    }
-
-    public void setThemeTextColor(String string_val) {
-        themeTextColor = string_val;
-    }
-
-    public void setThemeLinkColor(String string_val) {
-        themeLinkColor = string_val;
-    }
-
     public void setLogoUrl(String string_val) {
         logoUrl = string_val;
     }
@@ -225,38 +185,6 @@ public class ApplicationBean {
 
     public String getCopyrightAnchor() {
         return copyrightAnchor;
-    }
-
-    public String getThemePrimaryColorLighter() {
-        return themePrimaryColorLighter;
-    }
-
-    public String getThemePrimaryColor() {
-        return themePrimaryColor;
-    }
-
-    public String getThemePrimaryColorDarker() {
-        return themePrimaryColorDarker;
-    }
-
-    public String getThemeBannerColor() {
-        return themeBannerColor;
-    }
-
-    public String getThemeSecondaryColor() {
-        return themeSecondaryColor;
-    }
-
-    public String getThemeAccentColor() {
-        return themeAccentColor;
-    }
-
-    public String getThemeTextColor() {
-        return themeTextColor;
-    }
-
-    public String getThemeLinkColor() {
-        return themeLinkColor;
     }
 
     public String getLogoUrl() {
