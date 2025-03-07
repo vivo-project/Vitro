@@ -1326,14 +1326,6 @@ uil-data:sparql_query_select_ask_results.Vitro
         uil:hasKey      "sparql_query_select_ask_results" ;
         uil:hasPackage  "Vitro-languages" .
 
-uil-data:individual_not_found.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        rdfs:label       "élément introuvable"@fr-CA ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "individual_not_found" ;
-        uil:hasPackage  "Vitro-languages" .
-
 uil-data:classes_by_classgroup.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
@@ -6180,14 +6172,6 @@ uil-data:viewing_page.Vitro
         rdfs:label       "Page d'aperçu probable "@fr-CA ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "viewing_page" ;
-        uil:hasPackage  "Vitro-languages" .
-
-uil-data:individual_not_found_msg.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        rdfs:label       "Élément introuvable dans le système."@fr-CA ;
-        uil:hasApp      "Vitro" ;
-        uil:hasKey      "individual_not_found_msg" ;
         uil:hasPackage  "Vitro-languages" .
 
 uil-data:setup_navigation_menu.Vitro

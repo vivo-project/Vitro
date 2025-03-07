@@ -1,0 +1,10 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix default: <http://vitro.mannlib.cornell.edu/ns/default/pages#> .
+@prefix display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> .
+
+default:page_not_found_dg a <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.FixedHTMLDataGetter> ;
+  .
+default:page_not_found a display:Page ;
+  display:hasDataGetter default:page_not_found_dg ;
+  .

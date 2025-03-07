@@ -47,7 +47,6 @@ public class Controllers {
     public static final String ENTITY_EDITABLE_PROP_LIST_JSP = "templates/entity/entityEditablePropsList.jsp";
 
     public static final String ENTITY_LIST_FOR_TABS_JSP = "templates/entity/entityListForTabs.jsp";
-    public static final String ENTITY_NOT_FOUND_JSP = "templates/error/entityNotFound.jsp";
 
     public static final String TAB_BASIC_JSP = "/templates/tabs/tabBasic.jsp";
     public static final String TAB_PRIMARY_JSP = "/templates/tabs/tabprimary.jsp";
