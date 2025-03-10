@@ -105,8 +105,6 @@ public class DataDistributorConfigController extends FreemarkerHttpServlet {
             return;
         }
 
-        response.addHeader("X-XSS-Protection", "0");
-
         super.doGet(request, response);
     }
 
