@@ -156,8 +156,6 @@ public class ReportingController extends FreemarkerHttpServlet {
             }
         }
 
-        response.addHeader("X-XSS-Protection", "0");
-
         // Determine if we are running a report or downloading intermediate XML or
         // template
         if (StringUtils.isNotBlank(reportName)) {
