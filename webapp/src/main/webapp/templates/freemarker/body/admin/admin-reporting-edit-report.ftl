@@ -2,6 +2,7 @@
 <#-- $This file is distributed under the terms of the license in LICENSE$ -->
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/reporting.css" />')}
 
+<#import "permissions.ftl" as p>
 
 <#if objectClass??>
     <h2>${i18n()["reporting_config_" + objectClass.name]}</h2>
@@ -101,7 +102,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/reporting.css" 
             </div>
         </#if>
         <div>
-			<@listOperationPermissions operationsToRoles />
+			<@p.listOperationPermissions operationsToRoles />
 		</div>
         <#if readOnly??>
             <a href="${submitUrlBase}">cancel</a>
@@ -127,15 +128,3 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/reporting.css" 
         </#if>
     </form>
 </section>
-
-<#macro listOperationPermissions operation2RolesMap>
-	<#list operation2RolesMap?keys as operation>
-		${i18n().operation_permissions_for_this_property(operation)}<br>
-		<#assign roles = operation2RolesMap[operation] /> 
-		<#list roles as role>
-			<input id="${operation?html}-${role.uri?html}" type="checkbox" name="${operation?lower_case?html}Roles" value="${role.uri?html}">
-			<label class="inline" for="${operation?html}-${role.uri?html}">${role.label?html}</label>
-		</#list>
-		<br>
-	</#list>
-</#macro>

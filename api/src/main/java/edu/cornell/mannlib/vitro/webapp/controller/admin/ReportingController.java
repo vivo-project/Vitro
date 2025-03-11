@@ -2,7 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.admin;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType.DATA_DISTRIBUTOR;
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType.REPORT_GENERATOR;
+import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation.EXECUTE;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -19,11 +21,14 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor.NotAuthorizedException;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.SelectFromContentDistributor;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.SelectFromGraphDistributor;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vedit.controller.OperationController;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.checks.UserOnThread;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.DataDistributorAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
@@ -129,11 +134,22 @@ public class ReportingController extends FreemarkerHttpServlet {
         setDefaultDataDistributorBaseUri(request);
         DataDistributorEndpoint.setDefault(new DataDistributorEndpoint(defaultDataDistributorBaseUri));
 
+        String reportName = request.getPathInfo();
+        if (reportName != null && reportName.startsWith("/")) {
+            reportName = reportName.substring(1);
+        }
+        String[] download = request.getParameterValues("download");
+
         // First, check to see if we have rights to administer the reports
         if (!PolicyHelper.isAuthorizedForActions(request, SimplePermission.MANAGE_REPORTS.ACTION)) {
             // Can't admin, but may be able to run reports
-            if (isAuthorizedToDisplayPage(request, response, SimplePermission.EXECUTE_REPORTS.ACTION)) {
-                request.setAttribute(EXECUTE_ONLY_ATTR, Boolean.TRUE);
+            if (!StringUtils.isBlank(reportName) && 
+                ArrayUtils.isEmpty(download)) {
+                String uri = getReportUri(request, reportName);
+                if (PolicyHelper.isAuthorizedForActions(request, new DataDistributorAccessObject(uri), EXECUTE)) {
+                    request.setAttribute(EXECUTE_ONLY_ATTR, Boolean.TRUE);
+                }
+                
             } else {
                 // Can't run or administer reports, so bail out here
                 return;
@@ -144,43 +160,39 @@ public class ReportingController extends FreemarkerHttpServlet {
 
         // Determine if we are running a report or downloading intermediate XML or
         // template
-        String reportName = request.getPathInfo();
-        if (reportName == null || reportName.isEmpty()) {
-            // Not processing a report, so carry on
-        } else {
-            // Retrieve the report name
-            if (reportName.startsWith("/")) {
-                reportName = reportName.substring(1);
-            }
-            if (!StringUtils.isEmpty(reportName)) {
-                // Check if we are requesting a download format
-                String[] download = request.getParameterValues("download");
-                if (!ArrayUtils.isEmpty(download)) {
-                    for (String format : download) {
-                        if ("xml".equalsIgnoreCase(format)) {
-                            if (processDownloadXml(reportName, request, response)) {
-                                return;
-                            }
-                        }
-
-                        if ("template".equalsIgnoreCase(format)) {
-                            if (processDownloadTemplate(reportName, request, response)) {
-                                return;
-                            }
+        if (StringUtils.isNotBlank(reportName)) {
+            // Check if we are requesting a download format
+            if (!ArrayUtils.isEmpty(download)) {
+                for (String format : download) {
+                    if ("xml".equalsIgnoreCase(format)) {
+                        if (processDownloadXml(reportName, request, response)) {
+                            return;
                         }
                     }
-                } else {
-                    // Not a download request, so run the report
-                    if (processReport(reportName, request, response)) {
-                        return;
+
+                    if ("template".equalsIgnoreCase(format)) {
+                        if (processDownloadTemplate(reportName, request, response)) {
+                            return;
+                        }
                     }
                 }
-
-                // Add an error message
+            } else {
+                // Not a download request, so run the report
+                if (processReport(reportName, request, response)) {
+                    return;
+                }
             }
         }
 
         super.doGet(request, response);
+    }
+
+    private String getReportUri(HttpServletRequest request, String reportName) {
+        ReportGenerator report = ModelAccess.on(request).getWebappDaoFactory().getReportingDao().getReportByName(reportName);
+        if (report == null) {
+            return null;
+        }
+        return report.getUri();
     }
 
     @Override
@@ -237,6 +249,7 @@ public class ReportingController extends FreemarkerHttpServlet {
                 // Update the model in the triple store with the submitted form
                 try (UserOnThread uot = new UserOnThread(vreq)) {
                     reportDao.updateReport(uri, report);
+                    OperationController.update3ComponentDataSets(vreq, uri, REPORT_GENERATOR);
                 }
 
                 // Redirect to the list
@@ -285,6 +298,7 @@ public class ReportingController extends FreemarkerHttpServlet {
                 // Update the model in the triple store with the submitted form
                 try (UserOnThread uot = new UserOnThread(vreq)) {
                     reportDao.updateReport(uri, submittedReport);
+                    OperationController.update3ComponentDataSets(vreq, uri, REPORT_GENERATOR);
                 }
 
                 // Redirect to the list

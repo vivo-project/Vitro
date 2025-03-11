@@ -13,6 +13,8 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,6 +23,10 @@ import javax.servlet.ServletException;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContext;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.DynamicPolicy;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyStore;
+import edu.cornell.mannlib.vitro.webapp.auth.rules.AccessRule;
+import edu.cornell.mannlib.vitro.webapp.auth.rules.FastFailAccessRule;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import org.apache.jena.ontology.OntModel;
@@ -55,8 +61,12 @@ public class DistributeDataApiControllerTest extends AbstractTestClass {
         req = new HttpServletRequestStub();
         resp = new HttpServletResponseStub();
         requestModels = new ModelAccessFactoryStub().get(req);
-
         controller = new DistributeDataApiController();
+        DynamicPolicy policy = new DynamicPolicy("test://policy-allow", 0);
+        AccessRule rule = new FastFailAccessRule();
+        rule.setRuleUri("test://rule-allow");
+        policy.addRules(Collections.singleton(rule));
+        PolicyStore.getInstance().add(policy);
     }
 
     // ----------------------------------------------------------------------

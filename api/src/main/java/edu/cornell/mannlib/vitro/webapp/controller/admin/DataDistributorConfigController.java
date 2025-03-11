@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.GraphBuilder;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
+import edu.cornell.mannlib.vedit.controller.OperationController;
 import edu.cornell.mannlib.vitro.webapp.auth.checks.UserOnThread;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -180,6 +180,7 @@ public class DataDistributorConfigController extends FreemarkerHttpServlet {
                 // Update the model in the triple store with the submitted form
                 try (UserOnThread uot = new UserOnThread(vreq)) {
                     ddDao.updateModel(uri, requestModel);
+                    OperationController.update3ComponentDataSets(vreq, uri, DATA_DISTRIBUTOR);
                 }
 
                 // Redirect to the list
@@ -230,6 +231,7 @@ public class DataDistributorConfigController extends FreemarkerHttpServlet {
                 // Update the model in the triple store with the submitted form
                 try (UserOnThread uot = new UserOnThread(vreq)) {
                     ddDao.updateModel(uri, requestModel);
+                    OperationController.update3ComponentDataSets(vreq, uri, DATA_DISTRIBUTOR);
                 }
 
                 // Redirect to the list
