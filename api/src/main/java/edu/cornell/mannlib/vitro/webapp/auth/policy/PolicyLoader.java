@@ -27,7 +27,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.rules.AccessRule;
 import edu.cornell.mannlib.vitro.webapp.auth.rules.AccessRuleFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;

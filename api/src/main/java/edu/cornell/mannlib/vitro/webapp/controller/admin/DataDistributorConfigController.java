@@ -273,7 +273,8 @@ public class DataDistributorConfigController extends FreemarkerHttpServlet {
         }
     }
 
-    private ResponseValues makeResponseValues(VitroRequest vreq, Class<?> objectClass, Map<String, Object> bodyMap, String uri) {
+    private ResponseValues makeResponseValues(VitroRequest vreq, Class<?> objectClass, Map<String, Object> bodyMap,
+            String uri) {
         bodyMap.put("properties", getPropertyMethodsFor(objectClass));
         bodyMap.put("objectClass", objectClass);
 
