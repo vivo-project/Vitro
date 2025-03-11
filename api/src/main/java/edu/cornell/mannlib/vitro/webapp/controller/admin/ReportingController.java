@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.admin;
 
-import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType.DATA_DISTRIBUTOR;
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType.REPORT_GENERATOR;
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation.EXECUTE;
 
@@ -21,12 +20,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor.NotAuthorizedException;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.SelectFromContentDistributor;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.SelectFromGraphDistributor;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.controller.OperationController;
-import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.checks.UserOnThread;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.DataDistributorAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
@@ -143,13 +140,12 @@ public class ReportingController extends FreemarkerHttpServlet {
         // First, check to see if we have rights to administer the reports
         if (!PolicyHelper.isAuthorizedForActions(request, SimplePermission.MANAGE_REPORTS.ACTION)) {
             // Can't admin, but may be able to run reports
-            if (!StringUtils.isBlank(reportName) && 
+            if (!StringUtils.isBlank(reportName) &&
                 ArrayUtils.isEmpty(download)) {
                 String uri = getReportUri(request, reportName);
                 if (PolicyHelper.isAuthorizedForActions(request, new DataDistributorAccessObject(uri), EXECUTE)) {
                     request.setAttribute(EXECUTE_ONLY_ATTR, Boolean.TRUE);
                 }
-                
             } else {
                 // Can't run or administer reports, so bail out here
                 return;
@@ -186,7 +182,8 @@ public class ReportingController extends FreemarkerHttpServlet {
     }
 
     private String getReportUri(HttpServletRequest request, String reportName) {
-        ReportGenerator report = ModelAccess.on(request).getWebappDaoFactory().getReportingDao().getReportByName(reportName);
+        ReportGenerator report = ModelAccess.on(request).getWebappDaoFactory().getReportingDao().getReportByName(
+                reportName);
         if (report == null) {
             return null;
         }
