@@ -228,7 +228,7 @@ public class BaseEditController extends VitroHttpServlet {
 
     protected static void addAccessAttributes(HttpServletRequest req, String entityURI, AccessObjectType aot) {
         Map<String, Object> bodyMap = getAccessAttributes(req, entityURI, aot);
-        req.setAttribute(ENTITY_URI_ATTRIBUTE_NAME, bodyMap.get(ENTITY_TYPE_ATTRIBUTE_NAME));
+        req.setAttribute(ENTITY_URI_ATTRIBUTE_NAME, bodyMap.get(ENTITY_URI_ATTRIBUTE_NAME));
         req.setAttribute(OPERATIONS_TO_ROLES, bodyMap.get(OPERATIONS_TO_ROLES));
     }
 
@@ -250,7 +250,7 @@ public class BaseEditController extends VitroHttpServlet {
         for (String operation : operations.keySet()) {
             Map<String, Boolean> roleValues = operations.get(operation);
             List<RoleInfo> roleInfos = new LinkedList<>();
-            operationsToRoles.put(operation, roleInfos);
+            operationsToRoles.put(operation.toLowerCase(), roleInfos);
             for (String roleUri : roleValues.keySet()) {
                 RoleInfo roleInfo = roles.get(roleUri).clone();
                 roleInfo.setGranted(roleValues.get(roleUri));

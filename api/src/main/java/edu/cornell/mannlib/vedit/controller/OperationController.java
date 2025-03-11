@@ -38,6 +38,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.checks.UserOnThread;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.EntityPolicyController;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyLoader;
 import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import org.apache.commons.lang3.EnumUtils;
@@ -236,24 +237,29 @@ public class OperationController extends BaseEditController {
             return;
         }
         try (UserOnThread uot = new UserOnThread(request)) {
-            updateEntityPermissions(request, entityUri, aot);
+            update3ComponentDataSets(request, entityUri, aot);
             updateTypeSuppressions(request, aot, entityUri);
             updateNotRelatedTypeSuppressions(request, aot, entityUri);
             updateNotRelatedPropertySuppressions(request, aot, entityUri);
         }
     }
 
-    private void updateEntityPermissions(HttpServletRequest request, String entityUri, AccessObjectType aot) {
-        Set<RoleInfo> roles = getAllRoles(request);
-        List<AccessOperation> operations = AccessOperation.getOperations(aot);
-        for (AccessOperation ao : operations) {
-            String operationGroupName = ao.toString().toLowerCase();
-            Set<String> selectedRoles = getSelectedRoles(request, operationGroupName);
-            for (RoleInfo role : roles) {
-                if (selectedRoles.contains(role.getUri())) {
-                    EntityPolicyController.grantAccess(entityUri, aot, ao, role.getUri());    
+    public static void update3ComponentDataSets(HttpServletRequest request, String entityUri, AccessObjectType aot) {
+        Map<String, Map<String, Boolean>> operations = PolicyLoader.get3ComponentDataSetsByAccessObjectType(aot,
+                entityUri);
+        for (String operationName : operations.keySet()) {
+            AccessOperation ao = AccessOperation.valueOf(operationName);
+            Set<String> selectedRoles = getSelectedRoles(request, operationName.toLowerCase());
+            Map<String, Boolean> roles = operations.get(operationName);
+            for (String role : roles.keySet()) {
+                if (selectedRoles.contains(role)) {
+                    if (Boolean.FALSE.equals(roles.get(role))) {
+                        EntityPolicyController.grantAccess(entityUri, aot, ao, role);
+                    }
                 } else {
-                    EntityPolicyController.revokeAccess(entityUri, aot, ao, role.getUri());
+                    if (Boolean.TRUE.equals(roles.get(role))) {
+                        EntityPolicyController.revokeAccess(entityUri, aot, ao, role);
+                    }
                 }
             }
         }
@@ -267,7 +273,7 @@ public class OperationController extends BaseEditController {
         }
         return roles;
     }
-    
+
     private void updateUriSuppressions(HttpServletRequest request, AccessObjectType aot, String entityUri) {
         if (!AccessObjectType.INDIVIDUAL.equals(aot)) {
             return;
@@ -356,7 +362,7 @@ public class OperationController extends BaseEditController {
         return request.getParameter(TYPE_SUPPRESSIONS_NOT_RELATED) != null;
     }
 
-    private Set<String> getSelectedRoles(HttpServletRequest request, String operationGroupName) {
+    private static Set<String> getSelectedRoles(HttpServletRequest request, String operationGroupName) {
         String[] selectedRoles = request.getParameterValues(operationGroupName + "Roles");
         if (selectedRoles == null) {
             selectedRoles = new String[0];
