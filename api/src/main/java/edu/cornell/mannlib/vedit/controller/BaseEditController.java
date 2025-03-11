@@ -238,7 +238,7 @@ public class BaseEditController extends VitroHttpServlet {
         // Add the permissionsEntityURI (if we are creating a new property, this will be empty)
         // Get the available permission sets
         List<PermissionSet> permissionSets = buildListOfSelectableRoles(ModelAccess.on(req).getWebappDaoFactory());
-        Map<String, RoleInfo> roles = new HashMap<>();
+        Map<String, RoleInfo> roles = new LinkedHashMap<>();
 
         for (PermissionSet permissionSet : permissionSets) {
             roles.put(permissionSet.getUri(), new RoleInfo(permissionSet));
@@ -251,10 +251,12 @@ public class BaseEditController extends VitroHttpServlet {
             Map<String, Boolean> roleValues = operations.get(operation);
             List<RoleInfo> roleInfos = new LinkedList<>();
             operationsToRoles.put(operation.toLowerCase(), roleInfos);
-            for (String roleUri : roleValues.keySet()) {
-                RoleInfo roleInfo = roles.get(roleUri).clone();
-                roleInfo.setGranted(roleValues.get(roleUri));
-                roleInfos.add(roleInfo);
+            for (String roleUri : roles.keySet()) {
+                if (roleValues.containsKey(roleUri)) {
+                    RoleInfo roleInfo = roles.get(roleUri).clone();
+                    roleInfo.setGranted(roleValues.get(roleUri));
+                    roleInfos.add(roleInfo);
+                }
             }
         }
         bodyMap.put(ENTITY_URI_ATTRIBUTE_NAME, entityURI);
