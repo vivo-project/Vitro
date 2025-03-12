@@ -33,9 +33,11 @@
                 <@fieldForProperty property />
             </#if>
         </#list>
+        <br>
 		<div>
 			<@p.listOperationPermissions operationsToRoles />
 		</div>
+		<br>
         <#if readOnly??>
             <a href="${submitUrlBase}">cancel</a>
         <#else>

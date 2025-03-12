@@ -101,9 +101,11 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/reporting.css" 
                 ${i18n().reporting_template} <input type="file" name="template" />
             </div>
         </#if>
+        <br>
         <div>
 			<@p.listOperationPermissions operationsToRoles />
 		</div>
+		<br>
         <#if readOnly??>
             <a href="${submitUrlBase}">cancel</a>
         <#else>
