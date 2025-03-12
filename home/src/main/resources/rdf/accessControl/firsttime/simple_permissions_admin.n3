@@ -19,6 +19,9 @@
     access:value simplePermission:UseMiscellaneousAdminPages ;
     access:value simplePermission:UseSparqlQueryPage ;
     access:value simplePermission:PageViewableAdmin ;
+    access:value simplePermission:ManageDataDistributors ;
+    access:value simplePermission:ManageReports ;
+    
 
     # Uncomment the following permission line to enable the SPARQL update API.
     # Before enabling, be sure that the URL api/sparqlUpdate is secured by HTTPS,
@@ -33,6 +36,7 @@
     access:value simplePermission:PageViewableCurator ;
 
     # permissions for EDITOR and above.
+    access:value simplePermission:ExecuteReports ;
     access:value simplePermission:DoBackEndEditing ;
     access:value simplePermission:SeeIndividualEditingPanel ;
     access:value simplePermission:SeeRevisionInfo ;

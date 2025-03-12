@@ -1,0 +1,168 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/access-allowed-data-distributor/> .
+
+:PolicyTemplate a access:PolicyTemplate ;
+    access:hasRule :AllowMatchingDataDistributor ;
+
+    access:hasDataSet :PublicExecuteDataDistributorDataSet ;
+    access:hasDataSet :SelfEditorExecuteDataDistributorDataSet ;
+    access:hasDataSet :EditorExecuteDataDistributorDataSet ;
+    access:hasDataSet :CuratorExecuteDataDistributorDataSet ;
+    access:hasDataSet :AdminExecuteDataDistributorDataSet ;
+
+    access:hasDataSetTemplate :RoleExecuteDataDistributorDataSetTemplate ;
+    .
+
+#Role Execute DataDistributor data set template
+
+:RoleExecuteDataDistributorDataSetTemplate a access:DataSetTemplate ;
+    access:hasDataSetTemplateKey :RoleExecuteDataDistributorDataSetTemplateKey ;
+    access:hasDataSetKeyTemplate :RoleExecuteDataDistributorDataSetKeyTemplate ;
+    access:hasRelatedValueSet access-individual:DataDistributorValueSet ;
+    access:hasRelatedValueSet access-individual:ExecuteOperationValueSet ;
+    access:dataSetValueTemplate :RoleExecuteDataDistributorRoleValueSetTemplate ;
+    access:dataSetValueTemplate :RoleExecuteDataDistributorValueSetTemplate .  
+
+:RoleExecuteDataDistributorDataSetTemplateKey a access:DataSetTemplateKey ;
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
+
+:RoleExecuteDataDistributorDataSetKeyTemplate a access:DataSetKeyTemplate ;
+    access:hasKeyComponent access-individual:DataDistributor ;
+    access:hasKeyComponent access-individual:ExecuteOperation ;
+    access:hasKeyComponentTemplate access-individual:SubjectRole .
+
+:RoleExecuteDataDistributorRoleValueSetTemplate a access:ValueSetTemplate ;
+    access:relatedCheck :SubjectRoleCheck;
+    access:containsElementsOfType access-individual:SubjectRole .
+
+:RoleExecuteDataDistributorValueSetTemplate a access:ValueSetTemplate ;
+    access:relatedCheck :AccessObjectUriCheck ;
+#    access:value access-individual:defaultUri ;
+    access:containsElementsOfType access-individual:DataDistributor .
+
+### Public display class uri data sets
+
+:PublicExecuteDataDistributorDataSet a access:DataSet ;
+    access:hasDataSetKey :PublicExecuteDataDistributorDataSetKey ;
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataDistributorValueSet ;
+    access:hasRelatedValueSet access-individual:ExecuteOperationValueSet ;
+    access:hasRelatedValueSet :PublicExecuteDataDistributorValueSet .
+
+:PublicExecuteDataDistributorDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:DataDistributor ;
+    access:hasKeyComponent access-individual:PublicRoleUri ;
+    access:hasKeyComponent access-individual:ExecuteOperation .
+
+### Self editor display class uri data sets
+
+:SelfEditorExecuteDataDistributorDataSet a access:DataSet ;
+    access:hasDataSetKey :SelfEditorExecuteDataDistributorDataSetKey ;
+    access:hasRelatedValueSet access-individual:SelfEditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataDistributorValueSet ;
+    access:hasRelatedValueSet access-individual:ExecuteOperationValueSet ;
+    access:hasRelatedValueSet :SelfEditorExecuteDataDistributorValueSet .
+
+:SelfEditorExecuteDataDistributorDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:DataDistributor ;
+    access:hasKeyComponent access-individual:SelfEditorRoleUri ;
+    access:hasKeyComponent access-individual:ExecuteOperation .
+
+### Editor display class uri data sets
+
+:EditorExecuteDataDistributorDataSet a access:DataSet ;
+    access:hasDataSetKey :EditorExecuteDataDistributorDataSetKey ;
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataDistributorValueSet ;
+    access:hasRelatedValueSet access-individual:ExecuteOperationValueSet ;
+    access:hasRelatedValueSet :EditorExecuteDataDistributorValueSet .
+
+:EditorExecuteDataDistributorDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:DataDistributor ;
+    access:hasKeyComponent access-individual:EditorRoleUri ;
+    access:hasKeyComponent access-individual:ExecuteOperation .
+
+### Curator display class uri data sets
+
+:CuratorExecuteDataDistributorDataSet a access:DataSet ;
+    access:hasDataSetKey :CuratorExecuteDataDistributorDataSetKey ;
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataDistributorValueSet ;
+    access:hasRelatedValueSet access-individual:ExecuteOperationValueSet ;
+    access:hasRelatedValueSet :CuratorExecuteDataDistributorValueSet .
+
+:CuratorExecuteDataDistributorDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:DataDistributor ;
+    access:hasKeyComponent access-individual:CuratorRoleUri ;
+    access:hasKeyComponent access-individual:ExecuteOperation .
+
+### Admin display class uri data sets
+
+:AdminExecuteDataDistributorDataSet a access:DataSet ;
+    access:hasDataSetKey :AdminExecuteDataDistributorDataSetKey ;
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet access-individual:DataDistributorValueSet ;
+    access:hasRelatedValueSet access-individual:ExecuteOperationValueSet ;
+    access:hasRelatedValueSet :AdminExecuteDataDistributorValueSet .
+
+:AdminExecuteDataDistributorDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:DataDistributor ;
+    access:hasKeyComponent access-individual:AdminRoleUri ;
+    access:hasKeyComponent access-individual:ExecuteOperation .
+
+:AllowMatchingDataDistributor a access:Rule;
+    access:requiresCheck :SubjectRoleCheck ;
+    access:requiresCheck :OperationCheck ;
+    access:requiresCheck :AccessObjectTypeCheck ;
+    access:requiresCheck :AccessObjectUriCheck .
+
+:AccessObjectTypeCheck a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:AccessObjectType ;
+    access:values access-individual:DataDistributorValueSet ;
+    .
+
+:OperationCheck a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:Operation ;
+    access:values access-individual:ExecuteOperationValueSet ;
+    .
+
+:SubjectRoleCheck a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:SubjectRole ;
+    access:values access-individual:PublicRoleValueSet ;
+    access:values access-individual:SelfEditorRoleValueSet ;
+    access:values access-individual:EditorRoleValueSet ;
+    access:values access-individual:CuratorRoleValueSet ;
+    access:values access-individual:AdminRoleValueSet .
+
+:AccessObjectUriCheck a access:Check ;
+    access:useOperator access-individual:OneOf ;
+    access:hasTypeToCheck access-individual:AccessObjectUri ;
+    access:values :AdminExecuteDataDistributorValueSet ;
+    access:values :CuratorExecuteDataDistributorValueSet ;
+    access:values :EditorExecuteDataDistributorValueSet ;
+    access:values :SelfEditorExecuteDataDistributorValueSet ;
+    access:values :PublicExecuteDataDistributorValueSet ;
+    .
+
+:AdminExecuteDataDistributorValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:DataDistributor .
+
+:CuratorExecuteDataDistributorValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:DataDistributor .
+
+:EditorExecuteDataDistributorValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:DataDistributor .
+
+:SelfEditorExecuteDataDistributorValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:DataDistributor .
+
+:PublicExecuteDataDistributorValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:DataDistributor .
+
