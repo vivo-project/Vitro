@@ -50,7 +50,7 @@ dojo.lang.extend(dojo.widget.html.MenuItem, {
 		var child = dojo.dom.getFirstChildElement(this.domNode);
 		if(child){
 			if(child.click){
-				child.click();
+				child.on("click", );
 			}else if(child.href){
 				location.href = child.href;
 			}

@@ -40,7 +40,7 @@
 <script  type="text/javascript">
 $(document).ready(function() {
       var source = "";
-    $('input#primaryAction').click(function() {
+    $('input#primaryAction').on("click", function() {
         source = "submit";
     });
     $('form#editForm').submit(function() {
