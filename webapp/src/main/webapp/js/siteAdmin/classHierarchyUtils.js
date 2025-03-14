@@ -47,17 +47,17 @@
 
             classHierarchyUtils.form.submit();
         });
-        this.addClass.click(function() {
+        this.addClass.on("click", function() {
             classHierarchyUtils.form.attr("action", "vclass_retry");
             classHierarchyUtils.form.submit();
         });
-        this.addGroup.click(function() {
+        this.addGroup.on("click", function() {
             classHierarchyUtils.form.attr("action", "editForm?controller=Classgroup");
             classHierarchyUtils.form.submit();
         });
 
         if ( this.displayOption == "group" ) {
-            this.expandAll.click(function() {
+            this.expandAll.on("click", function() {
 
                 if ( classHierarchyUtils.expandAll.text() == i18nStrings.hideSubclasses ) {
                     $('td.subclassCell').parent('tr').hide();
@@ -175,7 +175,7 @@
 
         var $clickableHeader = $('section#classContainer' + ctr).find('span.headerSpanPlus');
 
-        $clickableHeader.click(function() {
+        $clickableHeader.on("click", function() {
             if ( $clickableHeader.attr('view') == "less" ) {
                 $clickableHeader.addClass("headerSpanMinus");
                 $('table#classHierarchy' + ctr).find('span.subclassExpandPlus').addClass("subclassExpandMinus");
@@ -197,7 +197,7 @@
             var $clickableSpan = $('section#container').find('span#' + currentSpan);
             var $subclassTable = $('section#container').find('table#subclassTable' + currentSpan.replace("subclassExpand",""));
 
-            $clickableSpan.click(function() {
+            $clickableSpan.on("click", function() {
                 if ( $subclassTable.is(':visible') ) {
                     $subclassTable.hide();
                     $subclassTable.find('table.subclassTable').hide();
@@ -213,7 +213,7 @@
     },
 
     wireExpandLink: function() {
-        this.expandAll.click(function() {
+        this.expandAll.on("click", function() {
             if ( classHierarchyUtils.expandAll.text() == i18nStrings.expandAll ) {
                 classHierarchyUtils.expandAll.text(i18nStrings.collapseAll);
                 $('span.headerSpanPlus').addClass("headerSpanMinus");

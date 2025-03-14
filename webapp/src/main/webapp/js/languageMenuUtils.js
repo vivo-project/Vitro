@@ -5,13 +5,13 @@ $(function() {
 	$.extend(this, i18nStringsLangMenu);
 	var theText = this.selectLanguage;
 	var imgHTML = "";
-    $("ul.language-dropdown li#language-menu").hover(function(){
+    $("ul.language-dropdown li#language-menu").on("mouseenter", function(){
 		$("a#lang-link").html(theText);
         $(this).addClass("hover");
         $('ul:first',this).css('visibility', 'visible');
         $("ul.language-dropdown ul.sub_menu li").css('width', ($("ul.language-dropdown").width() - 4) + 'px');
 
-    }, function(){
+    }).on("mouseleave", function(){
     	$("a#lang-link").html(imgHTML);
         $(this).removeClass("hover");
         $('ul:first',this).css('visibility', 'hidden');

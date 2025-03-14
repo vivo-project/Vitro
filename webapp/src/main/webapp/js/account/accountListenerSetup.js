@@ -36,7 +36,7 @@ $(document).ready(function(){
         });
     });
 
-    $('.remove-proxy').click(function(){
+    $('.remove-proxy').on("click", function(){
         disableSubmit()
     })
 });

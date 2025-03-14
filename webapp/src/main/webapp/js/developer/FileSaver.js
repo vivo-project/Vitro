@@ -72,7 +72,7 @@
     } catch (e) {}
 
     return xhr.status >= 200 && xhr.status <= 299;
-  } // `a.click()` doesn't work for all browsers (#465)
+  } // `a.on("click", )` doesn't work for all browsers (#465)
 
 
   function click(node) {
