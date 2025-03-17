@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.haulmont.yarg.formatters.factory.DefaultFormatterFactory;
 import com.haulmont.yarg.loaders.factory.DefaultLoaderFactory;
 import com.haulmont.yarg.loaders.impl.JsonDataLoader;
@@ -15,16 +16,20 @@ import com.haulmont.yarg.structure.BandOrientation;
 import com.haulmont.yarg.structure.ReportOutputType;
 import com.haulmont.yarg.structure.impl.BandBuilder;
 import com.haulmont.yarg.structure.impl.ReportBuilder;
+import com.haulmont.yarg.structure.impl.ReportFieldFormatImpl;
 import com.haulmont.yarg.structure.impl.ReportTemplateBuilder;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.RequestModelAccess;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Base implementation for reports that use the Yet Another Report Generator
  * library
  */
 public abstract class AbstractYARGTemplateReport extends AbstractTemplateReport {
+    private static final Log log = LogFactory.getLog(AbstractYARGTemplateReport.class);
     /**
      * Generate the report
      */
@@ -80,7 +85,7 @@ public abstract class AbstractYARGTemplateReport extends AbstractTemplateReport 
                         "parameter=" + dataSource.getOutputName() + "_footer $.head.vars[*]", "json");
                 footerBand.orientation(BandOrientation.HORIZONTAL);
                 reportBuilder.band(footerBand.build());
-
+                addHtmlFields(reportBuilder, dataSource, body);
             }
         }
 
@@ -93,5 +98,30 @@ public abstract class AbstractYARGTemplateReport extends AbstractTemplateReport 
 
         // Run the report writing to the output stream
         reporting.runReport((new RunParams(reportBuilder.build())).params(params), outputStream);
+    }
+
+    private void addHtmlFields(ReportBuilder reportBuilder, DataSource dataSource, String body) {
+        try {
+            JsonNode jsonNode = mapper.readTree(body);
+            if (jsonNode == null) {
+                return;
+            }
+            JsonNode head = jsonNode.get("head");
+            if (head == null) {
+                return;
+            }
+            JsonNode vars = head.get("vars");
+            if (vars != null && vars.isArray()) {
+                for (JsonNode var : vars) {
+                    String varName = var.asText();
+                    if (varName.endsWith("_html")) {
+                        reportBuilder.format(new ReportFieldFormatImpl(dataSource.getOutputName() +
+                                "." + varName + ".value", "${html}"));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error(e, e);
+        }
     }
 }

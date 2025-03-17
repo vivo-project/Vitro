@@ -6,6 +6,7 @@ import static edu.cornell.mannlib.vitro.webapp.dao.ReportingDao.PROPERTY_TEMPLAT
 
 import java.util.Base64;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -14,6 +15,7 @@ import org.apache.commons.lang3.ArrayUtils;
  */
 public abstract class AbstractTemplateReport extends AbstractReport {
     protected byte[] template;
+    protected ObjectMapper mapper = new ObjectMapper();
 
     public void setTemplate(byte[] template) {
         this.template = template;
