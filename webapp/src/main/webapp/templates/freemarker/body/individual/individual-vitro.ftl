@@ -101,15 +101,16 @@
 
 </script>
 
-${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/individual/individual.css" />',
-                  '<link rel="stylesheet" type="text/css" href="${urls.base}/css/jquery_plugins/qtip/jquery.qtip.min.css" />')}
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/individual/individual.css" />')}
 
-${headScripts.add('<script type="text/javascript" src="${urls.base}/js/jquery_plugins/qtip/jquery.qtip.min.js"></script>',
-                  '<script type="text/javascript" src="${urls.base}/js/tiny_mce/tiny_mce.js"></script>')}
+${headScripts.add('<script type="text/javascript" src="${urls.base}/js/tiny_mce/tiny_mce.js"></script>')}
+${headScripts.add('<script type="text/javascript" src="${urls.base}/webjars/floatingui/floating-ui.core.umd.js"></script>')}
+${headScripts.add('<script type="text/javascript" src="${urls.base}/webjars/floatingui/floating-ui.dom.umd.js"></script>')}
 
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/imageUpload/imageUploadUtils.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/fileUpload/fileUploadUtils.js"></script>',
 	          '<script type="text/javascript" src="${urls.base}/js/individual/moreLessController.js"></script>',
+	          '<script type="text/javascript" src="${urls.base}/js/tooltip/tooltip-utils.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/individual/individualUriRdf.js"></script>')}
 
 <script type="text/javascript">
