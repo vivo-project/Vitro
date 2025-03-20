@@ -5,7 +5,6 @@
 
 default:page_not_found_dg display:htmlValue
   """
-  <h2>Unfortunately the page you have requested is no longer available or has been removed.</h2>
   <h2>Page not found</h2>
   <p>It looks like the page you were trying to access is no longer available or has been removed.<br />You can return to homepage or use search to find what you are looking for.</p>
   """@en-US ;
