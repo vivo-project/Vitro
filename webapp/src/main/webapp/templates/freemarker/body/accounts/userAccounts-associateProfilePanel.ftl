@@ -4,7 +4,7 @@
 
 <#assign strings = i18n() />
 
-${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/autocomplete.css" />',
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/templates/freemarker/edit/forms/css/autocomplete.css" />',
                    '<link rel="stylesheet" href="${urls.base}/webjars/jquery-ui-themes/smoothness/jquery-ui.min.css" />')}
 <section id="externalAuthMatchId">
     <div id="associateProfileBackgroundOne">
