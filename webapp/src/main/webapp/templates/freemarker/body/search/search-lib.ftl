@@ -31,25 +31,23 @@
         <div id="selected-filters">
             <@printSelectedFilterValueLabels filters />
         </div>
-        <div id="filter-groups" class="tabs">
-            <#assign active = true>
-            <#list filterGroups as group>
-                <#if group.displayed >
-                    <@searchFormGroupTab group active/>
-                    <#assign active = false>
-                </#if>  
-            </#list>
-        </div>
-        <div class="tabs filter-area">
-            <#assign active = true>
-            <#list filterGroups as group>
-                <#if group.displayed >
-                      <@groupFilters group active/>
-                      <#assign active = false>
-                </#if>
-            </#list>
-        </div>
-        
+        <#assign filterGroupTabsContent>
+            <@filterGroupTabs/>
+        </#assign>
+        <#if filterGroupTabsContent?has_content>
+            <div id="filter-groups" class="tabs">
+                ${filterGroupTabsContent}
+            </div>
+            <div class="tabs filter-area">
+                <#assign active = true>
+                <#list filterGroups as group>
+                    <#if group.displayed && !isEmptyGroup(group)>
+                        <@groupFilters group active/>
+                        <#assign active = false>
+                    </#if>
+                </#list>
+            </div>
+        </#if>
         <div id="search-form-footer">
             <div>
                 <@printResultNumbers />
@@ -63,8 +61,17 @@
         </div> 
 </#macro>
 
+<#macro filterGroupTabs >
+    <#assign active = true>
+    <#list filterGroups as group>
+        <#if group.displayed && !isEmptyGroup(group)>
+            <@searchFormGroupTab group active/>
+            <#assign active = false>
+        </#if>
+    </#list>
+</#macro>
+
 <#macro groupFilters group active>
-    
         <div id="${group.id}" class="tab <#if active >active<#else>fade</#if>">
             <div id="search-filter-group-container-${group.id}" class="search-filter-group-container">
                 <div class="tabs">
@@ -72,7 +79,7 @@
                     <#list group.filters as filterId>
                         <#if filters[filterId]??>
                             <#assign f = filters[filterId]>
-                            <#if f.displayed >
+                            <#if f.displayed && !isEmptyFilter(f) >
                                 <@searchFormFilterTab f assignedActive/>  
                                 <#if !assignedActive && (f.selected || emptySearch )>
                                     <#assign assignedActive = true>
@@ -87,7 +94,7 @@
                 <#list group.filters as filterId>
                     <#if filters[filterId]??>
                         <#assign f = filters[filterId]>
-                        <#if f.displayed >
+                        <#if f.displayed && !isEmptyFilter(f) >
                             <@printFilterValues f assignedActive emptySearch/>  
                             <#if !assignedActive && ( f.selected || emptySearch )>
                                 <#assign assignedActive = true>
@@ -157,12 +164,9 @@
 </#macro>
 
 <#macro searchFormFilterTab filter assignedActive>
-    <#if filter.id == "querytext">
-        <#return>
-    </#if>
-        <div class="tab filter-tab" >
-            <a href="#" onclick="openTab(event, '${filter.id?html}');return false;">${filter.name?html}</a>
-        </div>
+    <div class="tab filter-tab" >
+        <a href="#" onclick="openTab(event, '${filter.id?html}');return false;">${filter.name?html}</a>
+    </div>
 </#macro>
 
 <#macro printFilterValues filter assignedActive isEmptySearch>
@@ -296,4 +300,20 @@
         <#assign result = result + " (" + count + ")" >
     </#if>
     <#return result />
+</#function>
+
+<#function isEmptyFilter filter >
+    <#return filter.id == "querytext" || (filter.type != "RangeFilter" && !filter.input && filter.values?values?filter(v -> !v.selected)?size == 0 ) />
+</#function>
+
+<#function isEmptyGroup group >
+	<#list group.filters as filterId>
+        <#if filters[filterId]??>
+            <#assign f = filters[filterId]>
+            <#if f.displayed && !isEmptyFilter(f) >
+                <#return false />
+            </#if>
+        </#if>
+    </#list>
+    <#return true />
 </#function>
