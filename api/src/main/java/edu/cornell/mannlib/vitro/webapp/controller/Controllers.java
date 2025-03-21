@@ -40,8 +40,6 @@ public class Controllers {
 
     public static final String DASHBOARD_PROP_LIST_JSP = "edit/dashboardPropsList.jsp";
 
-    public static final String ENTITY_EDITABLE_PROP_LIST_JSP = "templates/entity/entityEditablePropsList.jsp";
-
     public static final String TAB_BASIC_JSP = "/templates/tabs/tabBasic.jsp";
     public static final String TAB_PRIMARY_JSP = "/templates/tabs/tabprimary.jsp";
 
