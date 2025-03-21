@@ -38,8 +38,6 @@ public class Controllers {
 
     public static final String TAB = "/index.jsp";
 
-    public static final String DASHBOARD_PROP_LIST_JSP = "edit/dashboardPropsList.jsp";
-
     public static final String HORIZONTAL_JSP = "/templates/edit/fetch/horizontal.jsp";
     public static final String VERTICAL_JSP = "/templates/edit/fetch/vertical.jsp";
 
