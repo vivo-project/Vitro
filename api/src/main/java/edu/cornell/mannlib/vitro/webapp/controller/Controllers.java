@@ -45,8 +45,6 @@ public class Controllers {
     public static final String TAB_BASIC_JSP = "/templates/tabs/tabBasic.jsp";
     public static final String TAB_PRIMARY_JSP = "/templates/tabs/tabprimary.jsp";
 
-    public static final String ALPHA_INDEX_JSP = "/templates/alpha/alphaIndex.jsp";
-
     public static final String HORIZONTAL_JSP = "/templates/edit/fetch/horizontal.jsp";
     public static final String VERTICAL_JSP = "/templates/edit/fetch/vertical.jsp";
 
