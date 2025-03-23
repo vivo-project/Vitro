@@ -64,8 +64,6 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
             		appInd, APPLICATION_COPYRIGHTURL));
             application.setThemeDir(getPropertyStringValue(
             		appInd, APPLICATION_THEMEDIR));
-			application.setCustomCssPath(getPropertyStringValue(
-					appInd, APPLICATION_CUSTOMCSSPATH));
         } catch (Exception e) {
     		log.error(e, e);
     	} finally {
@@ -106,9 +104,6 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
             updatePropertyStringValue(
             		appInd, APPLICATION_THEMEDIR,
             		    application.getThemeDir(), ontModel);
-			updatePropertyStringValue(
-					appInd, APPLICATION_CUSTOMCSSPATH,
-						application.getCustomCssPath(), ontModel);
         } catch (Exception e) {
     		log.error(e, e);
     	} finally {

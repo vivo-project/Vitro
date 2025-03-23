@@ -4,19 +4,25 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletResponse;
 
-
-import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
-import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import org.apache.tika.Tika;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.filestorage.UploadedFileHelper;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
+
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdf.model.impl.StatementImpl;
 
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
@@ -169,21 +175,13 @@ public class SiteStyleController extends FreemarkerHttpServlet {
 		UploadedFileHelper fileHelper = new UploadedFileHelper(fileStorage, webAppDaoFactory, getServletContext());
 		FileInfo fileInfo = createFile(file, "custom-style.css", fileHelper);
 
-		ApplicationDao applicationDao = webAppDaoFactory.getApplicationDao();
-		ApplicationBean applicationBean = applicationDao.getApplicationBean();
-		applicationBean.setCustomCssPath(UrlBuilder.getUrl(fileInfo.getBytestreamAliasUrl()));
-		applicationDao.updateApplicationBean(applicationBean);
+		updateCssFileDispalyModel(UrlBuilder.getUrl(fileInfo.getBytestreamAliasUrl()));
 
 		return showMainStyleEditPage(vreq);
 	}
 
 	private TemplateResponseValues removeCssFile(VitroRequest vreq) {
-		WebappDaoFactory webAppDaoFactory = vreq.getUnfilteredWebappDaoFactory();
-		ApplicationDao applicationDao = webAppDaoFactory.getApplicationDao();
-		ApplicationBean applicationBean = applicationDao.getApplicationBean();
-		applicationBean.setCustomCssPath(null);
-		applicationDao.updateApplicationBean(applicationBean);
-
+		removeCssFileDisplayModel();
 		return showMainStyleEditPage(vreq);
 	}
 
@@ -195,6 +193,36 @@ public class SiteStyleController extends FreemarkerHttpServlet {
 		rv.put(BODY_FORM_ACTION_REMOVE, UrlBuilder.getPath(URL_HERE, new ParamMap(PARAMETER_ACTION, ACTION_REMOVE)));
 
 		return rv;
+	}
+
+
+	private void updateCssFileDispalyModel(String cssFilePath) {
+		ContextModelAccess cma = ModelAccess.getInstance();
+		OntModel displayModel = cma.getOntModel(ModelNames.DISPLAY);
+
+		Resource portalResource = ResourceFactory.createResource(VitroVocabulary.PROPERTY_CUSTOMSTYLE);
+
+		String propertyUri = VitroVocabulary.PORTAL_CUSTOMCSSPATH;
+		String value = cssFilePath;
+		Property property = ResourceFactory.createProperty(propertyUri);
+
+		displayModel.removeAll(portalResource, property, null);
+
+		if ( !value.isEmpty() && !value.equals("null")) {
+			Statement statement = new StatementImpl(portalResource, property, ResourceFactory.createTypedLiteral(value));
+			displayModel.add(statement);
+		}
+	}
+
+
+	private void removeCssFileDisplayModel() {
+		ContextModelAccess cma = ModelAccess.getInstance();
+		OntModel displayModel = cma.getOntModel(ModelNames.DISPLAY);
+
+		Resource themeResource = ResourceFactory.createResource(VitroVocabulary.PROPERTY_CUSTOMSTYLE);
+
+		Property property = ResourceFactory.createProperty(VitroVocabulary.PORTAL_CUSTOMCSSPATH);
+		displayModel.removeAll(themeResource, property, null);
 	}
 
 }

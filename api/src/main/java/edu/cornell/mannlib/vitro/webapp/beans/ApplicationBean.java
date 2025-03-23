@@ -49,9 +49,6 @@ public class ApplicationBean {
     private String    copyrightAnchor;
     private String    themeDir;
 
-    private String    customCssPath;
-
-
     public String toString() {
         String output = "Application Bean Contents:\n";
         output += "  initialized from DB:    [" + initialized             + "]\n";
@@ -119,10 +116,6 @@ public class ApplicationBean {
 		themeDir = string_val;
 	}
 
-    public void setCustomCssPath(String string_val) {
-        customCssPath = string_val;
-    }
-
     /*************************** GET functions ****************************/
 
     public String getSessionIdStr() {
@@ -171,10 +164,6 @@ public class ApplicationBean {
 
     public String getCopyrightAnchor() {
         return copyrightAnchor;
-    }
-
-    public String getCustomCssPath() {
-        return customCssPath;
     }
 
     // TODO deprecate or remove the following three legacy methods?
