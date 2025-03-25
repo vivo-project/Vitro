@@ -100,10 +100,11 @@ public class RolesController extends FreemarkerHttpServlet {
 
     private ResponseValues processRemove(VitroRequest vreq) {
         String uri = vreq.getParameter(URI_PARAM);
-        if (isNotValid(uri)) {
+        if (StringUtils.isBlank(uri)) {
             TemplateResponseValues response = processList(vreq);
             response.put("errorMessage", I18n.text(vreq, "removed_role_uri_is_invalid", new Object[] { uri }));
             log.error(String.format("Uri '%s' of role to remove is not valid", uri));
+            response.setStatusCode(400);
             return response;
         }
         removeRole(uri);
@@ -114,16 +115,18 @@ public class RolesController extends FreemarkerHttpServlet {
     private ResponseValues processEdit(VitroRequest vreq) {
         String uri = vreq.getParameter(URI_PARAM);
         String label = vreq.getParameter(LABEL_PARAM);
-        if (isNotValid(uri)) {
+        if (StringUtils.isBlank(uri)) {
             TemplateResponseValues response = processList(vreq);
             response.put("errorMessage", I18n.text(vreq, "edited_role_uri_is_invalid", new Object[] { uri }));
             log.error(String.format("Uri '%s' of role to edit is not valid", uri));
+            response.setStatusCode(400);
             return response;
         }
-        if (isNotValid(label)) {
+        if (StringUtils.isBlank(label)) {
             TemplateResponseValues response = processList(vreq);
             response.put("errorMessage", I18n.text(vreq, "edited_role_label_is_invalid", new Object[] { label }));
             log.error(String.format("New label '%s' of role '%s' to edit is not valid", label, uri));
+            response.setStatusCode(400);
             return response;
         }
         editRole(uri, label, vreq);
@@ -131,16 +134,13 @@ public class RolesController extends FreemarkerHttpServlet {
         return response;
     }
 
-    private boolean isNotValid(String uri) {
-        return StringUtils.isBlank(uri);
-    }
-
     private ResponseValues processAdd(VitroRequest vreq) {
         String label = vreq.getParameter(LABEL_PARAM);
-        if (isNotValid(label)) {
+        if (StringUtils.isBlank(label)) {
             TemplateResponseValues response = processList(vreq);
             response.put("errorMessage", I18n.text(vreq, "added_role_label_is_invalid", new Object[] { label }));
             log.error(String.format("Label '%s' of new role to add is not valid", label));
+            response.setStatusCode(400);
             return response;
         }
         addRole(label, vreq);
@@ -208,7 +208,6 @@ public class RolesController extends FreemarkerHttpServlet {
             m.remove(toRemove);
         }
         PolicyTemplateController.removeRoleDataSets(uri);
-        // TODO: Remove policies related to removed role
     }
 
     private static final String GET_PERMISSION_SET_LABELS_QUERY = ""
