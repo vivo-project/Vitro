@@ -23,9 +23,6 @@ import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * TODO
- */
 public class SelectingFileDistributor_FileFinderTest extends AbstractTestClass {
     private static final Path SCHOLARS_HOME = Paths
             .get("/scholars/home/directory");

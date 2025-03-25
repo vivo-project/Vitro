@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.reporting;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -11,13 +10,14 @@ import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.RequestModelAccess;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.docx4j.Docx4J;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
@@ -29,6 +29,7 @@ import org.w3c.dom.Element;
  * in them.
  */
 public class OpenDopeWordReport extends AbstractTemplateReport implements XmlGenerator {
+    private static final Log log = LogFactory.getLog(OpenDopeWordReport.class);
     /**
      * Define the docx mime type, including the UTF-8 character set
      */
@@ -64,10 +65,10 @@ public class OpenDopeWordReport extends AbstractTemplateReport implements XmlGen
             }
 
             return xmlDoc;
-        } catch (IOException | ParserConfigurationException e) {
+        } catch (Exception e) {
+            log.error(e, e);
+            throw new ReportGeneratorException("Error generating XML document", e);
         }
-
-        return null;
     }
 
     private void convertObjectNodeToXml(Document xmlDoc, String outputName, JsonNode rootNode) {
@@ -86,27 +87,25 @@ public class OpenDopeWordReport extends AbstractTemplateReport implements XmlGen
                     JsonNode result = bindings.get(idx);
                     // Get the results
                     Iterator<Map.Entry<String, JsonNode>> iterator = result.fields();
-                    if (iterator != null) {
-                        // Create a row for the results
-                        Element row = xmlDoc.createElement("row");
+                    // Create a row for the results
+                    Element row = xmlDoc.createElement("row");
 
-                        // For each result
-                        while (iterator.hasNext()) {
-                            Map.Entry<String, JsonNode> entry = iterator.next();
+                    // For each result
+                    while (iterator.hasNext()) {
+                        Map.Entry<String, JsonNode> entry = iterator.next();
 
-                            // Get the value
-                            JsonNode value = entry.getValue();
-                            JsonNode type = value.get("type");
+                        // Get the value
+                        JsonNode value = entry.getValue();
+                        JsonNode type = value.get("type");
 
-                            // Add each literal as a column
-                            if (type != null && type.isTextual() && "literal".equals(type.asText())) {
-                                Element column = xmlDoc.createElement(entry.getKey());
-                                column.setTextContent(value.get("value").asText());
-                                row.appendChild(column);
-                            }
+                        // Add each literal as a column
+                        if (type != null && type.isTextual() && "literal".equals(type.asText())) {
+                            Element column = xmlDoc.createElement(entry.getKey());
+                            column.setTextContent(value.get("value").asText());
+                            row.appendChild(column);
                         }
-                        resultsElement.appendChild(row);
                     }
+                    resultsElement.appendChild(row);
                 }
             }
         }

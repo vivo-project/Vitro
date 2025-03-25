@@ -1082,9 +1082,7 @@ public class PolicyLoader {
                     String roleId = qs.getLiteral("roleId").getLexicalForm();
                     Boolean isInSet = qs.getLiteral("valueInSet").getBoolean();
                     Map<String, Boolean> roles = operations.getOrDefault(operationId, new LinkedHashMap<>());
-                    if (!operations.containsKey(operationId)) {
-                        operations.put(operationId, roles);
-                    }
+                    operations.putIfAbsent(operationId, roles);
                     roles.put(roleId, isInSet);
                 }
             });
