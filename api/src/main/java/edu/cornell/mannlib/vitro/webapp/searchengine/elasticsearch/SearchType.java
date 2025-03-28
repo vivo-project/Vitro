@@ -7,5 +7,6 @@ public enum SearchType {
     RANGE,
     PREFIX,
     WILDCARD,
-    EXISTS
+    EXISTS,
+    MATCH_ALL
 }
