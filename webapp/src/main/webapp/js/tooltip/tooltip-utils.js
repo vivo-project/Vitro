@@ -133,7 +133,7 @@ function createTooltipElement(data) {
 }
 
 function setupCloseButtonHandler(tooltip) {
-    $('.tooltip a.close').click((event) => {
+    $('.tooltip a.close').on("click", (event) => {
         event.preventDefault();
         removeTooltip(tooltip);
         // $(event.target).closest('.tooltip').remove();

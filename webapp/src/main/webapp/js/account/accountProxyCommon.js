@@ -61,7 +61,7 @@ function itemElement(template, uri, label, classLabel, imageUrl, removeInfo) {
 		element.addClass("proxyInfoElement");
 
 		var removeLink = $("[templatePart='remove']", element).first();
-		removeLink.click(function(event) {
+		removeLink.on("click", function(event) {
 			self.removeInfo(self);
 			return false;
 		});
@@ -140,7 +140,7 @@ function proxyAutocomplete(parms, excludedUris, getProxyInfos, addProxyInfo, rep
             	term: request.term
             },
             complete: function(xhr, status) {
-                var results = $.parseJSON(xhr.responseText);
+                var results = JSON.parse(xhr.responseText);
                 cache[request.term] = results;
                 sendResponse(request, response, filterResults(results));
             }
