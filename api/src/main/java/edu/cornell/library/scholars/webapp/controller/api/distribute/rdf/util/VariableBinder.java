@@ -48,7 +48,7 @@ public class VariableBinder {
     private QueryHolder bindUriParameters(Set<String> names, QueryHolder queryHolder)
             throws MissingParametersException {
         for (String name : names) {
-            queryHolder = queryHolder.bindToUri(name, getOneParameter(name));
+            queryHolder = queryHolder.bindToUri(name, getParameter(name));
         }
         return queryHolder;
     }
@@ -56,12 +56,12 @@ public class VariableBinder {
     private QueryHolder bindLiteralParameters(Set<String> names, QueryHolder queryHolder)
             throws MissingParametersException {
         for (String name : names) {
-            queryHolder = queryHolder.bindToPlainLiteral(name, getOneParameter(name));
+            queryHolder = queryHolder.bindToPlainLiteral(name, getParameter(name));
         }
         return queryHolder;
     }
 
-    private String getOneParameter(String name) throws MissingParametersException {
+    private String getParameter(String name) throws MissingParametersException {
         String[] uris = parameters.get(name);
         if (uris == null || uris.length == 0) {
             throw new MissingParametersException("A '" + name + "' parameter is required.");
