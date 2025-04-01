@@ -87,15 +87,13 @@ public class RequestModelAccessImpl implements RequestModelAccess {
 			.getLog(RequestModelAccessImpl.class);
 
 	private final HttpServletRequest req;
-	private final ServletContext ctx;
 	private final ConfigurationProperties props;
 	private final ShortTermCombinedTripleSource source;
 
 	public RequestModelAccessImpl(HttpServletRequest req,
 			ShortTermCombinedTripleSource source) {
 		this.req = req;
-		this.ctx = req.getSession().getServletContext();
-		this.props = ConfigurationProperties.getBean(req);
+		this.props = ConfigurationProperties.getInstance();
 		this.source = source;
 	}
 

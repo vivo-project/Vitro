@@ -1,0 +1,168 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix access-individual: <https://vivoweb.org/ontology/vitro-application/auth/individual/> .
+@prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/> .
+@prefix : <https://vivoweb.org/ontology/vitro-application/auth/individual/access-allowed-report-generator/> .
+
+:PolicyTemplate a access:PolicyTemplate ;
+    access:hasRule :AllowMatchingReportGenerator ;
+
+    access:hasDataSet :PublicExecuteReportGeneratorDataSet ;
+    access:hasDataSet :SelfEditorExecuteReportGeneratorDataSet ;
+    access:hasDataSet :EditorExecuteReportGeneratorDataSet ;
+    access:hasDataSet :CuratorExecuteReportGeneratorDataSet ;
+    access:hasDataSet :AdminExecuteReportGeneratorDataSet ;
+
+    access:hasDataSetTemplate :RoleExecuteReportGeneratorDataSetTemplate ;
+    .
+
+#Role Execute ReportGenerator data set template
+
+:RoleExecuteReportGeneratorDataSetTemplate a access:DataSetTemplate ;
+    access:hasDataSetTemplateKey :RoleExecuteReportGeneratorDataSetTemplateKey ;
+    access:hasDataSetKeyTemplate :RoleExecuteReportGeneratorDataSetKeyTemplate ;
+    access:hasRelatedValueSet access-individual:ReportGeneratorValueSet ;
+    access:hasRelatedValueSet access-individual:ExecuteOperationValueSet ;
+    access:dataSetValueTemplate :RoleExecuteReportGeneratorRoleValueSetTemplate ;
+    access:dataSetValueTemplate :RoleExecuteReportGeneratorValueSetTemplate .  
+
+:RoleExecuteReportGeneratorDataSetTemplateKey a access:DataSetTemplateKey ;
+    access:hasTemplateKeyComponent access-individual:SubjectRole .
+
+:RoleExecuteReportGeneratorDataSetKeyTemplate a access:DataSetKeyTemplate ;
+    access:hasKeyComponent access-individual:ReportGenerator ;
+    access:hasKeyComponent access-individual:ExecuteOperation ;
+    access:hasKeyComponentTemplate access-individual:SubjectRole .
+
+:RoleExecuteReportGeneratorRoleValueSetTemplate a access:ValueSetTemplate ;
+    access:relatedCheck :SubjectRoleCheck;
+    access:containsElementsOfType access-individual:SubjectRole .
+
+:RoleExecuteReportGeneratorValueSetTemplate a access:ValueSetTemplate ;
+    access:relatedCheck :AccessObjectUriCheck ;
+#    access:value access-individual:defaultUri ;
+    access:containsElementsOfType access-individual:ReportGenerator .
+
+### Public display class uri data sets
+
+:PublicExecuteReportGeneratorDataSet a access:DataSet ;
+    access:hasDataSetKey :PublicExecuteReportGeneratorDataSetKey ;
+    access:hasRelatedValueSet access-individual:PublicRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ReportGeneratorValueSet ;
+    access:hasRelatedValueSet access-individual:ExecuteOperationValueSet ;
+    access:hasRelatedValueSet :PublicExecuteReportGeneratorValueSet .
+
+:PublicExecuteReportGeneratorDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:ReportGenerator ;
+    access:hasKeyComponent access-individual:PublicRoleUri ;
+    access:hasKeyComponent access-individual:ExecuteOperation .
+
+### Self editor display class uri data sets
+
+:SelfEditorExecuteReportGeneratorDataSet a access:DataSet ;
+    access:hasDataSetKey :SelfEditorExecuteReportGeneratorDataSetKey ;
+    access:hasRelatedValueSet access-individual:SelfEditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ReportGeneratorValueSet ;
+    access:hasRelatedValueSet access-individual:ExecuteOperationValueSet ;
+    access:hasRelatedValueSet :SelfEditorExecuteReportGeneratorValueSet .
+
+:SelfEditorExecuteReportGeneratorDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:ReportGenerator ;
+    access:hasKeyComponent access-individual:SelfEditorRoleUri ;
+    access:hasKeyComponent access-individual:ExecuteOperation .
+
+### Editor display class uri data sets
+
+:EditorExecuteReportGeneratorDataSet a access:DataSet ;
+    access:hasDataSetKey :EditorExecuteReportGeneratorDataSetKey ;
+    access:hasRelatedValueSet access-individual:EditorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ReportGeneratorValueSet ;
+    access:hasRelatedValueSet access-individual:ExecuteOperationValueSet ;
+    access:hasRelatedValueSet :EditorExecuteReportGeneratorValueSet .
+
+:EditorExecuteReportGeneratorDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:ReportGenerator ;
+    access:hasKeyComponent access-individual:EditorRoleUri ;
+    access:hasKeyComponent access-individual:ExecuteOperation .
+
+### Curator display class uri data sets
+
+:CuratorExecuteReportGeneratorDataSet a access:DataSet ;
+    access:hasDataSetKey :CuratorExecuteReportGeneratorDataSetKey ;
+    access:hasRelatedValueSet access-individual:CuratorRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ReportGeneratorValueSet ;
+    access:hasRelatedValueSet access-individual:ExecuteOperationValueSet ;
+    access:hasRelatedValueSet :CuratorExecuteReportGeneratorValueSet .
+
+:CuratorExecuteReportGeneratorDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:ReportGenerator ;
+    access:hasKeyComponent access-individual:CuratorRoleUri ;
+    access:hasKeyComponent access-individual:ExecuteOperation .
+
+### Admin display class uri data sets
+
+:AdminExecuteReportGeneratorDataSet a access:DataSet ;
+    access:hasDataSetKey :AdminExecuteReportGeneratorDataSetKey ;
+    access:hasRelatedValueSet access-individual:AdminRoleValueSet ;
+    access:hasRelatedValueSet access-individual:ReportGeneratorValueSet ;
+    access:hasRelatedValueSet access-individual:ExecuteOperationValueSet ;
+    access:hasRelatedValueSet :AdminExecuteReportGeneratorValueSet .
+
+:AdminExecuteReportGeneratorDataSetKey a access:DataSetKey ;
+    access:hasKeyComponent access-individual:ReportGenerator ;
+    access:hasKeyComponent access-individual:AdminRoleUri ;
+    access:hasKeyComponent access-individual:ExecuteOperation .
+
+:AllowMatchingReportGenerator a access:Rule;
+    access:requiresCheck :SubjectRoleCheck ;
+    access:requiresCheck :OperationCheck ;
+    access:requiresCheck :AccessObjectTypeCheck ;
+    access:requiresCheck :AccessObjectUriCheck .
+
+:AccessObjectTypeCheck a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:AccessObjectType ;
+    access:values access-individual:ReportGeneratorValueSet ;
+    .
+
+:OperationCheck a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:Operation ;
+    access:values access-individual:ExecuteOperationValueSet ;
+    .
+
+:SubjectRoleCheck a access:Check ;
+    access:useOperator access-individual:Equals ;
+    access:hasTypeToCheck access-individual:SubjectRole ;
+    access:values access-individual:PublicRoleValueSet ;
+    access:values access-individual:SelfEditorRoleValueSet ;
+    access:values access-individual:EditorRoleValueSet ;
+    access:values access-individual:CuratorRoleValueSet ;
+    access:values access-individual:AdminRoleValueSet .
+
+:AccessObjectUriCheck a access:Check ;
+    access:useOperator access-individual:OneOf ;
+    access:hasTypeToCheck access-individual:AccessObjectUri ;
+    access:values :AdminExecuteReportGeneratorValueSet ;
+    access:values :CuratorExecuteReportGeneratorValueSet ;
+    access:values :EditorExecuteReportGeneratorValueSet ;
+    access:values :SelfEditorExecuteReportGeneratorValueSet ;
+    access:values :PublicExecuteReportGeneratorValueSet ;
+    .
+
+:AdminExecuteReportGeneratorValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:ReportGenerator .
+
+:CuratorExecuteReportGeneratorValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:ReportGenerator .
+
+:EditorExecuteReportGeneratorValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:ReportGenerator .
+
+:SelfEditorExecuteReportGeneratorValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:ReportGenerator .
+
+:PublicExecuteReportGeneratorValueSet a access:ValueSet ;
+    access:containsElementsOfType access-individual:ReportGenerator .
+
