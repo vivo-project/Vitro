@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Objects;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -102,6 +103,10 @@ public class FileServingServlet extends VitroHttpServlet {
 		 * the image bytes.
 		 */
 		response.setStatus(SC_OK);
+
+		if (Objects.equals(mimeType, "text/plain") && path.endsWith(".css")) {
+			mimeType = "text/css";
+		}
 
 		if (mimeType != null) {
 			response.setContentType(mimeType);
