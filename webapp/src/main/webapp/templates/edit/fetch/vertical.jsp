@@ -102,7 +102,7 @@ if ( rows > 0  && results.size() > rows ) { // avoid divide by zero error in nex
     </table>
 <%
 } else {
-    System.out.println("No results reported when " + rows + " rows and a result array size of " + results.size()); %>
+%>
     No results retrieved for query "<%=request.getAttribute("querystring")%>".
 <%  Iterator errorIter = results.iterator();
     while ( errorIter.hasNext()) {

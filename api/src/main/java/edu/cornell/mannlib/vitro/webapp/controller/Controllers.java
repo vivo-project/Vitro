@@ -38,21 +38,6 @@ public class Controllers {
 
     public static final String TAB = "/index.jsp";
 
-    public static final String DEBUG_JSP = "/templates/page/debug.jsp";
-    public static final Object BODY_MSG = "/templates/page/bodyMsg.jsp";
-
-    public static final String DASHBOARD_PROP_LIST_JSP = "edit/dashboardPropsList.jsp";
-
-    public static final String ENTITY_EDITABLE_JSP = "templates/entity/entityEditable.jsp";
-    public static final String ENTITY_EDITABLE_PROP_LIST_JSP = "templates/entity/entityEditablePropsList.jsp";
-
-    public static final String ENTITY_LIST_FOR_TABS_JSP = "templates/entity/entityListForTabs.jsp";
-
-    public static final String TAB_BASIC_JSP = "/templates/tabs/tabBasic.jsp";
-    public static final String TAB_PRIMARY_JSP = "/templates/tabs/tabprimary.jsp";
-
-    public static final String ALPHA_INDEX_JSP = "/templates/alpha/alphaIndex.jsp";
-
     public static final String HORIZONTAL_JSP = "/templates/edit/fetch/horizontal.jsp";
     public static final String VERTICAL_JSP = "/templates/edit/fetch/vertical.jsp";
 
