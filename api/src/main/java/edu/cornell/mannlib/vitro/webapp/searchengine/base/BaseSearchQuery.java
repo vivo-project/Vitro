@@ -27,6 +27,8 @@ public class BaseSearchQuery implements SearchQuery {
 	private final Set<String> facetFields = new HashSet<>();
 	private int facetLimit = 100;
 	private int facetMinCount = -1;
+    private boolean facetTextToCompareIgnoreCase;
+    private String facetContainsText;
 
 	@Override
 	public SearchQuery setQuery(String query) {
@@ -146,5 +148,27 @@ public class BaseSearchQuery implements SearchQuery {
 				+ ", facetFields=" + facetFields + ", facetLimit=" + facetLimit
 				+ ", facetMinCount=" + facetMinCount + "]";
 	}
+
+    @Override
+    public SearchQuery setFacetTextToMatch(String text) {
+        facetContainsText = text;
+        return this;
+    }
+
+    @Override
+    public String getFacetTextToMatch() {
+        return facetContainsText;
+    }
+
+    @Override
+    public SearchQuery setFacetTextCompareCaseInsensitive(boolean b) {
+        facetTextToCompareIgnoreCase = b;
+        return this;
+    }
+
+    @Override
+    public boolean isFacetTextCompareCaseInsensitive() {
+        return facetTextToCompareIgnoreCase;
+    }
 
 }

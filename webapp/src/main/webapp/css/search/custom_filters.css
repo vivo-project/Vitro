@@ -115,3 +115,15 @@
 	padding-left: 7px;
 	font-size: 14px;
 }
+
+.facet-input {
+	width: 100%;
+}
+
+.hidden-search-option {
+	display: none;
+}
+
+.hidden-all-search-options {
+	display: none;
+}

@@ -47,7 +47,7 @@ public class SearchFiltering {
 
     private static final String FILTER_RANGE = "filter_range_";
     private static final String FILTER_INPUT_PREFIX = "filter_input_";
-    private static final String FILTERS = "filters";
+    public static final String FILTERS = "filters";
     public static final String ANY_VALUE = "[* TO *]";
 
     private static final String FILTER_QUERY = ""

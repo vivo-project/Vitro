@@ -263,3 +263,7 @@ a.hidden-search-option {
 	margin-left: .5em;
 	height : 3em;
 }
+
+.facet-input {
+	width: 100%;
+}
