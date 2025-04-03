@@ -54,9 +54,9 @@
     </form>
     
     <script type="text/javascript">
-        $('.filter-tab > ul > li').not('.li-selected').hide();
+        $('.filter-tab > ul > li').not('.li-selected').addClass('hidden-all-search-options');
         $('.filter-tab > a').click(function() {
-            $(this).parent().find('ul > li').not('.li-selected').toggle();
+            $(this).parent().find('ul > li').not('.li-selected').toggleClass('hidden-all-search-options');
         });
     </script>
 
@@ -114,7 +114,14 @@
 </#macro>
 
 <#macro filterFacets f >
+    <#if ( !filter.localizationRequired && filter.values?values?size > filter.moreLimit) >
+        <li>
+            <@sl.createAutocomplete filter "filter-form" />
+        </li>
+    </#if>
     <#assign idCounter = 1 >
+    <#assign notSelectedCount = 0>
+    <#assign additionalLabels = false>
     <#list f.values?values as value>
         <#if !value.displayed>
             <#continue>
@@ -126,7 +133,7 @@
         </#if>
         <#if value.selected>
             <#if value.id != "[* TO *]">
-                <li id="${value.id?html}" class="li-selected">
+                <li class="li-selected">
                     <a href="#" class="selected">
                         <@sl.getInput f value sl.getValueID(f.id, idCounter) idCounter 'filter-form' />
                         <@sl.getSelectedLabel sl.getValueID(f.id, idCounter)?html value f resultsCount />
@@ -135,16 +142,24 @@
             </#if>
         <#else>
             <#if resultsCount != 0>
-                <li id="${value.id?html}">
+                <#if f.moreLimit = notSelectedCount >
+                    <#assign additionalLabels = true>
+                    <li class="more-facets-link" href="javascript:void(0);" onclick="expandSearchOptions(this)">${i18n().paging_link_more}</li>
+                </#if>
+                <li <#if additionalLabels>class="additional-search-options hidden-search-option"</#if> >
                     <a href="#">
                         <@sl.getInput f value sl.getValueID(f.id, idCounter) idCounter 'filter-form' />
                         <@sl.getLabel sl.getValueID(f.id, idCounter) value f resultsCount />
                     </a>
                 </li>
+                <#assign notSelectedCount += 1>
             </#if>
         </#if>
         <#assign idCounter = idCounter + 1>
     </#list>
+    <#if additionalLabels >
+        <li class="less-facets-link additional-search-options hidden-search-option" href="javascript:void(0);" onclick="collapseSearchOptions(this)">${i18n().display_less}</li>
+    </#if>
 </#macro>
 
 <#macro alphabeticalIndexLinks>

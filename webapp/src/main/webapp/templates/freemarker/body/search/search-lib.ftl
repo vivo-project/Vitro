@@ -108,17 +108,20 @@
 
 <#macro printSelectedFilterValueLabels filters>
     <#list filters?values as filter>
-        <#assign valueNumber = 1>
-        <#list filter.values?values as v>
-            <#if v.selected>
-                <@getInput filter v getValueID(filter.id, valueNumber) valueNumber />
-                <#if filter.displayed>
-                    <@getSelectedLabel getValueID(filter.id, valueNumber)?html v filter v.count />
+        <#if filter.inputText?has_content>
+            <@userSelectedInput filter "search-form" />
+        <#else>
+            <#assign valueNumber = 1>
+            <#list filter.values?values as v>
+                <#if v.selected>
+                    <@getInput filter v getValueID(filter.id, valueNumber) valueNumber />
+                    <#if filter.displayed>
+                        <@getSelectedLabel getValueID(filter.id, valueNumber)?html v filter v.count />
+                    </#if>
                 </#if>
-            </#if>
-            <#assign valueNumber = valueNumber + 1>
-        </#list>
-        <@userSelectedInput filter "search-form" />
+                <#assign valueNumber = valueNumber + 1>
+            </#list>
+        </#if>
     </#list>
 </#macro>
 
@@ -176,16 +179,22 @@
             <#elseif filter.type == "RangeFilter">
                 <@rangeFilter filter "search-form" />
             <#else>
-                <#if filter.input>
+                <#if filter.input >
                     <div class="user-filter-search-input">
                         <@createUserInput filter />
                     </div>
                 </#if>
+                <#if ( !filter.localizationRequired && filter.values?values?size > filter.moreLimit) >
+                    <div class="user-filter-search-input">
+                        <@createAutocomplete filter />
+                    </div>
+                </#if>
                 <#assign valueNumber = 1>
+                <#assign notSelectedCount = 0>
                 <#assign additionalLabels = false>
                 <#list filter.values?values as v>
                     <#if !v.selected>
-                        <#if filter.moreLimit = valueNumber - 1 >
+                        <#if filter.moreLimit = notSelectedCount >
                             <#assign additionalLabels = true>
                             <a class="more-facets-link" href="javascript:void(0);" onclick="expandSearchOptions(this)">${i18n().paging_link_more}</a>
                         </#if>
@@ -193,12 +202,13 @@
                             <@getInput filter v getValueID(filter.id, valueNumber) valueNumber />
                             <@getLabel getValueID(filter.id, valueNumber)?html v filter v.count additionalLabels />
                         </#if>
+                        <#assign notSelectedCount += 1>
                     </#if>
-                    <#assign valueNumber = valueNumber + 1>
+                    <#assign valueNumber += 1>
                 </#list>
                 <#if additionalLabels >
                     <a class="less-facets-link additional-search-options hidden-search-option" href="javascript:void(0);" onclick="collapseSearchOptions(this)">${i18n().display_less}</a>
-                </#if>  
+                </#if>
             </#if>
         </div>
 </#macro>
@@ -268,6 +278,27 @@
 
 <#macro createUserInput filter>
     <input form="search-form" id="filter_input_${filter.id?html}"  placeholder="${i18n().search_field_placeholder}" class="search-vivo" type="text" name="filter_input_${filter.id?html}" value="${filter.inputText?html}" autocapitalize="none" />
+</#macro>
+
+<#macro createAutocomplete filter form="search-form">
+    <input id="filter_autocomplete_${filter.id?html}" placeholder="${i18n().search_field_placeholder}" class="facet-input" type="text" value="" autocapitalize="none" />
+    <input form="${form}" id="filter_selected_autocomplete_${filter.id?html}" type="hidden" name="filters_autocomplete_${filter.id?html}" value="" />
+    <script>
+      $( function() {
+          $( "#filter_autocomplete_${filter.id?html?js_string}" ).autocomplete({
+          source: function (request, response) {
+            $.getJSON("${facetOptionsUrl}&facet_filter=${filter.id?html?js_string}", {
+                term: request.term
+            }, response);
+          },
+          minLength: 3,
+          select: function( event, ui ) {
+            $("#filter_selected_autocomplete_${filter.id?html?js_string}").val("${filter.id?html?js_string}:" + ui.item.value);
+            $('#${form}').submit();
+          }
+        } );
+      } );
+    </script>
 </#macro>
 
 <#macro getInput filter filterValue valueID valueNumber form="search-form">
