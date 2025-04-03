@@ -139,4 +139,26 @@ public interface SearchQuery {
 	 * @return A negative value means that no limit has been specified.
 	 */
 	int getFacetMinCount();
+
+    /**
+     * @param text is the text a facet field should contain.
+     * @return this query
+     */
+	SearchQuery setFacetTextToMatch(String text);
+
+    /**
+     * @return The text a facet field.
+     */
+    String getFacetTextToMatch();
+
+    /**
+     * @param ignoreCase defines whether the text of a facet field should be compared case insensitively.
+     * @return this query
+     */
+    SearchQuery setFacetTextCompareCaseInsensitive(boolean ignoreCase);
+
+    /**
+     * @return defines whether the text of a facet field should be compared case insensitively.
+     */
+    boolean isFacetTextCompareCaseInsensitive();
 }

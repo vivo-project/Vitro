@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -246,12 +245,12 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                 }
             }
 
-            ParamMap pagingLinkParams = new ParamMap();
-            pagingLinkParams.put(PARAM_QUERY_TEXT, queryText);
-            pagingLinkParams.put(PARAM_HITS_PER_PAGE, String.valueOf(hitsPerPage));
+            ParamMap searchParams = new ParamMap();
+            searchParams.put(PARAM_QUERY_TEXT, queryText);
+            SearchFiltering.addFiltersToPageLinks(vreq, searchParams, vreq.getParameterNames());
 
-            Enumeration<String> paramNames = vreq.getParameterNames();
-            SearchFiltering.addFiltersToPageLinks(vreq, pagingLinkParams, paramNames);
+            ParamMap pagingLinkParams = new ParamMap(searchParams);
+            pagingLinkParams.put(PARAM_HITS_PER_PAGE, String.valueOf(hitsPerPage));
 
             if (wasXmlRequested) {
                 pagingLinkParams.put(PARAM_XML_REQUEST, "1");
@@ -302,6 +301,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             if (startIndex < (hitCount - hitsPerPage)) {
                 body.put("nextPage", getNextPageLink(startIndex, hitsPerPage, vreq.getServletPath(), pagingLinkParams));
             }
+            body.put("facetOptionsUrl", getFacetControllerLink(searchParams, requestFilters, vreq));
 
             String template = templateTable.get(format).get(Result.PAGED);
             if (log.isDebugEnabled()) {
@@ -454,7 +454,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         return text.toString();
     }
 
-    private static SearchQuery getQuery(String queryText, int hitsPerPage, int startIndex, VitroRequest vreq,
+    public static SearchQuery getQuery(String queryText, int hitsPerPage, int startIndex, VitroRequest vreq,
             Map<String, SearchFilter> filters, Map<String, SortConfiguration> sortOptions) {
         // Lowercase the search term to support wildcard searches: The search engine
         // applies no text
@@ -569,6 +569,21 @@ public class PagedSearchController extends FreemarkerHttpServlet {
     private static String getNextPageLink(int startIndex, int hitsPerPage, String baseUrl, ParamMap params) {
         params.put(PARAM_START_INDEX, String.valueOf(startIndex + hitsPerPage));
         return UrlBuilder.getUrl(baseUrl, params);
+    }
+
+    private static String getFacetControllerLink(ParamMap params, Map<String, List<String>> providedFilters, VitroRequest vreq) {
+        Map<String, List<String>> requestFilters = SearchFiltering.getRequestFilters(vreq);
+        Set<String> impliedFilters = new HashSet<String>(providedFilters.keySet());
+        impliedFilters.removeAll(requestFilters.keySet());
+        int i = 0;
+        for (String filter : impliedFilters) {
+            List<String> values = providedFilters.get(filter);
+            for (String value : values) {
+                params.put(SearchFiltering.FILTERS + "_" + i , filter + ":" + value);
+                i++;
+            }
+        }
+        return UrlBuilder.getUrl(SearchFacetsController.SEARCH_FACETS_URL, params);
     }
 
     protected static class PagingLink extends LinkTemplateModel {

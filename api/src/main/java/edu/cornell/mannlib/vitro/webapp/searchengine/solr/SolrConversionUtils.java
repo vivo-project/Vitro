@@ -4,6 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.searchengine.solr;
 
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.ALLTEXT;
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.ALLTEXTUNSTEMMED;
+import static org.apache.solr.common.params.FacetParams.FACET_CONTAINS;
+import static org.apache.solr.common.params.FacetParams.FACET_CONTAINS_IGNORE_CASE;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,13 +13,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
-
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchFacetField;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputField;
@@ -162,6 +164,16 @@ public class SolrConversionUtils {
 		int minCount = query.getFacetMinCount();
 		if (minCount >= 0) {
 			solrQuery.setFacetMinCount(minCount);
+		}
+
+		String facetText = query.getFacetTextToMatch();
+		if (StringUtils.isNotBlank(facetText)) {
+		    solrQuery.setParam(FACET_CONTAINS, facetText);
+		}
+
+		boolean facetContainsIgnoreCase = query.isFacetTextCompareCaseInsensitive();
+		if (facetContainsIgnoreCase) {
+		    solrQuery.setParam(FACET_CONTAINS_IGNORE_CASE, facetContainsIgnoreCase);
 		}
 
 		return solrQuery;
