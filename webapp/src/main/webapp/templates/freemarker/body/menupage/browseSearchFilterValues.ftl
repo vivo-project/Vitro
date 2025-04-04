@@ -51,6 +51,7 @@
                 </section>
             </section>
         </section>
+        <input form="filter-form" type="hidden" name="lang" value="${locale!}">
     </form>
     
     <script type="text/javascript">
