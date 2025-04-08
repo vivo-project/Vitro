@@ -123,7 +123,7 @@ dojo.widget.defineWidget(
 			}else{ //otherwise try the event-creation hack (our own invention)
 				// do we need these?
 				element.value = element.value;
-				element.trigger("blur");
+				element.blur();
 				element.focus();
 				// figure out how far back to go
 				var dist = parseInt(element.value.length)-end;
