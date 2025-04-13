@@ -69,6 +69,10 @@ public class SiteStyleController extends FreemarkerHttpServlet {
 	public static final String ACTION_REMOVE = "remove";
 
 
+	public static boolean customCssUrlLoaded = false;
+	public static String customCssUrl = null;
+
+
 	private FileStorage fileStorage;
 	private ReferrerHelper referrerHelper;
 	/**
@@ -175,13 +179,18 @@ public class SiteStyleController extends FreemarkerHttpServlet {
 		UploadedFileHelper fileHelper = new UploadedFileHelper(fileStorage, webAppDaoFactory, getServletContext());
 		FileInfo fileInfo = createFile(file, "custom-style.css", fileHelper);
 
-		updateCssFileDispalyModel(UrlBuilder.getUrl(fileInfo.getBytestreamAliasUrl()));
+		String cssFilePath = UrlBuilder.getUrl(fileInfo.getBytestreamAliasUrl());
+		updateCssFileDispalyModel(cssFilePath);
+
+		SiteStyleController.customCssUrlLoaded = true;
+		SiteStyleController.customCssUrl = cssFilePath;
 
 		return showMainStyleEditPage(vreq);
 	}
 
 	private TemplateResponseValues removeCssFile(VitroRequest vreq) {
 		removeCssFileDisplayModel();
+		resetCustomCssCache();
 		return showMainStyleEditPage(vreq);
 	}
 
@@ -222,7 +231,42 @@ public class SiteStyleController extends FreemarkerHttpServlet {
 		Resource themeResource = ResourceFactory.createResource(VitroVocabulary.PROPERTY_CUSTOMSTYLE);
 
 		Property property = ResourceFactory.createProperty(VitroVocabulary.PORTAL_CUSTOMCSSPATH);
-		displayModel.removeAll(themeResource, property, null);
+		displayModel.removeAll(themeResource, property, null);	
+	}
+	
+
+	private static void updateCustomCssUrl() {
+		ContextModelAccess cma = ModelAccess.getInstance();
+		OntModel displayModel = cma.getOntModel(ModelNames.DISPLAY);
+
+		Resource s = ResourceFactory.createResource(VitroVocabulary.PROPERTY_CUSTOMSTYLE);
+		Property customCssPathProperty = ResourceFactory.createProperty(VitroVocabulary.PORTAL_CUSTOMCSSPATH);
+		StmtIterator iter = displayModel.listStatements(s, customCssPathProperty, (RDFNode) null);
+
+		if (iter.hasNext()) {
+			Statement stmt = iter.nextStatement();
+			RDFNode object = stmt.getObject();
+
+			if (object.isLiteral()) {
+				customCssUrl = object.asLiteral().getString();
+			} else {
+				customCssUrl = null;
+			}
+		} else {
+			customCssUrl = null;
+		}
+		customCssUrlLoaded = true;
 	}
 
+	public static void resetCustomCssCache() {
+		customCssUrlLoaded = false;
+		customCssUrl = null;
+	}
+
+	public static String getCustomCssUrlCache() {
+		if (customCssUrlLoaded == false) {
+			updateCustomCssUrl();
+		}
+		return customCssUrl;
+	}
 }
