@@ -479,7 +479,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
         // Add these accumulator objects. They will collect tags so the template can write them
         // at the appropriate location.
 
-        map.putAll(getCustomCss());
+        map.put("customCssPath", SiteStyleController.getCustomCssUrlCache());
 
         map.put("stylesheets", new Tags().wrap());
         map.put("scripts", new Tags().wrap());
@@ -489,26 +489,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
         return map;
     }
 
-    private Map<String, String> getCustomCss() {
-        ContextModelAccess cma = ModelAccess.getInstance();
-        OntModel displayModel = cma.getOntModel(ModelNames.DISPLAY);
-
-        Resource s = ResourceFactory.createResource(VitroVocabulary.PROPERTY_CUSTOMSTYLE);
-        Property customCssPathProperty = ResourceFactory.createProperty(VitroVocabulary.PORTAL_CUSTOMCSSPATH);
-        StmtIterator iter = displayModel.listStatements(s, customCssPathProperty, (RDFNode) null);
-
-        Map<String, String> colorParams = new HashMap<>();
-
-        if (iter.hasNext()) {
-            Statement stmt = iter.nextStatement();
-            RDFNode object = stmt.getObject();
-
-            if (object.isLiteral()) {
-                colorParams.put("customCssPath", object.asLiteral().getString());
-            }
-        }
-        return  colorParams;
-    }
 
     private String normalizeServletName(String name) {
         // Return a uniform value for the home page.
