@@ -449,7 +449,7 @@ h1.vitro-logo {
 
 @media (min-width: 768px) {
     h1.vitro-logo {
-        background-image: var(--logo-url, var(--logo-small-url, url(../images/VITRO-logo.png)));
+        background-image: var(--logo-url, url(../images/VITRO-logo.png));
         max-width: none;
     }
 }

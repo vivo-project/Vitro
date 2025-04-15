@@ -344,6 +344,7 @@
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]controller[\\/]freemarker[\\/]FreemarkerSetup\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]controller[\\/]freemarker[\\/]HomePageController\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]controller[\\/]freemarker[\\/]ImageUploadController\.java" checks="."/>
+    <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]controller[\\/]freemarker[\\/]ReferrerHelper\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]controller[\\/]freemarker[\\/]ImageUploadHelper\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]controller[\\/]freemarker[\\/]IndividualListController\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]controller[\\/]freemarker[\\/]IndividualListQueryResults\.java" checks="."/>
@@ -363,6 +364,7 @@
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]controller[\\/]freemarker[\\/]SimpleReasonerRecomputeController\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]controller[\\/]freemarker[\\/]SiteAdminController\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]controller[\\/]freemarker[\\/]SiteBrandingController\.java" checks="."/>
+    <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]controller[\\/]freemarker[\\/]SiteBrandingLogoController\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]controller[\\/]freemarker[\\/]StaticPageController\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]controller[\\/]freemarker[\\/]TemplateProcessingHelper\.java" checks="."/>
     <suppress files="src[\\/]main[\\/]java[\\/]edu[\\/]cornell[\\/]mannlib[\\/]vitro[\\/]webapp[\\/]controller[\\/]freemarker[\\/]TestController\.java" checks="."/>

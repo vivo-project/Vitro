@@ -302,7 +302,7 @@ $(document).ready(function(){
             text: 'Cancel',
             css: {
                 padding: '5px 10px',
-                background: '#f44336',§
+                background: '#f44336',
                 color: '#fff',
                 border: 'none',
                 cursor: 'pointer'

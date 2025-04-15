@@ -44,36 +44,9 @@
         <a id="changeColorsButton" href="#">Change theme branding colors</a>
         <br>
 
-        <br>
-        <label>Banner Logo</label>
-
-
-        <label>Logo Url</label>
-        <input type="text" name="LogoUrl" value="<form:value name="LogoUrl"/>" ${longField} maxlength="120" size="40" />
-        <c:set var="LogoUrl"><form:error name="LogoUrl"/></c:set>
-        <c:if test="${!empty LogoUrlError}">
-            <span class="notice"><c:out value="${LogoUrlError}"/></span>
-        </c:if>
 
         <br>
-        
-        <img class="logoImgPreview" src="<form:value name="LogoUrl"/>" alt="" srcset="">
-        
-        <a href="${updateLogoUrl}">Upload LOGO</a>
-        <br>
-        <br>
-
-        <label>Logo Small Url (Mobile view)</label>
-        <input type="text" name="LogoSmallUrl" value="<form:value name="LogoSmallUrl"/>" ${longField} maxlength="120" size="40" />
-        <c:set var="LogoSmallUrl"><form:error name="LogoSmallUrl"/></c:set>
-        <c:if test="${!empty LogoSmallUrlError}">
-            <span class="notice"><c:out value="${LogoSmallUrlError}"/></span>
-        </c:if>
-
-        <br>
-        <img class="logoImgPreview" src="<form:value name="LogoSmallUrl"/>" alt="" srcset="">
-        <a href="${updateLogoSmallUrl}">Upload Small LOGO</a>
-        <br>
+        <a href="${updateLogoUrl}">Change logo</a>
         <br>
 
         <br>
