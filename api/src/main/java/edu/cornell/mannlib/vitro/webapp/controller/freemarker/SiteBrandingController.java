@@ -44,6 +44,9 @@ public class SiteBrandingController extends VitroAjaxController {
 	private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(ReorderController.class);
 
+    public static boolean themeBrandingLoaded = false;
+	public static Map<String, String> themeBranding = null;
+
 	@Override
     protected AuthorizationRequest requiredActions(VitroRequest vreq) {
     	// return SimplePermission.SEE_SITE_ADMIN_PAGE.ACTION;
@@ -85,40 +88,56 @@ public class SiteBrandingController extends VitroAjaxController {
             default:
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid action parameter");
         }
-    }
-
-    private void listBrandingColors(VitroRequest vreq, HttpServletResponse response) {
-        ContextModelAccess cma = ModelAccess.getInstance();
-        OntModel displayModel = cma.getOntModel(ModelNames.DISPLAY);
-
 
         String currentTheme = vreq.getParameter("theme");
         if (currentTheme == null) {
             currentTheme = getCurrentTheme(vreq);
         }
+        updatethemeBrandingCache(currentTheme);
+    }
 
-        Resource s = ResourceFactory.createResource(VitroVocabulary.vitroURI + currentTheme);
-        StmtIterator iter = displayModel.listStatements(s, null, (RDFNode) null);
-    
-        JsonObject jsonResponse = new JsonObject();
-    
-        while (iter.hasNext()) {
-            Statement stmt = iter.nextStatement();
-            Property property = stmt.getPredicate();
-            RDFNode object = stmt.getObject();
-    
-            if (object.isLiteral()) {
-                String propertyName = property.getURI().contains("#") ? property.getURI().split("#")[1] : property.getURI();
-                jsonResponse.put(propertyName, object.asLiteral().getString());
-            }
+    private void listBrandingColors(VitroRequest vreq, HttpServletResponse response) {
+        String currentTheme = vreq.getParameter("theme");
+        if (currentTheme == null) {
+            currentTheme = getCurrentTheme(vreq);
         }
-    
+
+        Map<String, String> brandingColors = getBrandingColors(currentTheme);
+
+        JsonObject jsonResponse = new JsonObject();
+        brandingColors.forEach(jsonResponse::put);
+
         response.setContentType("application/json");
         try {
             response.getWriter().write(jsonResponse.toString());
         } catch (IOException e) {
             log.error("Error writing response", e);
         }
+    }
+
+
+    private static Map<String, String> getBrandingColors(String theme) {
+        ContextModelAccess cma = ModelAccess.getInstance();
+        OntModel displayModel = cma.getOntModel(ModelNames.DISPLAY);
+
+        
+
+        Resource s = ResourceFactory.createResource(VitroVocabulary.vitroURI + theme);
+        StmtIterator iter = displayModel.listStatements(s, null, (RDFNode) null);
+
+        Map<String, String> brandingColors = new HashMap<>();
+        while (iter.hasNext()) {
+            Statement stmt = iter.nextStatement();
+            Property property = stmt.getPredicate();
+            RDFNode object = stmt.getObject();
+
+            if (object.isLiteral()) {
+                String propertyName = property.getURI().contains("#") ? property.getURI().split("#")[1] : property.getURI();
+                brandingColors.put(propertyName, object.asLiteral().getString());
+            }
+        }
+
+        return brandingColors;
     }
     
 
@@ -192,9 +211,22 @@ public class SiteBrandingController extends VitroAjaxController {
     }
     
 
-    private String getCurrentTheme(VitroRequest vreq) {
+    public static String getCurrentTheme(VitroRequest vreq) {
         WebappDaoFactory wadf = ModelAccess.on(vreq).getWebappDaoFactory();
         return wadf.getApplicationDao().getApplicationBean().getThemeDir();
     }
+
+    private static void updatethemeBrandingCache(String theme) {
+		themeBranding = getBrandingColors(theme);
+		themeBrandingLoaded = true;
+	}
+
+
+	public static Map<String, String> getThemeBrandingCache(String theme) {
+		if (themeBrandingLoaded == false) {
+			updatethemeBrandingCache(theme);
+		}
+		return themeBranding;
+	}
 
 }

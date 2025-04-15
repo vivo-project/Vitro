@@ -95,6 +95,7 @@ public class VitroVocabulary {
     public static final String PROPERTY_STUBOBJECTPROPERTYANNOT = vitroURI + "stubObjectPropertyAnnot";
 	public static final String PROPERTY_COLLATEBYSUBCLASSANNOT = vitroURI + "collateBySubclassAnnot";
     public static final String IS_INTERNAL_CLASSANNOT = vitroURI + "isMenuPageIntersectionClass";
+    public static final String PROPERTY_CUSTOMSTYLE = vitroURI + "customStyle";
     // ================== link related =====================================
 
     public static final String LINK = vitroURI+"Link";

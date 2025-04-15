@@ -113,17 +113,17 @@ public class ImageUploadHelper {
 	 *             if there is no file, if it is empty, or if it is not an image
 	 *             file.
 	 */
-	FileItem validateImageFromRequest(VitroRequest vreq)
+	FileItem validateImageFromRequest(VitroRequest vreq, String fieldName)
 			throws UserMistakeException {
 		Map<String, List<FileItem>> map = vreq.getFiles();
 		if (map == null) {
 			throw new IllegalStateException(ERROR_CODE_BAD_MULTIPART_REQUEST);
 		}
 
-		List<FileItem> list = map.get(PARAMETER_UPLOADED_FILE);
+		List<FileItem> list = map.get(fieldName);
 		if ((list == null) || list.isEmpty()) {
 			throw new UserMistakeException(ERROR_CODE_FORM_FIELD_MISSING,
-					PARAMETER_UPLOADED_FILE);
+					fieldName);
 		}
 
 		FileItem file = list.get(0);
@@ -142,6 +142,10 @@ public class ImageUploadHelper {
 		return file;
 	}
 
+	FileItem validateImageFromRequest(VitroRequest vreq) throws UserMistakeException {
+		return validateImageFromRequest(vreq, PARAMETER_UPLOADED_FILE);
+	}
+
 	/**
 	 * The user has uploaded a new main image, but we're not ready to assign it
 	 * to them.
@@ -149,7 +153,7 @@ public class ImageUploadHelper {
 	 * Put it into the file storage system, and attach it as a temp file on the
 	 * session until we need it.
 	 */
-	FileInfo storeNewImage(FileItem fileItem, VitroRequest vreq) {
+	FileInfo storeNewImage(FileItem fileItem, VitroRequest vreq, boolean storeTemp) {
 		InputStream inputStream = null;
 		try {
 			inputStream = fileItem.getInputStream();
@@ -158,8 +162,10 @@ public class ImageUploadHelper {
 			FileInfo fileInfo = uploadedFileHelper.createFile(filename,
 					mimeType, inputStream);
 
-			TempFileHolder.attach(vreq.getSession(), ATTRIBUTE_TEMP_FILE,
-					fileInfo);
+			if (storeTemp) {
+				TempFileHolder.attach(vreq.getSession(), ATTRIBUTE_TEMP_FILE,
+						fileInfo);
+		 	}
 
 			return fileInfo;
 		} catch (IOException e) {
@@ -174,6 +180,10 @@ public class ImageUploadHelper {
 				}
 			}
 		}
+	}
+
+	FileInfo storeNewImage(FileItem fileItem, VitroRequest vreq) {
+		return this.storeNewImage(fileItem, vreq, true);
 	}
 
 	/**

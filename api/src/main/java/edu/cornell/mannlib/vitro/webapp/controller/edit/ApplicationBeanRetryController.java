@@ -92,8 +92,7 @@ public class ApplicationBeanRetryController extends BaseEditController {
         request.setAttribute("_action",action);
         request.setAttribute("unqualifiedClassName","ApplicationBean");
 
-        request.setAttribute("updateLogoUrl", UrlBuilder.getUrl("uploadImages", new ParamMap("entityUri", applicationForEditing.getIndividualUri(), "photoType", "portalLogo")));
-        request.setAttribute("updateLogoSmallUrl", UrlBuilder.getUrl("uploadImages", new ParamMap("entityUri", applicationForEditing.getIndividualUri(), "photoType", "portalLogoSmall")));
+        request.setAttribute("updateLogoUrl", UrlBuilder.getUrl("site-branding-logo"));
         setRequestAttributes(request,epo);
 
         try {
