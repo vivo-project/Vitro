@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
@@ -1070,7 +1071,11 @@ public class PolicyLoader {
         RDFService rdfService = ModelAccess.getInstance().getRDFService(CONFIGURATION);
         ParameterizedSparqlString pss = new ParameterizedSparqlString(OPERATION_AND_ROLE_BY_ACCESS_OBJECT_TYPE_QUERY);
         pss.setLiteral("aotId", type.toString());
-        pss.setIri("value", entityURI);
+        if (entityURI != null) {
+            pss.setIri("value", entityURI);
+        } else {
+            pss.setIri("value", "urn:uuid:" + UUID.randomUUID());
+        }
         final String queryText = pss.toString();
         debug("SPARQL Query to get uri of role value patterns:\n %s", queryText);
         Map<String, Map<String, Boolean>> operations = new LinkedHashMap<>();
