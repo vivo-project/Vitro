@@ -89,6 +89,10 @@ public class PolicyTemplateController {
                 dataSetModel.createProperty(AUTH_VOCABULARY_PREFIX + "hasDataSetKey"),
                 dataSetModel.createResource(dataSetKeyUri)));
 
+        dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetKeyUri),
+                dataSetModel.createProperty(RDF_TYPE),
+                dataSetModel.createResource(AUTH_VOCABULARY_PREFIX + "DataSetKey")));
+
         for (String key : keys) {
             dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetKeyUri),
                     dataSetModel.createProperty(AUTH_VOCABULARY_PREFIX + "hasKeyComponent"),
