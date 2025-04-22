@@ -114,7 +114,7 @@
     </ul>
 </#macro>
 
-<#macro filterFacets f >
+<#macro filterFacets filter >
     <#if ( !filter.localizationRequired && filter.values?values?size > filter.moreLimit) >
         <li>
             <@sl.createAutocomplete filter "filter-form" />
@@ -123,7 +123,7 @@
     <#assign idCounter = 1 >
     <#assign notSelectedCount = 0>
     <#assign additionalLabels = false>
-    <#list f.values?values as value>
+    <#list filter.values?values as value>
         <#if !value.displayed>
             <#continue>
         </#if>
@@ -136,21 +136,21 @@
             <#if value.id != "[* TO *]">
                 <li class="li-selected">
                     <a href="#" class="selected">
-                        <@sl.getInput f value sl.getValueID(f.id, idCounter) idCounter 'filter-form' />
-                        <@sl.getSelectedLabel sl.getValueID(f.id, idCounter)?html value f resultsCount />
+                        <@sl.getInput filter value sl.getValueID(filter.id, idCounter) idCounter 'filter-form' />
+                        <@sl.getSelectedLabel sl.getValueID(filter.id, idCounter)?html value filter resultsCount />
                     </a>
                 </li>
             </#if>
         <#else>
             <#if resultsCount != 0>
-                <#if f.moreLimit = notSelectedCount >
+                <#if filter.moreLimit = notSelectedCount >
                     <#assign additionalLabels = true>
                     <li class="more-facets-link" href="javascript:void(0);" onclick="expandSearchOptions(this)">${i18n().paging_link_more}</li>
                 </#if>
                 <li <#if additionalLabels>class="additional-search-options hidden-search-option"</#if> >
                     <a href="#">
-                        <@sl.getInput f value sl.getValueID(f.id, idCounter) idCounter 'filter-form' />
-                        <@sl.getLabel sl.getValueID(f.id, idCounter) value f resultsCount />
+                        <@sl.getInput filter value sl.getValueID(filter.id, idCounter) idCounter 'filter-form' />
+                        <@sl.getLabel sl.getValueID(filter.id, idCounter) value filter resultsCount />
                     </a>
                 </li>
                 <#assign notSelectedCount += 1>
