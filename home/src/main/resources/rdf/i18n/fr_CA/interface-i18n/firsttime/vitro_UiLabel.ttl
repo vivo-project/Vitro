@@ -5881,7 +5881,7 @@ uil-data:search_for.Vitro
 uil-data:other.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "autre"@fr-CA ;
+        rdfs:label       "Autre"@fr-CA ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "other" ;
         uil:hasPackage  "Vitro-languages" .
