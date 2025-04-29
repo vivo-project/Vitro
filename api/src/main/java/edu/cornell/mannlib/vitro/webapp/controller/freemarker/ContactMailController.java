@@ -11,8 +11,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 
 import javax.mail.Address;
 import javax.mail.Message;
@@ -114,12 +112,12 @@ public class ContactMailController extends FreemarkerHttpServlet {
     }
 
     private String[] figureRecipients(VitroRequest vreq) {
-        String contactMailAddresses = vreq.getAppBean().getContactMail().trim();
+        String contactMailAddresses = vreq.getAppBean().getContactMail();
         if ((contactMailAddresses == null) || contactMailAddresses.isEmpty()) {
             return new String[0];
         }
 
-        return contactMailAddresses.split(",");
+        return contactMailAddresses.trim().split(",");
     }
 
     private ResponseValues processValidRequest(VitroRequest vreq,
