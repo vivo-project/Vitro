@@ -21,17 +21,19 @@
 		<#list roles as role>
 			<p>${role.label}
 				<a href="javascript:editRole('${role.uri?js_string?html}', '${role.label?js_string?html}');"><img src="${urls.images!}/individual/editIcon.gif"></a>
-				<a href="javascript:deleteRole('${role.uri?js_string?html}', '${role.label?js_string?html}');"><img src="${urls.images!}/individual/deleteIcon.gif"></a>
-				<form name="remove-${role.uri}" id="remove-${role.uri}" action="${rolesControllerUrl}" method="POST">
-					<input type="hidden" name="uri" value="${role.uri}">
-					<input type="hidden" name="action" value="remove">
-				</form>
-				<form name="edit-${role.uri}" id="$edit-${role.uri}" action="${rolesControllerUrl}" method="POST">
-					<input type="hidden" name="label">
-					<input type="hidden" name="uri" value="${role.uri}">
-					<input type="hidden" name="action" value="edit">
-				</form>
+				<#if role.uri != "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#PUBLIC">
+					<a href="javascript:deleteRole('${role.uri?js_string?html}', '${role.label?js_string?html}');"><img src="${urls.images!}/individual/deleteIcon.gif"></a>
+				</#if>
 			</p>
+			<form name="edit-${role.uri}" id="$edit-${role.uri}" action="${rolesControllerUrl}" method="POST">
+				<input type="hidden" name="label">
+				<input type="hidden" name="uri" value="${role.uri}">
+				<input type="hidden" name="action" value="edit">
+			</form>
+			<form name="remove-${role.uri}" id="remove-${role.uri}" action="${rolesControllerUrl}" method="POST">
+				<input type="hidden" name="uri" value="${role.uri}">
+				<input type="hidden" name="action" value="remove">
+			</form>
 		</#list>
 	</#if>
 	<form action="${rolesControllerUrl}" method="POST">
