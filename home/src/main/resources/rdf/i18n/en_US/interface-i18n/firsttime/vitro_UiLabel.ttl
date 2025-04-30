@@ -6872,3 +6872,30 @@ uil-data:reporting_config_dataSource_outputName.Vitro
         uil:hasKey       "reporting_config_dataSource_outputName" .
 
 
+uil-data:user_roles.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "User roles"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "user_roles" .
+
+uil-data:add_new_role.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Add new role"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "add_new_role" .
+
+uil-data:role_rename_prompt.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Please enter new role label"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "role_rename_prompt" .
+
+uil-data:remove_role_confirmation.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Are you sure you would like to remove the role?"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "remove_role_confirmation" .

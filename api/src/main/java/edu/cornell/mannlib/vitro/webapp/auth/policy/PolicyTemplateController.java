@@ -4,38 +4,62 @@ import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.AUTH_INDIVIDU
 import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.AUTH_VOCABULARY_PREFIX;
 import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.RDF_TYPE;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jena.query.ParameterizedSparqlString;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.impl.StatementImpl;
 
 public class PolicyTemplateController {
 
     private static final Log log = LogFactory.getLog(PolicyTemplateController.class);
-    public static void createRoleDataSets(String roleUri) {
+    public static Collection<String> createRoleDataSets(String roleUri) {
 
         // Execute sparql query to get all data set templates that have ao:hasTemplateKeyComponent
         // access-individual:SubjectRole .
+        Set<String> datasetUris = new HashSet<>();
+        Model dataSetModel = VitroModelFactory.createModel();
         Map<String, String> templates = PolicyLoader.getInstance().getRoleDataSetTemplates();
         for (String templateUri : templates.keySet()) {
-            createRoleDataSet(templateUri, roleUri, templates.get(templateUri));
+            Map<String, Set<String>> ids = createRoleDataSetFromTemplate(templateUri, roleUri, templates.get(
+                    templateUri), dataSetModel);
+            Set<String> currentDataSets = ids.get("dataSets");
+            if (currentDataSets != null) {
+                datasetUris.addAll(currentDataSets);
+            }
         }
+        PolicyLoader.getInstance().updateAccessControlModel(dataSetModel, true);
+        return datasetUris;
     }
 
-    private static void createRoleDataSet(String dataSetTemplateUri, String roleUri, String dataSetsUri) {
+    private static Map<String, Set<String>> createRoleDataSetFromTemplate(String dataSetTemplateUri, String roleUri,
+            String dataSetsUri, Model dataSetModel) {
+        Map<String, Set<String>> resourceMap = new HashMap<>();
         String role = getRoleShortName(roleUri);
+
+        //dataSetUri might need to be collected to be used later
         String dataSetUri = getUriFromTemplate(dataSetTemplateUri, role);
+        resourceMap.put("dataSets", Collections.singleton(dataSetUri));
+        Set<String> valueSets = new HashSet<>();
+        resourceMap.put("valueSets", valueSets);
         String dataSetKeyUri = dataSetUri + "Key";
         // TODO: Check uri doesn't exists in access control graph
         PolicyLoader policyLoader = PolicyLoader.getInstance();
         List<String> keys = policyLoader.getDataSetKeysFromTemplate(dataSetTemplateUri);
         List<String> keyTemplates = policyLoader.getDataSetKeyTemplatesFromTemplate(dataSetTemplateUri);
-
-        Model dataSetModel = VitroModelFactory.createModel();
 
         for (String keyTemplate : keyTemplates) {
             if (keyTemplate.equals(AUTH_INDIVIDUAL_PREFIX + "SubjectRole")) {
@@ -49,7 +73,7 @@ public class PolicyTemplateController {
                 keys.add(roleKeyUri);
             } else {
                 log.error(String.format("Not recognized key template found '%s'", keyTemplate));
-                return;
+                return resourceMap;
             }
         }
         // Add ?dataSets ao:hasDataSet dataSetUri .
@@ -64,6 +88,10 @@ public class PolicyTemplateController {
         dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetUri),
                 dataSetModel.createProperty(AUTH_VOCABULARY_PREFIX + "hasDataSetKey"),
                 dataSetModel.createResource(dataSetKeyUri)));
+
+        dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetKeyUri),
+                dataSetModel.createProperty(RDF_TYPE),
+                dataSetModel.createResource(AUTH_VOCABULARY_PREFIX + "DataSetKey")));
 
         for (String key : keys) {
             dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetKeyUri),
@@ -83,6 +111,7 @@ public class PolicyTemplateController {
 
         for (String valueSetTemplateUri : valueSetTemplateUris) {
             String valueSetUri = getUriFromTemplate(valueSetTemplateUri, role);
+            valueSets.add(valueSetUri);
             dataSetModel.add(new StatementImpl(dataSetModel.createResource(dataSetUri),
                     dataSetModel.createProperty(AUTH_VOCABULARY_PREFIX + "hasRelatedValueSet"),
                     dataSetModel.createResource(valueSetUri)));
@@ -91,7 +120,7 @@ public class PolicyTemplateController {
             // TODO: Check uri doesn't exists in access control graph
             // If value set template is subject role, then role uri should be added to the set
         }
-        policyLoader.updateAccessControlModel(dataSetModel, true);
+        return resourceMap;
     }
 
     public static String createSubjectRoleUri(String roleUri, Model dataSetModel) {
@@ -120,6 +149,45 @@ public class PolicyTemplateController {
             templateName = templateName.substring(0, index);
         }
         return templatePrefix + name + templateName;
+    }
+
+    public static void removeRoleDataSets(String role) {
+        Model model = VitroModelFactory.createModel();
+        Map<String, String> templates = PolicyLoader.getInstance().getRoleDataSetTemplates();
+        for (String template : templates.keySet()) {
+            Map<String, Set<String>> ids = createRoleDataSetFromTemplate(template, role, templates.get(template),
+                    model);
+            addTemplateValueSetValues(model, ids.get("valueSets"));
+            Set<String> dataSets = ids.get("dataSets");
+            if (!dataSets.isEmpty()) {
+                PolicyStore.getInstance().remove(dataSets.iterator().next());
+            }
+        }
+        PolicyLoader.getInstance().updateAccessControlModel(model, false);
+    }
+
+    public static final String VALUE_SET_VALUES_QUERY = ""
+            + "prefix access: <https://vivoweb.org/ontology/vitro-application/auth/vocabulary/>\n"
+            + "CONSTRUCT {\n"
+            + "  ?valueSetUri access:value ?dataValue .\n"
+            + "}\n"
+            + "WHERE {\n"
+            + "  GRAPH <http://vitro.mannlib.cornell.edu/default/access-control> {\n"
+            + "    ?valueSetUri access:value ?dataValue .\n"
+            + "  }"
+            + "}\n";
+
+    private static void addTemplateValueSetValues(Model model, Set<String> valueSets) {
+        RDFService rdfService = ModelAccess.getInstance().getRDFService(WhichService.CONFIGURATION);
+        for (String valueSet : valueSets) {
+            ParameterizedSparqlString pss = new ParameterizedSparqlString(VALUE_SET_VALUES_QUERY);
+            pss.setIri("valueSetUri", valueSet);
+            try {
+                rdfService.sparqlConstructQuery(pss.toString(), model);
+            } catch (RDFServiceException e) {
+                log.error(e, e);
+            }
+        }
     }
 
 }
