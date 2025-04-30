@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.admin;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.ROLE_PUBLIC_URI;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.USER_ACCOUNTS;
 
 import java.io.IOException;
@@ -107,10 +108,17 @@ public class RolesController extends FreemarkerHttpServlet {
             response.setStatusCode(400);
             return response;
         }
+        if (ROLE_PUBLIC_URI.equals(uri)) {
+            TemplateResponseValues response = processList(vreq);
+            String errorMessage = "Removal of the " + uri + " role is not allowed.";
+            response.put("errorMessage", errorMessage);
+            log.error(errorMessage);
+            response.setStatusCode(400);
+            return response;
+        }
         removeRole(uri);
         return processList(vreq);
     }
-
 
     private ResponseValues processEdit(VitroRequest vreq) {
         String uri = vreq.getParameter(URI_PARAM);
