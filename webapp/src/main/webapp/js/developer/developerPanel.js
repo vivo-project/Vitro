@@ -28,9 +28,9 @@ function DeveloperPanel(developerAjaxUrl) {
     }
 
 	function addBehaviorToElements() {
-		$( "#developerPanelClickMe" ).click(openPanel);
-	    $( "#developerPanelSaveButton" ).click(saveSettings);
-	    $( "#developerPanelBody input:checkbox" ).change(updateDisabledFields);
+		$( "#developerPanelClickMe" ).on("click", openPanel);
+	    $( "#developerPanelSaveButton" ).on("click",saveSettings);
+	    $( "#developerPanelBody input:checkbox" ).on("change", updateDisabledFields);
 	}
 
 	function openPanel() {
