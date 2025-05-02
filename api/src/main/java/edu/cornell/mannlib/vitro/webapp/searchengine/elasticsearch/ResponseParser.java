@@ -5,10 +5,12 @@ package edu.cornell.mannlib.vitro.webapp.searchengine.elasticsearch;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -41,8 +43,7 @@ class ResponseParser {
     @SuppressWarnings("unchecked")
     public ResponseParser(String responseString) throws SearchEngineException {
         try {
-            this.responseMap = new ObjectMapper().readValue(responseString,
-                    HashMap.class);
+            this.responseMap = new ObjectMapper().readValue(responseString, new TypeReference<Map<String, Object>>() {});
         } catch (IOException e) {
             throw new SearchEngineException(e);
         }
@@ -98,32 +99,37 @@ class ResponseParser {
         highlightingMap = new HashMap<>();
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> uberHits = (Map<String, Object>) responseMap
-                .get("hits");
+        Map<String, Object> uberHits = (Map<String, Object>) responseMap.get("hits");
         if (uberHits == null) {
-            log.warn("Didn't find a 'hits' field " + "in the query response: "
-                    + responseMap);
+            log.warn("Didn't find a 'hits' field in the query response: " + responseMap);
             return;
         }
 
-        Integer total = (Integer) uberHits.get("total");
-        if (total == null) {
-            log.warn("Didn't find a 'hits.total' field "
-                    + "in the query response: " + responseMap);
+        // Updated handling of the 'total' field
+        @SuppressWarnings("unchecked")
+        Map<String, Object> totalMap = (Map<String, Object>) uberHits.get("total");
+        if (totalMap == null) {
+            log.warn("Didn't find a 'hits.total' field in the query response: " + responseMap);
             return;
         }
+        Integer total = ((Number) totalMap.get("value")).intValue(); // Extract the integer value
+
+        if (total == null) {
+            log.warn("Didn't find a 'hits.total.value' field in the query response: " + responseMap);
+            return;
+        }
+        totalHits = total;
 
         @SuppressWarnings("unchecked")
-        List<Map<String, Object>> hits = (List<Map<String, Object>>) uberHits
-                .get("hits");
+        List<Map<String, Object>> hits = (List<Map<String, Object>>) uberHits.get("hits");
         if (hits == null) {
-            log.warn("Didn't find a 'hits.hits' field "
-                    + "in the query response: " + responseMap);
+            log.warn("Didn't find a 'hits.hits' field in the query response: " + responseMap);
             return;
         }
 
         parseDocuments(hits);
     }
+
 
     private void parseDocuments(List<Map<String, Object>> hits) {
         for (Map<String, Object> hit : hits) {
@@ -141,8 +147,7 @@ class ResponseParser {
 
     private SearchResultDocument parseDocument(Map<String, Object> hitMap) {
         @SuppressWarnings("unchecked")
-        Map<String, Collection<Object>> sourceMap = (Map<String, Collection<Object>>) hitMap
-                .get("_source");
+        Map<String, Object> sourceMap = (Map<String, Object>) hitMap.get("_source");
         if (sourceMap == null) {
             log.warn("Didn't find a '_source' field in the hit: " + hitMap);
             return null;
@@ -154,7 +159,22 @@ class ResponseParser {
             return null;
         }
 
-        return new BaseSearchResultDocument(id, sourceMap);
+        Map<String, Collection<Object>> parsedSourceMap = new HashMap<>();
+        for (Map.Entry<String, Object> entry : sourceMap.entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof Collection) {
+                parsedSourceMap.put(entry.getKey(), (Collection<Object>) value);
+            } else if (value instanceof Map) {
+                // This is done assuming the only "Map" field will be a _drsim field
+                parsedSourceMap.put(entry.getKey(), Collections.singletonList(
+                    ((Map<String, String>) value).get("gte") + " TO " + ((Map<String, String>) value).get("lte"))
+                );
+            } else {
+                parsedSourceMap.put(entry.getKey(), Collections.singletonList(value));
+            }
+        }
+
+        return new BaseSearchResultDocument(id, parsedSourceMap);
     }
 
     private Map<String, List<String>> parseHighlight(
