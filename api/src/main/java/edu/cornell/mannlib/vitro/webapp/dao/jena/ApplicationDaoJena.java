@@ -50,6 +50,7 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
     		if (appName != null) {
     			application.setApplicationName(appName);
     		} // else leave as default
+			application.setIndividualUri(appInd.getURI());
 	        application.setAboutText(getPropertyStringValue(
 	        		appInd, APPLICATION_ABOUTTEXT));
 	        application.setAcknowledgeText(getPropertyStringValue(
@@ -62,8 +63,10 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
 	        		appInd, APPLICATION_COPYRIGHTANCHOR));
             application.setCopyrightURL(getPropertyStringValue(
             		appInd, APPLICATION_COPYRIGHTURL));
-            application.setThemeDir(getPropertyStringValue(
-            		appInd, APPLICATION_THEMEDIR));
+			application.setLogoUrl(getPropertyStringValue(
+					appInd, APPLICATION_LOGOURL));
+			application.setLogoSmallUrl(getPropertyStringValue(
+					appInd, APPLICATION_LOGOSMALLURL));
         } catch (Exception e) {
     		log.error(e, e);
     	} finally {
@@ -104,6 +107,13 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
             updatePropertyStringValue(
             		appInd, APPLICATION_THEMEDIR,
             		    application.getThemeDir(), ontModel);
+			updatePropertyStringValue(
+					appInd, APPLICATION_LOGOURL,
+					application.getLogoUrl(), ontModel);
+			updatePropertyStringValue(
+					appInd, APPLICATION_LOGOSMALLURL,
+					application.getLogoSmallUrl(), ontModel);
+
         } catch (Exception e) {
     		log.error(e, e);
     	} finally {

@@ -2,10 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
-import static edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.PARAMETER_UPLOADED_FILE;
-import static edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.THUMBNAIL_HEIGHT;
-import static edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.THUMBNAIL_WIDTH;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,6 +30,8 @@ import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor.CropRectangle;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor.Dimensions;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor.ImageProcessorException;
+
+import static edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.*;
 
 /**
  * Handle the mechanics of validating, storing, and deleting file images.
@@ -115,17 +113,17 @@ public class ImageUploadHelper {
 	 *             if there is no file, if it is empty, or if it is not an image
 	 *             file.
 	 */
-	FileItem validateImageFromRequest(VitroRequest vreq)
+	FileItem validateImageFromRequest(VitroRequest vreq, String fieldName)
 			throws UserMistakeException {
 		Map<String, List<FileItem>> map = vreq.getFiles();
 		if (map == null) {
 			throw new IllegalStateException(ERROR_CODE_BAD_MULTIPART_REQUEST);
 		}
 
-		List<FileItem> list = map.get(PARAMETER_UPLOADED_FILE);
+		List<FileItem> list = map.get(fieldName);
 		if ((list == null) || list.isEmpty()) {
 			throw new UserMistakeException(ERROR_CODE_FORM_FIELD_MISSING,
-					PARAMETER_UPLOADED_FILE);
+					fieldName);
 		}
 
 		FileItem file = list.get(0);
@@ -144,6 +142,10 @@ public class ImageUploadHelper {
 		return file;
 	}
 
+	FileItem validateImageFromRequest(VitroRequest vreq) throws UserMistakeException {
+		return validateImageFromRequest(vreq, PARAMETER_UPLOADED_FILE);
+	}
+
 	/**
 	 * The user has uploaded a new main image, but we're not ready to assign it
 	 * to them.
@@ -151,7 +153,7 @@ public class ImageUploadHelper {
 	 * Put it into the file storage system, and attach it as a temp file on the
 	 * session until we need it.
 	 */
-	FileInfo storeNewImage(FileItem fileItem, VitroRequest vreq) {
+	FileInfo storeNewImage(FileItem fileItem, VitroRequest vreq, boolean storeTemp) {
 		InputStream inputStream = null;
 		try {
 			inputStream = fileItem.getInputStream();
@@ -160,8 +162,10 @@ public class ImageUploadHelper {
 			FileInfo fileInfo = uploadedFileHelper.createFile(filename,
 					mimeType, inputStream);
 
-			TempFileHolder.attach(vreq.getSession(), ATTRIBUTE_TEMP_FILE,
-					fileInfo);
+			if (storeTemp) {
+				TempFileHolder.attach(vreq.getSession(), ATTRIBUTE_TEMP_FILE,
+						fileInfo);
+		 	}
 
 			return fileInfo;
 		} catch (IOException e) {
@@ -176,6 +180,10 @@ public class ImageUploadHelper {
 				}
 			}
 		}
+	}
+
+	FileInfo storeNewImage(FileItem fileItem, VitroRequest vreq) {
+		return this.storeNewImage(fileItem, vreq, true);
 	}
 
 	/**
@@ -244,7 +252,7 @@ public class ImageUploadHelper {
 	 * Crop the main image to create the thumbnail, and put it into the file
 	 * storage system.
 	 */
-	FileInfo generateThumbnail(CropRectangle crop, FileInfo newImage) {
+	FileInfo generateThumbnail(CropRectangle crop, FileInfo newImage, String thumbnailType) {
 		InputStream mainStream = null;
 		InputStream thumbStream = null;
 		try {
@@ -253,13 +261,23 @@ public class ImageUploadHelper {
 			mainStream = fileStorage.getInputStream(mainBytestreamUri,
 					mainFilename);
 
-			thumbStream = ApplicationUtils
-					.instance()
-					.getImageProcessor()
-					.cropAndScale(mainStream, crop,
-							new Dimensions(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT));
+			String mimeType;
+			if ("LOGO".equalsIgnoreCase(thumbnailType)) {
+				thumbStream = ApplicationUtils
+						.instance()
+						.getImageProcessor()
+						.cropAndScale(mainStream, crop,
+								new Dimensions(1000, 1000), true);
+				mimeType = RECOGNIZED_FILE_TYPES.get(".png");
+			} else {
+				thumbStream = ApplicationUtils
+						.instance()
+						.getImageProcessor()
+						.cropAndScale(mainStream, crop,
+								new Dimensions(THUMBNAIL_LOGO_WIDTH, THUMBNAIL_LOGO_HEIGHT));
+				mimeType = RECOGNIZED_FILE_TYPES.get(".jpg");
+			}
 
-			String mimeType = RECOGNIZED_FILE_TYPES.get(".jpg");
 			String filename = createThumbnailFilename(mainFilename);
 			FileInfo fileInfo = uploadedFileHelper.createFile(filename,
 					mimeType, thumbStream);
@@ -296,17 +314,27 @@ public class ImageUploadHelper {
 	 * If this entity already had a main image, remove it. If the image and the
 	 * thumbnail are no longer used by anyone, throw them away.
 	 */
+
+	void removeExistingImageAtPredicate(Individual person, String predicateUri) {
+		uploadedFileHelper.removeMainImage(person, predicateUri);
+	}
+
 	void removeExistingImage(Individual person) {
-		uploadedFileHelper.removeMainImage(person);
+		removeExistingImageAtPredicate(person, null);
 	}
 
 	/**
 	 * Store the image on the entity, and the thumbnail on the image.
 	 */
+	void storeImageFilesAtPredicate(Individual entity, FileInfo newImage,
+						 FileInfo thumbnail, String predicateUri) {
+		uploadedFileHelper.setImagesOnEntityAtPredicate(entity.getURI(), newImage,
+				thumbnail, predicateUri);
+	}
+
 	void storeImageFiles(Individual entity, FileInfo newImage,
 			FileInfo thumbnail) {
-		uploadedFileHelper.setImagesOnEntity(entity.getURI(), newImage,
-				thumbnail);
+		storeImageFilesAtPredicate(entity, newImage, thumbnail, null);
 	}
 
 	/**
