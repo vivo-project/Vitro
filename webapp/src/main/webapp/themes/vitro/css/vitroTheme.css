@@ -1048,6 +1048,14 @@ ul#find-filters a.selected {
     border-right: 1px dotted #dde4e3;
     font-weight: bold;
 }
+nav#alpha-browse-container {
+    border: 1px solid #dde4e3;
+    background-color: #fff;
+    border-left: 1px solid #dde4e3;
+    border-bottom: none;
+    float: right;
+    margin-right: 17px;
+}
 #profile-photo-display {
     width: 600px;
 }
