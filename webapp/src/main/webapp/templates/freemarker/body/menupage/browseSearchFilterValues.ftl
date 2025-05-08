@@ -120,7 +120,10 @@
                     <#assign selectedLetter = c?upper_case >
                 </#if> 
             </#list>
-            <li><p class="no-individuals">${i18n().there_are_no_entries_starting_with} ${selectedLetter} </p></li>
+            <li>
+                <p class="no-individuals">${i18n().there_are_no_entries_starting_with} ${selectedLetter}</p>
+                <p class="no-individuals">${i18n().try_another_letter}</p>
+            </li>
         <#else>
             <li><p class="no-individuals">${i18n().there_are_no_results_to_display}</p></li>
         </#if>
