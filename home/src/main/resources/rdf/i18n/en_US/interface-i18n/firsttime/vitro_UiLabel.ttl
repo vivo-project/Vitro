@@ -89,7 +89,7 @@ uil-data:accounts_search_results.Vitro
 uil-data:search_individual_results.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Search Class Individuals"@en-US ;
+        rdfs:label       "Search class individuals"@en-US ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "search_individual_results" ;
         uil:hasPackage  "Vitro-languages" .
@@ -1353,7 +1353,7 @@ uil-data:close_capitalized.Vitro
 uil-data:browse_class_group.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Browse Class Group"@en-US ;
+        rdfs:label       "Browse class group"@en-US ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "browse_class_group" ;
         uil:hasPackage  "Vitro-languages" .
@@ -2433,7 +2433,7 @@ uil-data:upload_photo.Vitro
 uil-data:sparql_query_results.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Sparql Query Results"@en-US ;
+        rdfs:label       "SPARQL query results"@en-US ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "sparql_query_results" ;
         uil:hasPackage  "Vitro-languages" .
