@@ -104,12 +104,12 @@
 
 <#macro filteredResults>
     <ul role="list">
-        <#if individuals??>
+        <#if individuals?has_content>
             <#list individuals as individual>
-                <li class="individual" role="listitem">
-                    <@shortView uri=individual.uri viewContext="browse" />
-                </li>
+                <@shortView uri=individual.uri viewContext="browse" />
             </#list>
+        <#else>
+            <li><p class="no-individuals">${i18n().there_are_no_results_to_display}</p></li>
         </#if>
     </ul>
 </#macro>

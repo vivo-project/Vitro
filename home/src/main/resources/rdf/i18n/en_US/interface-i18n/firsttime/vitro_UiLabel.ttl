@@ -6922,3 +6922,12 @@ uil-data:remove_role_confirmation.Vitro
         rdfs:label       "Are you sure you would like to remove the role?"@en-US ;
         uil:hasApp       "Vitro" ;
         uil:hasKey       "remove_role_confirmation" .
+
+uil-data:there_are_no_results_to_display.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "There are no results to display."@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "there_are_no_results_to_display" ;
+        uil:hasPackage   "Vitro-languages" .
+
