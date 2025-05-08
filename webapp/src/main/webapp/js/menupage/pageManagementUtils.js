@@ -389,7 +389,7 @@ var pageManagementUtils = {
             	pageManagementUtils.searchIndividualsSection.hide();
             	pageManagementUtils.searchFilterSection.hide();
             } else if (_this.contentTypeSelect.val() == "searchFilterValues"){
-                pageManagementUtils.headerBar.text(pageManagementUtils.browseSearchFilter + " - ");
+                pageManagementUtils.headerBar.text(pageManagementUtils.browseSearchFilterValues + " - ");
                 pageManagementUtils.searchFilterSection.show();
                 pageManagementUtils.sparqlQuerySection.hide();
             	pageManagementUtils.fixedHTMLSection.hide();
