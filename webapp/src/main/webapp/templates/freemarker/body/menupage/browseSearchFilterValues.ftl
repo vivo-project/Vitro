@@ -153,7 +153,7 @@
                 <li class="li-selected">
                     <a href="#" class="selected">
                         <@sl.getInput filter value sl.getValueID(filter.id, idCounter) idCounter 'filter-form' />
-                        <@sl.getSelectedLabel sl.getValueID(filter.id, idCounter)?html value filter resultsCount />
+                        <@sl.getLabel sl.getValueID(filter.id, idCounter)?html value filter resultsCount />
                     </a>
                 </li>
             </#if>
