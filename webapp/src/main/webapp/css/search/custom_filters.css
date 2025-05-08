@@ -1,8 +1,8 @@
 .li-selected> a > label::before {
-	content: url(../../images/arrowIcon.gif);
+	content: url(../../images/checkMark.svg);
 	color: #2ea0cf;
-	padding-right: 2px;
-	margin-left: -12px;
+	padding-right: 5px;
+	margin-left: -17px;
 }
 
 .checked-search-input-label {
@@ -30,6 +30,8 @@
 	border-left: 0px;
 	height: 3em;
 	border-radius: unset;
+	color: rgb(112, 106, 102);
+	font-family: inherit;
 }
 
 #filter-form-hits-per-page {
@@ -63,7 +65,7 @@
 }
 
 #browse-filters>li {
-	margin-left: 10px;
+	margin-left: 12px;
 	margin-right: 10px;
 	padding-top: 10px;
 	padding-bottom: 10px;
@@ -78,6 +80,30 @@
 #browse-filters li a label {
 	display: block;
 	margin: 0px;
+}
+
+#browse-filters li a label:hover {
+	color: #2ea0cf;
+}
+
+.li-selected a label {
+	color: #2ea0cf;	
+}
+
+li > a > label:hover {
+	color: #2ea0cf;
+}
+
+#browse-filters li:not(.li-selected) > a > label:hover::before {
+	content: url(../../images/checkMark.svg);
+	padding-right: 5px;
+	margin-left: -17px;
+}
+
+#browse-filters li.li-selected > a > label:hover::before {
+	content: unset;
+	padding-right: unset;
+	margin-left: unset;
 }
 
 .facet-values {
@@ -95,10 +121,6 @@
 .filter-tab > a:focus {
 	color: unset;
 	text-decoration: none;
-}
-
-.facet-values > li > a > label:hover {
-	color: #2ea0cf;
 }
 
 .range-filter {
