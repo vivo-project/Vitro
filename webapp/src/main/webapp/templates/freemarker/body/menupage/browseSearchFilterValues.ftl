@@ -3,7 +3,11 @@
 
 <#-- <#assign additionalFilters = ["type"]> -->
 <#if filters[searchFilter]??>
-
+    <#if languageAware >
+        <#assign indexFilterName = "label_regex">
+    <#else>
+        <#assign indexFilterName = "raw_label_regex">
+    </#if>
     <script>
         let searchFormId = "filter-form";
         let urlsBase = "${urls.base}";
@@ -37,7 +41,7 @@
                             <@filterFacets filters[searchFilter] />
                         </#if>
                     </ul>
-                    <@alphabeticalIndexLinks />
+                    <@alphabeticalIndexLinks indexFilterName/>
                 </nav>
                 <section id="individuals-in-class" role="region">
                     <@printPagingLinks />
@@ -46,7 +50,7 @@
                         <@sl.showHits "filter-form" />
                         <img id="downloadIcon" alt="${i18n().download_results}" title="${i18n().download_results}" />
                     </div>
-                    <@filteredResults />
+                    <@filteredResults indexFilterName />
                     <@printPagingLinks />
                 </section>
             </section>
@@ -102,12 +106,21 @@
     </#if>
 </#macro>
 
-<#macro filteredResults>
+<#macro filteredResults indexFilterName>
     <ul role="list">
         <#if individuals?has_content>
             <#list individuals as individual>
                 <@shortView uri=individual.uri viewContext="browse" />
             </#list>
+        <#elseif filters[indexFilterName]?? && filters[indexFilterName].inputText?has_content>
+            <#assign selectedLetter = filters[indexFilterName].inputText >
+            <#list i18n().browse_results_alphabetical_index?split(",") as c>
+                <#assign regexValue = "(" + c?lower_case?cap_first + "|" + c?lower_case + "|" + c?upper_case + ").*">
+                <#if filters[indexFilterName].inputText == regexValue >
+                    <#assign selectedLetter = c?upper_case >
+                </#if> 
+            </#list>
+            <li><p class="no-individuals">${i18n().there_are_no_entries_starting_with} ${selectedLetter} </p></li>
         <#else>
             <li><p class="no-individuals">${i18n().there_are_no_results_to_display}</p></li>
         </#if>
@@ -163,12 +176,7 @@
     </#if>
 </#macro>
 
-<#macro alphabeticalIndexLinks>
-    <#if languageAware >
-        <#assign indexFilterName = "label_regex">
-    <#else>
-        <#assign indexFilterName = "raw_label_regex">
-    </#if>
+<#macro alphabeticalIndexLinks indexFilterName>
     <#if filters[indexFilterName]??>
         <#assign indexFilter = filters[indexFilterName]>
         <nav id="alpha-browse-container" role="navigation">
