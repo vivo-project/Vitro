@@ -20,13 +20,11 @@
         if (!queryText.includes('filters_${searchFilter}')) {
             queryText += "&filters_${searchFilter}=${searchFilter}:${"[* TO *]"?url}";
         }
-        
     </script>
 
     <section id="menupage-intro" role="region">
         <h2>${page.title}</h2>
     </section>
-    ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/menupage/menupage.css" />')}
     <form id="filter-form" name="filter-form" autocomplete="off" method="get" action="${urls.currentPage}">
         <section id="noJavascriptContainer">
             <section id="browse-by" role="region">
@@ -41,15 +39,15 @@
                             <@filterFacets filters[searchFilter] />
                         </#if>
                     </ul>
-                    <@alphabeticalIndexLinks indexFilterName/>
                 </nav>
                 <section id="individuals-in-class" role="region">
-                    <@printPagingLinks />
                     <div id="browsing-options">
-                        <@showSortOptions />
+                        <button type="button" id="downloadIcon" class="download-results-text-button">${i18n().download_results}</button>
                         <@sl.showHits "filter-form" />
-                        <img id="downloadIcon" alt="${i18n().download_results}" title="${i18n().download_results}" />
+                        <@showSortOptions />
                     </div>
+                    <@alphabeticalIndexLinks indexFilterName/>
+                    <@printPagingLinks />
                     <@filteredResults indexFilterName />
                     <@printPagingLinks />
                 </section>
@@ -182,8 +180,8 @@
 <#macro alphabeticalIndexLinks indexFilterName>
     <#if filters[indexFilterName]??>
         <#assign indexFilter = filters[indexFilterName]>
-        <nav id="alpha-browse-container" role="navigation">
-            <ul id="alpha-browse-individuals">
+        <nav id="alphabetical-index-container" role="navigation">
+            <ul id="alphabetical-index-individuals">
             <li>
                  <a href="#" <#if indexFilter.inputText == ""> class="selected" </#if> >
                      <@getAlphabetInput indexFilter '' sl.getValueID(indexFilter.id, 0) />
@@ -208,7 +206,7 @@
 
 <#macro printPagingLinks>
     <#if (pagingLinks?? && pagingLinks?size > 0)>
-        <div class="pagination menupage">
+        <div class="pagination-container">
             ${i18n().pages}:
             <ul>
             <#list pagingLinks as link>
@@ -248,6 +246,9 @@
 </#macro>
 
 <#macro showSortOptions>
+    <#if !sortOptionIds??>
+        <#assign sortOptionIds = ["titledesc", "titleasc"]>
+    </#if>
     <#if sortOptions?has_content && sortOptionIds?? && sortOptionIds?is_sequence>
         <select form="filter-form" name="sort" id="filter-form-sort" onchange="this.form.submit()" >
             <#assign addDefaultOption = true>

@@ -18,7 +18,7 @@ $(document).ready(function(){
         $( "#amount" ).val( $( "#slider-vertical" ).slider( "value" ) );
     }
 
-    setTooltip("img#downloadIcon", {
+    setTooltip("#downloadIcon", {
         title: '<div class="clearfix"><div style="float:right; width:150px;border-left: 1px solid #A6B1B0; padding: 3px 0 0 20px">'
                     	+'<p><label for="amount" style="font-size:14px;">Maximum Records:</label>'
                     	+'<input disabled type="text" id="amount" style="margin-left:35px; border: 0; color: #f6931f; font-weight: bold; width:45px" /></p>'
