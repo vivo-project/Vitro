@@ -4,12 +4,12 @@
    id="Capa_1"
    x="0px"
    y="0px"
-   viewBox="0 0 12.100418 9.1516207"
+   viewBox="0 0 6.0988621 8.9971474"
    xml:space="preserve"
-   sodipodi:docname="checkMark.svg"
+   sodipodi:docname="arrowSmall.svg"
    inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
-   width="12.100418"
-   height="9.1516209"
+   width="6.0988622"
+   height="8.9971476"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -37,9 +37,9 @@
    inkscape:window-height="2079"
    id="namedview45"
    showgrid="false"
-   inkscape:zoom="32"
-   inkscape:cx="4.453125"
-   inkscape:cy="3.359375"
+   inkscape:zoom="45.254834"
+   inkscape:cx="6.1540387"
+   inkscape:cy="-1.2926796"
    inkscape:window-x="25"
    inkscape:window-y="28"
    inkscape:window-maximized="1"
@@ -51,74 +51,75 @@
 
 <g
    id="g14"
-   transform="translate(-196.88023,-156.877)">
+   transform="translate(-200.77344,-156.95043)">
 </g>
 <g
    id="g16"
-   transform="translate(-196.88023,-156.877)">
+   transform="translate(-200.77344,-156.95043)">
 </g>
 <g
    id="g18"
-   transform="translate(-196.88023,-156.877)">
+   transform="translate(-200.77344,-156.95043)">
 </g>
 <g
    id="g20"
-   transform="translate(-196.88023,-156.877)">
+   transform="translate(-200.77344,-156.95043)">
 </g>
 <g
    id="g22"
-   transform="translate(-196.88023,-156.877)">
+   transform="translate(-200.77344,-156.95043)">
 </g>
 <g
    id="g24"
-   transform="translate(-196.88023,-156.877)">
+   transform="translate(-200.77344,-156.95043)">
 </g>
 <g
    id="g26"
-   transform="translate(-196.88023,-156.877)">
+   transform="translate(-200.77344,-156.95043)">
 </g>
 <g
    id="g28"
-   transform="translate(-196.88023,-156.877)">
+   transform="translate(-200.77344,-156.95043)">
 </g>
 <g
    id="g30"
-   transform="translate(-196.88023,-156.877)">
+   transform="translate(-200.77344,-156.95043)">
 </g>
 <g
    id="g32"
-   transform="translate(-196.88023,-156.877)">
+   transform="translate(-200.77344,-156.95043)">
 </g>
 <g
    id="g34"
-   transform="translate(-196.88023,-156.877)">
+   transform="translate(-200.77344,-156.95043)">
 </g>
 <g
    id="g36"
-   transform="translate(-196.88023,-156.877)">
+   transform="translate(-200.77344,-156.95043)">
 </g>
 <g
    id="g38"
-   transform="translate(-196.88023,-156.877)">
+   transform="translate(-200.77344,-156.95043)">
 </g>
 <g
    id="g40"
-   transform="translate(-196.88023,-156.877)">
+   transform="translate(-200.77344,-156.95043)">
 </g>
 <g
    id="g42"
-   transform="translate(-196.88023,-156.877)">
+   transform="translate(-200.77344,-156.95043)">
 </g>
 <g
    id="g6305"
-   transform="translate(0,-0.18062592)"><path
-     d="m 6.0553322,9.3322466 v 0 L 6.9702976,6.1736617 v 0 0 0 0 L 2.1666518,1.9814048 0,4.0056186 Z"
-     id="polygon8"
-     inkscape:connector-curvature="0"
-     sodipodi:nodetypes="cccccccccc"
-     style="fill:#b6d362;fill-opacity:1;stroke-width:0.058842" /><path
-     d="m 6.0553322,9.3322466 v 0 L 4.8585992,6.0859319 v 0 0 0 0 L 9.8171728,0.18062592 12.100418,2.0118498 Z"
-     id="polygon8-6"
-     inkscape:connector-curvature="0"
-     sodipodi:nodetypes="cccccccccc"
-     style="fill:#b6d362;fill-opacity:1;stroke-width:0.0624242" /></g></svg>
+   transform="translate(-3.8932091,-0.2540566)"><g
+     id="g1073"><path
+       d="m 9.9920711,4.7526302 v 0 L 7.3714499,4.0728922 v 0 0 0 0 l -3.4782407,3.568682 1.679454,1.6096296 z"
+       id="polygon8"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccccccccc"
+       style="fill:#b6d362;fill-opacity:1;stroke-width:0.0461968" /><path
+       d="m 9.9920711,4.7526302 v 0 l -2.6206213,0.679738 v 0 0 0 0 L 3.8932091,1.8636862 5.5726631,0.2540566 Z"
+       id="polygon8-4"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccccccccc"
+       style="fill:#b6d362;fill-opacity:1;stroke-width:0.0461968" /></g></g></svg>
