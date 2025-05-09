@@ -1,45 +1,3 @@
-<#-- $This file is distributed under the terms of the license in LICENSE$ -->
-
-${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/css/nouislider.css"/>')}
-${stylesheets.add('<link rel="stylesheet" type="text/css" href="${urls.base}/css/search-results.css"/>')}
-
-${headScripts.add('<script type="text/javascript" src="${urls.base}/webjars/floatingui/floating-ui.core.umd.js"></script>')}
-${headScripts.add('<script type="text/javascript" src="${urls.base}/webjars/floatingui/floating-ui.dom.umd.js"></script>')}
-${headScripts.add('<script type="text/javascript" src="${urls.base}/js/tooltip/tooltip-utils.js"></script>')}
-
-${headScripts.add('<script type="text/javascript" src="${urls.base}/js/nouislider.min.js"></script>')}
-${headScripts.add('<script type="text/javascript" src="${urls.base}/js/wNumb.min.js"></script>')}
-
-<#include "search-lib.ftl">
-
-<script>
-	let searchFormId = "search-form";
-	let urlsBase = "${urls.base}";
-	if (window.location.toString().indexOf("?") == -1){
-		var queryText = 'querytext=${querytext?js_string}';
-	} else {
-		var queryText = window.location.toString().split("?")[1];
-	}
-</script>
-
-<@searchForm  />
-
-<div class="contentsBrowseGroup">
-
-    <@printPagingLinks />
-    <#-- Search results -->
-    <ul class="searchhits">
-        <#list individuals as individual>
-            <li>
-                <@shortView uri=individual.uri viewContext="search" />
-            </li>
-        </#list>
-    </ul>
-    <input form="search-form" type="hidden" name="lang" value="${locale!}">
-
-    <@printPagingLinks />
-    <br />
-</div> 
 
 <#macro printPagingLinks>
 
@@ -72,49 +30,56 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/wNumb.min
 <#macro searchForm>
         <div id="selected-filters">
             <@printSelectedFilterValueLabels filters />
-        </div>  
-        <div id="filter-groups">
-            <ul class="nav nav-tabs">
+        </div>
+        <#assign filterGroupTabsContent>
+            <@filterGroupTabs/>
+        </#assign>
+        <#if filterGroupTabsContent?has_content>
+            <div id="filter-groups" class="tabs">
+                ${filterGroupTabsContent}
+            </div>
+            <div class="tabs filter-area">
                 <#assign active = true>
                 <#list filterGroups as group>
-                    <#if ( user.loggedIn || group.public ) && !group.hidden >
-                        <@searchFormGroupTab group active/>
+                    <#if group.displayed && !isEmptyGroup(group)>
+                        <@groupFilters group active/>
                         <#assign active = false>
-                    </#if>  
+                    </#if>
                 </#list>
-            </ul>
-            <#assign active = true>
-            <#list filterGroups as group>
-                <#if ( user.loggedIn || group.public ) && !group.hidden >
-                      <@groupFilters group active/>
-                      <#assign active = false>
-                </#if>
-            </#list>
-        </div>
+            </div>
+        </#if>
         <div id="search-form-footer">
             <div>
                 <@printResultNumbers />
             </div>
             <div>
-                <@printHits />
+                <div>
+                    <@showHits />
+                </div>
                 <@printSorting />
             </div>
         </div> 
 </#macro>
 
+<#macro filterGroupTabs >
+    <#assign active = true>
+    <#list filterGroups as group>
+        <#if group.displayed && !isEmptyGroup(group)>
+            <@searchFormGroupTab group active/>
+            <#assign active = false>
+        </#if>
+    </#list>
+</#macro>
+
 <#macro groupFilters group active>
-    <#if active >
-        <div id="${group.id}" class="tab-pane fade in active filter-area">
-    <#else>
-        <div id="${group.id}" class="tab-pane fade filter-area">
-    </#if>
-            <div id="search-filter-group-container-${group.id}">
-                <ul class="nav nav-tabs">
+        <div id="${group.id}" class="tab <#if active >active<#else>fade</#if>">
+            <div id="search-filter-group-container-${group.id}" class="search-filter-group-container">
+                <div class="tabs">
                     <#assign assignedActive = false>
                     <#list group.filters as filterId>
                         <#if filters[filterId]??>
                             <#assign f = filters[filterId]>
-                            <#if ( user.loggedIn || f.public ) && !f.hidden >
+                            <#if f.displayed && !isEmptyFilter(f) >
                                 <@searchFormFilterTab f assignedActive/>  
                                 <#if !assignedActive && (f.selected || emptySearch )>
                                     <#assign assignedActive = true>
@@ -122,14 +87,14 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/wNumb.min
                             </#if>
                         </#if>
                     </#list>
-                </ul>
+                </div>
             </div>
             <div id="search-filter-group-tab-content-${group.id}" class="tab-content">
                 <#assign assignedActive = false>
                 <#list group.filters as filterId>
                     <#if filters[filterId]??>
                         <#assign f = filters[filterId]>
-                        <#if ( user.loggedIn || f.public ) && !f.hidden >
+                        <#if f.displayed && !isEmptyFilter(f) >
                             <@printFilterValues f assignedActive emptySearch/>  
                             <#if !assignedActive && ( f.selected || emptySearch )>
                                 <#assign assignedActive = true>
@@ -143,27 +108,30 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/wNumb.min
 
 <#macro printSelectedFilterValueLabels filters>
     <#list filters?values as filter>
-        <#assign valueNumber = 1>
-        <#list filter.values?values as v>
-            <#if v.selected>
-                <@getInput filter v getValueID(filter.id, valueNumber) valueNumber />
-                <#if user.loggedIn || filter.public>
-                    <@getSelectedLabel valueNumber, v, filter />
+        <#if filter.inputText?has_content>
+            <@userSelectedInput filter "search-form" />
+        <#else>
+            <#assign valueNumber = 1>
+            <#list filter.values?values as v>
+                <#if v.selected>
+                    <@getInput filter v getValueID(filter.id, valueNumber) valueNumber />
+                    <#if filter.displayed>
+                        <@getSelectedLabel getValueID(filter.id, valueNumber)?html v filter v.count />
+                    </#if>
                 </#if>
-            </#if>
-            <#assign valueNumber = valueNumber + 1>
-        </#list>
-        <@userSelectedInput filter />
+                <#assign valueNumber = valueNumber + 1>
+            </#list>
+        </#if>
     </#list>
 </#macro>
 
 <#macro printSorting>
-    <#if sorting?has_content>
+    <#if sortOptions?has_content>
         <div>
             <select form="search-form" name="sort" id="search-form-sort" onchange="this.form.submit()" >
                 <#assign addDefaultOption = true>
-                <#list sorting as option>
-                    <#if option.display>
+                <#list sortOptions?values as option>
+                    <#if option.displayed>
                         <#if option.selected>
                             <option value="${option.id}" selected="selected">${i18n().search_results_sort_by(option.label)}</option>
                             <#assign addDefaultOption = false>
@@ -180,9 +148,8 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/wNumb.min
     </#if>
 </#macro>
 
-<#macro printHits>
-    <div>
-    <select form="search-form" name="hitsPerPage" id="search-form-hits-per-page" onchange="this.form.submit()">
+<#macro showHits form="search-form">
+    <select form="${form}" name="hitsPerPage" id="${form}-hits-per-page" onchange="this.form.submit()">
         <#list hitsPerPageOptions as option>
             <#if option == hitsPerPage>
                 <option value="${option}" selected="selected">${i18n().search_results_per_page(option)}</option>
@@ -191,64 +158,62 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/wNumb.min
             </#if>
         </#list>
     </select>
-    </div>
 </#macro>
 
 <#macro searchFormGroupTab group active >
-    <#if active>
-         <li class="active form-group-tab">
-    <#else>
-        <li class="form-group-tab">
-    </#if>
-            <a data-toggle="tab" href="#${group.id?html}">${group.label?html}</a>
-        </li>
+    <div class="tab <#if active>active</#if>">
+        <a href="#" onclick="openTab(event, '${group.id?html}');return false;">${group.label?html}</a>
+    </div>
 </#macro>
 
 <#macro searchFormFilterTab filter assignedActive>
-    <#if filter.id == "querytext">
-        <#-- skip query text filter -->
-        <#return>
-    </#if>
-        <li class="filter-tab">
-            <a data-toggle="tab" href="#${filter.id?html}">${filter.name?html}</a>
-        </li>
+    <div class="tab filter-tab" >
+        <a href="#" onclick="openTab(event, '${filter.id?html}');return false;">${filter.name?html}</a>
+    </div>
 </#macro>
 
 <#macro printFilterValues filter assignedActive isEmptySearch>
-        <div id="${filter.id?html}" class="tab-pane fade filter-area">
+        <div id="${filter.id?html}" class="tab fade filter-area">
             <#if filter.id == "querytext">
             <#-- skip query text filter -->
             <#elseif filter.type == "RangeFilter">
-                <@rangeFilter filter/>
+                <@rangeFilter filter "search-form" />
             <#else>
-                <#if filter.input>
+                <#if filter.input >
                     <div class="user-filter-search-input">
                         <@createUserInput filter />
                     </div>
                 </#if>
+                <#if ( !filter.localizationRequired && filter.values?values?size > filter.moreLimit) >
+                    <div class="user-filter-search-input">
+                        <@createAutocomplete filter />
+                    </div>
+                </#if>
                 <#assign valueNumber = 1>
+                <#assign notSelectedCount = 0>
                 <#assign additionalLabels = false>
                 <#list filter.values?values as v>
                     <#if !v.selected>
-                        <#if filter.moreLimit = valueNumber - 1 >
+                        <#if filter.moreLimit = notSelectedCount >
                             <#assign additionalLabels = true>
                             <a class="more-facets-link" href="javascript:void(0);" onclick="expandSearchOptions(this)">${i18n().paging_link_more}</a>
                         </#if>
-                        <#if user.loggedIn || v.publiclyAvailable>
+                        <#if v.displayed>
                             <@getInput filter v getValueID(filter.id, valueNumber) valueNumber />
-                            <@getLabel valueNumber, v, filter, additionalLabels />
+                            <@getLabel getValueID(filter.id, valueNumber)?html v filter v.count additionalLabels />
                         </#if>
+                        <#assign notSelectedCount += 1>
                     </#if>
-                    <#assign valueNumber = valueNumber + 1>
+                    <#assign valueNumber += 1>
                 </#list>
                 <#if additionalLabels >
                     <a class="less-facets-link additional-search-options hidden-search-option" href="javascript:void(0);" onclick="collapseSearchOptions(this)">${i18n().display_less}</a>
-                </#if>  
+                </#if>
             </#if>
         </div>
 </#macro>
 
-<#macro rangeFilter filter>
+<#macro rangeFilter filter form>
     <#assign min = filter.min >
     <#assign max = filter.max >
     <#assign from = filter.fromYear >
@@ -269,21 +234,21 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/wNumb.min
             <#else>
                 <div class="range-slider-end">${max?html}</div>
             </#if>
-            <input form="search-form" id="filter_range_${filter.id?html}" style="display:none;" class="range-slider-input" name="filter_range_${filter.id?html}" value="${filter.rangeInput?html}"/>
+            <input form="${form}" id="filter_range_${filter.id?html}" style="display:none;" class="range-slider-input" name="filter_range_${filter.id?html}" value="${filter.rangeInput?html}"/>
         </div>
     </div>
 </#macro>
 
 
-<#macro getSelectedLabel valueID value filter >
+<#macro getSelectedLabel valueId value filter count >
     <#assign label = filter.name + " : " + value.name >
     <#if !filter.localizationRequired>
         <#assign label = filter.name + " : " + value.id >
     </#if>
-    <label for="${getValueID(filter.id, valueNumber)?html}">${getValueLabel(label, value.count)?html}</label>
+    <label for="${valueId}">${getValueLabel(label, count)?html}</label>
 </#macro>
 
-<#macro getLabel valueID value filter additional=false >
+<#macro getLabel valueId value filter count additional=false >
     <#assign label = value.name >
     <#assign additionalClass = "" >
     <#if !filter.localizationRequired>
@@ -292,20 +257,22 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/wNumb.min
     <#if additional=true>
         <#assign additionalClass = "additional-search-options hidden-search-option" >
     </#if>
-
-    <label class="${additionalClass}" for="${getValueID(filter.id, valueNumber)?html}" >${getValueLabel(label, value.count)?html}</label>
+    <label class="${additionalClass}" for="${valueId}" >${getValueLabel(label, count)?html}</label>
 </#macro>
 
-
-<#macro userSelectedInput filter>
+<#macro userSelectedInput filter form>
     <#if filter.inputText?has_content>
-        <button form="search-form" type="button" id="button_filter_input_${filter.id?html}" onclick="clearInput('filter_input_${filter.id?js_string?html}')" class="checked-search-input-label">${filter.name?html} : ${filter.inputText?html}</button>
+        <#assign inputID = "filter_input_" + filter.id >
+        <#if filter.id == "querytext">
+            <#assign inputID = filter.id >
+        </#if>
+        <button form="${form}" type="button" id="button_filter_input_${filter.id?html}" onclick="clearInput(event,'${inputID?js_string?html}')" class="checked-search-input-label">${filter.name?html} : ${filter.inputText?html}</button>
     </#if>
     <#assign from = filter.fromYear >
     <#assign to = filter.toYear >
     <#if from?has_content && to?has_content >
         <#assign range = i18n().from + " " + from + " " + i18n().to + " " + to >
-        <button form="search-form" type="button" id="button_filter_range_${filter.id?html}" onclick="clearInput('filter_range_${filter.id?js_string?html}')" class="checked-search-input-label">${filter.name?html} : ${range?html}</button>
+        <button form="${form}" type="button" id="button_filter_range_${filter.id?html}" onclick="clearInput(event,'filter_range_${filter.id?js_string?html}')" class="checked-search-input-label">${filter.name?html} : ${range?html}</button>
     </#if>
 </#macro>
 
@@ -313,9 +280,31 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/wNumb.min
     <input form="search-form" id="filter_input_${filter.id?html}"  placeholder="${i18n().search_field_placeholder}" class="search-vivo" type="text" name="filter_input_${filter.id?html}" value="${filter.inputText?html}" autocapitalize="none" />
 </#macro>
 
+<#macro createAutocomplete filter form="search-form">
+    <input id="filter_autocomplete_${filter.id?html}" placeholder="${i18n().search_field_placeholder}" class="facet-input" type="text" value="" autocapitalize="none" />
+    <input form="${form}" id="filter_selected_autocomplete_${filter.id?html}" type="hidden" name="filters_autocomplete_${filter.id?html}" value="" />
+    <script>
+      $( function() {
+          $( "#filter_autocomplete_${filter.id?html?js_string}" ).autocomplete({
+          source: function (request, response) {
+            $.getJSON("${facetOptionsUrl}&facet_filter=${filter.id?html?js_string}", {
+                term: request.term
+            }, response);
+          },
+          minLength: 3,
+          select: function( event, ui ) {
+            $("#filter_selected_autocomplete_${filter.id?html?js_string}").val("${filter.id?html?js_string}:" + ui.item.value);
+            $('#${form}').submit();
+          }
+        } );
+      } );
+    </script>
+</#macro>
+
 <#macro getInput filter filterValue valueID valueNumber form="search-form">
     <#assign checked = "" >
     <#assign class = "" >
+    <#assign inputName = "filters_" + valueID >
     <#if filterValue.selected>
         <#assign checked = " checked=\"checked\" " >
         <#assign class = "selected-input" >
@@ -323,22 +312,13 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/wNumb.min
     <#assign type = "checkbox" >
     <#if !filter.multivalued>
         <#assign type = "radio" >
+        <#assign inputName = "filters_" + filter.id >
     </#if>
     <#assign filterName = filter.id >
     <#if filter.multivalued>
         <#assign filterName = filterName + "_" + valueNumber >
     </#if>
-
-    <input 
-        form="${form}" 
-        type="${type}" 
-        id="${valueID?html}" 
-        value="${filter.id?html + ":" + filterValue.id?html}" 
-        name="filters_${valueID?html}" 
-        style="display:none;" 
-        ${checked} 
-        class="${class}" 
-    >
+    <input form="${form}" type="${type}" id="${valueID?html}" value="${filter.id?html + ":" + filterValue.id?html}" name="${inputName?html}" style="display:none;" ${checked} <#if class?has_content>class="${class}"</#if> >
 </#macro>
 
 <#function getValueID id number>
@@ -347,20 +327,24 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/wNumb.min
 
 <#function getValueLabel label count >
     <#assign result = label >
-    ${label}
     <#if count!=0>
         <#assign result = result + " (" + count + ")" >
     </#if>
     <#return result />
 </#function>
 
-${stylesheets.add('<link rel="stylesheet" href="//code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />',
-  				  '<link rel="stylesheet" href="${urls.base}/css/search.css" />')}
+<#function isEmptyFilter filter >
+    <#return filter.id == "querytext" || (filter.type != "RangeFilter" && !filter.input && filter.values?values?filter(v -> !v.selected)?size == 0 ) />
+</#function>
 
-${headScripts.add('<script src="//code.jquery.com/ui/1.10.3/jquery-ui.js"></script>',
-                  '<script type="text/javascript" src="${urls.base}/js/tiny_mce/tiny_mce.js"></script>'
-                  )}
-
-${scripts.add('<script type="text/javascript" src="${urls.base}/js/searchDownload.js"></script>')}
-${scripts.add('<script type="text/javascript" src="${urls.base}/js/search/search_results.js"></script>')}
-
+<#function isEmptyGroup group >
+	<#list group.filters as filterId>
+        <#if filters[filterId]??>
+            <#assign f = filters[filterId]>
+            <#if f.displayed && !isEmptyFilter(f) >
+                <#return false />
+            </#if>
+        </#if>
+    </#list>
+    <#return true />
+</#function>

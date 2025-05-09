@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -15,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -78,7 +78,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
     public static final String PARAM_QUERY_TEXT = "querytext";
     public static final String PARAM_QUERY_SORT_BY = "sort";
 
-    protected static final Map<Format, Map<Result, String>> templateTable;
+    protected static final Map<Format, Map<Result, String>> templateTable = setupTemplateTable();
 
     protected enum Format {
         HTML,
@@ -90,10 +90,6 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         PAGED,
         ERROR,
         BAD_QUERY
-    }
-
-    static {
-        templateTable = setupTemplateTable();
     }
 
     /**
@@ -142,7 +138,11 @@ public class PagedSearchController extends FreemarkerHttpServlet {
 
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
+        Map<String, List<String>> requestFilters = SearchFiltering.getRequestFilters(vreq);
+        return process(vreq, requestFilters);
+    }
 
+    public static ResponseValues process(VitroRequest vreq, Map<String, List<String>> requestFilters) {
         // There may be other non-html formats in the future
         Format format = getFormat(vreq);
         boolean wasXmlRequested = Format.XML == format;
@@ -180,28 +180,22 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                 log.debug(getSpentTime(startTime) + "ms spent before read filter configurations.");
             }
             Set<String> currentRoles = SearchFiltering.getCurrentUserRoles(vreq);
-            Map<String, SearchFilter> filterConfigurationsByField = SearchFiltering.readFilterConfigurations(currentRoles, vreq);
+            Map<String, SearchFilter> filters = SearchFiltering.readFilterConfigurations(currentRoles, vreq);
             if (log.isDebugEnabled()) {
                 log.debug(getSpentTime(startTime) + "ms spent before get sort configurations.");
             }
-            for (SearchFilter filter: filterConfigurationsByField.values()) {
-                filter.setInputText(SearchFiltering.getFilterInputText(vreq, filter.getId()));
-                filter.setRangeValues(SearchFiltering.getFilterRangeText(vreq, filter.getId()));
-            }
-            Map<String, List<String>> requestFilters = SearchFiltering.getRequestFilters(vreq);
-            if (log.isDebugEnabled()) {
-                log.debug(getSpentTime(startTime) + "ms spent after getRequestFilters.");
-            }
-            SearchFiltering.setSelectedFilters(filterConfigurationsByField, requestFilters);
+
+            SearchFiltering.setSelectedFilters(filters, requestFilters);
             if (log.isDebugEnabled()) {
                 log.debug(getSpentTime(startTime) + "ms spent after setSelectedFilters.");
             }
+
             Map<String, SortConfiguration> sortConfigurations = SearchFiltering.getSortConfigurations(vreq);
             if (log.isDebugEnabled()) {
                 log.debug(getSpentTime(startTime) + "ms spent before get query configurations.");
             }
             SearchQuery query =
-                    getQuery(queryText, documentsToReturn, startIndex, vreq, filterConfigurationsByField, sortConfigurations);
+                    getQuery(queryText, documentsToReturn, startIndex, vreq, filters, sortConfigurations);
             if (log.isDebugEnabled()) {
                 log.debug(getSpentTime(startTime) + "ms spent after get query configurations.");
             }
@@ -223,10 +217,11 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                 log.error("Search response was null");
                 return doFailedSearch(I18n.text(vreq, "error_in_search_request"), queryText, format, vreq);
             }
-            addFacetCountersFromRequest(response, filterConfigurationsByField, vreq);
+            addFacetCountersFromRequest(response, filters, vreq);
             if (log.isDebugEnabled()) {
                 log.debug(getSpentTime(startTime) + "ms spent after addFacetCountersFromRequest.");
             }
+            addFilterValueLabels(filters, vreq);
             SearchResultDocumentList docs = response.getResults();
             if (docs == null) {
                 log.error("Document list for a search was null");
@@ -250,12 +245,12 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                 }
             }
 
-            ParamMap pagingLinkParams = new ParamMap();
-            pagingLinkParams.put(PARAM_QUERY_TEXT, queryText);
-            pagingLinkParams.put(PARAM_HITS_PER_PAGE, String.valueOf(hitsPerPage));
+            ParamMap searchParams = new ParamMap();
+            searchParams.put(PARAM_QUERY_TEXT, queryText);
+            SearchFiltering.addFiltersToPageLinks(vreq, searchParams, vreq.getParameterNames());
 
-            Enumeration<String> paramNames = vreq.getParameterNames();
-            SearchFiltering.addFiltersToPageLinks(vreq, pagingLinkParams, paramNames);
+            ParamMap pagingLinkParams = new ParamMap(searchParams);
+            pagingLinkParams.put(PARAM_HITS_PER_PAGE, String.valueOf(hitsPerPage));
 
             if (wasXmlRequested) {
                 pagingLinkParams.put(PARAM_XML_REQUEST, "1");
@@ -270,18 +265,16 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                 if (log.isDebugEnabled()) {
                     log.debug(getSpentTime(startTime) + "ms spent before sorting filterConfigurationsByField values.");
                 }
-                for (Entry<String, SearchFilter> entry : filterConfigurationsByField.entrySet()) {
-                    entry.getValue().sortValues();
+                for (Entry<String, SearchFilter> entry : filters.entrySet()) {
+                    entry.getValue().sortValues(vreq.getCollator());
                 }
                 if (log.isDebugEnabled()) {
                     log.debug(getSpentTime(startTime) + "ms spent after sorting filterConfigurationsByField values.");
                 }
-                Map<String, SearchFilter> filtersForTemplateById =
-                        SearchFiltering.getFiltersForTemplate(filterConfigurationsByField);
-                body.put("filters", filtersForTemplateById);
-                body.put("filterGroups", SearchFiltering.readFilterGroupsConfigurations(vreq, filtersForTemplateById));
-                body.put("sorting", sortConfigurations.values());
-                body.put("emptySearch", isEmptySearchFilters(filterConfigurationsByField));
+                body.put("filters", filters);
+                body.put("filterGroups", SearchFiltering.readFilterGroupsConfigurations(vreq, filters));
+                body.put("sortOptions", sortConfigurations);
+                body.put("emptySearch", isEmptySearchFilters(filters));
             }
 
             body.put("individuals", IndividualSearchResult.getIndividualTemplateModels(individuals, vreq));
@@ -308,6 +301,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             if (startIndex < (hitCount - hitsPerPage)) {
                 body.put("nextPage", getNextPageLink(startIndex, hitsPerPage, vreq.getServletPath(), pagingLinkParams));
             }
+            body.put("facetOptionsUrl", getFacetControllerLink(searchParams, requestFilters, vreq));
 
             String template = templateTable.get(format).get(Result.PAGED);
             if (log.isDebugEnabled()) {
@@ -323,11 +317,27 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         }
     }
 
-    private long getSpentTime(long startTime) {
+
+    private static void addFilterValueLabels(Map<String, SearchFilter> filters, VitroRequest vreq) {
+        for (SearchFilter filter : filters.values()) {
+            if (filter.isLocalizationRequired()) {
+                for (FilterValue value : filter.getValues().values()) {
+                    if (StringUtils.isBlank(value.getName()) && !value.getId().contains(" ")) {
+                        String label = SearchFiltering.getUriLabel(value.getId(), vreq);
+                        if (!StringUtils.isBlank(label)) {
+                            value.setName(label);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private static long getSpentTime(long startTime) {
         return (System.nanoTime() - startTime) / 1000000;
     }
 
-    private Object isEmptySearchFilters(Map<String, SearchFilter> filterConfigurationsByField) {
+    private static Object isEmptySearchFilters(Map<String, SearchFilter> filterConfigurationsByField) {
         for (SearchFilter filter : filterConfigurationsByField.values()) {
             if (filter.isSelected()) {
                 return false;
@@ -336,10 +346,11 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         return true;
     }
 
-    private void addFacetCountersFromRequest(SearchResponse response, Map<String, SearchFilter> filtersByField,
+    private static void addFacetCountersFromRequest(SearchResponse response, Map<String, SearchFilter> filters,
             VitroRequest vreq) {
         long startTime = System.nanoTime();
-        List<SearchFacetField> resultfacetFields = response.getFacetFields();
+        Map<String, SearchFacetField> fields = response.getFacetFields().stream()
+                .collect(Collectors.toMap(SearchFacetField::getName, Function.identity()));
         if (log.isDebugEnabled()) {
             log.debug(getSpentTime(startTime) + "ms spent after getFacetFields.");
         }
@@ -347,13 +358,12 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         if (log.isDebugEnabled()) {
             log.debug(getSpentTime(startTime) + "ms spent after SearchFiltering.getRequestFilters.");
         }
-        for (SearchFacetField resultField : resultfacetFields) {
-            SearchFilter searchFilter = filtersByField.get(resultField.getName());
-            if (searchFilter == null) {
+        for (SearchFilter searchFilter : filters.values()) {
+            SearchFacetField resultField = fields.get(searchFilter.getField());
+            if (resultField == null) {
                 continue;
             }
             List<Count> values = resultField.getValues();
-
             for (Count value : values) {
                 if (value.getCount() == 0) {
                     continue;
@@ -362,6 +372,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                 FilterValue filterValue = searchFilter.getValue(valueName);
                 if (filterValue == null) {
                     filterValue = new FilterValue(valueName);
+                    filterValue.setDisplayed(true);
                     searchFilter.addValue(filterValue);
                 }
                 if (requestFiltersById.containsKey(searchFilter.getId())) {
@@ -371,12 +382,6 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                     }
                     if (!SearchFiltering.isEmptyValues(requestedValues)) {
                         searchFilter.setSelected(true);
-                    }
-                }
-                if (searchFilter.isLocalizationRequired() && StringUtils.isBlank(filterValue.getName())) {
-                    String label = SearchFiltering.getUriLabel(value.getName(), vreq);
-                    if (!StringUtils.isBlank(label)) {
-                        filterValue.setName(label);
                     }
                 }
                 // COUNT should be from the real results of the query
@@ -397,7 +402,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         return query;
     }
 
-    private int getHitsPerPage(VitroRequest vreq) {
+    private static int getHitsPerPage(VitroRequest vreq) {
         int hitsPerPage = DEFAULT_HITS_PER_PAGE;
         try {
             int hits = Integer.parseInt(vreq.getParameter(PARAM_HITS_PER_PAGE));
@@ -411,7 +416,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         return hitsPerPage;
     }
     
-    private int getDocumentsNumber(VitroRequest vreq) {
+    private static int getDocumentsNumber(VitroRequest vreq) {
         int documentsNumber = DEFAULT_DOCUMENTS_NUMBER;
         try {
             documentsNumber = Integer.parseInt(vreq.getParameter(PARAM_DOCUMENTS_NUMBER));
@@ -425,7 +430,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         return documentsNumber;
     }
 
-    private int getStartIndex(VitroRequest vreq) {
+    private static int getStartIndex(VitroRequest vreq) {
         int startIndex = 0;
         try {
             startIndex = Integer.parseInt(vreq.getParameter(PARAM_START_INDEX));
@@ -436,7 +441,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         return startIndex;
     }
 
-    private String getSnippet(SearchResultDocument doc, SearchResponse response) {
+    private static String getSnippet(SearchResultDocument doc, SearchResponse response) {
         String docId = doc.getStringValue(VitroSearchTermNames.DOCID);
         StringBuilder text = new StringBuilder();
         Map<String, Map<String, List<String>>> highlights = response.getHighlighting();
@@ -449,8 +454,8 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         return text.toString();
     }
 
-    private SearchQuery getQuery(String queryText, int hitsPerPage, int startIndex, VitroRequest vreq,
-            Map<String, SearchFilter> filtersByField, Map<String, SortConfiguration> sortOptions) {
+    public static SearchQuery getQuery(String queryText, int hitsPerPage, int startIndex, VitroRequest vreq,
+            Map<String, SearchFilter> filters, Map<String, SortConfiguration> sortOptions) {
         // Lowercase the search term to support wildcard searches: The search engine
         // applies no text
         // processing to a wildcard search term.
@@ -465,24 +470,22 @@ public class PagedSearchController extends FreemarkerHttpServlet {
 
         addDefaultVitroFacets(vreq, query);
 
-        SearchFiltering.addFacetFieldsToQuery(filtersByField, query);
+        SearchFiltering.addFacetFieldsToQuery(filters, query);
 
-        Map<String, SearchFilter> filtersById = SearchFiltering.getFiltersById(filtersByField);
-
-        SearchFiltering.addFiltersToQuery(vreq, query, filtersById);
+        SearchFiltering.addFiltersToQuery(query, filters);
 
         log.debug("Query = " + query.toString());
         return query;
     }
 
-    private void addDefaultVitroFacets(VitroRequest vreq, SearchQuery query) {
+    private static void addDefaultVitroFacets(VitroRequest vreq, SearchQuery query) {
         String[] facets = vreq.getParameterValues(FACETS);
         if (facets != null && facets.length > 0) {
             query.addFacetFields(facets);
         }
     }
 
-    private void addSortRules(VitroRequest vreq, SearchQuery query, Map<String, SortConfiguration> sortOptions) {
+    private static void addSortRules(VitroRequest vreq, SearchQuery query, Map<String, SortConfiguration> sortOptions) {
         String sortType = getSortType(vreq);
         if (sortOptions.isEmpty()) {
             return;
@@ -503,7 +506,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         // If text field is not empty, sort by relevance (no need to add sort field)
     }
 
-    private void addSortField(VitroRequest vreq, SearchQuery query, SortConfiguration conf,
+    private static void addSortField(VitroRequest vreq, SearchQuery query, SortConfiguration conf,
             Map<String, SortConfiguration> sortOptions, Set<String> appliedSortOptions) {
         if (conf == null || appliedSortOptions.contains(conf.getId())) {
             return;
@@ -514,13 +517,13 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             log.error(String.format("Sort field is not set for '%s'", conf.getId()));
             return;
         }
-        query.addSortField(field, conf.getSortOrder());
+        query.addSortField(field, conf.getSortDirection());
         if (sortOptions.containsKey(conf.getFallback())) {
             addSortField(vreq, query, sortOptions.get(conf.getFallback()), sortOptions, appliedSortOptions);
         }
     }
 
-    private String getSortType(VitroRequest vreq) {
+    private static String getSortType(VitroRequest vreq) {
         return vreq.getParameter(PARAM_QUERY_SORT_BY);
     }
 
@@ -558,14 +561,29 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         return pagingLinks;
     }
 
-    private String getPreviousPageLink(int startIndex, int hitsPerPage, String baseUrl, ParamMap params) {
+    private static String getPreviousPageLink(int startIndex, int hitsPerPage, String baseUrl, ParamMap params) {
         params.put(PARAM_START_INDEX, String.valueOf(startIndex - hitsPerPage));
         return UrlBuilder.getUrl(baseUrl, params);
     }
 
-    private String getNextPageLink(int startIndex, int hitsPerPage, String baseUrl, ParamMap params) {
+    private static String getNextPageLink(int startIndex, int hitsPerPage, String baseUrl, ParamMap params) {
         params.put(PARAM_START_INDEX, String.valueOf(startIndex + hitsPerPage));
         return UrlBuilder.getUrl(baseUrl, params);
+    }
+
+    private static String getFacetControllerLink(ParamMap params, Map<String, List<String>> providedFilters, VitroRequest vreq) {
+        Map<String, List<String>> requestFilters = SearchFiltering.getRequestFilters(vreq);
+        Set<String> impliedFilters = new HashSet<String>(providedFilters.keySet());
+        impliedFilters.removeAll(requestFilters.keySet());
+        int i = 0;
+        for (String filter : impliedFilters) {
+            List<String> values = providedFilters.get(filter);
+            for (String value : values) {
+                params.put(SearchFiltering.FILTERS + "_" + i , filter + ":" + value);
+                i++;
+            }
+        }
+        return UrlBuilder.getUrl(SearchFacetsController.SEARCH_FACETS_URL, params);
     }
 
     protected static class PagingLink extends LinkTemplateModel {
@@ -585,13 +603,13 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         }
     }
 
-    private ExceptionResponseValues doSearchError(Throwable e, Format f) {
+    private static ExceptionResponseValues doSearchError(Throwable e, Format f) {
         Map<String, Object> body = new HashMap<String, Object>();
         body.put("message", "Search failed: " + e.getMessage());
         return new ExceptionResponseValues(getTemplate(f, Result.ERROR), body, e);
     }
 
-    private TemplateResponseValues doFailedSearch(String message, String querytext, Format f, VitroRequest vreq) {
+    private static TemplateResponseValues doFailedSearch(String message, String querytext, Format f, VitroRequest vreq) {
         Map<String, Object> body = new HashMap<String, Object>();
         body.put("title", I18n.text(vreq, "search_for", querytext));
         if (StringUtils.isEmpty(message)) {
@@ -604,7 +622,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
     /**
      * Makes a message to display to user for a bad search term.
      */
-    private String makeBadSearchMessage(String querytext, String exceptionMsg, VitroRequest vreq) {
+    private static String makeBadSearchMessage(String querytext, String exceptionMsg, VitroRequest vreq) {
         String rv = "";
         try {
             // try to get the column in the search term that is causing the problems
@@ -666,7 +684,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         }
     }
 
-    protected Format getFormat(VitroRequest req) {
+    protected static Format getFormat(VitroRequest req) {
         if (req != null && req.getParameter("xml") != null && "1".equals(req.getParameter("xml"))) {
             return Format.XML;
         } else if (req != null && req.getParameter("csv") != null && "1".equals(req.getParameter("csv"))) {

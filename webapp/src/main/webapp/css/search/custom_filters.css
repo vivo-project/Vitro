@@ -1,0 +1,152 @@
+.li-selected> a > label::before {
+	content: url(../../images/checkMark.svg);
+	color: #2ea0cf;
+	padding-right: 5px;
+	margin-left: -17px;
+}
+
+.checked-search-input-label {
+	padding: 2px 5px 2px 5px;
+	border: 0px;
+	background-color: inherit;
+}
+
+.range-slider {
+	margin-bottom: 15px;
+}
+
+.range-slider-end {
+	display: inline-block;
+}
+
+.range-slider-start {
+	display: inline-block;
+}
+
+#filter-form-sort {
+	margin: 0px;
+	border-bottom: 0px;
+	border-top: 0px;
+	border-left: 0px;
+	height: 3em;
+	border-radius: unset;
+	color: rgb(112, 106, 102);
+	font-family: inherit;
+}
+
+#filter-form-hits-per-page {
+	margin: 0px;
+	border-bottom: 0px;
+	border-top: 0px;
+	border-left: 0px;
+	height: 3em;
+	border-radius: unset;
+}
+
+#browsing-options {
+	border-bottom: 1px solid #dde4e3;
+	border-top: 1px solid #dde4e3;
+	padding-left: 11px;
+}
+
+.display-title {
+	font-size: small;
+	display: block;
+}
+
+#browse-filters {
+	width: 271px;
+	float: left;
+	background-color: #f1f2ee;
+}
+
+#browse-filters>li:not(:last-child) {
+	border-bottom: 1px dotted #dde4e3;
+}
+
+#browse-filters>li {
+	margin-left: 12px;
+	margin-right: 10px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+#browse-filters li a {
+	padding-left: 10px;
+	text-decoration: none;
+	display: block;
+}
+
+#browse-filters li a label {
+	display: block;
+	margin: 0px;
+}
+
+#browse-filters li a label:hover {
+	color: #2ea0cf;
+}
+
+.li-selected a label {
+	color: #2ea0cf;	
+}
+
+li > a > label:hover {
+	color: #2ea0cf;
+}
+
+#browse-filters li:not(.li-selected) > a > label:hover::before {
+	content: url(../../images/checkMark.svg);
+	padding-right: 5px;
+	margin-left: -17px;
+}
+
+#browse-filters li.li-selected > a > label:hover::before {
+	content: unset;
+	padding-right: unset;
+	margin-left: unset;
+}
+
+.facet-values {
+	padding-left: 10px;
+}
+
+.facet-values li {
+	padding-top: 10px;
+}
+
+.facet-values label{
+	cursor:pointer;
+}
+
+.filter-tab > a:focus {
+	color: unset;
+	text-decoration: none;
+}
+
+.range-filter {
+	padding-right: 16px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	padding-left: 4px;
+}
+
+.download-url {
+	padding: 5px 25px 5px;
+}
+
+#downloadIcon {
+	padding-left: 7px;
+	font-size: 14px;
+}
+
+.facet-input {
+	width: 100%;
+}
+
+.hidden-search-option {
+	display: none;
+}
+
+.hidden-all-search-options {
+	display: none;
+}

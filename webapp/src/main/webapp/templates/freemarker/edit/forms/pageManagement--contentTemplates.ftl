@@ -4,3 +4,4 @@
 <#include "pageManagement--sparqlQuery.ftl">
 <#include "pageManagement--fixedHtml.ftl">
 <#include "pageManagement--searchIndividuals.ftl">
+<#include "pageManagement--browseSearchFilterValues.ftl">

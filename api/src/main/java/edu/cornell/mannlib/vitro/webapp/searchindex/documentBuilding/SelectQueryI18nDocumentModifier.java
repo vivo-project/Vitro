@@ -78,7 +78,10 @@ public class SelectQueryI18nDocumentModifier extends SelectQueryDocumentModifier
 			for (String locale : locales) {
 				LanguageFilteringRDFService lfrs = new LanguageFilteringRDFService(rdfService,
 						Collections.singletonList(locale));
-				List<String> list = createSelectQueryContext(lfrs, queryHolder).execute().toStringFields().flatten();
+				List<String> list = createSelectQueryContext(lfrs, queryHolder)
+				        .execute()
+				        .toStringFields(varNames.toArray(new String[varNames.size()]))
+				        .flatten();
 				mapLocaleToFields.put(locale, list);
 				log.debug(label + " for locale " + locale + " - query: '" + query + "' returns " + list);
 			}
