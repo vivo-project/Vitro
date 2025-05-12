@@ -1,0 +1,9 @@
+{
+    "themeStyle": {
+        "css": [
+            "/themes/vitro/css/screen.css",
+            "/themes/vitro/css/reset.css",
+            "/themes/vitro/css/vitroTheme.css"
+        ]
+    }
+}
