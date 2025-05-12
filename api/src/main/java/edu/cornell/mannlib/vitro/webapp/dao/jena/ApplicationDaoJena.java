@@ -63,6 +63,8 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
 	        		appInd, APPLICATION_COPYRIGHTANCHOR));
             application.setCopyrightURL(getPropertyStringValue(
             		appInd, APPLICATION_COPYRIGHTURL));
+			application.setThemeDir(getPropertyStringValue(
+					appInd, APPLICATION_THEMEDIR));
 			application.setLogoUrl(getPropertyStringValue(
 					appInd, APPLICATION_LOGOURL));
 			application.setLogoSmallUrl(getPropertyStringValue(
