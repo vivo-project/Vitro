@@ -2,7 +2,7 @@
     <h2>Site Styles</h2>
 
 
-   <h2>Custom CSS Style</h2>
+   <h3>Custom CSS Style</h3>
 
    <#if customCssPath?? && customCssPath != "null">
        <button
