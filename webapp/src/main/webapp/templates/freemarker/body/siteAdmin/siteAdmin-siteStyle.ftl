@@ -1,64 +1,6 @@
 <div>
     <h2>Site Styles</h2>
-    <div class="button-group">
-        <a class="button blue" download href="${urls.base}/css/vitro.css">vitro.css</a>
-        <a class="button blue" download href="${urls.base}/css/login.css">login.css</a>
-        <a class="button blue" download href="${urls.base}/css/edit.css">edit.css</a>
-        <a class="button blue" download href="${urls.base}/css/individual/individual-property-groups.css">individual-property-groups.css</a>
-        <a class="button blue" download href="${urls.base}/css/developer/developerPanel.css">developerPanel.css</a>
-        
-        <!-- Samo Wilma i TF-->
-        <a class="button blue" download href="${urls.base}/css/home-page-maps.css">page-createAndLink.css</a> 
 
-
-        <#if themeDir == "themes/wilma">
-            <a class="button blue" download href="${urls.base}/themes/wilma/css/reset.css">reset.css</a>
-            <a class="button blue" download href="${urls.base}/themes/wilma/css/wilma.css">wilma.css</a>
-            <a class="button blue" download href="${urls.base}/themes/wilma/css/page-createAndLink.css">page-createAndLink.css</a>
-            <a class="button blue" download href="${urls.base}/themes/wilma/css/screen.css">screen.css</a>
-        </#if>
-
-        <#if themeDir == "themes/willow">
-            <a class="button blue" download href="${urls.base}/themes/willow/css/reset.css">reset.css</a>
-            <a class="button blue" download href="${urls.base}/themes/willow/css/wilma.css">wilma.css</a>
-            <a class="button blue" download href="${urls.base}/themes/willow/css/page-createAndLink.css">page-createAndLink.css</a>
-            <a class="button blue" download href="${urls.base}/themes/willow/css/screen.css">screen.css</a>
-        </#if>
-
-        <#if themeDir == "themes/vitro">
-            <a class="button blue" download href="${urls.base}/themes/vitro/css/screen.css">screen.css</a>
-            <a class="button blue" download href="${urls.base}/themes/vitro/css/reset.css">reset.css</a>
-            <a class="button blue" download href="${urls.base}/themes/vitro/css/vitroTheme.css">vitroTheme.css</a>
-        </#if>
-        
-        <#if themeDir == "themes/tenderfoot">
-            <a class="button blue" download href="${urls.base}/themes/tenderfoot/css/screen.css">screen.css</a>
-            <a class="button blue" download href="${urls.base}/themes/tenderfoot/css/reset.css">reset.css</a>
-            <a class="button blue" download href="${urls.base}/themes/tenderfoot/css/tenderfoot.css">tenderfoot.css</a>
-            <a class="button blue" download href="${urls.base}/themes/tenderfoot/css/edit.css">edit.css</a>
-            <a class="button blue" download href="${urls.base}/themes/tenderfoot/css/navbar-breakpoint.css">navbar-breakpoint.css</a>
-            <a class="button blue" download href="${urls.base}/themes/tenderfoot/css/page-admin.css">page-admin.css</a>
-            <a class="button blue" download href="${urls.base}/themes/tenderfoot/css/page-browse.css">page-browse.css</a>
-            <a class="button blue" download href="${urls.base}/themes/tenderfoot/css/page-home.css">page-home.css</a>
-            <a class="button blue" download href="${urls.base}/themes/tenderfoot/css/page-imageupload.css">page-imageupload.css</a>
-            <a class="button blue" download href="${urls.base}/themes/tenderfoot/css/page-index.css">page-index.css</a>
-            <a class="button blue" download href="${urls.base}/themes/tenderfoot/css/page-individual.css">page-individual.css</a>
-            <a class="button blue" download href="${urls.base}/themes/tenderfoot/css/page-login.css">page-login.css</a>
-            <a class="button blue" download href="${urls.base}/themes/tenderfoot/css/page-menu.css">page-menu.css</a>
-            <a class="button blue" download href="${urls.base}/themes/tenderfoot/css/page-createAndLink.css">page-createAndLink.css</a>
-            <a class="button blue" download href="${urls.base}/webjars/fonts/noto-sans/index.css">index.css</a>
-        </#if>
-
-        <#if themeDir == "themes/nemo">
-            <a class="button blue" download href="${urls.base}/themes/nemo/css/theme.css">theme.css</a>
-            <a class="button blue" download href="${urls.base}/themes/nemo/css/homepage.css">homepage.css</a>
-            <a class="button blue" download href="${urls.base}/themes/nemo/css/individual.css">individual.css</a>
-        </#if>
-
-   </div>
-   <hr>
-
-   <br>
 
    <h2>Custom CSS Style</h2>
 
