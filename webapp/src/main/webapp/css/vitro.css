@@ -527,9 +527,3 @@ a.button.blue {
     padding: 4px;
     display: inline-block;
 }
-
-#cssLinks {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 3px;
-}
