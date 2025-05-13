@@ -4,9 +4,9 @@
 <#-- <#assign additionalFilters = ["type"]> -->
 <#if filters[searchFilter]??>
     <#if languageAware >
-        <#assign indexFilterName = "label_regex">
+        <#assign indexFilterName = "initial">
     <#else>
-        <#assign indexFilterName = "raw_label_regex">
+        <#assign indexFilterName = "raw_initial">
     </#if>
     <script>
         let searchFormId = "filter-form";
@@ -112,12 +112,6 @@
             </#list>
         <#elseif filters[indexFilterName]?? && filters[indexFilterName].inputText?has_content>
             <#assign selectedLetter = filters[indexFilterName].inputText >
-            <#list i18n().browse_results_alphabetical_index?split(",") as c>
-                <#assign regexValue = "(" + c?lower_case?cap_first + "|" + c?lower_case + "|" + c?upper_case + ").*">
-                <#if filters[indexFilterName].inputText == regexValue >
-                    <#assign selectedLetter = c?upper_case >
-                </#if> 
-            </#list>
             <li>
                 <p class="no-individuals">${i18n().there_are_no_entries_starting_with} ${selectedLetter}</p>
                 <p class="no-individuals">${i18n().try_another_letter}</p>
@@ -190,10 +184,9 @@
             </li>
             <#assign idCounter = 1>
             <#list i18n().browse_results_alphabetical_index?split(",") as c>
-                <#assign regexValue = "(" + c?lower_case?cap_first + "|" + c?lower_case + "|" + c?upper_case + ").*">
                 <li>
-                    <a href="#" <#if indexFilter.inputText == regexValue > class="selected" </#if> >
-                        <@getAlphabetInput indexFilter regexValue sl.getValueID(indexFilter.id, idCounter) />
+                    <a href="#" <#if indexFilter.inputText == c > class="selected" </#if> >
+                        <@getAlphabetInput indexFilter c sl.getValueID(indexFilter.id, idCounter) />
                         <@getAlphabetLabel sl.getValueID(indexFilter.id, idCounter) c?upper_case />
                     </a>
                 </li>

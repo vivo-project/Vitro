@@ -56,7 +56,7 @@ public class SearchFiltering {
             + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
             + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
             + "SELECT ?filter_id ?filter_type ?filter_label ?value_label ?value_id  ?field_name ?public ?filter_rank "
-            + "?value_rank (STR(?isUriReq) as ?isUri ) ?multivalued ?input ?regex ?facet ?min ?max ?role "
+            + "?value_rank (STR(?isUriReq) as ?isUri ) ?multivalued ?input ?regex ?regexPattern ?facet ?min ?max ?role "
             + "?value_public ?more_limit ?multilingual ?isDescending\n"
             + "?filterDisplayLimitRole ?valueDisplayLimitRole ?sortingObjectType \n"
             + "WHERE {\n"
@@ -90,6 +90,7 @@ public class SearchFiltering {
             + "    OPTIONAL {?filter search:isUriValues ?isUriReq }\n"
             + "    OPTIONAL {?filter search:userInput ?input }\n"
             + "    OPTIONAL {?filter search:userInputRegex ?regex }\n"
+            + "    OPTIONAL {?filter search:regexPattern ?regexPattern }\n"
             + "    OPTIONAL {?filter search:facetResults ?facet }\n"
             + "    OPTIONAL {?filter search:reverseFacetOrder ?isDescendingDeprecated }\n"
             + "    OPTIONAL {"
@@ -527,6 +528,11 @@ public class SearchFiltering {
             filter.setSortOption(sortOption.asResource().getURI());
         }
 
+        RDFNode regexPattern = solution.get("regexPattern");
+        if (regexPattern != null && regexPattern.isLiteral()) {
+            filter.setRegexPattern(regexPattern.asLiteral().getLexicalForm());
+        }
+
         RDFNode moreLimit = solution.get("more_limit");
         if (moreLimit != null && moreLimit.isLiteral()) {
             filter.setMoreLimit(moreLimit.asLiteral().getInt());
@@ -547,11 +553,10 @@ public class SearchFiltering {
                 || PagedSearchController.PARAM_QUERY_TEXT.equals(searchFilter.getId())) {
             return;
         }
-        String searchText = searchFilter.getInputText();
         if (searchFilter.isInputRegex()) {
-            query.addFilterQuery(searchFilter.getField() + ":/" + searchText + "/");
+            query.addFilterQuery(searchFilter.getField() + ":/" + searchFilter.getInputRegex() + "/");
         } else {
-            query.addFilterQuery(searchFilter.getField() + ":\"" + searchText + "\"");
+            query.addFilterQuery(searchFilter.getField() + ":\"" + searchFilter.getInputText() + "\"");
         }
     }
 
