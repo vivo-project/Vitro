@@ -63,6 +63,7 @@
 	padding: 20px 20px;
 	display: inline-block;
 	font-size: .8em;
+	box-sizing: border-box;
 }
 
 .pagination-container:not(:last-child) {
@@ -202,6 +203,7 @@ li>a>label:hover {
 
 nav#alphabetical-index-container {
 	border-bottom: 1px solid #dde4e3;
+	border-right: 1px solid #dde4e3;
 }
 
 nav#alphabetical-index-container {
