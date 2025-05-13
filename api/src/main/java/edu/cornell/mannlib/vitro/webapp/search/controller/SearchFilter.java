@@ -25,6 +25,7 @@ import org.apache.jena.rdf.model.RDFNode;
 
 public class SearchFilter {
 
+    private static final String DEFAULT_PATTERN = "$0";
     private static final String FILTER = "Filter";
     private static final String RANGE_FILTER = "RangeFilter";
     private static final Log log = LogFactory.getLog(SearchFilter.class);
@@ -57,6 +58,7 @@ public class SearchFilter {
     private boolean input = false;
     private Map<String, FilterValue> values = new LinkedHashMap<>();
     private boolean inputRegex = false;
+    private String regexPattern = DEFAULT_PATTERN;
     private boolean facetsRequired;
     private Order valueSortDirection = Order.ASC;
     private String type = FILTER;
@@ -428,5 +430,13 @@ public class SearchFilter {
                 log.error(e, e);
             }
         }
+    }
+
+    public void setRegexPattern(String regexPattern) {
+        this.regexPattern = regexPattern;
+    }
+
+    public String getInputRegex() {
+        return regexPattern.replace(DEFAULT_PATTERN, inputText);
     }
 }
