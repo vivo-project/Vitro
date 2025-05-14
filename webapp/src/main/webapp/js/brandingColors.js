@@ -1,7 +1,7 @@
 /* $This file is distributed under the terms of the license in LICENSE$ */
 
 
-let theme = "themes/wilma/";
+let theme = "themes/vitro/";
 
 const colorNameConvertor = {
     "primary-lighter": "themePrimaryColorLighter",
@@ -18,50 +18,6 @@ const colorNameConvertorInverse = Object.keys(colorNameConvertor).reduce((acc, k
         acc[colorNameConvertor[key]] = key;
         return acc;
     }, {})
-
-
-const defaultColorPalete = {
-    "themes/wilma/": {
-        "primary-lighter": "#7bb3cb",
-        "primary-base": "#2485ae",
-        "primary-darker": "#064d68",
-        "banner-base": "#023048",
-        "secondary-base": "#398aac",
-        "accent-base": "#749a02",
-        "text-base": "#5f6464",
-        "link-base": "#2485ae"
-    },
-    "themes/vitro/": {
-        "primary-lighter": "#62b6d7",
-        "primary-base": "#47b6d0",
-        "primary-darker": "#006279",
-        "banner-base": "#012d3d",
-        "secondary-base": "#398aac",
-        "accent-base": "#0ea5c8",
-        "text-base": "#595B5B",
-        "link-base": "#47b6d0"
-    },
-    "themes/tenderfoot/": {
-        "primary-lighter": "#8bb9cc",
-        "primary-base": "#3E8BAA",
-        "primary-darker": "#0c0cb5",
-        "banner-base": "#013049",
-        "secondary-base": "#93c3d4",
-        "accent-base": "#3446A0",
-        "text-base": "#595B5B",
-        "link-base": "#2485ae"
-    },
-    "themes/nemo/": {
-        "primary-lighter": "#337ab7",
-        "primary-base": "#064d68",
-        "primary-darker": "#023447",
-        "banner-base": "#064d68",
-        "secondary-base": "#064d68",
-        "accent-base": "#8BAB2E",
-        "text-base": "#333",
-        "link-base": "#064d68"
-    }
-};
 
 const colorPallete = {
     "primary-lighter": "--primary-color-lighter",
@@ -129,7 +85,7 @@ $(document).ready(function(){
     }
     
     function resetColor(inputId) {
-        let pallete = defaultColorPalete[theme];
+        let pallete = getSchemaData().defaultColors || {};
 
         $('#' + inputId + '-color').val(pallete[inputId]);
         $('#' + inputId + '-color').attr('default-color', true);
@@ -178,7 +134,7 @@ $(document).ready(function(){
 
     function loadTheme() {
         let data = getSchemaData();
-        theme = data.theme || "themes/wilma/";
+        theme = data.theme || "themes/vitro/";
     }
 
     function initColors() {

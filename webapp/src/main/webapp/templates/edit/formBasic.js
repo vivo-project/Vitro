@@ -52,24 +52,60 @@
     
     function onSave() {
         if (openThemeEditorOnSave) {
-
             openEditor();
-
         }
     }
     
-    function openEditor() {
+
+    function getThemeDefaultColors(themeDir) {
+        return fetch(themeDir)
+            .then((response) => {
+                if (!response.ok) {
+                    console.error("Error fetching theme-config.json");
+                    alert(
+                        "Failed to load default theme pallete. Please check if 'theme-config.json' file exists and is accessible."
+                    );
+                    
+                    return null;
+                }
+                return response.json();
+            })
+            .then((data) => {
+                if (!data) return null;
+                if (
+                    !data ||
+                    !data.defaultBrandingColors
+                ) {
+                    console.error("Invalid theme-config.json format");
+                    alert("The theme configuration file is not in the expected format. Please verify its structure.");
+                    return null;
+                }
+                console.log("Theme Config JSON:", data);
+                return data.defaultBrandingColors;
+            })
+            .catch((error) => {
+                console.error("Error fetching theme-config.json:", error);
+                alert("An unexpected error occurred while loading the theme configuration. Please verify its structure.");
+            });
+    } 
+
+    async function openEditor() {
+        let baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
+        let themeDir = document.getElementById('ThemeDir').value;
+        let themeConfigUrl = baseUrl + "/" + themeDir + "theme-config.json";
+        let defaultColors = await getThemeDefaultColors(themeConfigUrl);
+
         let data = {
                 enabled: true,
                 lastUrl: window.location.href,
                 colors: themeBrandingColors,
-                theme: document.getElementById('ThemeDir').value
+                theme: document.getElementById('ThemeDir').value,
+                defaultColors: defaultColors
             }
 
         localStorage.setItem('colorSchemeEditor', JSON.stringify(data));
 
         return data
-
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -81,11 +117,10 @@
         document.getElementById("ThemeDir").addEventListener('change', handleThemeChange);
 
         document.querySelector("[name=_update][type=submit]").addEventListener('click', onSave);
-        // document.querySelector("[name=_cancel][type=submit]").addEventListener('click', onCancel);
 
         document.getElementById('changeColorsButton').addEventListener('click', (event) => {
             event.preventDefault();
-            let data = openEditor()
+            openEditor()
 
             if (themeChanged) {
                 let storedData = JSON.parse(localStorage.getItem('colorSchemeEditor')) || {};
@@ -94,7 +129,7 @@
                 localStorage.setItem('colorSchemeEditor', JSON.stringify(storedData));
                 alert("The editor will open once you save your changes.");
             } else {
-                window.location.href = data.lastUrl.substring(0, data.lastUrl.lastIndexOf('/'));
+                window.location.href = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
             }
         });
 
