@@ -227,6 +227,8 @@ ul#alphabetical-index-individuals li {
 
 #individuals-in-class ul {
 	list-style: none;
+	float: left;
+	width: 100%;
 }
 
 #individuals-in-class {
@@ -296,6 +298,12 @@ li.individual h1.thumb {
 	padding-top: 30px;
 }
 
-p.no-individuals {
-	margin: 1em 2em;
+p.no-individuals:first-child {
+	margin-top: 2em;
+	margin-left: 2em;
+	margin-bottom: 1em;
+}
+
+p.no-individuals:not(:first-child) {
+	margin-left: 2em;
 }
