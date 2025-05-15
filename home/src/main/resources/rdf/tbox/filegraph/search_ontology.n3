@@ -41,6 +41,10 @@ search:PublicParameter  a             owl:Class .
 
 search:SearchField  a                 owl:Class .
 
+search:SortDirection  a               owl:Class .
+
+search:SortingObjectType  a           owl:Class .
+
 search:FilterValue  a                 owl:Class ;
         rdfs:subClassOf               search:PublicParameter .
 
@@ -60,10 +64,6 @@ search:multivalued  a                 owl:DatatypeProperty , owl:FunctionalPrope
         rdfs:domain                   search:SearchField ;
         rdfs:range                    xsd:boolean .
 
-search:isAscending  a                 owl:DatatypeProperty , owl:FunctionalProperty ;
-        rdfs:domain                   search:Sort ;
-        rdfs:range                    xsd:boolean .
-
 search:indexField  a                  owl:DatatypeProperty , owl:FunctionalProperty ;
         rdfs:domain                   search:SearchField ;
         rdfs:range                    xsd:string .
@@ -81,6 +81,15 @@ search:isLanguageSpecific
         rdfs:domain                   search:SearchField ;
         rdfs:range                    xsd:boolean .
 
+search:direction  a                   owl:ObjectProperty , owl:FunctionalProperty ;
+        rdfs:domain                   [ rdf:type owl:Class ;
+                                        owl:unionOf ( 
+                                            search:Sort
+                                            search:Filter
+                                        )
+                                      ] ;
+        rdfs:range                    search:SortDirection .
+
 search:filterField  a                 owl:ObjectProperty , owl:FunctionalProperty ;
         rdfs:domain                   search:Filter ;
         rdfs:range                    search:SearchField .
@@ -89,7 +98,7 @@ search:isUriValues  a                 owl:DatatypeProperty , owl:FunctionalPrope
         rdfs:domain                   search:Filter ;
         rdfs:range                    xsd:boolean .
 
-search:order  a                       owl:FunctionalProperty , owl:DatatypeProperty ;
+search:rank  a                        owl:FunctionalProperty , owl:DatatypeProperty ;
         rdfs:domain                   search:PublicParameter ;
         rdfs:range                    xsd:integer .
 
@@ -105,6 +114,11 @@ search:userInputRegex
         a                             owl:DatatypeProperty , owl:FunctionalProperty ;
         rdfs:domain                   search:Filter ;
         rdfs:range                    xsd:boolean .
+
+search:regexPattern
+        a                             owl:DatatypeProperty , owl:FunctionalProperty ;
+        rdfs:domain                   search:Filter ;
+        rdfs:range                    xsd:string .
 
 search:sortField  a                   owl:FunctionalProperty , owl:ObjectProperty ;
         rdfs:domain                   search:Sort ;
@@ -126,9 +140,13 @@ search:to  a                          owl:DatatypeProperty , owl:FunctionalPrope
         rdfs:domain                   search:RangeFilter ;
         rdfs:range                    xsd:string .
 
-search:hasKnownValue  a                owl:ObjectProperty ;
-        rdfs:domain                    search:Filter ;
-        rdfs:range                     search:FilterValue .
+search:hasKnownValue  a               owl:ObjectProperty ;
+        rdfs:domain                   search:Filter ;
+        rdfs:range                    search:FilterValue .
+
+search:sortValuesBy  a                owl:ObjectProperty, owl:FunctionalProperty ;
+        rdfs:domain                   search:Filter ;
+        rdfs:range                    search:SortingObjectType .
 
 search:public  a                      owl:DatatypeProperty , owl:FunctionalProperty ;
         rdfs:domain                   search:PublicParameter ;
@@ -138,13 +156,29 @@ search:display a                      owl:DatatypeProperty , owl:FunctionalPrope
         rdfs:domain                   search:Sort ;
         rdfs:range                    xsd:boolean .
 
+search:reverseFacetOrder a            owl:DatatypeProperty , owl:FunctionalProperty ;
+        rdfs:domain                   search:Filter ;
+        rdfs:range                    xsd:boolean .
+
+
 search:isDefaultForRole
         a                   <http://www.w3.org/2002/07/owl#ObjectProperty> ;
         rdfs:domain         <https://vivoweb.org/ontology/vitro-search#FilterValue> ;
+        rdfs:range          auth:PermissionSet .
+
+search:limitDisplayTo
+        a                   <http://www.w3.org/2002/07/owl#ObjectProperty> ;
+        rdfs:domain         [ rdf:type owl:Class ;
+                              owl:unionOf ( search:Sort
+                                            search:Filter
+                                            search:FilterGroup
+                                            search:FilterValue
+                                          )
+                            ] ; 
         rdfs:range          auth:PermissionSet .
 
 search:moreLimit
         a                   <http://www.w3.org/2002/07/owl#DatatypeProperty> , <http://www.w3.org/2002/07/owl#FunctionalProperty> ;
         rdfs:domain         <https://vivoweb.org/ontology/vitro-search#Filter> ;
         rdfs:range          <http://www.w3.org/2001/XMLSchema#int> ;
-        rdfs:subPropertyOf  <http://www.w3.org/2002/07/owl#topDataProperty> .
+        .

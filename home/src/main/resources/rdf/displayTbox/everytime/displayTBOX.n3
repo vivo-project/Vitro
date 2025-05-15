@@ -28,6 +28,8 @@ display:HomePage a owl:Class .
 
 display:ClassGroupPage a owl:Class .
 
+display:SearchFilterValuesDataGetter a owl:Class .
+
 display:IndividualsForClassesPage a owl:Class .
 
 display:InternalClassesPage a owl:Class .
@@ -56,6 +58,10 @@ display:RequiredAction a owl:Class ;
 <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupPageData>
     a owl:Class ;
     rdfs:comment "A data getter for a VClassGroup page" .
+
+<java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SearchFilterValuesDataGetter>
+    a owl:Class ;
+    rdfs:comment "A data getter for a search filter values page" .
 
 <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.FixedHTMLDataGetter>
     a owl:Class ;

@@ -66,6 +66,8 @@ public class SelectQueryDocumentModifier implements DocumentModifier,
 	 */
 	private List<String> fieldNames = new ArrayList<>();
 
+	protected List<String> varNames = new ArrayList<>();
+
 	/**
 	 * URIs of the types of individuals to whom these queries apply. If empty,
 	 * then the queries apply to all individuals.
@@ -91,6 +93,11 @@ public class SelectQueryDocumentModifier implements DocumentModifier,
 	public void addTargetField(String fieldName) {
 		fieldNames.add(fieldName);
 	}
+
+    @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasVar")
+    public void addVar(String varName) {
+        varNames.add(varName);
+    }
 
 	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasTypeRestriction")
 	public void addTypeRestriction(String typeUri) {
@@ -154,7 +161,10 @@ public class SelectQueryDocumentModifier implements DocumentModifier,
 			QueryHolder queryHolder = new QueryHolder(query).bindToUri("uri",
 					ind.getURI());
 			List<String> list = createSelectQueryContext(rdfService,
-					queryHolder).execute().toStringFields().flatten();
+					queryHolder)
+			        .execute()
+			        .toStringFields(varNames.toArray(new String[varNames.size()]))
+			        .flatten();
 			log.debug(label + " - query: '" + query + "' returns " + list);
 			return list;
 		} catch (Throwable t) {
