@@ -113,7 +113,7 @@
         <#elseif filters[indexFilterName]?? && filters[indexFilterName].inputText?has_content>
             <#assign selectedLetter = filters[indexFilterName].inputText >
             <li>
-                <p class="no-individuals">${i18n().there_are_no_entries_starting_with} ${selectedLetter}</p>
+                <p class="no-individuals">${i18n().there_are_no_entries_starting_with} ${selectedLetter}.</p>
                 <p class="no-individuals">${i18n().try_another_letter}</p>
             </li>
         <#else>
