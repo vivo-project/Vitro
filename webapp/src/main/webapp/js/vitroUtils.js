@@ -111,7 +111,7 @@ $(document).ready(function(){
     if (colorSchemeEditor) {
         let colorSchemeEditorData = JSON.parse(colorSchemeEditor);
         if (colorSchemeEditorData.enabled) {
-            $.getScript('./js/brandingColors.js');
+            $.getScript(colorSchemeEditorData.script);
         }
     }
 

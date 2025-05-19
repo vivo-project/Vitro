@@ -1,8 +1,7 @@
 <div class="logo-upload-container">
     <h2>Logo Configuration</h2>
 
-    <form id="logoUploadForm" action="/vivo/site-branding-logo?action=upload" enctype="multipart/form-data" method="post" role="form">
-
+    <form id="logoUploadForm" action="${actionUpload}" enctype="multipart/form-data" method="post" role="form">
         <!-- Desktop Logo Section -->
         <div class="logo-section">
             <label class="logo-label">Desktop Logo</label>
