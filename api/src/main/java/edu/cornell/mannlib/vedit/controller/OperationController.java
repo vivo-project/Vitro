@@ -39,7 +39,9 @@ import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.checks.UserOnThread;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.EntityPolicyController;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyLoader;
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.SiteBrandingController;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -161,6 +163,10 @@ public class OperationController extends BaseEditController {
             epo.setRequestParameterMap(request.getParameterMap());
 
             notifyChangeListeners(epo, action);
+
+            if (newObj instanceof ApplicationBean) {
+                SiteBrandingController.updatethemeBrandingCache(((ApplicationBean) newObj).getThemeDir());
+            }
 
             /* send the user somewhere */
             switch (action) {
