@@ -98,6 +98,7 @@
         let data = {
                 enabled: true,
                 lastUrl: window.location.href,
+                script: baseUrl + "/js/brandingColors.js",
                 colors: themeBrandingColors,
                 theme: document.getElementById('ThemeDir').value,
                 defaultColors: defaultColors

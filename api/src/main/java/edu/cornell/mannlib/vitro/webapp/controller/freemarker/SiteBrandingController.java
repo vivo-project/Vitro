@@ -216,7 +216,7 @@ public class SiteBrandingController extends VitroAjaxController {
         return wadf.getApplicationDao().getApplicationBean().getThemeDir();
     }
 
-    private static void updatethemeBrandingCache(String theme) {
+    public static void updatethemeBrandingCache(String theme) {
 		themeBranding = getBrandingColors(theme);
 		themeBrandingLoaded = true;
 	}

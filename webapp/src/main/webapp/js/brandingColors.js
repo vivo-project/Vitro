@@ -64,7 +64,7 @@ $(document).ready(function(){
 
             if (!data.colors[color]) return;
             $('#' + colorFormated + '-color').val(data.colors[color]);
-            handleColorInput(colorFormated.split('-')[0], colorFormated.split('-')[1], data.colors[color]);
+            handleColorInput(colorFormated.split('-')[0], colorFormated.split('-')[1], data.colors[color], false);
         });
     }
 
@@ -89,6 +89,8 @@ $(document).ready(function(){
 
         $('#' + inputId + '-color').val(pallete[inputId]);
         $('#' + inputId + '-color').attr('default-color', true);
+        $('#' + inputId + '-color').attr('user-changed', false);
+
         updateCSSVariable(colorPallete[inputId], null);
     }
 
@@ -101,19 +103,26 @@ $(document).ready(function(){
         saveDateToLocalStorage();
     }
 
-    function handleColorInput(color, shade, value) {
+    function handleColorInput(color, shade, value, updateShades = true, userChanged = true) {
         updateCSSVariable(colorPallete[color + '-' + shade], value);
         toggleResetButton(color + '-reset', true);
-        $('#' + color + '-' + shade + '-color').attr('default-color', false);
+        const colorInput = $('#' + color + '-' + shade + '-color')
+        colorInput.attr('default-color', false);
+        colorInput.attr('user-changed', userChanged);
 
-        if (color === 'primary' && shade === 'base') {
+        if (updateShades && color === 'primary' && shade === 'base') {
             ["lighter", "darker"].forEach(newShade => {
                 const variation = color + '-' + newShade
                 const variationId = variation + '-color';
                 const adjustedValue = adjustHexColor(value, variation === "primary-lighter" ? 40 : -40);
                 
-                $('#' + variationId).val(adjustedValue);
-                handleColorInput(color, newShade, adjustedValue);
+                const shadeColorInput = $('#' + variationId)
+                if (shadeColorInput.attr('user-changed') === 'true') {
+                    return
+                }
+                
+                shadeColorInput.val(adjustedValue);
+                handleColorInput(color, newShade, adjustedValue, false, false);
             });
         }
     }
@@ -208,10 +217,12 @@ $(document).ready(function(){
             }).appendTo($colorDiv);
 
             colors[color].forEach(function(shade) {
+                const inputCss = (shade === "lighter" || shade === "darker") ? { border: 0 } : {};
                 $('<input>', {
                     type: 'color',
                     id: color + '-' + shade + '-color',
                     name: color + '-' + shade + '-color',
+                    css: inputCss,
                     on: {
                         input: function() {
                             handleColorInput(color, shade, $(this).val());
