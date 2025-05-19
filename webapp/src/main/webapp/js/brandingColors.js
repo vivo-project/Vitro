@@ -52,9 +52,7 @@ $(document).ready(function(){
             const colorInput = $('#' + color + '-color');
             data.colors[colorNameConvertor[color]] = colorInput.attr('default-color') === 'true' ? undefined : colorInput.val();
         });
-        localStorage.setItem('colorSchemeEditor', JSON.stringify(data));
-        console.log("SAVED");
-        
+        localStorage.setItem('colorSchemeEditor', JSON.stringify(data));        
     }
 
     function loadDateFromLocalStorage() {
@@ -156,7 +154,6 @@ $(document).ready(function(){
 
     // Creating the editor
     function renderEditor() {
-        console.log("loading");
         
         $('body').css('margin-bottom', '150px');
         var $footer = $('<footer>', {
@@ -322,7 +319,6 @@ $(document).ready(function(){
                     window.location.href = getSchemaData().lastUrl;
                     localStorage.removeItem('colorSchemeEditor');
                     alert('Color scheme changes submitted.');
-                    console.log(results);
                 }
             });
 
