@@ -41,7 +41,7 @@
         </select>
 
         <br><br>
-        <a href="${siteStyleUrl}">Change CSS Styles</a>
+        <a href="${siteStyleUrl}">Customize CSS</a>
         <br><br>
 
         <label>Copyright text<span class="note"> used in footer (e.g., name of your institution)</span></label>

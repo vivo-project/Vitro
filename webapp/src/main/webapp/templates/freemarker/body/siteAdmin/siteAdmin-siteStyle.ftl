@@ -11,9 +11,8 @@
        <a href="${customCssPath}" download="custom.css" class="button blue">Download Custom CSS</a>
    </#if>
    <form action="${actionUpload}" method="post" enctype="multipart/form-data">
-       <label for="fileUpload" class="">Upload new custom style.css:</label>
+       <label for="fileUpload" class="">Upload new css file</label>
        <input type="file" id="fileUpload" name="fileUpload" accept=".css" class="form-item">
-       <p class="note">Note: Avoid using relative links inside the CSS file to ensure proper loading of resources.</p>
        <div class="button-group">
            <a href="${backLocation}" class="button">Back</a>
            <button id="primaryAction" type="submit" class="button green">Upload</button>
