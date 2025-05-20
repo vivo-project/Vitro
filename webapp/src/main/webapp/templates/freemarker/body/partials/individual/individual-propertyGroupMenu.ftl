@@ -18,7 +18,7 @@
                         	<#assign groupnameHtmlId = p.createPropertyGroupHtmlId(groupname) >
                             <#-- capitalize will capitalize each word in the name; cap_first only the first. We may need a custom
                             function to capitalize all except function words. -->
-                            <li role="listitem"><a href="#${groupnameHtmlId}" title="${i18n().group_name}">${groupname?capitalize}</a></li>
+                            <li role="listitem"><a href="#${groupnameHtmlId}" title="${i18n().group_name}">${groupname}</a></li>
                         </#if>
                     </#list>
                 </ul>
