@@ -23,7 +23,7 @@ $(document).ready(function(){
         var groupName = $(this).attr("groupName");
         var $propertyGroupLi = $(this);
 
-        $(this).click(function() {
+        $(this).on("click", function() {
 
             if ( $propertyGroupLi.attr("class") == "nonSelectedGroupTab clickable" ) {
                 $.each($('li.selectedGroupTab'), function() {
@@ -106,11 +106,11 @@ $(document).ready(function(){
         if ( $list.length > 0 )
         {
             var $more = $list.find('a.more-less');
-            $more.click();
+            $more.trigger("click");
         }
         else {
             var $more = $('ul#geographicFocusOfList').find('a.more-less');
-            $more.click();
+            $more.trigger("click");
         }
     }
 

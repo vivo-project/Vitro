@@ -25,7 +25,7 @@ var browseClassGroups = {
     // Event listeners. Called on page load
     bindEventListeners: function() {
         // Listener for classGroup switching
-        this.browseClassGroupLinks.click(function() {
+        this.browseClassGroupLinks.on("click", function() {
             uri = $(this).attr("data-uri");
             individualCount = $(this).attr("data-count");
             browseClassGroups.getVClasses(uri, individualCount);
@@ -160,7 +160,7 @@ var graphClassGroups = {
 
         // Was unable to append <a> within <svg> -- was always hidden and couldn't get it to display
         // so using jQuery click to add links
-        $('rect').click(function() {
+        $('rect').on("click", function() {
             var index = $('rect').index(this);
             var uri = uris[index];
             var link = browseClassGroups.baseUrl + '/individuallist?vclassId=' + encodeURIComponent(uri);
