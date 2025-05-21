@@ -127,13 +127,25 @@ public class QueryConverter {
     }
 
     private Map<String, Object> figureFacet(String field) {
-        return tree() //
-                .put("terms", tree() //
-                        .put("field", field.endsWith("_ss") ? field + ".keyword" : field) //
-                        .put("size", ifPositive(query.getFacetLimit())) //
-                        .put("min_doc_count",
-                                ifPositive(query.getFacetMinCount()))) //
-                .asMap();
+        String fieldToAggregate = field.endsWith("_ss") ? field + ".keyword" : field;
+
+        return tree()
+            .put("terms", tree()
+                .put("field", fieldToAggregate)
+                .put("size", ifPositive(query.getFacetLimit()))
+                .put("min_doc_count", ifPositive(query.getFacetMinCount()))
+            )
+            .put("aggs", tree()
+                .put("top_label", tree()
+                    .put("top_hits", tree()
+                        .put("size", 1)
+                        .put("_source",
+                            List.of("es_label_display")  // fetch default display label from index source
+                        )
+                    )
+                )
+            )
+            .asMap();
     }
 
     private List<String> figureReturnFields() {

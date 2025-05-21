@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -101,7 +102,9 @@ public class ExpressionTransformer {
         Stack<String> tokenStack = new Stack<>();
         ArrayList<String> postfixExpression = new ArrayList<>();
 
-        for (String token : expression) {
+        List<String> fixedTokens = fixDisjointFieldTokens(expression);
+
+        for (String token : fixedTokens) {
             if (!priorities.containsKey(token) && !token.equals(")")) {
                 postfixExpression.add(token);
             } else if (token.equals("(")) {
@@ -125,6 +128,30 @@ public class ExpressionTransformer {
         }
 
         return postfixExpression;
+    }
+
+    private List<String> fixDisjointFieldTokens(List<String> expression) {
+        List<String> fixedTokens = new ArrayList<>();
+        Set<String> specialCharacters = Set.of("AND", "OR", "NOT", "(", ")");
+
+        for (String token : expression) {
+            if (!fixedTokens.isEmpty()) {
+                String prev = fixedTokens.get(fixedTokens.size() - 1);
+
+                // Check if previous token contains ":" which indicates a field query
+                if (prev.contains(":") &&
+                    !token.contains(":") &&
+                    !specialCharacters.contains(token)) {
+
+                    // Merge with previous token
+                    fixedTokens.set(fixedTokens.size() - 1, prev + " " + token);
+                    continue;
+                }
+            }
+
+            fixedTokens.add(token);
+        }
+        return fixedTokens;
     }
 
     private Query buildQueryFromPostFixExpression(List<String> postfixExpression) {

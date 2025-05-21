@@ -37,7 +37,8 @@ public class ESQuery {
             throws SearchEngineException {
         String queryString = new QueryConverter(query).asString();
         String response = doTheQuery(queryString);
-        return new ResponseParser(response).parse();
+        return new ResponseParser(response)
+            .parse(query.getFacetTextToMatch(), query.isFacetTextCompareCaseInsensitive());
     }
 
     private String doTheQuery(String queryString) {
