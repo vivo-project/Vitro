@@ -47,15 +47,13 @@
         })
     }
 
-    
-    
-    
-    function onSave() {
+    async function onSave(e) {
         if (openThemeEditorOnSave) {
-            openEditor();
+            e.preventDefault();
+            await openEditor();
+            e.target.form.submit();
         }
     }
-    
 
     function getThemeDefaultColors(themeDir) {
         return fetch(themeDir)
@@ -121,17 +119,18 @@
 
         document.getElementById('changeColorsButton').addEventListener('click', (event) => {
             event.preventDefault();
-            openEditor()
+            openEditor().then(() => {
+                if (themeChanged) {
+                    let storedData = JSON.parse(localStorage.getItem('colorSchemeEditor')) || {};
+                    storedData.enabled = false;
+                    openThemeEditorOnSave = true;
+                    localStorage.setItem('colorSchemeEditor', JSON.stringify(storedData));
+                    alert("The editor will open once you save your changes.");
+                } else {
+                    window.location.href = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
+                }
+            })
 
-            if (themeChanged) {
-                let storedData = JSON.parse(localStorage.getItem('colorSchemeEditor')) || {};
-                storedData.enabled = false;
-                openThemeEditorOnSave = true;
-                localStorage.setItem('colorSchemeEditor', JSON.stringify(storedData));
-                alert("The editor will open once you save your changes.");
-            } else {
-                window.location.href = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
-            }
         });
 
     });
