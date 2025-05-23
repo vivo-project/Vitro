@@ -209,7 +209,8 @@ $(document).ready(function(){
                 css: {
                     display: 'flex',
                     flexDirection: 'column',
-                    alignItems: 'center'
+                    alignItems: 'center',
+                    position: 'relative',
                 }
             }).appendTo($colorDiv);
 
