@@ -317,17 +317,20 @@ $(document).ready(function(){
                 },
                 complete: function(xhr, status) {
                     alert('Color scheme changes submitted.');
+                    var location = getSchemaData().lastUrl;
                     localStorage.removeItem('colorSchemeEditor');
-                    window.location.href = getSchemaData().lastUrl;
+                    window.location.href = location;
                 }
             });
 
         });
 
         $cancelButton.click(function() {
-            window.location.href = getSchemaData().lastUrl;
-            localStorage.removeItem('colorSchemeEditor');
             alert('Color scheme changes canceled.');
+            var location = getSchemaData().lastUrl;
+            localStorage.removeItem('colorSchemeEditor');
+            window.location.href = location;
+
         });
         
         $resetAllButton.click(function() {
@@ -340,8 +343,9 @@ $(document).ready(function(){
                 },
                 complete: function(xhr, status) {
                     alert('Color scheme reset successfully.');
+                    var location = getSchemaData().lastUrl;
                     localStorage.removeItem('colorSchemeEditor');
-                    window.location.href = getSchemaData().lastUrl;
+                    window.location.href = location;
                 }
             });
 
