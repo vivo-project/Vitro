@@ -600,7 +600,8 @@ table#table-listing td  a {
     background: #ccc;
 }
 
-#primary-lighter-color[user-changed="false"]::after {
+/* If input selector have attrivute [user-changed="false"] then .chain gets this style */
+input#primary-lighter-color[user-changed="false"] + .chain {
     content: "";
     color: #888;    
     position: absolute;
@@ -612,9 +613,10 @@ table#table-listing td  a {
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
+    user-select: none;
 }
 
-#primary-darker-color[user-changed="false"]::after {
+input#primary-darker-color[user-changed="false"] + .chain {
     content: "";
     color: #888;    
     position: absolute;
@@ -626,4 +628,5 @@ table#table-listing td  a {
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
+    user-select: none;
 }
