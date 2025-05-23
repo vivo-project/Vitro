@@ -298,6 +298,7 @@ $(document).ready(function(){
 
         // Event handlers for buttons
         $submitButton.click(function() {
+            saveDateToLocalStorage();
             const data = getSchemaData();
             $.ajax({
                 url: baseUrl + "/siteBranding",
@@ -315,10 +316,9 @@ $(document).ready(function(){
                     themeBannerColor: data.colors["themeBannerColor"] || null,
                 },
                 complete: function(xhr, status) {
-                    var results = jQuery.parseJSON(xhr.responseText);
-                    window.location.href = getSchemaData().lastUrl;
-                    localStorage.removeItem('colorSchemeEditor');
                     alert('Color scheme changes submitted.');
+                    localStorage.removeItem('colorSchemeEditor');
+                    window.location.href = getSchemaData().lastUrl;
                 }
             });
 
@@ -339,10 +339,9 @@ $(document).ready(function(){
                     action: "removeall",
                 },
                 complete: function(xhr, status) {
-                    var results = jQuery.parseJSON(xhr.responseText);
-                    window.location.href = getSchemaData().lastUrl;
-                    localStorage.removeItem('colorSchemeEditor');
                     alert('Color scheme reset successfully.');
+                    localStorage.removeItem('colorSchemeEditor');
+                    window.location.href = getSchemaData().lastUrl;
                 }
             });
 
