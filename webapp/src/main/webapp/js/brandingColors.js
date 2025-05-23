@@ -197,7 +197,7 @@ $(document).ready(function(){
             }).appendTo($colorContainer);
 
             var $label = $('<label>', {
-                for: color + '-color',
+                for: color + '-base-color',
                 text: color.charAt(0).toUpperCase() + color.slice(1) + ' Color: ',
                 css: {
                 marginRight: '10px',
@@ -229,6 +229,9 @@ $(document).ready(function(){
                             saveDateToLocalStorage();
                         }
                     }
+                }).appendTo($colorGroup);
+                $('<div>', {
+                    class: 'chain'
                 }).appendTo($colorGroup);
             });
             $('<button>', {
