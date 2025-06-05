@@ -338,7 +338,7 @@ function fillList(id, data, selectedtext) {
     var monikerSelection = {
         // onChange event listener for moniker select list
         monikerListener: function() {
-            $('#Moniker').change(function() {
+            $('#Moniker').on("change", function() {
                 // alert('The moniker has changed');
                 // if "[new moniker]" is selected, then enable the alt field
                 if ( $('#Moniker option:selected').text() == "[new moniker]" ) {

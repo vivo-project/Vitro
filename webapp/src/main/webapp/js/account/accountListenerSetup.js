@@ -19,7 +19,7 @@ $(document).ready(function(){
 
     $('input').each(function() {
         if ( $(this).attr('type') != 'submit' && $(this).attr('name') != 'querytext') {
-            $(this).change(function() {
+            $(this).on("change", function() {
                 disableSubmit()
             });
             $(this).bind("propertychange", function() {
@@ -31,7 +31,7 @@ $(document).ready(function(){
         }
     });
     $('select').each(function() {
-        $(this).change(function() {
+        $(this).on("change", function() {
             disableSubmit()
         });
     });

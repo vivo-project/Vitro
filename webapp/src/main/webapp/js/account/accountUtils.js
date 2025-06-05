@@ -26,7 +26,7 @@ $(document).ready(function(){
     //Hide if javascript is enabled
     $('input[name="accounts-per-page"]').addClass('hidden');
 
-    $('.accounts-per-page').change(function() {
+    $('.accounts-per-page').on("change", function() {
         // ensure both accounts-per-page select elements are
         // set to the same value before submitting
         var selectedValue = $(this).val();

@@ -253,13 +253,13 @@ var pageManagementUtils = {
 	    });
 	    //replacing with menu management edit version which is extended with some of the logic below
 	    //This is technically content specific and should be moved into the individual processor classes somehow
-	    this.selectClassGroupDropdown.change(function() {
+	    this.selectClassGroupDropdown.on("change", function() {
             pageManagementUtils.chooseClassGroup();
         });
 
 
 
-	    this.contentTypeSelect.change( function() {
+	    this.contentTypeSelect.on("change", function() {
 	    	pageManagementUtils.handleContentTypeSelect();
 	    });
 

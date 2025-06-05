@@ -114,7 +114,7 @@ var processClassGroupDataGetterContent = {
         processClassGroupDataGetterContent.toggleClassSelection(pageContentSection);
 
     	var selectClassGroupDropdown =  pageContentSection.find("select[name='selectClassGroup']");
-    	selectClassGroupDropdown.change(function(e, el) {
+    	selectClassGroupDropdown.on("change", function(e, el) {
              processClassGroupDataGetterContent.chooseClassGroup(pageContentSection);
          });
     },

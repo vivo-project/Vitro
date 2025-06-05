@@ -55,10 +55,10 @@ var associateProfileFields = {
 
     bindEventListeners: function() {
         this.idCache = {};
-        this.externalAuthIdField.change(function() {
+        this.externalAuthIdField.on("change", function() {
             associateProfileFields.externalAuthIdFieldHasChanged();
         });
-        this.externalAuthIdField.keyup(function() {
+        this.externalAuthIdField.on("keyup", function() {
             associateProfileFields.externalAuthIdFieldHasChanged();
         });
         this.externalAuthIdField.bind("propertychange", function() {
@@ -78,7 +78,7 @@ var associateProfileFields = {
             return false;
         });
 
-        this.newProfileClassSelector.change(function() {
+        this.newProfileClassSelector.on("change", function() {
             associateProfileFields.newProfileClassHasChanged();
         });
 

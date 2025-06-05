@@ -27,7 +27,7 @@ var menuManagementEdit = {
 
            return false;
         });
-        this.selectClassGroupDropdown.change(function() {
+        this.selectClassGroupDropdown.on("change", function() {
             menuManagementEdit.chooseClassGroup();
         });
 

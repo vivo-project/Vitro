@@ -37,7 +37,7 @@
     },
 
     bindEventListeners: function() {
-        this.select.change(function() {
+        this.select.on("change", function() {
             if ( classHierarchyUtils.select.val() == "all") {
                 classHierarchyUtils.form.attr("action", "listVClassWebapps");
             }
