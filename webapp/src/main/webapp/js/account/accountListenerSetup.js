@@ -22,10 +22,10 @@ $(document).ready(function(){
             $(this).on("change", function() {
                 disableSubmit()
             });
-            $(this).bind("propertychange", function() {
+            $(this).on("propertychange", function() {
                 disableSubmit();
             });
-            $(this).bind("input", function() {
+            $(this).on('input', function() {
                 disableSubmit()
             });
         }

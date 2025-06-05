@@ -65,7 +65,7 @@ $(document).ready(function(){
     });
 
     //Select role and filter
-    $('#roleFilterUri').bind('change', function () {
+    $('#roleFilterUri').on('change', function () {
         var url = $(this).val(); // get selected value
         if (url) { // require a URL
             window.location = url; // redirect

@@ -61,10 +61,10 @@ var associateProfileFields = {
         this.externalAuthIdField.on("keyup", function() {
             associateProfileFields.externalAuthIdFieldHasChanged();
         });
-        this.externalAuthIdField.bind("propertychange", function() {
+        this.externalAuthIdField.on("propertychange", function() {
             associateProfileFields.externalAuthIdFieldHasChanged();
         });
-        this.externalAuthIdField.bind("input", function() {
+        this.externalAuthIdField.on('input', function() {
             associateProfileFields.externalAuthIdFieldHasChanged();
         });
 
