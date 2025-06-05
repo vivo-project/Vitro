@@ -22,27 +22,27 @@ var menuManagementEdit = {
     },
     bindEventListeners: function() {
         // Listeners for vClass switching
-        this.changeContentType.click(function() {
+        this.changeContentType.on("click", function() {
            menuManagementEdit.showClassGroups();
 
            return false;
         });
-        this.selectClassGroupDropdown.change(function() {
+        this.selectClassGroupDropdown.on("change", function() {
             menuManagementEdit.chooseClassGroup();
         });
 
         // Listeners for template field
-        this.defaultTemplateRadio.click(function(){
+        this.defaultTemplateRadio.on("click", function(){
             menuManagementEdit.customTemplate.addClass('hidden');
         });
-        this.customTemplateRadio.click(function(){
+        this.customTemplateRadio.on("click", function(){
             // If checked, hide this input element
             menuManagementEdit.customTemplate.removeClass('hidden');
         });
-        $("form").submit(function () {
+        $("form").on( "submit", function () {
             var validationError = menuManagementEdit.validateMenuItemForm();
             if (validationError == "") {
-                   $(this).submit();
+                   $(this).trigger("submit");
                } else{
                    $('#error-alert').removeClass('hidden');
                    $('#error-alert p').html(validationError);
@@ -74,7 +74,7 @@ var menuManagementEdit = {
     },
     toggleClassSelection: function() {
         // Check/unckeck all classes for selection
-        $('input:checkbox[name=allSelected]').click(function(){
+        $('input:checkbox[name=allSelected]').on("click", function(){
              if ( this.checked ) {
              // if checked, select all the checkboxes
              $('input:checkbox[name=classInClassGroup]').prop('checked','checked');
@@ -85,7 +85,7 @@ var menuManagementEdit = {
              }
         });
 
-        $('input:checkbox[name=classInClassGroup]').click(function(){
+        $('input:checkbox[name=classInClassGroup]').on("click", function(){
             $('input:checkbox[name=allSelected]').prop('checked', null);
         });
     },

@@ -23,7 +23,7 @@ var defaultDataPropertyUtils = {
 
     bindEventListeners: function() {
 
-        this.form.submit(function() {
+        this.form.on("submit", function() {
 			if ( defaultDataPropertyUtils.textArea.length ) {
 	            var theText = tinyMCE.get('literal').getContent();
 

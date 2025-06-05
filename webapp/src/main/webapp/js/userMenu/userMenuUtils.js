@@ -2,7 +2,7 @@
 
 $(function(){
 
-    $("ul.dropdown li").hover(function(){
+    $("ul.dropdown li").on("mouseenter", function(){
         $(this).addClass("hover");
         $('ul:first',this).css('visibility', 'visible');
         if ( $('ul.dropdown').width() > 88 ) {
@@ -10,7 +10,7 @@ $(function(){
         }
         $("ul.dropdown ul.sub_menu li:last-child").css('width', ($("ul.dropdown").width() - 14) + 'px');
 
-    }, function(){
+    }).on("mouseleave", function(){
 
         $(this).removeClass("hover");
         $('ul:first',this).css('visibility', 'hidden');

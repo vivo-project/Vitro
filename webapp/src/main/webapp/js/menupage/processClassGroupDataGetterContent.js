@@ -92,7 +92,7 @@ var processClassGroupDataGetterContent = {
 	//handler to THIS new section
 	 toggleClassSelection: function(pageContentSection) {
         // Check/unckeck all classes for selection
-        pageContentSection.find('input:checkbox[name=allSelected]').click(function(){
+        pageContentSection.find('input:checkbox[name=allSelected]').on("click", function(){
              if ( this.checked ) {
              // if checked, select all the checkboxes for this particular section
             $(this).closest("ul").find('input:checkbox[name=classInClassGroup]').prop('checked','checked');
@@ -106,7 +106,7 @@ var processClassGroupDataGetterContent = {
              }
         });
 
-        pageContentSection.find('input:checkbox[name=classInClassGroup]').click(function(){
+        pageContentSection.find('input:checkbox[name=classInClassGroup]').on("click", function(){
             $(this).closest("ul").find('input:checkbox[name=allSelected]').prop('checked', null);
         });
     },
@@ -114,7 +114,7 @@ var processClassGroupDataGetterContent = {
         processClassGroupDataGetterContent.toggleClassSelection(pageContentSection);
 
     	var selectClassGroupDropdown =  pageContentSection.find("select[name='selectClassGroup']");
-    	selectClassGroupDropdown.change(function(e, el) {
+    	selectClassGroupDropdown.on("change", function(e, el) {
              processClassGroupDataGetterContent.chooseClassGroup(pageContentSection);
          });
     },

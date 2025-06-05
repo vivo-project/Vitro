@@ -22,17 +22,17 @@
          }
          if (theForm.Username.value.length == 0 ) {
              alert("Please enter a valid Email address.");
-             theForm.Username.focus();
+             theForm.Username.trigger("focus");
              return false;
          }
         if (theForm.FirstName.value.length == 0 ) {
              alert("Please enter a First Name.");
-             theForm.FirstName.focus();
+             theForm.FirstName.trigger("focus");
              return false;
          }
          if (theForm.LastName.value.length == 0 ) {
              alert("Please enter a Last Name.");
-             theForm.LastName.focus();
+             theForm.LastName.trigger("focus");
              return false;
          }
 		 else {

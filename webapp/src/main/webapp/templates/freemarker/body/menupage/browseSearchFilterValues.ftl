@@ -58,7 +58,7 @@
     
     <script type="text/javascript">
         $('.filter-tab > ul > li').not('.li-selected').addClass('hidden-all-search-options');
-        $('.filter-tab > a').click(function() {
+        $('.filter-tab > a').on( "click", function() {
             $(this).parent().find('ul > li').not('.li-selected').toggleClass('hidden-all-search-options');
         });
     </script>

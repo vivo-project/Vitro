@@ -172,7 +172,7 @@ var customForm = {
         this.or.hide();
         this.requiredLegend.hide();
 
-        this.cancel.unbind('click');
+        this.cancel.off('click');
     },
 
     initFormFullView: function() {
@@ -189,9 +189,9 @@ var customForm = {
                 customForm.addAcHelpText($(this));
         });
 
-        this.cancel.unbind('click');
+        this.cancel.off('click');
         if (this.formSteps > 1) {
-            this.cancel.click(function() {
+            this.cancel.on("click", function() {
                 customForm.clearFormData(); // clear any input and validation errors
                 customForm.initFormTypeView();
                 customForm.clearAcSelections = true;
@@ -229,7 +229,7 @@ var customForm = {
     // that depend on the view should be initialized in the view setup method.
     bindEventListeners: function() {
 
-        this.typeSelector.change(function() {
+        this.typeSelector.on("change", function() {
             var typeVal = $(this).val();
             this.acCache = {};
 
@@ -251,22 +251,22 @@ var customForm = {
 			}
         });
 
-        this.verifyMatch.click(function() {
+        this.verifyMatch.on("click", function() {
             window.open($(this).attr('href'), 'verifyMatchWindow', 'width=640,height=640,scrollbars=yes,resizable=yes,status=yes,toolbar=no,menubar=no,location=no');
             return false;
         });
 
         // loop through all the acSelectors
         $.each(this.acSelectors, function() {
-            $(this).focus(function() {
+            $(this).on("focus", function() {
                 customForm.deleteAcHelpText($(this));
             });
-            $(this).blur(function() {
+            $(this).on("blur", function() {
                 customForm.addAcHelpText($(this));
             });
         });
 
-        this.form.submit(function() {
+        this.form.on("submit", function() {
         	//TODO: update the following
         	//custom submission for edit mode in case where existing object should not remove original object
         	//if edit mode and custom flag and original uri not equivalent to new uri, then
@@ -325,7 +325,7 @@ var customForm = {
                     },
                     complete: function(xhr, status) {
                         // Not sure why, but we need an explicit json parse here.
-                        var results = $.parseJSON(xhr.responseText);
+                        var results = JSON.parse(xhr.responseText);
                         var filteredResults = customForm.filterAcResults(results);
                         /*
                         if ( customForm.acTypes[$(selectedObj).attr('acGroupName')] == customForm.conceptClassURI ) {
@@ -531,7 +531,7 @@ var customForm = {
         $acDiv.find("a.verifyMatch").attr('href', this.baseHref + uri);
 
         $changeLink = $acDiv.find('a.changeSelection');
-        $changeLink.click(function() {
+        $changeLink.on("click", function() {
             customForm.undoAutocompleteSelection($acDiv);
         });
 

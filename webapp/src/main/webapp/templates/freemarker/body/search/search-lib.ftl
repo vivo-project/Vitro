@@ -294,7 +294,7 @@
           minLength: 3,
           select: function( event, ui ) {
             $("#filter_selected_autocomplete_${filter.id?html?js_string}").val("${filter.id?html?js_string}:" + ui.item.value);
-            $('#${form}').submit();
+            $('#${form}').trigger("submit");
           }
         } );
       } );
