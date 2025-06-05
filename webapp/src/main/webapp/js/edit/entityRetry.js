@@ -314,7 +314,7 @@ function fillList(id, data, selectedtext) {
 		theHiddenInput.name=theButtonWeWantToClick.name;
 		theHiddenInput.value=theButtonWeWantToClick.name;
 		theForm.appendChild(theHiddenInput);
-		theForm.submit();
+		theForm.trigger("submit");
 	}
 
 	function findPos(obj)

@@ -45,15 +45,15 @@
                 classHierarchyUtils.form.attr("action", "listGroups");
             }
 
-            classHierarchyUtils.form.submit();
+            classHierarchyUtils.form.trigger("submit");
         });
         this.addClass.on("click", function() {
             classHierarchyUtils.form.attr("action", "vclass_retry");
-            classHierarchyUtils.form.submit();
+            classHierarchyUtils.form.trigger("submit");
         });
         this.addGroup.on("click", function() {
             classHierarchyUtils.form.attr("action", "editForm?controller=Classgroup");
-            classHierarchyUtils.form.submit();
+            classHierarchyUtils.form.trigger("submit");
         });
 
         if ( this.displayOption == "group" ) {

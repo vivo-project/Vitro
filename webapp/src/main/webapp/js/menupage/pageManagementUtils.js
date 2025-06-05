@@ -265,7 +265,7 @@ var pageManagementUtils = {
 
 
 	    //Submission: validate as well as create appropriate hidden json inputs
-	    $("form").submit(function (event) {
+	    $("form").on("submit", function(event) {
            pageManagementUtils.handleFormSubmission(event);
          });
 
@@ -514,7 +514,7 @@ var pageManagementUtils = {
     //For binding content type specific event handlers should they exist
     bindClonedContentEventHandlers:function($newContentObj) {
     	var dataGetterProcessorObj = pageManagementUtils.getDataGetterProcessorObject($newContentObj);
-    	if($.isFunction(dataGetterProcessorObj.bindEventHandlers)) {
+    	if(typeof dataGetterProcessorObj.bindEventHandlers === "function") {
     		dataGetterProcessorObj.bindEventHandlers($newContentObj);
     	}
     	//Bind done event as the done button is within the cloned content
@@ -940,7 +940,7 @@ var pageManagementUtils = {
 	    			if(pageManagementUtils.dataGetterProcessorMap != null) {
 	    				var dataGetterProcessor = pageManagementUtils.dataGetterProcessorMap[dataGetterType];
 	    				//the content type specific processor will create the json object to be returned
-	    				if($.isFunction(dataGetterProcessor.validateFormSubmission)) {
+	    				if(typeof dataGetterProcessor.validateFormSubmission === "function") {
 	    					//Get label of page content section
 	    					var label = pageManagementUtils.getPageContentSectionLabel($(this));
 	    					validationErrorMsg += dataGetterProcessor.validateFormSubmission($(this), label);

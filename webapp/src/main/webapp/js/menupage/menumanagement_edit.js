@@ -39,10 +39,10 @@ var menuManagementEdit = {
             // If checked, hide this input element
             menuManagementEdit.customTemplate.removeClass('hidden');
         });
-        $("form").submit(function () {
+        $("form").on( "submit", function () {
             var validationError = menuManagementEdit.validateMenuItemForm();
             if (validationError == "") {
-                   $(this).submit();
+                   $(this).trigger("submit");
                } else{
                    $('#error-alert').removeClass('hidden');
                    $('#error-alert p').html(validationError);

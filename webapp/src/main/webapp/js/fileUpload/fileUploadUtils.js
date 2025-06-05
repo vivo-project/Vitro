@@ -56,6 +56,6 @@ function uploadFileRequest(node){
 }
 
 function onFileSelect(e) {
-	e.target.parentElement.submit();
+	e.target.parentElement.trigger("submit");
 	}
 

@@ -13,7 +13,7 @@
 
     bindEventListeners: function() {
         this.select.change(function() {
-        	fauxPropertiesListingUtils.theForm.submit();
+        	fauxPropertiesListingUtils.theForm.trigger("submit");
         });
 	}
 }

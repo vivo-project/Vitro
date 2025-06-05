@@ -67,12 +67,12 @@ var objectPropHierarchyUtils = {
                 else {
                     objectPropHierarchyUtils.form.attr("action", "listPropertyGroups");
                 }
-                objectPropHierarchyUtils.form.submit();
+                objectPropHierarchyUtils.form.trigger("submit");
             });
 
             this.addProperty.on("click", function() {
                 objectPropHierarchyUtils.form.attr("action", "editForm?controller=Property");
-                objectPropHierarchyUtils.form.submit();
+                objectPropHierarchyUtils.form.trigger("submit");
             });
         }
         else  {
@@ -86,7 +86,7 @@ var objectPropHierarchyUtils = {
                 else {
                     objectPropHierarchyUtils.form.attr("action", "listPropertyGroups");
                 }
-                objectPropHierarchyUtils.form.submit();
+                objectPropHierarchyUtils.form.trigger("submit");
             });
 
             this.addProperty.on("click", function() {
