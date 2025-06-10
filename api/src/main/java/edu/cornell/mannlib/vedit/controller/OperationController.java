@@ -165,7 +165,7 @@ public class OperationController extends BaseEditController {
             notifyChangeListeners(epo, action);
 
             if (newObj instanceof ApplicationBean) {
-                SiteBrandingController.updatethemeBrandingCache(((ApplicationBean) newObj).getThemeDir());
+                SiteBrandingController.updateThemeBrandingCache(((ApplicationBean) newObj).getThemeDir());
             }
 
             /* send the user somewhere */

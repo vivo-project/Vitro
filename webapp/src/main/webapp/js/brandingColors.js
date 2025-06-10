@@ -334,7 +334,7 @@ $(document).ready(function(){
                 dataType: 'json',
                 type: 'POST',
                 data: {
-                    action: "removeall",
+                    action: "remove-all",
                 },
                 complete: function(xhr, status) {
                     alert('Color scheme reset successfully.');

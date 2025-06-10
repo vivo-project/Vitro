@@ -491,28 +491,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
         return map;
     }
 
-    private Map<String, String> getBrandingColors(String currentTheme) {
-        ContextModelAccess cma = ModelAccess.getInstance();
-        OntModel displayModel = cma.getOntModel(ModelNames.DISPLAY);
-
-        Resource s = ResourceFactory.createResource(VitroVocabulary.vitroURI + currentTheme);
-        StmtIterator iter = displayModel.listStatements(s, null, (RDFNode) null);
-
-        Map<String, String> colorParams = new HashMap<>();
-
-        while (iter.hasNext()) {
-            Statement stmt = iter.nextStatement();
-            Property property = stmt.getPredicate();
-            RDFNode object = stmt.getObject();
-
-            if (object.isLiteral()) {
-                String propertyName = property.getURI().contains("#") ? property.getURI().split("#")[1] : property.getURI();
-                colorParams.put(propertyName, object.asLiteral().getString());
-            }
-        }
-        return  colorParams;
-    }
-
     private String normalizeServletName(String name) {
         // Return a uniform value for the home page.
         // Note that if servletName is "index.jsp", it must be the home page,

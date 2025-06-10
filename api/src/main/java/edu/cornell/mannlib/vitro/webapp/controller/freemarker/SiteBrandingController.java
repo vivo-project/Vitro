@@ -2,54 +2,50 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
+import edu.cornell.mannlib.vitro.webapp.controller.edit.ReorderController;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
-import org.apache.jena.atlas.json.JsonObject;
-
-import org.apache.jena.rdf.model.*;
-
-import org.apache.jena.rdf.model.impl.StatementImpl;
-
-
-import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.ontology.OntModel;
-
-
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
-
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
-import edu.cornell.mannlib.vitro.webapp.controller.edit.ReorderController;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.rdf.model.impl.StatementImpl;
 
 /**
  * Handle adding, replacing or deleting the custom css file.
  */
-@WebServlet(name = "SiteStyleController", urlPatterns = { "/siteBranding" })
+@WebServlet(name = "SiteStyleController", urlPatterns = {"/siteBranding"})
 public class SiteBrandingController extends VitroAjaxController {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(ReorderController.class);
 
     public static boolean themeBrandingLoaded = false;
-	public static Map<String, String> themeBranding = null;
+    public static Map<String, String> themeBranding = null;
 
-	@Override
+    @Override
     protected AuthorizationRequest requiredActions(VitroRequest vreq) {
-    	// return SimplePermission.SEE_SITE_ADMIN_PAGE.ACTION;
+        // return SimplePermission.SEE_SITE_ADMIN_PAGE.ACTION;
         return SimplePermission.PAGE_VIEWABLE_PUBLIC.ACTION;
 
     }
@@ -68,7 +64,8 @@ public class SiteBrandingController extends VitroAjaxController {
                 break;
 
             default:
-                response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "Only GET and POST methods are supported");
+                response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED,
+                    "Only GET and POST methods are supported");
         }
     }
 
@@ -80,7 +77,7 @@ public class SiteBrandingController extends VitroAjaxController {
                 updateBrandingColor(vreq, response);
                 break;
 
-            case "removeall":
+            case "remove-all":
                 removeAllBrandingColors(vreq, response);
                 response.setStatus(HttpServletResponse.SC_OK);
                 break;
@@ -93,7 +90,7 @@ public class SiteBrandingController extends VitroAjaxController {
         if (currentTheme == null) {
             currentTheme = getCurrentTheme(vreq);
         }
-        updatethemeBrandingCache(currentTheme);
+        updateThemeBrandingCache(currentTheme);
     }
 
     private void listBrandingColors(VitroRequest vreq, HttpServletResponse response) {
@@ -120,7 +117,6 @@ public class SiteBrandingController extends VitroAjaxController {
         ContextModelAccess cma = ModelAccess.getInstance();
         OntModel displayModel = cma.getOntModel(ModelNames.DISPLAY);
 
-        
 
         Resource s = ResourceFactory.createResource(VitroVocabulary.vitroURI + theme);
         StmtIterator iter = displayModel.listStatements(s, null, (RDFNode) null);
@@ -132,26 +128,34 @@ public class SiteBrandingController extends VitroAjaxController {
             RDFNode object = stmt.getObject();
 
             if (object.isLiteral()) {
-                String propertyName = property.getURI().contains("#") ? property.getURI().split("#")[1] : property.getURI();
+                String propertyName =
+                    property.getURI().contains("#") ? property.getURI().split("#")[1] : property.getURI();
                 brandingColors.put(propertyName, object.asLiteral().getString());
             }
         }
 
         return brandingColors;
     }
-    
 
-    private void updateBrandingColor(VitroRequest vreq, HttpServletResponse response) {
-        ContextModelAccess cma = ModelAccess.getInstance();
-        OntModel displayModel = cma.getOntModel(ModelNames.DISPLAY);
 
+    private String getRequestTheme(VitroRequest vreq) {
         String currentTheme = vreq.getParameter("theme");
         if (currentTheme == null) {
             currentTheme = getCurrentTheme(vreq);
         }
+        return currentTheme;
+    }
 
+    private OntModel getDisplayModel() {
+        ContextModelAccess cma = ModelAccess.getInstance();
+        return cma.getOntModel(ModelNames.DISPLAY);
+    }
+
+    private void updateBrandingColor(VitroRequest vreq, HttpServletResponse response) {
+        String currentTheme = getRequestTheme(vreq);
+        OntModel displayModel = getDisplayModel();
         Resource themeResource = ResourceFactory.createResource(VitroVocabulary.vitroURI + currentTheme);
-    
+
         Map<String, String> colorParams = new HashMap<>();
         colorParams.put(VitroVocabulary.PORTAL_THEMEPRIMARYCOLOR, vreq.getParameter("themePrimaryColor"));
         colorParams.put(VitroVocabulary.PORTAL_THEMEPRIMARYCOLORLIGHTER, vreq.getParameter("themePrimaryColorLighter"));
@@ -161,7 +165,7 @@ public class SiteBrandingController extends VitroAjaxController {
         colorParams.put(VitroVocabulary.PORTAL_THEMELINKCOLOR, vreq.getParameter("themeLinkColor"));
         colorParams.put(VitroVocabulary.PORTAL_THEMETEXTCOLOR, vreq.getParameter("themeTextColor"));
         colorParams.put(VitroVocabulary.PORTAL_THEMEBANNERCOLOR, vreq.getParameter("themeBannerColor"));
-    
+
         for (Map.Entry<String, String> entry : colorParams.entrySet()) {
             String propertyUri = entry.getKey();
             String value = entry.getValue();
@@ -170,8 +174,9 @@ public class SiteBrandingController extends VitroAjaxController {
             if (value != null) {
                 displayModel.removeAll(themeResource, property, null);
 
-                if ( !value.isEmpty() && !value.equals("null")) {
-                    Statement statement = new StatementImpl(themeResource, property, ResourceFactory.createTypedLiteral(value));
+                if (!value.isEmpty() && !value.equals("null")) {
+                    Statement statement =
+                        new StatementImpl(themeResource, property, ResourceFactory.createTypedLiteral(value));
                     displayModel.add(statement);
                 }
             }
@@ -182,14 +187,8 @@ public class SiteBrandingController extends VitroAjaxController {
 
 
     private void removeAllBrandingColors(VitroRequest vreq, HttpServletResponse response) {
-        ContextModelAccess cma = ModelAccess.getInstance();
-        OntModel displayModel = cma.getOntModel(ModelNames.DISPLAY);
-
-        String currentTheme = vreq.getParameter("theme");
-        if (currentTheme == null) {
-            currentTheme = getCurrentTheme(vreq);
-        }
-
+        String currentTheme = getRequestTheme(vreq);
+        OntModel displayModel = getDisplayModel();
         Resource themeResource = ResourceFactory.createResource(VitroVocabulary.vitroURI + currentTheme);
 
         Property[] propertiesToRemove = {
@@ -209,24 +208,24 @@ public class SiteBrandingController extends VitroAjaxController {
 
         listBrandingColors(vreq, response);
     }
-    
+
 
     public static String getCurrentTheme(VitroRequest vreq) {
         WebappDaoFactory wadf = ModelAccess.on(vreq).getWebappDaoFactory();
         return wadf.getApplicationDao().getApplicationBean().getThemeDir();
     }
 
-    public static void updatethemeBrandingCache(String theme) {
-		themeBranding = getBrandingColors(theme);
-		themeBrandingLoaded = true;
-	}
+    public static void updateThemeBrandingCache(String theme) {
+        themeBranding = getBrandingColors(theme);
+        themeBrandingLoaded = true;
+    }
 
 
-	public static Map<String, String> getThemeBrandingCache(String theme) {
-		if (themeBrandingLoaded == false) {
-			updatethemeBrandingCache(theme);
-		}
-		return themeBranding;
-	}
+    public static Map<String, String> getThemeBrandingCache(String theme) {
+        if (!themeBrandingLoaded) {
+            updateThemeBrandingCache(theme);
+        }
+        return themeBranding;
+    }
 
 }

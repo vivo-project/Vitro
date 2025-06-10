@@ -49,9 +49,8 @@
 
     async function onSave(e) {
         if (openThemeEditorOnSave) {
-            e.preventDefault();
             await openEditor();
-            e.target.form.submit();
+            openThemeEditorOnSave = false;
         }
     }
 
