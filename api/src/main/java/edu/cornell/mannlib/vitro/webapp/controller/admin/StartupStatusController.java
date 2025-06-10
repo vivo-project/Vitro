@@ -7,6 +7,7 @@ import java.util.Map;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -40,7 +41,7 @@ public class StartupStatusController extends FreemarkerHttpServlet {
 	}
 
 	private String getContextPath() {
-		String cp = getServletContext().getContextPath();
+		String cp = ContextPath.getPath(getServletContext());
 		if ((cp == null) || cp.isEmpty()) {
 			return "The application";
 		} else {
