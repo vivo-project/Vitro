@@ -25,7 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 
 public class ApplicationBeanRetryController extends BaseEditController {
 
@@ -91,6 +91,7 @@ public class ApplicationBeanRetryController extends BaseEditController {
         request.setAttribute("title","Site Information");
         request.setAttribute("_action",action);
         request.setAttribute("unqualifiedClassName","ApplicationBean");
+        request.setAttribute("i18n", I18n.bundle(request));
 
         request.setAttribute("updateLogoUrl", UrlBuilder.getUrl("site-branding-logo"));
         setRequestAttributes(request,epo);

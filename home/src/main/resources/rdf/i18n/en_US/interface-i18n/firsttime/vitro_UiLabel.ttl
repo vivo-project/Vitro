@@ -6046,6 +6046,14 @@ uil-data:save_changes.Vitro
         uil:hasKey      "save_changes" ;
         uil:hasPackage  "Vitro-languages" .
 
+uil-data:back.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Back"@en-US ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "back" ;
+        uil:hasPackage  "Vitro-languages" .
+
 uil-data:cant_activate_while_logged_in.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
@@ -6931,3 +6939,114 @@ uil-data:there_are_no_results_to_display.Vitro
         uil:hasKey       "there_are_no_results_to_display" ;
         uil:hasPackage   "Vitro-languages" .
 
+uil-data:branding_colors_submit_alert.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Color scheme changes submitted."@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "branding_colors_submit_alert" .
+
+uil-data:branding_colors_cancel_alert.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Color scheme changes canceled."@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "branding_colors_cancel_alert" .
+
+uil-data:branding_colors_reset_alert.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Color scheme reset successfully."@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "branding_colors_reset_alert" .
+
+uil-data:branding_colors_error_fetch_config.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Failed to load default theme pallete. Please check if 'theme-config.json' file exists and is accessible."@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "branding_colors_error_fetch_config" .
+
+uil-data:branding_colors_error_format_config.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "The theme configuration file is not in the expected format. Please verify its structure."@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "branding_colors_error_fetch_config" .
+
+uil-data:branding_colors_error_unexpected_config.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "An unexpected error occurred while loading the theme configuration. Please verify its structure."@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "branding_colors_error_fetch_config" .
+
+uil-data:branding_colors_open_after_save.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "The editor will open once you save your changes."@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "branding_colors_open_after_save" .
+
+uil-data:branding_colors_modified.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Theme colors is modified"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "branding_colors_modified" .
+
+uil-data:change_branding_colors_link.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Change theme branding colors"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "change_branding_colors_link" .
+
+uil-data:change_logo_link.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Change logo"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "change_logo_link" .
+
+uil-data:branding_logo_title.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Logo Configuration"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "branding_logo_title" .
+
+uil-data:desktop_logo.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Desktop Logo"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "desktop_logo" .
+
+uil-data:desktop_logo_preview.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Desktop Logo Preview"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "desktop_logo_preview" .
+
+uil-data:mobile_logo.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Mobile Logo"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "mobile_logo" .
+
+uil-data:mobile_logo_preview.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Mobile Logo Preview"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "mobile_logo_preview" .
+
+uil-data:reset.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Reset"@en-US ;
+        uil:hasApp       "VitRro" ;
+        uil:hasKey       "reset" .

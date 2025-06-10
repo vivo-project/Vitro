@@ -39,14 +39,14 @@
         <select id="ThemeDir" name="ThemeDir">
             <form:option name="ThemeDir" />
         </select>
-        <span id="themeChangeIndicator" style="display: none;" class="note">Theme colors is modified</span>
+        <span id="themeChangeIndicator" style="display: none;" class="note">${i18n.text('branding_colors_modified')}</span>
         <br />
-        <a id="changeColorsButton" href="#">Change theme branding colors</a>
+        <a id="changeColorsButton" href="#">${i18n.text('change_branding_colors_link')}</a>
         <br>
 
 
         <br>
-        <a href="${updateLogoUrl}">Change logo</a>
+        <a href="${updateLogoUrl}">${i18n.text('change_logo_link')}</a>
         <br>
 
         <br>

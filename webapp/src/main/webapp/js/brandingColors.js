@@ -1,5 +1,6 @@
 /* $This file is distributed under the terms of the license in LICENSE$ */
 
+$.extend(this, globalI18nStrings);
 
 const colorNameConvertor = {
     "primary-lighter": "themePrimaryColorLighter",
@@ -311,7 +312,7 @@ $(document).ready(function(){
                     themeBannerColor: data.colors["themeBannerColor"] || null,
                 },
                 complete: function(xhr, status) {
-                    alert('Color scheme changes submitted.');
+                    alert(globalI18nStrings.brandingColorsSubmitAlert);
                     var location = getSchemaData().lastUrl;
                     localStorage.removeItem('colorSchemeEditor');
                     window.location.href = location;
@@ -321,7 +322,7 @@ $(document).ready(function(){
         });
 
         $cancelButton.click(function() {
-            alert('Color scheme changes canceled.');
+            alert(globalI18nStrings.brandingColorsCancelAlert);
             var location = getSchemaData().lastUrl;
             localStorage.removeItem('colorSchemeEditor');
             window.location.href = location;
@@ -337,7 +338,7 @@ $(document).ready(function(){
                     action: "remove-all",
                 },
                 complete: function(xhr, status) {
-                    alert('Color scheme reset successfully.');
+                    alert(globalI18nStrings.brandingColorsResetAlert);
                     var location = getSchemaData().lastUrl;
                     localStorage.removeItem('colorSchemeEditor');
                     window.location.href = location;

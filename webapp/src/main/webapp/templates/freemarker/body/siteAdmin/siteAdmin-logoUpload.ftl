@@ -1,40 +1,40 @@
 <div class="logo-upload-container">
-    <h2>Logo Configuration</h2>
+    <h2>${i18n().branding_logo_title}</h2>
 
     <form id="logoUploadForm" action="${actionUpload}" enctype="multipart/form-data" method="post" role="form">
         <!-- Desktop Logo Section -->
         <div class="logo-section">
-            <label class="logo-label">Desktop Logo</label>
+            <label class="logo-label">${i18n().desktop_logo}</label>
             <div class="logo-preview">
-                <img id="portalLogoPreview" src="${logoUrl!}" alt="Desktop Logo Preview"
+                <img id="portalLogoPreview" src="${logoUrl!}" alt="${i18n().desktop_logo_preview}"
                 style="${logoUrl?has_content?then('display: block;', '')}" />
             </div>
             <div class="logo-controls">
                 <input type="hidden" id="portalLogoActionInput" name="portalLogoAction" value="keep" />
                 <input type="file" name="portalLogo" accept="image/*" id="portalLogoInput" />
-                <button type="button" id="portalLogoResetButton">Reset</button>
+                <button type="button" id="portalLogoResetButton">${i18n().reset}</button>
             </div>
         </div>
 
         <!-- Mobile Logo Section -->
         <div class="logo-section">
-            <label class="logo-label">Mobile Logo</label>
+            <label class="logo-label">${i18n().mobile_logo}</label>
             <div class="logo-preview">
-                <img id="mobilePortalLogoPreview" src="${logoSmallUrl!}" alt="Mobile Logo Preview"
+                <img id="mobilePortalLogoPreview" src="${logoSmallUrl!}" alt="${i18n().mobile_logo_preview}"
                     style="${logoSmallUrl?has_content?then('display: block;', '')}" />
             </div>
 
             <div class="logo-controls">
                 <input type="hidden" id="mobilePortalLogoActionInput" name="mobilePortalLogoAction" value="keep" />
                 <input type="file" name="mobilePortalLogo" accept="image/*" id="mobilePortalLogoInput" />
-                <button type="button" id="mobilePortalLogoResetButton">Reset</button>
+                <button type="button" id="mobilePortalLogoResetButton">${i18n().reset}</button>
             </div>
         </div>
 
 
         <div class="button-group">
-            <a href="${backLocation}" class="button">Back</a>
-            <input class="submit" type="submit" value="Save Changes" />
+            <a href="${backLocation}" class="button">${i18n().back}</a>
+            <input class="submit" type="submit" value="${i18n().save_changes}" />
         </div>
 
     </form>

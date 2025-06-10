@@ -5,7 +5,6 @@
         return confirm(msg);
     }
     
-
     var oldTheme = null;
     var themeChanged = false;
     var openThemeEditorOnSave = false;
@@ -30,7 +29,6 @@
                 document.getElementById('themeChangeIndicator').style.display = 'none'; 
             }
 
-            console.log(colors);
         }).fail(function(error) {
             console.error('Error loading colors:', error);
         });
@@ -59,9 +57,7 @@
             .then((response) => {
                 if (!response.ok) {
                     console.error("Error fetching theme-config.json");
-                    alert(
-                        "Failed to load default theme pallete. Please check if 'theme-config.json' file exists and is accessible."
-                    );
+                    alert(globalI18nStrings.brandingColorsErrorFetchConfig);
                     
                     return null;
                 }
@@ -74,15 +70,14 @@
                     !data.defaultBrandingColors
                 ) {
                     console.error("Invalid theme-config.json format");
-                    alert("The theme configuration file is not in the expected format. Please verify its structure.");
+                    alert(globalI18nStrings.brandingColorsErrorFormatConfig);
                     return null;
                 }
-                console.log("Theme Config JSON:", data);
                 return data.defaultBrandingColors;
             })
             .catch((error) => {
                 console.error("Error fetching theme-config.json:", error);
-                alert("An unexpected error occurred while loading the theme configuration. Please verify its structure.");
+                alert(globalI18nStrings.brandingColorsErrorUnexpectedConfig);
             });
     } 
 
@@ -124,7 +119,7 @@
                     storedData.enabled = false;
                     openThemeEditorOnSave = true;
                     localStorage.setItem('colorSchemeEditor', JSON.stringify(storedData));
-                    alert("The editor will open once you save your changes.");
+                    alert(globalI18nStrings.brandingColorsOpenAfterSave);
                 } else {
                     window.location.href = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
                 }
