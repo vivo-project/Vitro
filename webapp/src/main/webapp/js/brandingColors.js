@@ -1,8 +1,6 @@
 /* $This file is distributed under the terms of the license in LICENSE$ */
 
 
-let theme = "themes/vitro/";
-
 const colorNameConvertor = {
     "primary-lighter": "themePrimaryColorLighter",
     "primary-base": "themePrimaryColor",
@@ -139,18 +137,11 @@ $(document).ready(function(){
         loadDateFromLocalStorage();
     }
 
-    function loadTheme() {
-        let data = getSchemaData();
-        theme = data.theme || "themes/vitro/";
-    }
-
     function initColors() {
-        loadTheme();
         Object.keys(colorPallete).forEach(function(color) {
             resetColor(color);
         });
     }
-
 
     // Creating the editor
     function renderEditor() {
