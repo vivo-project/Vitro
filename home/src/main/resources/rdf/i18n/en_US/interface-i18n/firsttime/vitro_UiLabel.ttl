@@ -6931,3 +6931,50 @@ uil-data:there_are_no_results_to_display.Vitro
         uil:hasKey       "there_are_no_results_to_display" ;
         uil:hasPackage   "Vitro-languages" .
 
+uil-data:back.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Back"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "back" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:site_styles.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Site Styles"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "site_styles" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:cutom_css_style.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Custom CSS Style"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "cutom_css_style" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:remove_custom_css.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Remove Custom CSS"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "remove_custom_css" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:download_custom_css.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Download Custom CSS"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "download_custom_css" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:upload_new_css.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Upload new css file"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "upload_new_css" ;
+        uil:hasPackage   "Vitro-languages" .

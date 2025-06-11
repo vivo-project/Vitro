@@ -1,21 +1,21 @@
 <div>
-    <h2>Site Styles</h2>
+    <h2>${i18n().site_styles}</h2>
 
 
-   <h3>Custom CSS Style</h3>
+   <h3>${i18n().cutom_css_style}</h3>
 
    <#if customCssPath?? && customCssPath != "null">
        <button
        style="font-weight: normal !important; color: white !important; background-color: #b40000 !important; font-size: 16px !important; display: inline !important; visibility: visible !important; opacity: 1 !important; z-index: 10 !important; width: 201px !important; height: 31px !important;"
-        id="resetAction" type="button" class="button red" onclick="resetStyles()">Remove Custom CSS</button>
-       <a href="${customCssPath}" download="custom.css" class="button blue">Download Custom CSS</a>
+        id="resetAction" type="button" class="button red" onclick="resetStyles()">${i18n().remove_custom_css}</button>
+       <a href="${customCssPath}" download="custom.css" class="button blue">${i18n().download_custom_css}</a>
    </#if>
    <form action="${actionUpload}" method="post" enctype="multipart/form-data">
-       <label for="fileUpload" class="">Upload new css file</label>
+       <label for="fileUpload" class="">${i18n().upload_new_css}</label>
        <input type="file" id="fileUpload" name="fileUpload" accept=".css" class="form-item">
        <div class="button-group">
-           <a href="${backLocation}" class="button">Back</a>
-           <button id="primaryAction" type="submit" class="button green">Upload</button>
+           <a href="${backLocation}" class="button">${i18n().back}</a>
+           <button id="primaryAction" type="submit" class="button green">${i18n().file_upload_submit_label}</button>
        </div>
    </form>
 
