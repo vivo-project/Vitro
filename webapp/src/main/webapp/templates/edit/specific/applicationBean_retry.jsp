@@ -41,7 +41,7 @@
         </select>
 
         <br><br>
-        <a href="${siteStyleUrl}">${i18n().customize_css_link}</a>
+        <a href="${siteStyleUrl}">${i18n.text('customize_css_link')}</a>
         <br><br>
 
         <label>Copyright text<span class="note"> used in footer (e.g., name of your institution)</span></label>

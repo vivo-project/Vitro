@@ -6,7 +6,6 @@
 
    <#if customCssPath?? && customCssPath != "null">
        <button
-       style="font-weight: normal !important; color: white !important; background-color: #b40000 !important; font-size: 16px !important; display: inline !important; visibility: visible !important; opacity: 1 !important; z-index: 10 !important; width: 201px !important; height: 31px !important;"
         id="resetAction" type="button" class="button red" onclick="resetStyles()">${i18n().remove_custom_css}</button>
        <a href="${customCssPath}" download="custom.css" class="button blue">${i18n().download_custom_css}</a>
    </#if>
@@ -38,6 +37,8 @@
             }
 
             let currentElement = element;
+            currentElement.style.setProperty("color", "white", "important");
+            currentElement.style.setProperty("background-color", "#b40000", "important");
             let shoudlContinue = true;
             while (currentElement && shoudlContinue) {
                 currentElement.style.setProperty("display", "inline", "important");
@@ -47,14 +48,14 @@
 
                 const rect = currentElement.getBoundingClientRect();
                 if (rect.width < 150 || rect.height < 25) {
-                    currentElement.style.width = '200px';
-                    currentElement.style.height = '30px';
+                    currentElement.style.setProperty("width", "200px", "important");
+                    currentElement.style.setProperty("height", "30px", "important");
                     shoudlContinue = true;
                 }
                 if (rect.top < 0 || rect.left < 0 || rect.bottom > window.innerHeight || rect.right > window.innerWidth) {
-                    currentElement.style.position = 'absolute';
-                    currentElement.style.top = '0';
-                    currentElement.style.left = '0';
+                    currentElement.style.setProperty("position", "absolute", "important");
+                    currentElement.style.setProperty("top", "0", "important");
+                    currentElement.style.setProperty("left", "0", "important");
                     shoudlContinue = true;
                 }
                 currentElement = currentElement.parentElement;
