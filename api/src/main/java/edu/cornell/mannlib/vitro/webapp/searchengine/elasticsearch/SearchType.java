@@ -8,5 +8,6 @@ public enum SearchType {
     PREFIX,
     WILDCARD,
     EXISTS,
-    MATCH_ALL
+    MATCH_ALL,
+    REGEXP
 }

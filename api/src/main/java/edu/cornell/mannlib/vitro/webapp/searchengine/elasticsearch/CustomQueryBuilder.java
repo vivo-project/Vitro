@@ -8,6 +8,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.PrefixQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.RangeQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.RegexpQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.WildcardQuery;
 
 public class CustomQueryBuilder {
@@ -42,8 +43,8 @@ public class CustomQueryBuilder {
                 String[] values = value.split("TO");
                 return RangeQuery.of(m -> m
                     .field(field)
-                    .from(values[0])
-                    .to(values[1])
+                    .from(values[0].replace("[", "").trim())
+                    .to(values[1].replace("]", "").trim())
                 )._toQuery();
             case EXISTS:
                 return ExistsQuery.of(m -> m
@@ -51,6 +52,20 @@ public class CustomQueryBuilder {
                 )._toQuery();
             case MATCH_ALL:
                 return MatchAllQuery.of(m -> m)._toQuery();
+            case REGEXP:
+                String regexpValue;
+
+                boolean isSolrRegexpSpecification = value.startsWith("/") && value.endsWith("/") && value.length() > 1;
+                if (isSolrRegexpSpecification) {
+                    regexpValue = value.substring(1, value.length() - 1);
+                } else {
+                    regexpValue = value;
+                }
+
+                return RegexpQuery.of(m -> m
+                    .field(field)
+                    .value(regexpValue)
+                )._toQuery();
             case WILDCARD:
                 if (field.trim().equals("*")) {
                     return MatchAllQuery.of(m -> m)._toQuery();
@@ -58,7 +73,7 @@ public class CustomQueryBuilder {
 
                 return WildcardQuery.of(m -> m
                     .field(field)
-                    .value(value)
+                    .value(value.replace(".*", "*"))
                 )._toQuery();
             default:
                 return MatchPhraseQuery.of(m -> m

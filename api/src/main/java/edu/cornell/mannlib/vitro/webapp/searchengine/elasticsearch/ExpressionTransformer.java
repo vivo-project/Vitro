@@ -76,7 +76,7 @@ public class ExpressionTransformer {
         if (value.startsWith("\"") && value.endsWith("\"")) {
             searchType = SearchType.PHRASE;
         } else if (value.contains("TO") && !value.equals("TO")) {
-            if (value.equals("[*TO*]")) {
+            if (value.replace(" ", "").equals("[*TO*]")) {
                 searchType = SearchType.EXISTS;
             } else {
                 searchType = SearchType.RANGE;
@@ -84,6 +84,8 @@ public class ExpressionTransformer {
         } else if (field.contains("*") || value.contains("*")) {
             if (field.trim().equals("*")) {
                 searchType = SearchType.MATCH_ALL;
+            } else if (value.startsWith("/") && value.endsWith("/") && value.length() > 1) {
+                searchType = SearchType.REGEXP;
             } else {
                 searchType = SearchType.WILDCARD;
             }
