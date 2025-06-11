@@ -51,9 +51,6 @@ public class ApplicationBean {
     private String    copyrightAnchor;
     private String    themeDir;
 
-    private String    logoUrl;
-    private String    logoSmallUrl;
-
     public String toString() {
         String output = "Application Bean Contents:\n";
         output += "  initialized from DB:    [" + initialized             + "]\n";
@@ -125,14 +122,6 @@ public class ApplicationBean {
 		themeDir = string_val;
 	}
 
-    public void setLogoUrl(String string_val) {
-        logoUrl = string_val;
-    }
-
-    public void setLogoSmallUrl(String string_val) {
-        logoSmallUrl = string_val;
-    }
-
     /*************************** GET functions ****************************/
 
     public String getIndividualUri() {
@@ -185,14 +174,6 @@ public class ApplicationBean {
 
     public String getCopyrightAnchor() {
         return copyrightAnchor;
-    }
-
-    public String getLogoUrl() {
-        return logoUrl;
-    }
-
-    public String getLogoSmallUrl() {
-        return logoSmallUrl;
     }
 
     // TODO deprecate or remove the following three legacy methods?

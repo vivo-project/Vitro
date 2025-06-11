@@ -56,9 +56,6 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	public static final int THUMBNAIL_HEIGHT = 200;
 	public static final int THUMBNAIL_WIDTH = 200;
 
-	public static final int THUMBNAIL_LOGO_HEIGHT = 300;
-	public static final int THUMBNAIL_LOGO_WIDTH = 1000;
-
 	/** The form field that tells what we are doing: uploading? deleting? */
 	public static final String PARAMETER_ACTION = "action";
 
