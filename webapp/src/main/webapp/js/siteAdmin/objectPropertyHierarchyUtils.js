@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in LICENSE$ */
 
-    var objectPropHierarchyUtils = {
+var objectPropHierarchyUtils = {
     onLoad: function(urlBase,displayOption,type) {
         $.extend(this, i18nStrings);
         this.imagePath = urlBase + "/images/";
@@ -57,7 +57,7 @@
 
     bindEventListeners: function() {
         if ( this.propType == "object" ) {
-            this.select.change(function() {
+            this.select.on("change", function() {
                 if ( objectPropHierarchyUtils.select.val() == "all" ) {
                     objectPropHierarchyUtils.form.attr("action", "listPropertyWebapps");
                 }
@@ -67,16 +67,16 @@
                 else {
                     objectPropHierarchyUtils.form.attr("action", "listPropertyGroups");
                 }
-                objectPropHierarchyUtils.form.submit();
+                objectPropHierarchyUtils.form.trigger("submit");
             });
 
-            this.addProperty.click(function() {
+            this.addProperty.on("click", function() {
                 objectPropHierarchyUtils.form.attr("action", "editForm?controller=Property");
-                objectPropHierarchyUtils.form.submit();
+                objectPropHierarchyUtils.form.trigger("submit");
             });
         }
         else  {
-            this.select.change(function() {
+            this.select.on("change", function() {
                 if ( objectPropHierarchyUtils.select.val() == "all" ) {
                     objectPropHierarchyUtils.form.attr("action", "listDatatypeProperties");
                 }
@@ -86,16 +86,16 @@
                 else {
                     objectPropHierarchyUtils.form.attr("action", "listPropertyGroups");
                 }
-                objectPropHierarchyUtils.form.submit();
+                objectPropHierarchyUtils.form.trigger("submit");
             });
 
-            this.addProperty.click(function() {
+            this.addProperty.on("click", function() {
                 objectPropHierarchyUtils.form.attr("action", "editForm?controller=Dataprop");
-                objectPropHierarchyUtils.form.submit();
+                objectPropHierarchyUtils.form.trigger("submit");
             });
         }
         if ( this.propType == "group" ) {
-            this.expandAll.click(function() {
+            this.expandAll.on("click", function() {
 
                 if ( objectPropHierarchyUtils.expandAll.text() == i18nStrings.hideProperties ) {
                     $('td.subclassCell').parent('tr').hide();
@@ -232,7 +232,7 @@
 
         var $clickableHeader = $('section#classContainer' + ctr).find('span.headerSpanPlus');
 
-        $clickableHeader.click(function() {
+        $clickableHeader.on("click", function() {
             if ( $clickableHeader.attr('view') == "less" ) {
                 $clickableHeader.addClass("headerSpanMinus");
                 $('table#classHierarchy' + ctr).find('span.subclassExpandPlus').addClass("subclassExpandMinus");
@@ -254,7 +254,7 @@
             var $clickableSpan = $('section#container').find('span#' + currentSpan);
             var $subclassTable = $('section#container').find('table#subclassTable' + currentSpan.replace("subclassExpand",""));
 
-            $clickableSpan.click(function() {
+            $clickableSpan.on("click", function() {
                 if ( $subclassTable.is(':visible') ) {
                     $subclassTable.hide();
                     $subclassTable.find('table.subclassTable').hide();
@@ -270,7 +270,7 @@
     },
 
     wireExpandLink: function() {
-        this.expandAll.click(function() {
+        this.expandAll.on("click", function() {
             if ( objectPropHierarchyUtils.expandAll.text() == i18nStrings.expandAll ) {
                 objectPropHierarchyUtils.expandAll.text(i18nStrings.collapseAll);
                 $('span.headerSpanPlus').addClass("headerSpanMinus");

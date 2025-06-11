@@ -5,13 +5,13 @@ $("input:radio").on("click",function (e) {
     } else {
         input.prop("checked",true);
     }
-    $('#' + searchFormId).submit();
+    $('#' + searchFormId).trigger("submit");
 });
 
 $("input:checkbox").on("click",function (e) {
     var input=$(this);
     input.checked = !input.checked;
-    $('#' + searchFormId).submit();
+    $('#' + searchFormId).trigger("submit");
 });
 
 function clearInput(event, elementId) {
@@ -25,7 +25,7 @@ function clearInput(event, elementId) {
       let inputEl = inputElements[0];
       inputEl.value = "";
       event.target.classList.add("unchecked-selected-search-input-label");
-      $('#' + searchFormId).submit();
+      $('#' + searchFormId).trigger("submit");
 }
 
 function createSliders(){
@@ -37,10 +37,10 @@ function createSliders(){
         $(this)[0].setPointerCapture(e.pointerId);
     });
     $(".noUi-handle").on("mouseup", function (e) {
-        $('#' + searchFormId).submit();
+        $('#' + searchFormId).trigger("submit");
     });
     $(".noUi-handle").on("pointerup", function (e) {
-        $('#' + searchFormId).submit();
+        $('#' + searchFormId).trigger("submit");
     });
 };
     
@@ -89,7 +89,7 @@ window.onload = (event) => {
       createSliders();
 };
 
-$('#' + searchFormId).submit(function () {
+$('#' + searchFormId).on("submit", function() {
 $('#' + searchFormId)
     .find('input')
     .filter(function () {

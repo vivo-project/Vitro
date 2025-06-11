@@ -6,7 +6,7 @@ $(document).ready(function(){
 
     // The externalAuthOnly checkbox drives the display of the password and re-set
     // password fields. When checked, the password fields are hidden
-    $('input:checkbox[name=externalAuthOnly]').click(function(){
+    $('input:checkbox[name=externalAuthOnly]').on("click", function(){
          if ( this.checked ) {
          // If checked, hide those puppies
             $('#passwordContainer').addClass('hidden');

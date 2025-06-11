@@ -28,10 +28,10 @@
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/search.css" />')}
 <script type="text/javascript">
     $(document).ready(function(){
-        $('a#advTipsLink').click(function() {
+        $('a#advTipsLink').on("click", function() {
            $('ul#advanced').css("visibility","visible"); 
            $('a#closeLink').css("visibility","visible");
-           $('a#closeLink').click(function() {
+           $('a#closeLink').on("click", function() {
               $('ul#advanced').css("visibility","hidden"); 
               $('a#closeLink').css("visibility","hidden");
            });
