@@ -34,7 +34,7 @@
 
         <div class="button-group">
             <a href="${backLocation}" class="button">${i18n().back}</a>
-            <input class="submit" type="submit" value="${i18n().save_changes}" />
+            <input class="button green" type="submit" value="${i18n().save_changes}" />
         </div>
 
     </form>
