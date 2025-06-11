@@ -8,11 +8,9 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
@@ -28,7 +26,6 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileAlreadyExistsException;
 import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
-import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
 
 /**
  * A helper object to handle the mundane details of dealing with uploaded files
@@ -43,7 +40,6 @@ public class UploadedFileHelper {
 	private final DataPropertyStatementDao dataPropertyStatementDao;
 	private final ObjectPropertyStatementDao objectPropertyStatementDao;
 	private final ServletContext ctx;
-	private final ApplicationDao applicationDao;
 
 	public UploadedFileHelper(FileStorage fileStorage, WebappDaoFactory wadf, ServletContext ctx) {
 		this.fileStorage = fileStorage;
@@ -52,7 +48,6 @@ public class UploadedFileHelper {
 		this.dataPropertyStatementDao = wadf.getDataPropertyStatementDao();
 		this.objectPropertyStatementDao = wadf.getObjectPropertyStatementDao();
 		this.ctx = ctx;
-		this.applicationDao = wadf.getApplicationDao();
 	}
 
 	/**
@@ -98,15 +93,8 @@ public class UploadedFileHelper {
 	/**
 	 * Record this image file and thumbnail on this entity.
 	 */
-
-	@Deprecated
 	public void setImagesOnEntity(String entityUri, FileInfo mainInfo,
 			FileInfo thumbInfo) {
-		setImagesOnEntityAtPredicate(entityUri, mainInfo, thumbInfo, null);
-	}
-
-	public void setImagesOnEntityAtPredicate(String entityUri, FileInfo mainInfo,
-			FileInfo thumbInfo, String predicateUri) {
 		if (entityUri == null) {
 			throw new NullPointerException("entityUri may not be null.");
 		}
@@ -130,26 +118,7 @@ public class UploadedFileHelper {
 						thumbInfo.getUri()));
 
 		// Add the main image file to the entity.
-		if (predicateUri != null) {
-			ApplicationBean applicationBean = applicationDao.getApplicationBean();
-
-			// Save image url to application bean
-			if (predicateUri.endsWith("#portalLogo")) {
-				applicationBean.setLogoUrl(UrlBuilder.getUrl(thumbInfo.getBytestreamAliasUrl()));
-			} else if (predicateUri.endsWith("#portalLogoSmall")) {
-				applicationBean.setLogoSmallUrl(UrlBuilder.getUrl(thumbInfo.getBytestreamAliasUrl()));
-			}
-
-			applicationDao.updateApplicationBean(applicationBean);
-
-			objectPropertyStatementDao
-					.insertNewObjectPropertyStatement(new ObjectPropertyStatementImpl(
-							entityUri, predicateUri, mainInfo.getUri()));
-
-		} else {
-			entity.setMainImageUri(mainInfo.getUri());
-		}
-
+		entity.setMainImageUri(mainInfo.getUri());
 		individualDao.updateIndividual(entity);
 
 		log.debug("Set images on '" + entity.getURI() + "': main=" + mainInfo
@@ -163,33 +132,15 @@ public class UploadedFileHelper {
 	 *
 	 * Note: after this operation, entity is stale.
 	 */
-	public void removeMainImage(Individual entity, String predicateUri) {
-		if (predicateUri != null) {
-
-			ApplicationBean applicationBean = applicationDao.getApplicationBean();
-			if (predicateUri.endsWith("#portalLogo")) {
-				applicationBean.setLogoUrl(null);
-			} else if (predicateUri.endsWith("#portalLogoSmall")) {
-				applicationBean.setLogoSmallUrl(null);
-			}
-			applicationDao.updateApplicationBean(applicationBean);
-
-			List<ObjectPropertyStatement> statements = objectPropertyStatementDao.getObjectPropertyStatements(new ObjectPropertyStatementImpl(entity.getURI(), predicateUri, null));
-			for (ObjectPropertyStatement s : statements) {
-				objectPropertyStatementDao.deleteObjectPropertyStatement(s);
-			}
-
-		} else {
-			entity.setMainImageUri(null);
-		}
-
-
-		ImageInfo imageInfo = ImageInfo.instanceFromEntityUriAtPredicate(wadf, entity, predicateUri);
+	public void removeMainImage(Individual entity) {
+		ImageInfo imageInfo = ImageInfo.instanceFromEntityUri(wadf, entity);
 		if (imageInfo == null) {
 			log.debug("No image to remove from '" + entity.getURI() + "'");
 			return;
 		}
 
+		// Remove the main image from the entity.
+		entity.setMainImageUri(null);
 		individualDao.updateIndividual(entity);
 
 		// Remove the thumbnail from the main image.
@@ -302,7 +253,7 @@ public class UploadedFileHelper {
 		}
 		return !stmts.isEmpty();
 	}
-
+	
 	public void removeUploadedFile(String subjectUri, String predicateUri, String fileUri) {
 		FileInfo fileInfo = FileInfo.instanceFromSurrogateUri(wadf, fileUri);
 		objectPropertyStatementDao

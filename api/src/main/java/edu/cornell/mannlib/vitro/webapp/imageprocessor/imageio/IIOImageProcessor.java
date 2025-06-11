@@ -212,4 +212,3 @@ public class IIOImageProcessor implements ImageProcessor {
 		return bytes.toByteArray();
 	}
 }
-
