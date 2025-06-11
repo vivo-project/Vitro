@@ -6991,7 +6991,7 @@ uil-data:branding_colors_open_after_save.Vitro
 uil-data:branding_colors_modified.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Theme colors is modified"@en-US ;
+        rdfs:label       "Theme colors are modified"@en-US ;
         uil:hasApp       "Vitro" ;
         uil:hasKey       "branding_colors_modified" .
 
