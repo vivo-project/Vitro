@@ -6978,3 +6978,11 @@ uil-data:upload_new_css.Vitro
         uil:hasApp       "Vitro" ;
         uil:hasKey       "upload_new_css" ;
         uil:hasPackage   "Vitro-languages" .
+
+uil-data:customize_css_link.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Customize CSS"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "customize_css_link" ;
+        uil:hasPackage   "Vitro-languages" .
