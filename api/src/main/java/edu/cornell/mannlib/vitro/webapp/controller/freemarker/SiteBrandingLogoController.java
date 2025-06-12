@@ -71,9 +71,8 @@ public class SiteBrandingLogoController extends FreemarkerHttpServlet {
     public static String mobileLogoUrl = null;
 
 
-    private ReferrerHelper referrerHelper;
+    private RefererHelper refererHelper;
     private FileStorage fileStorage;
-    // private ReferrerHelper referrerHelper;
 
     /**
      * When initialized, get a reference to the File Storage system. Without
@@ -83,7 +82,7 @@ public class SiteBrandingLogoController extends FreemarkerHttpServlet {
     public void init() throws ServletException {
         super.init();
         fileStorage = ApplicationUtils.instance().getFileStorage();
-        referrerHelper = new ReferrerHelper("siteStyle", "editForm?controller=ApplicationBean");
+        refererHelper = new RefererHelper("siteStyle", "editForm?controller=ApplicationBean");
     }
 
     /**
@@ -124,12 +123,11 @@ public class SiteBrandingLogoController extends FreemarkerHttpServlet {
             if (action.equals("upload")) {
                 return uploadLogoFiles(vreq);
             } else {
-                this.referrerHelper.captureReferringUrl(vreq);
                 return showMainStyleEditPage(vreq);
             }
         }
 
-        // this.referrerHelper.captureReferringUrl(vreq);
+        this.refererHelper.captureReferringUrl(vreq);
         return showMainStyleEditPage(vreq);
     }
 
@@ -173,7 +171,7 @@ public class SiteBrandingLogoController extends FreemarkerHttpServlet {
     private TemplateResponseValues showMainStyleEditPage(VitroRequest vreq) {
         TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE);
 
-        rv.put(BODY_BACK_LOCATION, referrerHelper.getExitUrl(vreq));
+        rv.put(BODY_BACK_LOCATION, refererHelper.getExitUrl(vreq));
         rv.put(BODY_FORM_ACTION_UPLOAD, UrlBuilder.getPath(URL_HERE, new ParamMap(PARAMETER_ACTION, ACTION_UPLOAD)));
         rv.put(BODY_FORM_ACTION_REMOVE, UrlBuilder.getPath(URL_HERE, new ParamMap(PARAMETER_ACTION, ACTION_REMOVE)));
 
