@@ -39,6 +39,21 @@
         <select id="ThemeDir" name="ThemeDir">
             <form:option name="ThemeDir" />
         </select>
+        <span id="themeChangeIndicator" style="display: none;" class="note">${i18n.text('branding_colors_modified')}</span>
+        <br />
+        <a id="changeColorsButton" href="#">${i18n.text('change_branding_colors_link')}</a>
+        <br>
+
+
+        <br>
+        <a href="${updateLogoUrl}">${i18n.text('change_logo_link')}</a>
+        <br>
+
+        <br>
+        <!-- <c:set var="AccentColorError"><form:error name="AccentColor"/></c:set>
+        <c:if test="${!empty AccentColorError}">
+            <span class="notice"><c:out value="${AccentColorError}"/></span>
+        </c:if> -->
 
         <label>Copyright text<span class="note"> used in footer (e.g., name of your institution)</span></label>
         <input type="text" name="CopyrightAnchor" value="<form:value name="CopyrightAnchor"/>" ${longField} maxlength="120" size="40" />

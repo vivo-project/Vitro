@@ -39,7 +39,9 @@ import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.checks.UserOnThread;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.EntityPolicyController;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyLoader;
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.SiteBrandingController;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -50,6 +52,9 @@ import org.apache.commons.logging.LogFactory;
 public class OperationController extends BaseEditController {
 
     private static final Log log = LogFactory.getLog(OperationController.class.getName());
+    private static final List<String> ignoreReferers = Arrays.asList("/siteStyle", "/site-branding-logo");
+
+
 
     public void doPost (HttpServletRequest request, HttpServletResponse response) {
 
@@ -83,6 +88,10 @@ public class OperationController extends BaseEditController {
         // if we're canceling, we don't need to do anything
         if (request.getParameter("_cancel") != null){
             String referer = epo.getReferer();
+            boolean ignoreReferer = ignoreReferers.stream().anyMatch(referer::contains);
+            if (ignoreReferer) {
+                referer = null;
+            }
             if (referer == null) {
             	try {
             		response.sendRedirect(defaultLandingPage);
@@ -154,6 +163,10 @@ public class OperationController extends BaseEditController {
             epo.setRequestParameterMap(request.getParameterMap());
 
             notifyChangeListeners(epo, action);
+
+            if (newObj instanceof ApplicationBean) {
+                SiteBrandingController.updateThemeBrandingCache(((ApplicationBean) newObj).getThemeDir());
+            }
 
             /* send the user somewhere */
             switch (action) {

@@ -17,6 +17,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -51,6 +55,8 @@ import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 import freemarker.template.utility.DeepUnwrap;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.rdf.model.*;
 
 public class FreemarkerHttpServlet extends VitroHttpServlet  {
 
@@ -452,6 +458,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
 
         map.put("siteName", vreq.getAppBean().getApplicationName());
 
+        map.putAll(SiteBrandingController.getThemeBrandingCache(vreq.getAppBean().getThemeDir()));
+
         map.put("urls", buildRequestUrls(vreq));
 
         map.put("menu", getDisplayModelMenu(vreq));
@@ -475,6 +483,10 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
         map.put("scripts", new Tags().wrap());
         map.put("headScripts", new Tags().wrap());
         map.put("metaTags", new Tags().wrap());
+
+
+        map.put("logoUrl", SiteBrandingLogoController.getLogoUrlCache());
+        map.put("logoSmallUrl", SiteBrandingLogoController.getMobileLogoUrlCache());
 
         return map;
     }
