@@ -50,7 +50,7 @@ import org.apache.commons.logging.LogFactory;
 public class OperationController extends BaseEditController {
 
     private static final Log log = LogFactory.getLog(OperationController.class.getName());
-    private static final List<String> ignoreReferers = Arrays.asList("/siteStyle", "/uploadImages");
+    private static final List<String> ignoreReferers = Arrays.asList("/siteStyle", "/site-branding-logo");
 
 
 

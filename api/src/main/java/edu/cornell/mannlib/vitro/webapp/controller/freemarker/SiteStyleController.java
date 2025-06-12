@@ -74,7 +74,7 @@ public class SiteStyleController extends FreemarkerHttpServlet {
 
 
     private FileStorage fileStorage;
-    private ReferrerHelper referrerHelper;
+    private RefererHelper refererHelper;
 
     /**
      * When initialized, get a reference to the File Storage system. Without
@@ -84,7 +84,7 @@ public class SiteStyleController extends FreemarkerHttpServlet {
     public void init() throws ServletException {
         super.init();
         fileStorage = ApplicationUtils.instance().getFileStorage();
-        referrerHelper = new ReferrerHelper("siteStyle", "editForm?controller=ApplicationBean");
+        refererHelper = new RefererHelper("siteStyle", "editForm?controller=ApplicationBean");
     }
 
     /**
@@ -126,12 +126,12 @@ public class SiteStyleController extends FreemarkerHttpServlet {
             } else if (action.equals("remove")) {
                 return removeCssFile(vreq);
             } else {
-                this.referrerHelper.captureReferringUrl(vreq);
+                this.refererHelper.captureReferringUrl(vreq);
                 return showMainStyleEditPage(vreq);
             }
         }
 
-        this.referrerHelper.captureReferringUrl(vreq);
+        this.refererHelper.captureReferringUrl(vreq);
         return showMainStyleEditPage(vreq);
     }
 
@@ -197,7 +197,7 @@ public class SiteStyleController extends FreemarkerHttpServlet {
     private TemplateResponseValues showMainStyleEditPage(VitroRequest vreq) {
         TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE);
 
-        rv.put(BODY_BACK_LOCATION, referrerHelper.getExitUrl(vreq));
+        rv.put(BODY_BACK_LOCATION, refererHelper.getExitUrl(vreq));
         rv.put(BODY_FORM_ACTION_UPLOAD, UrlBuilder.getPath(URL_HERE, new ParamMap(PARAMETER_ACTION, ACTION_UPLOAD)));
         rv.put(BODY_FORM_ACTION_REMOVE, UrlBuilder.getPath(URL_HERE, new ParamMap(PARAMETER_ACTION, ACTION_REMOVE)));
 
