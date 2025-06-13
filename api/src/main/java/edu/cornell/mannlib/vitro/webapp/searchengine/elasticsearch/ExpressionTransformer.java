@@ -136,16 +136,25 @@ public class ExpressionTransformer {
         List<String> fixedTokens = new ArrayList<>();
         Set<String> specialCharacters = Set.of("AND", "OR", "NOT", "(", ")");
 
-        for (String token : expression) {
+        for (int i = 0; i < expression.size(); i++) {
+            String token = expression.get(i);
+
+            if ("TO".equals(token) && i > 0 && i < expression.size() - 1) {
+                String before = fixedTokens.remove(fixedTokens.size() - 1);
+                String after = expression.get(i + 1);
+                fixedTokens.add((before + " TO " + after).replace("\"", ""));
+                i++;
+                continue;
+            }
+
             if (!fixedTokens.isEmpty()) {
                 String prev = fixedTokens.get(fixedTokens.size() - 1);
 
-                // Check if previous token contains ":" which indicates a field query
                 if (prev.contains(":") &&
                     !token.contains(":") &&
-                    !specialCharacters.contains(token)) {
+                    !specialCharacters.contains(token) &&
+                    !"TO".equals(token)) {
 
-                    // Merge with previous token
                     fixedTokens.set(fixedTokens.size() - 1, prev + " " + token);
                     continue;
                 }
@@ -153,6 +162,7 @@ public class ExpressionTransformer {
 
             fixedTokens.add(token);
         }
+
         return fixedTokens;
     }
 
