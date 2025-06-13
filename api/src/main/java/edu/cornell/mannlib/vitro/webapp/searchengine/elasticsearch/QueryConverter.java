@@ -7,10 +7,13 @@ import static edu.cornell.mannlib.vitro.webapp.searchengine.elasticsearch.JsonTr
 import static edu.cornell.mannlib.vitro.webapp.searchengine.elasticsearch.JsonTree.tree;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -48,10 +51,33 @@ public class QueryConverter {
     }
 
     private Map<String, Object> filteredOrNot() {
-        if (query.getFilters().isEmpty()) {
+        ExpressionTransformer transformer = new ExpressionTransformer();
+        StringBuilder queryForParsing = new StringBuilder("( " + ExpressionTransformer.fillInMissingOperators(
+            ExpressionTransformer.removeWhitespacesFromRangeExpression(
+                query.getQuery()
+                    .replace("(", "( ")
+                    .replace(")", " )")
+            )) + " )");
+
+        for (String filter : query.getFilters()) {
+            queryForParsing.append(" AND ").append(filter);
+        }
+
+        List<String> queryTokens = new ArrayList<>(Arrays.asList(queryForParsing.toString().split(" ")));
+        queryTokens.removeIf(String::isEmpty);
+        String es8Query = BoolQuery.of(q -> {
+            q.must(transformer.parseAdvancedQuery(queryTokens));
+            return q;
+        })._toQuery().toString();
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            Map<String, Object> queryMap =
+                objectMapper.readValue(es8Query.replaceFirst("Query: ", ""), new TypeReference<Map<String, Object>>() {
+                });
+            return queryMap;
+        } catch (JsonProcessingException e) {
+            log.error("Query parsing for ES8 failed, falling back to old parsing method.");
             return new QueryStringMap(query.getQuery()).map;
-        } else {
-            return buildFilterStructure();
         }
     }
 
@@ -76,7 +102,11 @@ public class QueryConverter {
         Map<String, Object> map = new HashMap<>();
         for (String name : fields.keySet()) {
             String sortOrder = fields.get(name).toString().toLowerCase();
-            map.put(name, sortOrder);
+            if (name.equals("score")) {
+                map.put("_score", sortOrder);
+            } else {
+                map.put(name, sortOrder);
+            }
         }
         return map;
     }
@@ -97,13 +127,25 @@ public class QueryConverter {
     }
 
     private Map<String, Object> figureFacet(String field) {
-        return tree() //
-                .put("terms", tree() //
-                        .put("field", field) //
-                        .put("size", ifPositive(query.getFacetLimit())) //
-                        .put("min_doc_count",
-                                ifPositive(query.getFacetMinCount()))) //
-                .asMap();
+        String fieldToAggregate = field.endsWith("_ss") ? field + ".keyword" : field;
+
+        return tree()
+            .put("terms", tree()
+                .put("field", fieldToAggregate)
+                .put("size", ifPositive(query.getFacetLimit()))
+                .put("min_doc_count", ifPositive(query.getFacetMinCount()))
+            )
+            .put("aggs", tree()
+                .put("top_label", tree()
+                    .put("top_hits", tree()
+                        .put("size", 1)
+                        .put("_source",
+                            List.of("es_label_display")  // fetch default display label from index source
+                        )
+                    )
+                )
+            )
+            .asMap();
     }
 
     private List<String> figureReturnFields() {
@@ -112,13 +154,14 @@ public class QueryConverter {
 
     private Map<String, Object> figureFullMap() {
         return tree() //
+                .put("track_total_hits", true)
                 .put("query", queryAndFilters) //
                 .put("from", ifPositive(query.getStart())) //
                 .put("highlight", highlighter)
                 .put("size", ifPositive(query.getRows())) //
                 .put("sort", sortFields) //
                 .put("_source", returnFields) //
-                .put("aggregations", facets) //
+                .put("aggs", facets) //
                 .asMap();
     }
 
