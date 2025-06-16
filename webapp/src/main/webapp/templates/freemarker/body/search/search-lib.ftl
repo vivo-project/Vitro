@@ -108,20 +108,17 @@
 
 <#macro printSelectedFilterValueLabels filters>
     <#list filters?values as filter>
-        <#if filter.inputText?has_content>
-            <@userSelectedInput filter "search-form" />
-        <#else>
-            <#assign valueNumber = 1>
-            <#list filter.values?values as v>
-                <#if v.selected>
-                    <@getInput filter v getValueID(filter.id, valueNumber) valueNumber />
-                    <#if filter.displayed>
-                        <@getSelectedLabel getValueID(filter.id, valueNumber)?html v filter v.count />
-                    </#if>
+        <#assign valueNumber = 1>
+        <#list filter.values?values as v>
+            <#if v.selected>
+                <@getInput filter v getValueID(filter.id, valueNumber) valueNumber />
+                <#if filter.displayed>
+                    <@getSelectedLabel getValueID(filter.id, valueNumber)?html v filter v.count />
                 </#if>
-                <#assign valueNumber = valueNumber + 1>
-            </#list>
-        </#if>
+            </#if>
+            <#assign valueNumber = valueNumber + 1>
+        </#list>
+        <@userSelectedInput filter "search-form" />
     </#list>
 </#macro>
 
