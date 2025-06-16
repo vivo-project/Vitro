@@ -220,17 +220,9 @@
         <div class="range-slider-container" min="${filter.min?html}" max="${filter.max?html}">
             <div class="range-slider"></div>
             ${i18n().from}
-            <#if from?has_content>
-                <div class="range-slider-start">${from?html}</div>
-            <#else>
-                <div class="range-slider-start">${min?html}</div>
-            </#if>
+            <input type="text" size="4" class="range-slider-start" value="<#if from?has_content>${from?html}<#else>${min?html}</#if>">
             ${i18n().to}
-            <#if to?has_content>
-                <div class="range-slider-end">${to?html}</div>
-            <#else>
-                <div class="range-slider-end">${max?html}</div>
-            </#if>
+            <input type="text" size="4" class="range-slider-end" value="<#if to?has_content>${to?html}<#else>${max?html}</#if>">
             <input form="${form}" id="filter_range_${filter.id?html}" style="display:none;" class="range-slider-input" name="filter_range_${filter.id?html}" value="${filter.rangeInput?html}"/>
         </div>
     </div>
