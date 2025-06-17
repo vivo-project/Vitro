@@ -2,10 +2,13 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
+import java.io.IOException;
 import java.util.Objects;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
@@ -13,8 +16,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationReques
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.UserMistakeException;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
@@ -52,14 +53,9 @@ public class SiteBrandingLogoController extends FreemarkerHttpServlet {
      * The form field of the uploaded file; use as a key to the FileItem map.
      */
 
-    public static final String TEMPLATE = "siteAdmin/siteAdmin-logoUpload.ftl";
-
     public static final String URL_HERE = UrlBuilder.getUrl("/site-branding-logo");
     private static final String PARAMETER_ACTION = "action";
 
-    public static final String BODY_BACK_LOCATION = "backLocation";
-    public static final String BODY_FORM_ACTION_UPLOAD = "actionUpload";
-    public static final String BODY_FORM_ACTION_REMOVE = "actionRemove";
     public static final String ACTION_UPLOAD = "upload";
     public static final String ACTION_REMOVE = "remove";
 
@@ -71,7 +67,6 @@ public class SiteBrandingLogoController extends FreemarkerHttpServlet {
     public static String mobileLogoUrl = null;
 
 
-    private RefererHelper refererHelper;
     private FileStorage fileStorage;
 
     /**
@@ -82,7 +77,6 @@ public class SiteBrandingLogoController extends FreemarkerHttpServlet {
     public void init() throws ServletException {
         super.init();
         fileStorage = ApplicationUtils.instance().getFileStorage();
-        refererHelper = new RefererHelper("siteStyle", "editForm?controller=ApplicationBean");
     }
 
     /**
@@ -115,23 +109,21 @@ public class SiteBrandingLogoController extends FreemarkerHttpServlet {
      *
      */
     @Override
-    protected ResponseValues processRequest(VitroRequest vreq) {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        VitroRequest vreq = new VitroRequest(request);
         String action = vreq.getParameter(PARAMETER_ACTION);
 
         if (Objects.equals(vreq.getMethod(), "POST")) {
 
             if (action.equals("upload")) {
-                return uploadLogoFiles(vreq);
-            } else {
-                return showMainStyleEditPage(vreq);
+                uploadLogoFiles(vreq);
             }
         }
 
-        this.refererHelper.captureReferringUrl(vreq);
-        return showMainStyleEditPage(vreq);
+        printDefaultPage(request, response, "");
     }
 
-    private ResponseValues uploadLogoFiles(VitroRequest vreq) {
+    private void uploadLogoFiles(VitroRequest vreq) {
         ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
             vreq.getUnfilteredWebappDaoFactory(), getServletContext());
 
@@ -164,18 +156,18 @@ public class SiteBrandingLogoController extends FreemarkerHttpServlet {
             // Handle the exception appropriately, e.g., return an error response or rethrow it
         }
 
-        return showMainStyleEditPage(vreq);
     }
 
-
-    private TemplateResponseValues showMainStyleEditPage(VitroRequest vreq) {
-        TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE);
-
-        rv.put(BODY_BACK_LOCATION, refererHelper.getExitUrl(vreq));
-        rv.put(BODY_FORM_ACTION_UPLOAD, UrlBuilder.getPath(URL_HERE, new ParamMap(PARAMETER_ACTION, ACTION_UPLOAD)));
-        rv.put(BODY_FORM_ACTION_REMOVE, UrlBuilder.getPath(URL_HERE, new ParamMap(PARAMETER_ACTION, ACTION_REMOVE)));
-
-        return rv;
+    private void printDefaultPage(HttpServletRequest request, HttpServletResponse response, String info) {
+        try {
+            response.setContentType("text/html");
+            response.getWriter().println("<html><body><h2>Site Style</h2><pre>logoUrl: "
+                + (logoUrl != null ? logoUrl : "none") + "</pre><pre>mobileLogoUrl: "
+                + (mobileLogoUrl != null ? mobileLogoUrl : "none") + "</pre><pre>Info: "
+                + (info != null ? info : "") + "</pre></body></html>");
+        } catch (IOException e) {
+            log.error("Error writing sample data to response", e);
+        }
     }
 
     private void updateLogoPath(String propertyUri, String value) {
@@ -201,6 +193,9 @@ public class SiteBrandingLogoController extends FreemarkerHttpServlet {
         updateLogoPath(VitroVocabulary.PORTAL_LOGOSMALLURL, cssFilePath);
     }
 
+    public static String getLogoUploadUrlString() {
+        return UrlBuilder.getPath(URL_HERE, new ParamMap(PARAMETER_ACTION, ACTION_UPLOAD));
+    }
 
     private static String getLogo(String propertyUrl) {
         ContextModelAccess cma = ModelAccess.getInstance();

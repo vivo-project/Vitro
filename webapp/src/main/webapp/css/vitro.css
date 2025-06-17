@@ -584,10 +584,6 @@ table#table-listing td  a {
     gap: 1rem;
 }
 
-.logo-controls input[type="file"] {
-    flex: 1;
-}
-
 .logo-controls button {
     background: #e0e0e0;
     border: none;

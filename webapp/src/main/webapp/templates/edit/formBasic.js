@@ -46,6 +46,16 @@
     }
 
     async function onSave(e) {
+        if (isLogoChanges()) {
+            e.preventDefault();
+            await saveLogoInput();
+
+            resetLogoInputActions();
+            document.querySelector("[name=_update][type=submit]").click();
+            return;
+        }
+
+
         if (openThemeEditorOnSave) {
             await openEditor();
             openThemeEditorOnSave = false;
@@ -127,7 +137,105 @@
 
         });
 
+
+        document.getElementById('portalLogoInput').addEventListener('change', function (event) {
+            handleFileChange(event, 'portalLogoPreview', 'portalLogoActionInput');
+        });
+
+        document.getElementById('portalLogoResetButton').addEventListener('click', function () {
+            resetFileInput('portalLogoInput', 'portalLogoPreview', 'portalLogoActionInput');
+        });
+
+        document.getElementById('mobilePortalLogoInput').addEventListener('change', function (event) {
+            handleFileChange(event, 'mobilePortalLogoPreview', 'mobilePortalLogoActionInput');
+        });
+
+        document.getElementById('mobilePortalLogoResetButton').addEventListener('click', function () {
+            resetFileInput('mobilePortalLogoInput', 'mobilePortalLogoPreview', 'mobilePortalLogoActionInput');
+        });
+
     });
+
+    // Upload logo
+    const defaultLogoPlaceholder = '';
+
+    function handleFileChange(event, previewId, actionInputId) {
+        const file = event.target.files[0];
+        const preview = document.getElementById(previewId);
+        const actionInput = document.getElementById(actionInputId);
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+            actionInput.value = 'update';
+        }
+    }
+
+    function resetFileInput(inputId, previewId, actionInputId) {
+        const input = document.getElementById(inputId);
+        const preview = document.getElementById(previewId);
+        const actionInput = document.getElementById(actionInputId);
+
+        input.value = "";
+        preview.src = defaultLogoPlaceholder;
+        preview.style.display = 'none'; // still show blank box
+        actionInput.value = 'reset';
+    }
+
+    async function saveLogoInput() {
+        const formData = new FormData();
+
+        // Desktop logo
+        const portalLogoInput = document.getElementById('portalLogoInput');
+        const portalLogoAction = document.getElementById('portalLogoActionInput').value;
+        if (portalLogoInput.files.length > 0) {
+            formData.append('portalLogo', portalLogoInput.files[0]);
+        }
+        formData.append('portalLogoAction', portalLogoAction);
+
+        // Mobile logo
+        const mobilePortalLogoInput = document.getElementById('mobilePortalLogoInput');
+        const mobilePortalLogoAction = document.getElementById('mobilePortalLogoActionInput').value;
+        if (mobilePortalLogoInput.files.length > 0) {
+            formData.append('mobilePortalLogo', mobilePortalLogoInput.files[0]);
+        }
+        formData.append('mobilePortalLogoAction', mobilePortalLogoAction);
+
+        // Send request
+        await fetch(fromUrls.actionLogoUploadUrl, {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Upload failed');
+            }
+        })
+        .catch(error => {
+            alert("error");
+            console.error(error);
+        });
+    }
+
+    function isLogoChanges() {
+        const portalLogoAction = document.getElementById('portalLogoActionInput').value;
+        const mobilePortalLogoAction = document.getElementById('mobilePortalLogoActionInput').value;
+
+        if (portalLogoAction === "keep" && mobilePortalLogoAction === "keep") {
+            return false;
+        }
+        return true;
+    }
+
+    function resetLogoInputActions() {
+        document.getElementById('portalLogoActionInput').value = 'keep';
+        document.getElementById('mobilePortalLogoActionInput').value = 'keep';
+    }
+
 
 
 </script>
