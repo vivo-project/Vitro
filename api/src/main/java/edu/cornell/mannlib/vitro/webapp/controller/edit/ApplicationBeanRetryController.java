@@ -11,6 +11,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.SiteBrandingLogoController;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,6 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 
 public class ApplicationBeanRetryController extends BaseEditController {
 
@@ -89,6 +92,13 @@ public class ApplicationBeanRetryController extends BaseEditController {
         request.setAttribute("title","Site Information");
         request.setAttribute("_action",action);
         request.setAttribute("unqualifiedClassName","ApplicationBean");
+        request.setAttribute("i18n", I18n.bundle(request));
+
+        request.setAttribute("actionLogoUploadUrl", SiteBrandingLogoController.getLogoUploadUrlString());
+        request.setAttribute("logoUrl", SiteBrandingLogoController.getLogoUrlCache());
+        request.setAttribute("logoSmallUrl", SiteBrandingLogoController.getMobileLogoUrlCache());
+
+        request.setAttribute("updateLogoUrl", UrlBuilder.getUrl("site-branding-logo"));
         setRequestAttributes(request,epo);
 
         try {
