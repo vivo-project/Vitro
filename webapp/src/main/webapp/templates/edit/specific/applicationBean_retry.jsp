@@ -43,7 +43,7 @@
         <br><br>
         
         <label for="fileUpload" class="">${i18n.text('upload_new_css')}</label>
-        <input type="file" id="fileUpload" name="fileUpload" accept=".css" class="form-item">
+        <input type="file" id="fileUpload" name="fileUpload" accept=".css">
         <c:if test="${not empty customCssPath and customCssPath != 'null'}">
             <br><br>
             <button
