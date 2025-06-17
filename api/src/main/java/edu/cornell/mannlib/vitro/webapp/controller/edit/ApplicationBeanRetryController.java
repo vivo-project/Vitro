@@ -91,6 +91,11 @@ public class ApplicationBeanRetryController extends BaseEditController {
         request.setAttribute("title","Site Information");
         request.setAttribute("_action",action);
         request.setAttribute("unqualifiedClassName","ApplicationBean");
+
+        request.setAttribute("customCssPath", SiteStyleController.getCustomCssUrlCache());
+        request.setAttribute("actionRemove", SiteStyleController.getRemovePathString());
+        request.setAttribute("actionUpload", SiteStyleController.getUploadPathString());
+
         request.setAttribute("siteStyleUrl", SiteStyleController.URL_HERE);
         request.setAttribute("i18n", I18n.bundle(request));
 

@@ -41,7 +41,16 @@
         </select>
 
         <br><br>
-        <a href="${siteStyleUrl}">${i18n.text('customize_css_link')}</a>
+        
+        <label for="fileUpload" class="">${i18n.text('upload_new_css')}</label>
+        <input type="file" id="fileUpload" name="fileUpload" accept=".css" class="form-item">
+        <c:if test="${not empty customCssPath and customCssPath != 'null'}">
+            <br><br>
+            <button
+                id="resetAction" type="button" class="button red" onclick="resetStyles()">${i18n.text('remove_custom_css')}</button>
+            <a href="${customCssPath}" download="custom.css" class="button blue">${i18n.text('download_custom_css')}</a>
+        </c:if>
+
         <br><br>
 
         <label>Copyright text<span class="note"> used in footer (e.g., name of your institution)</span></label>
@@ -57,6 +66,13 @@
         <c:if test="${!empty CopyrightURLError}">
             <span class="notice"><c:out value="${CopyrightURLError}"/></span>
         </c:if>
+
+        <script>
+            var fromUrls = {
+                actionUploadUrl: '${actionUpload}',
+                actionRemoveUrl: '${actionRemove}',
+            };
+        </script>
 
 <!--
 <tr class="editformcell">

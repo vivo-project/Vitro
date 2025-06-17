@@ -4,10 +4,11 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Objects;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
@@ -15,8 +16,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationReques
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FileUploadController.FileUploadException;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.filestorage.UploadedFileHelper;
@@ -57,8 +56,6 @@ public class SiteStyleController extends FreemarkerHttpServlet {
      */
     public static final String PARAMETER_UPLOADED_FILE = "fileUpload";
 
-    public static final String TEMPLATE = "siteAdmin/siteAdmin-siteStyle.ftl";
-
     public static final String URL_HERE = UrlBuilder.getUrl("/siteStyle");
     private static final String PARAMETER_ACTION = "action";
 
@@ -74,7 +71,6 @@ public class SiteStyleController extends FreemarkerHttpServlet {
 
 
     private FileStorage fileStorage;
-    private RefererHelper refererHelper;
 
     /**
      * When initialized, get a reference to the File Storage system. Without
@@ -84,7 +80,6 @@ public class SiteStyleController extends FreemarkerHttpServlet {
     public void init() throws ServletException {
         super.init();
         fileStorage = ApplicationUtils.instance().getFileStorage();
-        refererHelper = new RefererHelper("siteStyle", "editForm?controller=ApplicationBean");
     }
 
     /**
@@ -116,23 +111,43 @@ public class SiteStyleController extends FreemarkerHttpServlet {
      * show the intro screen.
      */
     @Override
-    protected ResponseValues processRequest(VitroRequest vreq) throws FileUploadException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        VitroRequest vreq = new VitroRequest(request);
+
         String action = vreq.getParameter(PARAMETER_ACTION);
 
-        if (Objects.equals(vreq.getMethod(), "POST")) {
-
-            if (action.equals("upload")) {
-                return uploadCssFile(vreq);
-            } else if (action.equals("remove")) {
-                return removeCssFile(vreq);
-            } else {
-                this.refererHelper.captureReferringUrl(vreq);
-                return showMainStyleEditPage(vreq);
-            }
+        if ("remove".equals(action)) {
+            removeCssFile(vreq);
+            showMainStyleEditPage(request, response, "CSS file removed.");
+            return;
         }
 
-        this.refererHelper.captureReferringUrl(vreq);
-        return showMainStyleEditPage(vreq);
+        showMainStyleEditPage(request, response, "");
+
+    }
+
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        VitroRequest vreq = new VitroRequest(request);
+
+        String action = vreq.getParameter(PARAMETER_ACTION);
+
+        if ("remove".equals(action)) {
+            removeCssFile(vreq);
+            showMainStyleEditPage(request, response, "CSS file removed.");
+            return;
+        } else if ("upload".equals(action)) {
+            try {
+                uploadCssFile(vreq);
+            } catch (FileUploadException e) {
+                throw new ServletException(e);
+            }
+            showMainStyleEditPage(request, response, "Uploaded CSS file successfully.");
+            return;
+        } else {
+            showMainStyleEditPage(request, response, "No action specified.");
+            return;
+        }
     }
 
     private String getMediaType(FileItem file) {
@@ -167,7 +182,7 @@ public class SiteStyleController extends FreemarkerHttpServlet {
         return fileInfo;
     }
 
-    private ResponseValues uploadCssFile(VitroRequest vreq) throws FileUploadController.FileUploadException {
+    private void uploadCssFile(VitroRequest vreq) throws FileUploadController.FileUploadException {
         FileItem file = getUploadedFile(vreq);
 
         String mediaType = getMediaType(file);
@@ -185,23 +200,31 @@ public class SiteStyleController extends FreemarkerHttpServlet {
         SiteStyleController.customCssUrlLoaded = true;
         SiteStyleController.customCssUrl = cssFilePath;
 
-        return showMainStyleEditPage(vreq);
+        return;
     }
 
-    private TemplateResponseValues removeCssFile(VitroRequest vreq) {
+    private void removeCssFile(VitroRequest vreq) {
         removeCssFileDisplayModel();
         resetCustomCssCache();
-        return showMainStyleEditPage(vreq);
     }
 
-    private TemplateResponseValues showMainStyleEditPage(VitroRequest vreq) {
-        TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE);
+    private void showMainStyleEditPage(HttpServletRequest request, HttpServletResponse response, String info) {
+        try {
+            response.setContentType("text/html");
+            response.getWriter().println("<html><body><h2>Site Style</h2><pre>customCssUrl: "
+                + (customCssUrl != null ? customCssUrl : "none") + "</pre><pre>Info: "
+                + (info != null ? info : "") + "</pre></body></html>");
+        } catch (IOException e) {
+            log.error("Error writing sample data to response", e);
+        }
+    }
 
-        rv.put(BODY_BACK_LOCATION, refererHelper.getExitUrl(vreq));
-        rv.put(BODY_FORM_ACTION_UPLOAD, UrlBuilder.getPath(URL_HERE, new ParamMap(PARAMETER_ACTION, ACTION_UPLOAD)));
-        rv.put(BODY_FORM_ACTION_REMOVE, UrlBuilder.getPath(URL_HERE, new ParamMap(PARAMETER_ACTION, ACTION_REMOVE)));
+    public static String getRemovePathString() {
+        return UrlBuilder.getPath(URL_HERE, new ParamMap(PARAMETER_ACTION, ACTION_REMOVE));
+    }
 
-        return rv;
+    public static String getUploadPathString() {
+        return UrlBuilder.getPath(URL_HERE, new ParamMap(PARAMETER_ACTION, ACTION_UPLOAD));
     }
 
 
