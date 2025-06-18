@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
+import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpsBasicClientFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,7 +19,6 @@ import org.apache.http.entity.StringEntity;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
-import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
 
 /**
  * Convert a SearchQuery to JSON, send it to Elasticsearch, and convert the JSON
@@ -36,7 +37,8 @@ public class ESQuery {
             throws SearchEngineException {
         String queryString = new QueryConverter(query).asString();
         String response = doTheQuery(queryString);
-        return new ResponseParser(response).parse();
+        return new ResponseParser(response)
+            .parse(query.getFacetTextToMatch(), query.isFacetTextCompareCaseInsensitive());
     }
 
     private String doTheQuery(String queryString) {
@@ -90,6 +92,9 @@ public class ESQuery {
 
         public HttpResponse execute() throws SearchEngineException {
             try {
+                if (this.getURI().getScheme().equals("https")) {
+                    return ESHttpsBasicClientFactory.getHttpClient().execute(this);
+                }
                 return HttpClientFactory.getHttpClient().execute(this);
             } catch (IOException e) {
                 throw new SearchEngineException(e);
