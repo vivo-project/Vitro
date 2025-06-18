@@ -1,8 +1,11 @@
 package edu.cornell.mannlib.vitro.webapp.searchengine.elasticsearch;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,32 +45,147 @@ public class ExpressionTransformer {
     }
 
     public static String fillInMissingOperators(String query) {
-        String[] tokens = query.split(" ");
+        String[] tokens = removeInvalidParentheses(List.of(query.split(" "))).toArray(new String[0]);
         StringBuilder modifiedQuery = new StringBuilder();
 
+        boolean insidePhrase = false;
+        int parenBalance = 0;
+        String currentToken = "";
+
         for (int i = 0; i < tokens.length; i++) {
-            String currentToken = tokens[i];
+            currentToken = insidePhrase ? currentToken + " " + tokens[i] : tokens[i];
 
-            if (!priorities.containsKey(currentToken) && !currentToken.contains(":") && !currentToken.equals(")")) {
-                currentToken = "ALLTEXT:" + currentToken + " OR nameLowercaseSingleValued:" + currentToken;
+            if (currentToken.startsWith("\"") && !insidePhrase && hasClosingQuote(tokens, i)) {
+                insidePhrase = true;
+            } else if (currentToken.endsWith("\"") && insidePhrase) {
+                insidePhrase = false;
             }
 
-            if (i > 0 && currentToken.contains(":") && !priorities.containsKey(tokens[i - 1])) {
-                modifiedQuery.append(" OR ");
+            boolean isOpeningParen = currentToken.equals("(");
+            boolean isClosingParen = currentToken.equals(")");
+            boolean isLogicalOperator = priorities.containsKey(currentToken);
+            boolean isFieldQuery = isTokenAPredefinedFieldQuery(currentToken);
+
+            if (isOpeningParen) {
+                parenBalance++;
+            } else if (isClosingParen) {
+                if (parenBalance == 0) {
+                    continue;
+                }
+                parenBalance--;
             }
 
-            if (i > 0 && currentToken.startsWith("(") && !priorities.containsKey(tokens[i - 1])) {
+            if (i > 0 && isOpeningParen && !priorities.containsKey(tokens[i - 1]) && !tokens[i - 1].equals("(") &&
+                hasClosingParen(tokens, i)) {
                 modifiedQuery.append(" AND ");
             }
 
-            modifiedQuery.append(currentToken);
+            if (i > 0 && tokens[i - 1].equals(")") && !insidePhrase && !isLogicalOperator && !isClosingParen) {
+                modifiedQuery.append(" AND ");
+            }
 
-            if (i < tokens.length - 1) {
-                modifiedQuery.append(" ");
+            if (i > 0 && isFieldQuery && !priorities.containsKey(tokens[i - 1]) && !tokens[i - 1].equals("(")) {
+                modifiedQuery.append(" OR ");
+            }
+
+            if (!isLogicalOperator && !isFieldQuery && !isOpeningParen && !isClosingParen && !insidePhrase) {
+                if (i > 0 && modifiedQuery.toString().trim().endsWith("(")) {
+                    modifiedQuery.append(" OR ");
+                }
+                currentToken = "( ALLTEXT:" + currentToken + " OR nameLowercaseSingleValued:" + currentToken + " )";
+            }
+
+            if (!insidePhrase) {
+                modifiedQuery.append(currentToken);
+                if (i < tokens.length - 1) {
+                    modifiedQuery.append(" ");
+                }
             }
         }
 
+        if (modifiedQuery.length() == 0 && insidePhrase) {
+            return "ALLTEXT: " + currentToken + "\"";
+        }
+
         return modifiedQuery.toString();
+    }
+
+    public static List<String> removeInvalidParentheses(List<String> tokens) {
+        List<String> result = new ArrayList<>();
+        Deque<Integer> openParenIndexes = new ArrayDeque<>();
+
+        boolean insideQuotes = false;
+
+        Set<Integer> invalidIndexes = new HashSet<>();
+
+        for (int i = 0; i < tokens.size(); i++) {
+            String token = tokens.get(i);
+
+            long quoteCount = token.chars().filter(ch -> ch == '"').count();
+            if (quoteCount % 2 != 0) {
+                insideQuotes = !insideQuotes;
+            }
+
+            if (!insideQuotes) {
+                if (token.equals("(")) {
+                    openParenIndexes.push(i);
+                } else if (token.equals(")")) {
+                    if (!openParenIndexes.isEmpty()) {
+                        openParenIndexes.pop(); // matched
+                    } else {
+                        invalidIndexes.add(i); // unmatched closing paren
+                    }
+                }
+            }
+        }
+
+        invalidIndexes.addAll(openParenIndexes);
+
+        for (int i = 0; i < tokens.size(); i++) {
+            if (!invalidIndexes.contains(i) && !tokens.get(i).isBlank()) {
+                result.add(tokens.get(i));
+            }
+        }
+
+        return result;
+    }
+
+    private static boolean hasClosingParen(String[] tokens, int fromIndex) {
+        boolean insideQuotes = false;
+
+        for (int j = fromIndex + 1; j < tokens.length; j++) {
+            String token = tokens[j];
+
+            long quoteCount = token.chars().filter(ch -> ch == '"').count();
+            if (quoteCount % 2 != 0) {
+                insideQuotes = !insideQuotes;
+            }
+
+            if (!insideQuotes && token.equals(")")) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static boolean hasClosingQuote(String[] tokens, int fromIndex) {
+        boolean insideQuotes = false;
+        for (int j = fromIndex; j < tokens.length; j++) {
+            long quoteCount = tokens[j].chars().filter(ch -> ch == '"').count();
+            if (quoteCount % 2 != 0) {
+                insideQuotes = !insideQuotes;
+            }
+        }
+        return !insideQuotes;
+    }
+
+    public static boolean isTokenAPredefinedFieldQuery(String token) {
+        if (!token.contains(":")) {
+            return false;
+        }
+
+        return !token.startsWith(":") && !token.endsWith(":");
     }
 
     private static SearchType decideQueryType(String field, String value) {
