@@ -59,15 +59,13 @@ public class SiteStyleController extends FreemarkerHttpServlet {
     public static final String URL_HERE = UrlBuilder.getUrl("/siteStyle");
     private static final String PARAMETER_ACTION = "action";
 
-    public static final String BODY_BACK_LOCATION = "backLocation";
-    public static final String BODY_FORM_ACTION_UPLOAD = "actionUpload";
-    public static final String BODY_FORM_ACTION_REMOVE = "actionRemove";
     public static final String ACTION_UPLOAD = "upload";
     public static final String ACTION_REMOVE = "remove";
 
 
     public static boolean customCssUrlLoaded = false;
     public static String customCssUrl = null;
+    public static String customCssFileUri = null;
 
 
     private FileStorage fileStorage;
@@ -135,7 +133,6 @@ public class SiteStyleController extends FreemarkerHttpServlet {
         if ("remove".equals(action)) {
             removeCssFile(vreq);
             showMainStyleEditPage(request, response, "CSS file removed.");
-            return;
         } else if ("upload".equals(action)) {
             try {
                 uploadCssFile(vreq);
@@ -143,10 +140,8 @@ public class SiteStyleController extends FreemarkerHttpServlet {
                 throw new ServletException(e);
             }
             showMainStyleEditPage(request, response, "Uploaded CSS file successfully.");
-            return;
         } else {
             showMainStyleEditPage(request, response, "No action specified.");
-            return;
         }
     }
 
@@ -192,19 +187,19 @@ public class SiteStyleController extends FreemarkerHttpServlet {
 
         WebappDaoFactory webAppDaoFactory = vreq.getUnfilteredWebappDaoFactory();
         UploadedFileHelper fileHelper = new UploadedFileHelper(fileStorage, webAppDaoFactory, getServletContext());
+        removeCssFileDisplayModel(fileHelper);
         FileInfo fileInfo = createFile(file, "custom-style.css", fileHelper);
 
-        String cssFilePath = UrlBuilder.getUrl(fileInfo.getBytestreamAliasUrl());
-        updateCssFileDisplayModel(cssFilePath);
-
-        SiteStyleController.customCssUrlLoaded = true;
-        SiteStyleController.customCssUrl = cssFilePath;
-
-        return;
+        updateCssFileDisplayModel(fileInfo);
+        fileHelper.attachFileToSubject(fileInfo, VitroVocabulary.PROPERTY_CUSTOMSTYLE,
+            VitroVocabulary.PORTAL_CUSTOMCSSFILEURI);
     }
 
     private void removeCssFile(VitroRequest vreq) {
-        removeCssFileDisplayModel();
+        WebappDaoFactory webAppDaoFactory = vreq.getUnfilteredWebappDaoFactory();
+        UploadedFileHelper fileHelper = new UploadedFileHelper(fileStorage, webAppDaoFactory, getServletContext());
+
+        removeCssFileDisplayModel(fileHelper);
         resetCustomCssCache();
     }
 
@@ -228,7 +223,10 @@ public class SiteStyleController extends FreemarkerHttpServlet {
     }
 
 
-    private void updateCssFileDisplayModel(String cssFilePath) {
+    private void updateCssFileDisplayModel(FileInfo fileInfo) {
+        String cssFilePath = UrlBuilder.getUrl(fileInfo.getBytestreamAliasUrl());
+
+
         ContextModelAccess cma = ModelAccess.getInstance();
         OntModel displayModel = cma.getOntModel(ModelNames.DISPLAY);
 
@@ -237,17 +235,26 @@ public class SiteStyleController extends FreemarkerHttpServlet {
         String propertyUri = VitroVocabulary.PORTAL_CUSTOMCSSPATH;
         Property property = ResourceFactory.createProperty(propertyUri);
 
-        displayModel.removeAll(portalResource, property, null);
+        String propertyUriFileUri = VitroVocabulary.PORTAL_CUSTOMCSSFILEURI;
+        Property propertyFileUri = ResourceFactory.createProperty(propertyUriFileUri);
 
-        if (!cssFilePath.isEmpty() && !cssFilePath.equals("null")) {
-            Statement statement =
+        if (!cssFilePath.isEmpty()) {
+            Statement statementImageUrl =
                 new StatementImpl(portalResource, property, ResourceFactory.createTypedLiteral(cssFilePath));
-            displayModel.add(statement);
+            displayModel.add(statementImageUrl);
+            Statement statementUri = new StatementImpl(portalResource, propertyFileUri,
+                ResourceFactory.createTypedLiteral(fileInfo.getUri()));
+            displayModel.add(statementUri);
+
+            SiteStyleController.customCssUrlLoaded = true;
+            SiteStyleController.customCssUrl = cssFilePath;
+            SiteStyleController.customCssFileUri = fileInfo.getUri();
+
         }
     }
 
 
-    private void removeCssFileDisplayModel() {
+    private void removeCssFileDisplayModel(UploadedFileHelper fileHelper) {
         ContextModelAccess cma = ModelAccess.getInstance();
         OntModel displayModel = cma.getOntModel(ModelNames.DISPLAY);
 
@@ -255,6 +262,14 @@ public class SiteStyleController extends FreemarkerHttpServlet {
 
         Property property = ResourceFactory.createProperty(VitroVocabulary.PORTAL_CUSTOMCSSPATH);
         displayModel.removeAll(themeResource, property, null);
+
+        String url = SiteStyleController.getCustomCssUrlCache();
+        String fileUri = SiteStyleController.customCssFileUri;
+        if (url != null) {
+
+            fileHelper.removeUploadedFile(VitroVocabulary.PROPERTY_CUSTOMSTYLE, VitroVocabulary.PORTAL_CUSTOMCSSPATH,
+                fileUri);
+        }
     }
 
 
@@ -262,28 +277,35 @@ public class SiteStyleController extends FreemarkerHttpServlet {
         ContextModelAccess cma = ModelAccess.getInstance();
         OntModel displayModel = cma.getOntModel(ModelNames.DISPLAY);
 
-        Resource s = ResourceFactory.createResource(VitroVocabulary.PROPERTY_CUSTOMSTYLE);
+        Resource styleResource = ResourceFactory.createResource(VitroVocabulary.PROPERTY_CUSTOMSTYLE);
         Property customCssPathProperty = ResourceFactory.createProperty(VitroVocabulary.PORTAL_CUSTOMCSSPATH);
-        StmtIterator iter = displayModel.listStatements(s, customCssPathProperty, (RDFNode) null);
+        Property customCssFileUriProperty = ResourceFactory.createProperty(
+            VitroVocabulary.PORTAL_CUSTOMCSSFILEURI);
 
-        if (iter.hasNext()) {
-            Statement stmt = iter.nextStatement();
-            RDFNode object = stmt.getObject();
+        customCssUrl = getLiteralProperty(displayModel, styleResource, customCssPathProperty);
+        customCssFileUri = getLiteralProperty(displayModel, styleResource, customCssFileUriProperty);
 
-            if (object.isLiteral()) {
-                customCssUrl = object.asLiteral().getString();
-            } else {
-                customCssUrl = null;
-            }
-        } else {
-            customCssUrl = null;
-        }
         customCssUrlLoaded = true;
     }
+
+    private static String getLiteralProperty(OntModel model, Resource subject, Property property) {
+        StmtIterator stmtIterator = model.listStatements(subject, property, (RDFNode) null);
+        try {
+            if (stmtIterator.hasNext()) {
+                RDFNode object = stmtIterator.nextStatement().getObject();
+                return object.isLiteral() ? object.asLiteral().getString() : null;
+            }
+        } finally {
+            stmtIterator.close();
+        }
+        return null;
+    }
+
 
     public static void resetCustomCssCache() {
         customCssUrlLoaded = false;
         customCssUrl = null;
+        customCssFileUri = null;
     }
 
     public static String getCustomCssUrlCache() {

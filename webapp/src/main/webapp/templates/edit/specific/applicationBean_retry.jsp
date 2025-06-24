@@ -72,6 +72,9 @@
                 actionUploadUrl: '${actionUpload}',
                 actionRemoveUrl: '${actionRemove}',
             };
+            var i18nStrings = {
+                confirmRemove: '${i18n.text('confirm_remove_custom_css')}',
+            }
         </script>
 
 <!--

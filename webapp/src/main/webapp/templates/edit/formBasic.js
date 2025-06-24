@@ -41,7 +41,7 @@
     }
 
     function resetStyles() {
-        if (confirm('Are you sure you want to remove the custom CSS?')) {
+        if (confirm(i18nStrings.confirmRemove)) {
             fetch(fromUrls.actionRemoveUrl, { method: 'POST', credentials: 'same-origin' })
                 .then(function () {
                     window.location.reload();
@@ -66,7 +66,6 @@
                 reader.readAsText(file);
             }
         });
-
 
         document.querySelector("[name=_update][type=submit]").addEventListener('click', onSave);
 

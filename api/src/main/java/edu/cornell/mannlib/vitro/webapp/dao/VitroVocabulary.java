@@ -123,6 +123,8 @@ public class VitroVocabulary {
     public static final String PORTAL_COPYRIGHTURL = vitroURI+"copyrightURL";
     public static final String PORTAL_COPYRIGHTANCHOR = vitroURI+"copyrightAnchor";
     public static final String PORTAL_CUSTOMCSSPATH = vitroURI+"customCssPath";
+    public static final String PORTAL_CUSTOMCSSFILEURI = vitroURI+"customCssFileUri";
+
 
     // reusing displayRank property above
     public static final String PORTAL_URLPREFIX = vitroURI + "urlPrefix";
