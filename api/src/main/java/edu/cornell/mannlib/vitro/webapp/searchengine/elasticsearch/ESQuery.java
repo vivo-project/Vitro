@@ -19,6 +19,9 @@ import org.apache.http.entity.StringEntity;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 
 /**
  * Convert a SearchQuery to JSON, send it to Elasticsearch, and convert the JSON
@@ -35,7 +38,14 @@ public class ESQuery {
 
     public SearchResponse query(SearchQuery query)
             throws SearchEngineException {
-        String queryString = new QueryConverter(query).asString();
+        QueryParser parser = new QueryParser("defaultField", new StandardAnalyzer());
+        boolean treatAsLuceneQuery = true;
+        try {
+            parser.parse(query.getQuery());
+        } catch (ParseException e) {
+            treatAsLuceneQuery = false;
+        }
+        String queryString = new QueryConverter(query, treatAsLuceneQuery).asString();
         String response = doTheQuery(queryString);
         return new ResponseParser(response)
             .parse(query.getFacetTextToMatch(), query.isFacetTextCompareCaseInsensitive());

@@ -11,18 +11,17 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery.Order;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Accept a SearchQuery and make it available as a JSON string, suitable for
@@ -39,9 +38,9 @@ public class QueryConverter {
     private final List<String> returnFields;
     private final Map<String, Object> fullMap;
 
-    public QueryConverter(SearchQuery query) {
+    public QueryConverter(SearchQuery query, boolean treatAsLuceneQuery) {
         this.query = query;
-        this.queryAndFilters = filteredOrNot();
+        this.queryAndFilters = filteredOrNot(treatAsLuceneQuery);
         this.sortFields = figureSortFields();
         this.facets = figureFacets();
         this.highlighter = figureHighlighter();
@@ -50,14 +49,29 @@ public class QueryConverter {
         this.fullMap = figureFullMap();
     }
 
-    private Map<String, Object> filteredOrNot() {
+    private Map<String, Object> filteredOrNot(boolean treatAsLuceneQuery) {
         ExpressionTransformer transformer = new ExpressionTransformer();
-        StringBuilder queryForParsing = new StringBuilder("( " + ExpressionTransformer.fillInMissingOperators(
-            ExpressionTransformer.removeWhitespacesFromRangeExpression(
-                query.getQuery()
-                    .replace("(", "( ")
-                    .replace(")", " )")
-            )) + " )");
+
+        StringBuilder queryForParsing;
+        if (treatAsLuceneQuery) {
+            queryForParsing = new StringBuilder("( " + ExpressionTransformer.fillInMissingOperators(
+                ExpressionTransformer.removeWhitespacesFromRangeExpression(
+                    query.getQuery()
+                        .replace("(", "( ")
+                        .replace(")", " )")
+                )) + " )");
+        } else {
+            queryForParsing = new StringBuilder(Arrays.stream(query.getQuery().trim().split("\\s+"))
+                .filter(token -> !token.isBlank() && !token.equals("\""))
+                .map(token -> {
+                    if (token.startsWith("classgroup:")) {
+                        return token;
+                    }
+
+                    return "ALLTEXT:" + token + " OR nameLowercaseSingleValued:" + token;
+                })
+                .collect(Collectors.joining(" OR ")));
+        }
 
         for (String filter : query.getFilters()) {
             queryForParsing.append(" AND ").append(filter);
@@ -83,10 +97,10 @@ public class QueryConverter {
 
     private Map<String, Object> buildFilterStructure() {
         return tree() //
-                .put("bool", tree() //
-                        .put("must", new QueryStringMap(query.getQuery()).map) //
-                        .put("filter", buildFiltersList())) //
-                .asMap();
+            .put("bool", tree() //
+                .put("must", new QueryStringMap(query.getQuery()).map) //
+                .put("filter", buildFiltersList())) //
+            .asMap();
     }
 
     private List<Map<String, Object>> buildFiltersList() {
@@ -121,9 +135,9 @@ public class QueryConverter {
 
     private Map<String, Object> figureHighlighter() {
         return tree() //
-                .put("fields", tree() //
-                        .put("ALLTEXT", EMPTY_JSON_MAP))
-                .asMap();
+            .put("fields", tree() //
+                .put("ALLTEXT", EMPTY_JSON_MAP))
+            .asMap();
     }
 
     private Map<String, Object> figureFacet(String field) {
@@ -154,15 +168,15 @@ public class QueryConverter {
 
     private Map<String, Object> figureFullMap() {
         return tree() //
-                .put("track_total_hits", true)
-                .put("query", queryAndFilters) //
-                .put("from", ifPositive(query.getStart())) //
-                .put("highlight", highlighter)
-                .put("size", ifPositive(query.getRows())) //
-                .put("sort", sortFields) //
-                .put("_source", returnFields) //
-                .put("aggs", facets) //
-                .asMap();
+            .put("track_total_hits", true)
+            .put("query", queryAndFilters) //
+            .put("from", ifPositive(query.getStart())) //
+            .put("highlight", highlighter)
+            .put("size", ifPositive(query.getRows())) //
+            .put("sort", sortFields) //
+            .put("_source", returnFields) //
+            .put("aggs", facets) //
+            .asMap();
     }
 
     public String asString() throws SearchEngineException {
@@ -183,25 +197,25 @@ public class QueryConverter {
 
         /**
          * This is a kluge, but perhaps it will work for now.
-         * 
+         * <p>
          * Apparently Solr is willing to put up with query strings that contain
          * special characters in odd places, but Elasticsearch is not.
-         * 
+         * <p>
          * So, a query string of "classgroup:http://this/that" must be escaped
          * as "classgroup:http\:\/\/this\/that". Notice that the first colon
          * delimits the field name, and so must not be escaped.
-         * 
+         * <p>
          * But what if no field is specified? Then all colons must be escaped.
          * How would we distinguish that?
-         * 
+         * <p>
          * And what if the query is more complex, and more than one field is
          * specified? What if other special characters are included?
-         * 
+         * <p>
          * This could be a real problem.
          */
         private String escape(String queryString) {
             return queryString.replace(":", "\\:").replace("/", "\\/")
-                    .replaceFirst("\\\\:", ":");
+                .replaceFirst("\\\\:", ":");
         }
 
         private Map<String, String> makeInnerMap(String queryString) {

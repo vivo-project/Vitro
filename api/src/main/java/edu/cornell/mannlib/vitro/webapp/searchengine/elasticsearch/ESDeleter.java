@@ -85,7 +85,7 @@ public class ESDeleter {
             queryString = queryString.replace("[", "").replace("]", "").replace("*", "0");
         }
         SearchQuery query = new BaseSearchQuery().setQuery(queryString);
-        String queryJson = new QueryConverter(query).asString();
+        String queryJson = new QueryConverter(query, true).asString();
 
         try {
             HttpClient httpClient;
