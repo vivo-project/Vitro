@@ -153,7 +153,7 @@ public class SiteStyleController extends FreemarkerHttpServlet {
             is = file.getInputStream();
             mediaType = tika.detect(is);
         } catch (IOException e) {
-            log.error(e.getLocalizedMessage());
+            log.error(e,e);
         }
         return mediaType;
     }
@@ -171,7 +171,7 @@ public class SiteStyleController extends FreemarkerHttpServlet {
         try {
             fileInfo = fileHelper.createFile(storedFileName, getMediaType(file), file.getInputStream());
         } catch (Exception e) {
-            log.error(e.getLocalizedMessage());
+            log.error(e,e);
             throw new FileUploadController.FileUploadException(e.getLocalizedMessage());
         }
         return fileInfo;
