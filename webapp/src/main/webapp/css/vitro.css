@@ -521,3 +521,83 @@ table#table-listing td {
 table#table-listing td  a {
 	word-wrap: break-word;
 }
+
+/* Logo upload */
+.logo-section {
+    margin-bottom: 2rem;
+}
+
+.logo-label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #555;
+}
+
+.logo-preview {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    background-color: #f2f2f2;
+    border: 1px dashed #ccc;
+    border-radius: 8px;
+    margin: 0.5rem 0;
+    display: block;
+}
+
+.logo-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+    display: none;
+}
+
+.logo-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo-controls button {
+    background: #e0e0e0;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.logo-controls button:hover {
+    background: #ccc;
+}
+
+/* If input selector have attribute [user-changed="false"] then .chain gets this style */
+input#primary-lighter-color[user-changed="false"] + .chain {
+    content: "";
+    color: #888;    
+    position: absolute;
+    top: 16px;
+    right: -3px;
+    width: 13px;
+    height: 22px;
+    background-image: url('../images/link-chain.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    user-select: none;
+}
+
+input#primary-darker-color[user-changed="false"] + .chain {
+    content: "";
+    color: #888;    
+    position: absolute;
+    bottom: 16px;
+    right: -3px;
+    width: 13px;
+    height: 22px;
+    background-image: url('../images/link-chain.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    user-select: none;
+}
