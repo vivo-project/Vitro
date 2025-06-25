@@ -522,31 +522,6 @@ table#table-listing td  a {
 	word-wrap: break-word;
 }
 
-/* ADMIN PANEL */
-
-.advancedThemeColor {
-    display: none;
-}
-
-.themeColorReset > span {
-    color: #888;
-}
-
-.themeColorResetButton {
-    background: #ff3737;
-    color: white;
-    border-radius: 4px;
-    padding: 3px 8px;
-    border: 1px solid red;
-    cursor: pointer;
-}
-
-.themeColorPickerWrapper{
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
 /* Logo upload */
 .logo-section {
     margin-bottom: 2rem;
@@ -596,7 +571,7 @@ table#table-listing td  a {
     background: #ccc;
 }
 
-/* If input selector have attrivute [user-changed="false"] then .chain gets this style */
+/* If input selector have attribute [user-changed="false"] then .chain gets this style */
 input#primary-lighter-color[user-changed="false"] + .chain {
     content: "";
     color: #888;    
