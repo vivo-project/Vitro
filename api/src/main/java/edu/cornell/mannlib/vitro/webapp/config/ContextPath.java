@@ -7,17 +7,30 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class ContextPath {
+    private static final String CONTEXT_PATH_EXCLUDE = "context.path.exclude";
     static final Log log = LogFactory.getLog(ContextPath.class);
 
     public static String getPath(HttpServletRequest request) {
-        String path = ConfigurationProperties.getInstance().getProperty("context.path");
-        log.debug(String.format("Custom path %s, request path %s", path, request.getContextPath()));
-        return path == null ? request.getContextPath() : path;
+        if (isContextPathExcluded()) {
+            return "";
+        } else {
+            return request.getContextPath();
+        }
     }
 
     public static String getPath(ServletContext ctx) {
-        String path = ConfigurationProperties.getInstance().getProperty("context.path");
-        log.debug(String.format("Custom path %s, ctx path %s", path, ctx.getContextPath()));
-        return path == null ? ctx.getContextPath() : path;
+        if (isContextPathExcluded()) {
+            return "";
+        } else {
+            return ctx.getContextPath();
+        }
+    }
+
+    private static boolean isContextPathExcluded() {
+        String value = ConfigurationProperties.getInstance().getProperty(CONTEXT_PATH_EXCLUDE);
+        if (value == null) {
+            return false;
+        }
+        return Boolean.parseBoolean(value);
     }
 }
