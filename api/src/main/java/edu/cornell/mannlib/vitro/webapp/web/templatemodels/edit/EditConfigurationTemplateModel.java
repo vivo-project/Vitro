@@ -26,6 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
@@ -715,11 +716,11 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 
     //Get confirm deletion url
     public String getDeleteProcessingUrl() {
-    	return vreq.getContextPath() + "/deletePropertyController";
+    	return ContextPath.getPath(vreq) + "/deletePropertyController";
     }
 
     public String getDeleteIndividualProcessingUrl() {
-      return vreq.getContextPath() + "/deleteIndividualController";
+      return ContextPath.getPath(vreq) + "/deleteIndividualController";
     }
 
     //TODO: Check if this logic is correct and delete prohibited does not expect a specific value

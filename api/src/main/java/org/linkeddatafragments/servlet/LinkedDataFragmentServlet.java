@@ -1,6 +1,7 @@
 package org.linkeddatafragments.servlet;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import org.apache.jena.riot.Lang;
 import org.linkeddatafragments.config.ConfigReader;
 import org.linkeddatafragments.datasource.DataSourceFactory;
@@ -128,7 +129,7 @@ public class LinkedDataFragmentServlet extends HttpServlet {
      * @throws IOException
      */
     private IDataSource getDataSource(HttpServletRequest request) throws DataSourceNotFoundException {
-        String contextPath = request.getContextPath();
+        String contextPath = ContextPath.getPath(request);
         String requestURI = request.getRequestURI();
 
         String path = contextPath == null

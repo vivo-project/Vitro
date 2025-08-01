@@ -16,6 +16,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 
@@ -42,8 +43,7 @@ public class IndividualRequestAnalyzer {
 		this.vreq = vreq;
 
 		// get URL without hostname or servlet context
-		this.url = vreq.getRequestURI().substring(
-				vreq.getContextPath().length());
+		this.url = vreq.getRequestURI().substring(ContextPath.getPath(vreq).length());
 
 		this.analysisContext = analysisContext;
 	}

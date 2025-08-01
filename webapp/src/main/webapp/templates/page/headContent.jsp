@@ -7,6 +7,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean"%>
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.config.ContextPath"%>
 <%!
   public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.templates.page.headContent.jsp");
 %>
@@ -14,7 +15,7 @@
   VitroRequest vreq = new VitroRequest(request);
 
   String themeDir = vreq.getAppBean().getThemeDir();
-  themeDir = vreq.getContextPath() + '/' + themeDir;
+  themeDir = ContextPath.getPath(vreq) + '/' + themeDir;
 %>
 
 <!-- headContent.jsp -->
