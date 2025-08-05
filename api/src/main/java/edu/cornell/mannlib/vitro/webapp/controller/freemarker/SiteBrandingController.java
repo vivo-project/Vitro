@@ -45,9 +45,7 @@ public class SiteBrandingController extends VitroAjaxController {
 
     @Override
     protected AuthorizationRequest requiredActions(VitroRequest vreq) {
-        // return SimplePermission.SEE_SITE_ADMIN_PAGE.ACTION;
-        return SimplePermission.PAGE_VIEWABLE_PUBLIC.ACTION;
-
+        return SimplePermission.EDIT_SITE_INFORMATION.ACTION;
     }
 
     @Override

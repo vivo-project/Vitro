@@ -111,6 +111,12 @@ public class SiteBrandingLogoController extends FreemarkerHttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         VitroRequest vreq = new VitroRequest(request);
+
+        if (!isAuthorizedToDisplayPage(request, response,
+            requiredActions(vreq))) {
+            return;
+        }
+
         String action = vreq.getParameter(PARAMETER_ACTION);
 
         if (Objects.equals(vreq.getMethod(), "POST")) {
