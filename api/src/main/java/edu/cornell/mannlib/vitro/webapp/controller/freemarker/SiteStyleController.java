@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FileUploadController.FileUploadException;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
@@ -97,19 +96,16 @@ public class SiteStyleController extends FreemarkerHttpServlet {
     }
 
     /**
-     * The required action depends on what we are trying to do.
-     */
-    @Override
-    protected AuthorizationRequest requiredActions(VitroRequest vreq) {
-        return SimplePermission.EDIT_SITE_INFORMATION.ACTION;
-    }
-
-    /**
      * Handle the different actions. If not specified, the default action is to
      * show the intro screen.
      */
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        if (!isAuthorizedToDisplayPage(request, response,
+            SimplePermission.EDIT_SITE_INFORMATION.ACTION)) {
+            return;
+        }
+
         VitroRequest vreq = new VitroRequest(request);
 
         String action = vreq.getParameter(PARAMETER_ACTION);
@@ -126,6 +122,11 @@ public class SiteStyleController extends FreemarkerHttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        if (!isAuthorizedToDisplayPage(request, response,
+            SimplePermission.EDIT_SITE_INFORMATION.ACTION)) {
+            return;
+        }
+
         VitroRequest vreq = new VitroRequest(request);
 
         String action = vreq.getParameter(PARAMETER_ACTION);
@@ -153,7 +154,7 @@ public class SiteStyleController extends FreemarkerHttpServlet {
             is = file.getInputStream();
             mediaType = tika.detect(is);
         } catch (IOException e) {
-            log.error(e,e);
+            log.error(e, e);
         }
         return mediaType;
     }
@@ -171,7 +172,7 @@ public class SiteStyleController extends FreemarkerHttpServlet {
         try {
             fileInfo = fileHelper.createFile(storedFileName, getMediaType(file), file.getInputStream());
         } catch (Exception e) {
-            log.error(e,e);
+            log.error(e, e);
             throw new FileUploadController.FileUploadException(e.getLocalizedMessage());
         }
         return fileInfo;
