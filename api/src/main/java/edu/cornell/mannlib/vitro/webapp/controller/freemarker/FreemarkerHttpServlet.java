@@ -17,9 +17,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.checks.QueryResultsMapCache;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
@@ -52,6 +49,9 @@ import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 import freemarker.template.utility.DeepUnwrap;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class FreemarkerHttpServlet extends VitroHttpServlet  {
 
@@ -472,6 +472,9 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
 
         // Add these accumulator objects. They will collect tags so the template can write them
         // at the appropriate location.
+
+        map.put("customCssPath", SiteStyleController.getCustomCssUrlCache());
+
         map.put("stylesheets", new Tags().wrap());
         map.put("scripts", new Tags().wrap());
         map.put("headScripts", new Tags().wrap());
@@ -479,6 +482,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
 
         return map;
     }
+
 
     private String normalizeServletName(String name) {
         // Return a uniform value for the home page.
