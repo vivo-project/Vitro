@@ -521,3 +521,13 @@ table#table-listing td {
 table#table-listing td  a {
 	word-wrap: break-word;
 }
+
+a.button.blue {
+    padding: 7px 22px 8px;
+    font-family: sans-serif;
+    display: inline-block;
+}
+
+.button.red {
+    background-color: #b40000
+}
