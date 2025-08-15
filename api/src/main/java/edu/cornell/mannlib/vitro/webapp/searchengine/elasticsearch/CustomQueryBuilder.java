@@ -77,8 +77,9 @@ public class CustomQueryBuilder {
                 )._toQuery();
             default:
                 return MatchPhraseQuery.of(m -> m
-                    .field(field)
-                    .query(value.substring(1, value.length() - 1)) // Remove leading and trailing '"' character
+                        .field(field)
+                        .query(value.length() > 1 ? value.substring(1, value.length() - 1) : value)
+                    // Remove leading and trailing '"' character
                 )._toQuery();
         }
     }

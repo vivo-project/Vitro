@@ -38,14 +38,20 @@ public class ESQuery {
 
     public SearchResponse query(SearchQuery query)
             throws SearchEngineException {
-        QueryParser parser = new QueryParser("defaultField", new StandardAnalyzer());
-        boolean treatAsLuceneQuery = true;
-        try {
-            parser.parse(query.getQuery());
-        } catch (ParseException e) {
-            treatAsLuceneQuery = false;
-        }
-        String queryString = new QueryConverter(query, treatAsLuceneQuery).asString();
+//        QueryParser parser = new QueryParser("defaultField", new StandardAnalyzer());
+//        boolean treatAsStructuredQuery = true;
+//        if (query.isSimpleQuery()) {
+//            treatAsStructuredQuery = false;
+//        } else {
+//            try {
+//                parser.parse(query.getQuery());
+//            } catch (ParseException ignored) {
+//                treatAsStructuredQuery = false;
+//            }
+//        }
+        boolean treatAsStructuredQuery = !query.isSimpleQuery();
+
+        String queryString = new QueryConverter(query, treatAsStructuredQuery).asString();
         String response = doTheQuery(queryString);
         return new ResponseParser(response)
             .parse(query.getFacetTextToMatch(), query.isFacetTextCompareCaseInsensitive());
@@ -77,10 +83,10 @@ public class ESQuery {
      * allow you to put a body on a GET request. In online discussion, some say
      * that the HTTP spec is ambiguous on this point, so each implementation
      * makes its own choice. For example, CURL allows it.
-     * 
+     *
      * More to the point however, is that ElasticSearch requires it. So here's a
      * simple class to make that possible.
-     * 
+     *
      * USE POST INSTEAD!!
      */
     private static class ESFunkyGetRequest

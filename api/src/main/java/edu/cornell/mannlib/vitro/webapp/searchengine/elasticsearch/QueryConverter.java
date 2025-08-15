@@ -49,11 +49,36 @@ public class QueryConverter {
         this.fullMap = figureFullMap();
     }
 
-    private Map<String, Object> filteredOrNot(boolean treatAsLuceneQuery) {
+    private Map<String, Object> filteredOrNot(boolean treatAsStructuredQuery) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.readValue(getES8Query(treatAsStructuredQuery).replaceFirst("Query: ", ""),
+                new TypeReference<Map<String, Object>>() {
+                });
+        } catch (JsonProcessingException e) {
+            log.error("Query parsing for ES8 failed, parsing it as unstructured query.");
+            if (treatAsStructuredQuery) {
+                return filteredOrNot(false);
+            }
+        }
+
+        log.error("Query parsing for ES8 failed, falling back to old parsing method for query " + query.getQuery());
+        return new QueryStringMap(query.getQuery()).map;
+    }
+
+    private Map<String, Object> buildFilterStructure() {
+        return tree() //
+            .put("bool", tree() //
+                .put("must", new QueryStringMap(query.getQuery()).map) //
+                .put("filter", buildFiltersList())) //
+            .asMap();
+    }
+
+    private String getES8Query(Boolean treatAsStructuredQuery) {
         ExpressionTransformer transformer = new ExpressionTransformer();
 
         StringBuilder queryForParsing;
-        if (treatAsLuceneQuery) {
+        if (treatAsStructuredQuery) {
             queryForParsing = new StringBuilder("( " + ExpressionTransformer.fillInMissingOperators(
                 ExpressionTransformer.removeWhitespacesFromRangeExpression(
                     query.getQuery()
@@ -79,28 +104,11 @@ public class QueryConverter {
 
         List<String> queryTokens = new ArrayList<>(Arrays.asList(queryForParsing.toString().split(" ")));
         queryTokens.removeIf(String::isEmpty);
-        String es8Query = BoolQuery.of(q -> {
+
+        return BoolQuery.of(q -> {
             q.must(transformer.parseAdvancedQuery(queryTokens));
             return q;
         })._toQuery().toString();
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            Map<String, Object> queryMap =
-                objectMapper.readValue(es8Query.replaceFirst("Query: ", ""), new TypeReference<Map<String, Object>>() {
-                });
-            return queryMap;
-        } catch (JsonProcessingException e) {
-            log.error("Query parsing for ES8 failed, falling back to old parsing method.");
-            return new QueryStringMap(query.getQuery()).map;
-        }
-    }
-
-    private Map<String, Object> buildFilterStructure() {
-        return tree() //
-            .put("bool", tree() //
-                .put("must", new QueryStringMap(query.getQuery()).map) //
-                .put("filter", buildFiltersList())) //
-            .asMap();
     }
 
     private List<Map<String, Object>> buildFiltersList() {

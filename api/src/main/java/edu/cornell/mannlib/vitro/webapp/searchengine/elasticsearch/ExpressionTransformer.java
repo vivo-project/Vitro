@@ -53,6 +53,10 @@ public class ExpressionTransformer {
         String currentToken = "";
 
         for (int i = 0; i < tokens.length; i++) {
+            if (tokens[i].trim().isEmpty()) {
+                continue;
+            }
+
             currentToken = insidePhrase ? currentToken + " " + tokens[i] : tokens[i];
 
             if (currentToken.startsWith("\"") && !insidePhrase && hasClosingQuote(tokens, i)) {
@@ -65,6 +69,12 @@ public class ExpressionTransformer {
             boolean isClosingParen = currentToken.equals(")");
             boolean isLogicalOperator = priorities.containsKey(currentToken);
             boolean isFieldQuery = isTokenAPredefinedFieldQuery(currentToken);
+
+            if (isFieldQuery && currentToken.contains(":\"") && !currentToken.endsWith("\"")) {
+                modifiedQuery.append(currentToken.split(":")[0]).append(":");
+                currentToken = currentToken.split(":")[1];
+                insidePhrase = true;
+            }
 
             if (isOpeningParen) {
                 parenBalance++;
@@ -91,8 +101,9 @@ public class ExpressionTransformer {
             if (!isLogicalOperator && !isFieldQuery && !isOpeningParen && !isClosingParen && !insidePhrase) {
                 if (i > 0 && modifiedQuery.toString().trim().endsWith("(")) {
                     modifiedQuery.append(" OR ");
+                } else if (!modifiedQuery.toString().endsWith(":")) {
+                    currentToken = "( ALLTEXT:" + currentToken + " OR nameLowercaseSingleValued:" + currentToken + " )";
                 }
-                currentToken = "( ALLTEXT:" + currentToken + " OR nameLowercaseSingleValued:" + currentToken + " )";
             }
 
             if (!insidePhrase) {
