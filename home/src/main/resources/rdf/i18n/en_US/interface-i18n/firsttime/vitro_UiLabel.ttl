@@ -6955,12 +6955,12 @@ uil-data:upload_new_css.Vitro
         uil:hasKey       "upload_new_css" ;
         uil:hasPackage   "Vitro-languages" .
 
-uil-data:cusotm_css_style.Vitro
+uil-data:custom_css_style.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
         rdfs:label       "Custom css file"@en-US ;
         uil:hasApp       "Vitro" ;
-        uil:hasKey       "cusotm_css_style" ;
+        uil:hasKey       "custom_css_style" ;
         uil:hasPackage   "Vitro-languages" .
 
 uil-data:confirm_remove_custom_css.Vitro

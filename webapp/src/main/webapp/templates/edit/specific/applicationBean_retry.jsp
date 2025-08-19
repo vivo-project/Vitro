@@ -42,7 +42,7 @@
 
         <br><br>
         
-        <label for="fileUpload" class="">${i18n.text('cusotm_css_style')}</label>
+        <label for="fileUpload" class="">${i18n.text('custom_css_style')}</label>
         <input type="file" id="fileUpload" name="fileUpload" accept=".css" style="margin-bottom: 10px; display: ${not empty customCssPath and customCssPath != 'null' ? 'none' : 'inline'};">
         <c:if test="${not empty customCssPath and customCssPath != 'null'}">
             <br>
