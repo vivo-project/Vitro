@@ -406,7 +406,7 @@ public class FileUploadController extends FreemarkerHttpServlet {
 		}
 	}
 
-	static class FileUploadException extends Exception {
+	public static class FileUploadException extends Exception {
 		private static final long serialVersionUID = 1L;
 		private final Object[] parameters;
 
