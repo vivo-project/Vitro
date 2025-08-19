@@ -65,6 +65,10 @@
 
         document.querySelector("[name=_update][type=submit]").addEventListener('click', onSave);
 
+        const form = document.getElementById('editForm');
+        if (form) {
+            form.setAttribute('enctype', 'multipart/form-data');
+        }
     });
 
 </script>
