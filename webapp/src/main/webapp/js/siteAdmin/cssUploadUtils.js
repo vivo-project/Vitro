@@ -104,6 +104,7 @@
         fileInput.value = '';
         clearBtn.remove();
         removeDynamicCss();
+        restoreCustomCss();
     }
 
     function removeDynamicCss() {
@@ -125,7 +126,17 @@
     function removeExistingCustomCss() {
         const existingCustomCss = document.getElementById('custom-css-path');
         if (existingCustomCss) {
+            // Store the custom CSS element for later restoration
+            window.storedCustomCss = existingCustomCss.cloneNode(true);
             existingCustomCss.remove();
+        }
+    }
+
+    function restoreCustomCss() {
+        // Restore the previously stored custom CSS if it exists
+        if (window.storedCustomCss) {
+            document.head.appendChild(window.storedCustomCss);
+            window.storedCustomCss = null; // Clear the stored reference
         }
     }
 
