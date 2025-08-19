@@ -42,13 +42,16 @@
 
         <br><br>
         
-        <label for="fileUpload" class="">${i18n.text('upload_new_css')}</label>
-        <input type="file" id="fileUpload" name="fileUpload" accept=".css">
+        <label for="fileUpload" class="">${i18n.text('cusotm_css_style')}</label>
+        <input type="file" id="fileUpload" name="fileUpload" accept=".css" style="margin-bottom: 10px; display: ${not empty customCssPath and customCssPath != 'null' ? 'none' : 'inline'};">
         <c:if test="${not empty customCssPath and customCssPath != 'null'}">
+            <br>
+            <button id="resetAction" type="button" class="button red" onclick="resetStyles()">${i18n.text('remove_custom_css')}</button>
+            <button id="uploadNewAction" type="button" class="button blue" onclick="showFileInput()">${i18n.text('upload_new_css')}</button>
             <br><br>
-            <button
-                id="resetAction" type="button" class="button red" onclick="resetStyles()">${i18n.text('remove_custom_css')}</button>
-            <a href="${customCssPath}" download="custom.css" class="button blue">${i18n.text('download_custom_css')}</a>
+            <div class="uploaded-file-info">
+                <a href="${customCssPath}" download="custom.css">${i18n.text('download_custom_css')}</a>
+            </div>
         </c:if>
 
         <br><br>
@@ -74,7 +77,7 @@
             };
             var i18nStrings = {
                 confirmRemove: '${i18n.text('confirm_remove_custom_css')}',
-            }
+            };
         </script>
 
 <!--

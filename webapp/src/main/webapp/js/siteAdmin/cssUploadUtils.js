@@ -46,29 +46,119 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('fileUpload').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (file && file.type === 'text/css') {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    let styleTag = document.getElementById('dynamic-uploaded-css');
-                    if (!styleTag) {
-                        styleTag = document.createElement('style');
-                        styleTag.id = 'dynamic-uploaded-css';
-                        document.head.appendChild(styleTag);
-                    }
-                    styleTag.textContent = e.target.result;
-                };
-                reader.readAsText(file);
-            }
+        initializeFileUpload();
+        initializeFormSubmission();
+        setFormEncoding();
+    });
+
+    function initializeFileUpload() {
+        const fileInput = document.getElementById('fileUpload');
+        if (!fileInput) return;
+
+        fileInput.addEventListener('change', handleFileSelection);
+    }
+
+    function handleFileSelection(event) {
+        const file = event.target.files[0];
+        const fileInput = event.target;
+        
+        removeClearButton();
+        
+        if (file && file.type === 'text/css') {
+            createClearButton(fileInput);
+            previewCssFile(file);
+        }
+    }
+
+    function removeClearButton() {
+        const existingClearBtn = document.getElementById('clearFileBtn');
+        if (existingClearBtn) {
+            existingClearBtn.remove();
+        }
+    }
+
+    function createClearButton(fileInput) {
+        const clearBtn = document.createElement('button');
+        clearBtn.id = 'clearFileBtn';
+        clearBtn.type = 'button';
+        clearBtn.innerHTML = '✕';
+        clearBtn.title = 'Remove selected file';
+        
+        // Style the clear button
+        Object.assign(clearBtn.style, {
+            marginLeft: '10px',
+            padding: '2px 6px',
+            border: '1px solid #ccc',
+            background: '#f5f5f5',
+            cursor: 'pointer'
         });
+        
+        clearBtn.addEventListener('click', function() {
+            clearFileSelection(fileInput, clearBtn);
+        });
+        
+        fileInput.parentNode.insertBefore(clearBtn, fileInput.nextSibling);
+    }
 
-        document.querySelector("[name=_update][type=submit]").addEventListener('click', onSave);
+    function clearFileSelection(fileInput, clearBtn) {
+        fileInput.value = '';
+        clearBtn.remove();
+        removeDynamicCss();
+    }
 
+    function removeDynamicCss() {
+        const dynamicCss = document.getElementById('dynamic-uploaded-css');
+        if (dynamicCss) {
+            dynamicCss.remove();
+        }
+    }
+
+    function previewCssFile(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            removeExistingCustomCss();
+            applyDynamicCss(e.target.result);
+        };
+        reader.readAsText(file);
+    }
+
+    function removeExistingCustomCss() {
+        const existingCustomCss = document.getElementById('custom-css-path');
+        if (existingCustomCss) {
+            existingCustomCss.remove();
+        }
+    }
+
+    function applyDynamicCss(cssContent) {
+        let styleTag = document.getElementById('dynamic-uploaded-css');
+        if (!styleTag) {
+            styleTag = document.createElement('style');
+            styleTag.id = 'dynamic-uploaded-css';
+            document.head.appendChild(styleTag);
+        }
+        styleTag.textContent = cssContent;
+    }
+
+    function initializeFormSubmission() {
+        const submitButton = document.querySelector("[name=_update][type=submit]");
+        if (submitButton) {
+            submitButton.addEventListener('click', onSave);
+        }
+    }
+
+    function setFormEncoding() {
         const form = document.getElementById('editForm');
         if (form) {
             form.setAttribute('enctype', 'multipart/form-data');
         }
-    });
+    }
 
+
+    function showFileInput() {
+        document.getElementById('fileUpload').style.display = 'inline';
+        document.getElementById('fileUpload').click();
+
+        document.getElementById('uploadNewAction').style.display = 'none';
+    }
+    
 </script>
