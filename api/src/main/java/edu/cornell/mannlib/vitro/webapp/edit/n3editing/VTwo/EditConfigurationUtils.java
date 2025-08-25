@@ -22,6 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -172,7 +173,7 @@ public class EditConfigurationUtils {
     }
 
     public static String getEditUrl(VitroRequest vreq) {
-    	return vreq.getContextPath() + getEditUrlWithoutContext(vreq);
+    	return ContextPath.getPath(vreq) + getEditUrlWithoutContext(vreq);
     }
 
     public static String getEditUrlWithoutContext(VitroRequest vreq) {
@@ -180,7 +181,7 @@ public class EditConfigurationUtils {
     }
 
     public static String getCancelUrlBase(VitroRequest vreq) {
-    	 return vreq.getContextPath() + "/postEditCleanupController";
+    	 return ContextPath.getPath(vreq) + "/postEditCleanupController";
     }
 
 

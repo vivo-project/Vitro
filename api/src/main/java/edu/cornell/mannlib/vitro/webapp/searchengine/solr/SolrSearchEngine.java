@@ -21,6 +21,8 @@ import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
@@ -51,7 +53,7 @@ public class SolrSearchEngine implements SearchEngine {
 					+ "runtime.properties.  Vitro application needs the URL of "
 					+ "a solr server that it can use to index its data. It "
 					+ "should be something like http://localhost:${port}"
-					+ ctx.getContextPath() + "solr");
+					+ ContextPath.getPath(ctx) + "solr");
 			return;
 		}
 

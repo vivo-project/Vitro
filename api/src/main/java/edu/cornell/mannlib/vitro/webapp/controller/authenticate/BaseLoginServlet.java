@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.MLevel;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.Message;
@@ -66,6 +66,6 @@ public class BaseLoginServlet extends HttpServlet {
 		String uri = req.getRequestURI();
 		int authLength = url.length() - uri.length();
 		String auth = url.substring(0, authLength);
-		return auth + req.getContextPath();
+		return auth + ContextPath.getPath(req);
 	}
 }

@@ -21,6 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.CaptchaImplementation;
 import edu.cornell.mannlib.vitro.webapp.beans.CaptchaServiceBean;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
@@ -224,7 +225,7 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
 
         dataContext.put("forgotPasswordUrl", getForgotPasswordUrl(vreq));
         dataContext.put("contactUrl", getContactUrl(vreq));
-        dataContext.put("contextPath", vreq.getContextPath());
+        dataContext.put("contextPath", ContextPath.getPath(vreq));
         dataContext.put("emailConfigured", FreemarkerEmailFactory.isConfigured(vreq));
         dataContext.put("emailValue", "");
         dataContext.put("contactEmailConfigured", StringUtils.isNotBlank(appBean.getContactMail()));
@@ -355,7 +356,7 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
      * @return The URL for the "Forgot Password" page as a string.
      */
     private String getForgotPasswordUrl(VitroRequest request) {
-        String contextPath = request.getContextPath();
+        String contextPath = ContextPath.getPath(request);
         return contextPath + "/forgotPassword";
     }
 
@@ -366,7 +367,7 @@ public class ForgotPasswordController extends FreemarkerHttpServlet {
      * @return The URL for the "Contact" page as a string.
      */
     private String getContactUrl(VitroRequest request) {
-        String contextPath = request.getContextPath();
+        String contextPath = ContextPath.getPath(request);
         return contextPath + "/contact";
     }
 

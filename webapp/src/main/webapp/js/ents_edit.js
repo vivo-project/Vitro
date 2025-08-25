@@ -5,8 +5,6 @@
    vitro.js
    detect.js
 */
-dojo.require("dojo.io.*");
-dojo.require("dojo.event.*");
 
 //dwr.engine.setErrorHandler(function(data){alert("dwr.engine error: " + data);});
 //dwr.engine.setWarningHandler(function(data){alert("dwr.engine warning: " + data);});

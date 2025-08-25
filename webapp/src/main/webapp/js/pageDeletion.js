@@ -16,7 +16,7 @@ var pageDeletion = {
 		this.deleteLinks = $("a[cmd='deletePage']");
 	},
 	bindEventListeners:function() {
-		this.deleteLinks.click(function(event) {
+		this.deleteLinks.on("click", function(event) {
 			var href=$(this).attr("href");
 			var pageTitle = $(this).attr("pageTitle");
 			var confirmResult = confirm( i18nStrings.confirmPageDeletion + " " + pageTitle + "?");

@@ -15,7 +15,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/templates/freemarke
 <#elseif isEnabled && captchaToUse == "NANOCAPTCHA">
     <script>
         $(document).ready(function () {
-            $('#refresh').click(function () {
+            $('#refresh').on("click", function() {
                 var oldChallengeId = $('#challengeId').val();
 
                 $.ajax({

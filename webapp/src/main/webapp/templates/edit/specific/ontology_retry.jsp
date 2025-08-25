@@ -40,10 +40,10 @@
 <script  type="text/javascript">
 $(document).ready(function() {
       var source = "";
-    $('input#primaryAction').click(function() {
+    $('input#primaryAction').on("click", function() {
         source = "submit";
     });
-    $('form#editForm').submit(function() {
+    $('form#editForm').on("submit", function() {
         if (source == "submit") {
             var str = $('input[name=URI]').val();
             if ( str.indexOf('http://') >= 0 || str.indexOf('https://') >= 0 ) {

@@ -12,8 +12,8 @@
     },
 
     bindEventListeners: function() {
-        this.select.change(function() {
-        	fauxPropertiesListingUtils.theForm.submit();
+        this.select.on("change", function() {
+        	fauxPropertiesListingUtils.theForm.trigger("submit");
         });
 	}
 }

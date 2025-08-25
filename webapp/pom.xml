@@ -70,11 +70,12 @@
                                     <artifactId>jquery-migrate</artifactId>
                                     <type>jar</type>
                                     <includes>
-                                        META-INF/resources/webjars/jquery-migrate/*/dist/*.js
+                                        META-INF/resources/webjars/jquery-migrate/*/dist/*.js,
+					META-INF/resources/webjars/jquery-migrate/*/dist/*.map
                                     </includes>
                                     <fileMappers>
                                         <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
-                                            <pattern>^META-INF/resources/webjars/jquery-migrate/[^/]+/</pattern>
+                                            <pattern>^META-INF/resources/webjars/jquery-migrate/[^/]+/dist/</pattern>
                                             <replacement>./</replacement>
                                         </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
                                     </fileMappers>
@@ -96,6 +97,22 @@
                                         </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
                                     </fileMappers>
                                     <outputDirectory>target/${project.artifactId}-${project.version}/webjars/jquery-ui/</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.webjars</groupId>
+                                    <artifactId>jquery-ui-themes</artifactId>
+                                    <type>jar</type>
+                                    <includes>
+					    META-INF/resources/webjars/jquery-ui-themes/*/*/*.css,
+					    META-INF/resources/webjars/jquery-ui-themes/*/*/images/*.png,
+                                    </includes>
+                                    <fileMappers>
+                                        <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                                            <pattern>^META-INF/resources/webjars/jquery-ui-themes/[^/]+/</pattern>
+                                            <replacement>./</replacement>
+                                        </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                                    </fileMappers>
+                                    <outputDirectory>target/${project.artifactId}-${project.version}/webjars/jquery-ui-themes/</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.webjars.npm</groupId>
@@ -205,7 +222,7 @@
         <dependency>
             <groupId>org.mvnpm</groupId>
             <artifactId>datatables.net</artifactId>
-            <version>2.0.5</version>
+            <version>2.2.2</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
@@ -215,6 +232,11 @@
         <dependency>
            <groupId>org.webjars</groupId>
             <artifactId>jquery-ui</artifactId>
+            <version>1.13.2</version>
+        </dependency>
+        <dependency>
+           <groupId>org.webjars</groupId>
+            <artifactId>jquery-ui-themes</artifactId>
             <version>1.13.2</version>
         </dependency>
         <dependency>

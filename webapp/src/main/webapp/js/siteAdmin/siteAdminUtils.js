@@ -8,7 +8,7 @@ $(document).ready(function(){
      var classesInSelectList = $('#addIndividualClass option').length;
 
      if (classesInSelectList == 0) {
-         $('#addIndividualClass input[type="submit"]').css('opacity','.4').click(function(event){
+         $('#addIndividualClass input[type="submit"]').css('opacity','.4').on("click", function(event){
              event.preventDefault();
              $('#addClassBubble').effect( "shake", {times:2, direction:"up", distance:5}, 50 );
           });

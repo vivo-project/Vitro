@@ -55,30 +55,30 @@ var associateProfileFields = {
 
     bindEventListeners: function() {
         this.idCache = {};
-        this.externalAuthIdField.change(function() {
+        this.externalAuthIdField.on("change", function() {
             associateProfileFields.externalAuthIdFieldHasChanged();
         });
-        this.externalAuthIdField.keyup(function() {
+        this.externalAuthIdField.on("keyup", function() {
             associateProfileFields.externalAuthIdFieldHasChanged();
         });
-        this.externalAuthIdField.bind("propertychange", function() {
+        this.externalAuthIdField.on("propertychange", function() {
             associateProfileFields.externalAuthIdFieldHasChanged();
         });
-        this.externalAuthIdField.bind("input", function() {
+        this.externalAuthIdField.on('input', function() {
             associateProfileFields.externalAuthIdFieldHasChanged();
         });
 
-        this.verifyAssociatedProfileLink.click(function() {
+        this.verifyAssociatedProfileLink.on("click", function() {
             associateProfileFields.openVerifyWindow();
             return false;
         });
 
-        this.changeAssociatedProfileLink.click(function() {
+        this.changeAssociatedProfileLink.on("click", function() {
             associateProfileFields.showAssociatingOptionsArea();
             return false;
         });
 
-        this.newProfileClassSelector.change(function() {
+        this.newProfileClassSelector.on("change", function() {
             associateProfileFields.newProfileClassHasChanged();
         });
 
@@ -99,7 +99,7 @@ var associateProfileFields = {
                         externalAuthId: associateProfileFields.externalAuthIdField.val()
                     },
                     complete: function(xhr, status) {
-                        var results = jQuery.parseJSON(xhr.responseText);
+                        var results = JSON.parse(xhr.responseText);
                         associateProfileFields.acCache[request.term] = results;
                         response(results);
                     }
@@ -146,7 +146,7 @@ var associateProfileFields = {
                 externalAuthId: externalAuthId
             },
             complete: function(xhr, status) {
-                var results = $.parseJSON(xhr.responseText);
+                var results = JSON.parse(xhr.responseText);
                 associateProfileFields.idCache[externalAuthId] = results;
                 associateProfileFields.applyAjaxResultsForExternalAuthIdField(results);
             }

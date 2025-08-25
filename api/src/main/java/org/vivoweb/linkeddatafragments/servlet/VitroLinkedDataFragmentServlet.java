@@ -40,6 +40,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
@@ -103,7 +104,7 @@ public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
             MIMEParse.register(Lang.NTRIPLES.getHeaderString());
             MIMEParse.register(Lang.RDFXML.getHeaderString());
 
-            HtmlTriplePatternFragmentWriterImpl.setContextPath(servletConfig.getServletContext().getContextPath());
+            HtmlTriplePatternFragmentWriterImpl.setContextPath(ContextPath.getPath(ctx));
         } catch (Exception e) {
             throw new ServletException(e);
         }
@@ -133,7 +134,7 @@ public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
     }
     
     private IDataSource getDataSource(HttpServletRequest request) throws DataSourceNotFoundException {
-        String contextPath = request.getContextPath();
+        String contextPath = ContextPath.getPath(request);
         String requestURI = request.getRequestURI();
 
         String path = contextPath == null

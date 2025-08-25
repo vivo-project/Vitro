@@ -65,7 +65,7 @@ var manageLabels = {
     bindEventListeners: function() {
 
         //enable form to add label to be displayed or hidden
-        this.showFormButton.click(function() {
+        this.showFormButton.on("click", function() {
         	//clear the inputs for the label if the button is being clicked
         	manageLabels.clearAddForm();
         	manageLabels.onShowAddForm();
@@ -75,7 +75,7 @@ var manageLabels = {
         //Note addition will refresh the page and removing will remove the item so adding event listeners
         //to remove links should keep remove link events in synch with page
 
-        this.existingLabelsList.find("a.remove").click(function(event) {
+        this.existingLabelsList.find("a.remove").on("click", function(event) {
         	var message = "Are you sure you wish to delete this label?"
         	if (!confirm(message)) {
                 return false;
@@ -87,7 +87,7 @@ var manageLabels = {
         });
 
 
-        this.addLabelForm.find("a.cancel").click(function(event){
+        this.addLabelForm.find("a.cancel").on("click", function(event){
         	event.preventDefault();
         	//clear the add form
         	manageLabels.clearAddForm();
@@ -105,7 +105,7 @@ var manageLabels = {
     onShowAddForm:function() {
     	manageLabels.addLabelForm.show();
     	manageLabels.showFormButtonWrapper.hide();
-    	manageLabels.addLabelCancel.click(function(){
+    	manageLabels.addLabelCancel.on("click", function(){
     		//Canceling the add label form will hide the form
     		manageLabels.addLabelForm.hide();
     		manageLabels.showFormButtonWrapper.show();
