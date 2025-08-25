@@ -86,7 +86,7 @@ public class QueryConverter {
                         .replace(")", " )")
                 )) + " )");
         } else {
-            queryForParsing = new StringBuilder(Arrays.stream(query.getQuery().trim().split("\\s+"))
+            queryForParsing = new StringBuilder("( " + Arrays.stream(query.getQuery().trim().split("\\s+"))
                 .filter(token -> !token.isBlank() && !token.equals("\""))
                 .map(token -> {
                     if (token.startsWith("classgroup:")) {
@@ -95,7 +95,7 @@ public class QueryConverter {
 
                     return "ALLTEXT:" + token + " OR nameLowercaseSingleValued:" + token;
                 })
-                .collect(Collectors.joining(" OR ")));
+                .collect(Collectors.joining(" OR ")) + " )");
         }
 
         for (String filter : query.getFilters()) {
