@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -203,6 +204,10 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             SearchResponse response = null;
 
             try {
+                if (((HttpServletRequest) vreq.getRequest()).getRequestURI().endsWith("/search")) {
+                    query.setIsSimpleQuery(true);
+                }
+
                 response = search.query(query);
             } catch (Exception ex) {
                 String msg = makeBadSearchMessage(queryText, ex.getMessage(), vreq);
