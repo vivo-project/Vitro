@@ -173,7 +173,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             int hitsPerPage = getHitsPerPage(vreq);
             int documentsToReturn = hitsPerPage;
             if (!wasHtmlRequested) {
-                documentsToReturn = getDocumentsNumber(vreq);    
+                documentsToReturn = getDocumentsNumber(vreq);
             }
             String queryText = getQueryText(vreq);
             log.debug("Query text is \"" + queryText + "\"");
@@ -204,7 +204,8 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             SearchResponse response = null;
 
             try {
-                if (((HttpServletRequest) vreq.getRequest()).getRequestURI().endsWith("/search")) {
+                if (((HttpServletRequest) vreq.getRequest()).getRequestURI().endsWith("/search") &&
+                    !query.getQuery().trim().equals("*:*")) {
                     query.setIsSimpleQuery(true);
                 }
 
@@ -264,7 +265,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             /* Compile the data for the templates */
 
             Map<String, Object> body = new HashMap<String, Object>();
-          
+
             /* Add ClassGroup and type refinement links to body */
             if (wasHtmlRequested) {
                 if (log.isDebugEnabled()) {
@@ -420,7 +421,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         log.debug("hitsPerPage is " + hitsPerPage);
         return hitsPerPage;
     }
-    
+
     private static int getDocumentsNumber(VitroRequest vreq) {
         int documentsNumber = DEFAULT_DOCUMENTS_NUMBER;
         try {
