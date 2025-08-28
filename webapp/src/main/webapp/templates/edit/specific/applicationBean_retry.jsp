@@ -47,7 +47,7 @@
         <c:if test="${not empty customCssPath and customCssPath != 'null'}">
             <br>
             <button id="resetAction" type="button" class="button red" onclick="resetStyles()">${i18n.text('remove_custom_css')}</button>
-            <button id="uploadNewAction" type="button" class="button blue" onclick="showFileInput()">${i18n.text('upload_new_css')}</button>
+            <button id="uploadNewAction" type="button" class="button blue" onclick="showFileInput()">${i18n.text('replace_custom_css')}</button>
             <br><br>
             <div class="uploaded-file-info">
                 <a href="${customCssPath}" download="custom.css">${i18n.text('download_custom_css')}</a>
