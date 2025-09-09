@@ -7048,5 +7048,5 @@ uil-data:reset.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
         rdfs:label       "Reset"@en-US ;
-        uil:hasApp       "VitRro" ;
+        uil:hasApp       "Vitro" ;
         uil:hasKey       "reset" .
