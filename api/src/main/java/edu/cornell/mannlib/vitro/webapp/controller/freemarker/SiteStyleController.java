@@ -4,6 +4,9 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -66,6 +69,7 @@ public class SiteStyleController extends FreemarkerHttpServlet {
     public static boolean customCssUrlLoaded = false;
     public static String customCssUrl = null;
     public static String customCssFileUri = null;
+    public static String customCssVersion = null;
 
 
     private FileStorage fileStorage;
@@ -247,6 +251,8 @@ public class SiteStyleController extends FreemarkerHttpServlet {
 
         String propertyUriFileUri = VitroVocabulary.PORTAL_CUSTOMCSSFILEURI;
         Property propertyFileUri = ResourceFactory.createProperty(propertyUriFileUri);
+        String propertyUriVersion = VitroVocabulary.PORTAL_CUSTOMCSSVERSION;
+        Property propertyVersion = ResourceFactory.createProperty(propertyUriVersion);
 
         if (!cssFilePath.isEmpty()) {
             Statement statementImageUrl =
@@ -256,8 +262,15 @@ public class SiteStyleController extends FreemarkerHttpServlet {
                 ResourceFactory.createTypedLiteral(fileInfo.getUri()));
             displayModel.add(statementUri);
 
+            String versionValue =
+                DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(ZonedDateTime.now(ZoneOffset.UTC));
+            Statement statementVersion = new StatementImpl(portalResource, propertyVersion,
+                ResourceFactory.createTypedLiteral(versionValue));
+            displayModel.add(statementVersion);
+
             SiteStyleController.customCssUrlLoaded = true;
-            SiteStyleController.customCssUrl = cssFilePath;
+            SiteStyleController.customCssVersion = versionValue;
+            SiteStyleController.customCssUrl = appendVersion(cssFilePath, versionValue);
             SiteStyleController.customCssFileUri = fileInfo.getUri();
 
         }
@@ -272,6 +285,10 @@ public class SiteStyleController extends FreemarkerHttpServlet {
 
         Property property = ResourceFactory.createProperty(VitroVocabulary.PORTAL_CUSTOMCSSPATH);
         displayModel.removeAll(themeResource, property, null);
+        Property propertyFileUri = ResourceFactory.createProperty(VitroVocabulary.PORTAL_CUSTOMCSSFILEURI);
+        displayModel.removeAll(themeResource, propertyFileUri, null);
+        Property propertyVersion = ResourceFactory.createProperty(VitroVocabulary.PORTAL_CUSTOMCSSVERSION);
+        displayModel.removeAll(themeResource, propertyVersion, null);
 
         String url = SiteStyleController.getCustomCssUrlCache();
         String fileUri = SiteStyleController.customCssFileUri;
@@ -291,11 +308,26 @@ public class SiteStyleController extends FreemarkerHttpServlet {
         Property customCssPathProperty = ResourceFactory.createProperty(VitroVocabulary.PORTAL_CUSTOMCSSPATH);
         Property customCssFileUriProperty = ResourceFactory.createProperty(
             VitroVocabulary.PORTAL_CUSTOMCSSFILEURI);
+        Property customCssVersionProperty = ResourceFactory.createProperty(
+            VitroVocabulary.PORTAL_CUSTOMCSSVERSION);
 
-        customCssUrl = getLiteralProperty(displayModel, styleResource, customCssPathProperty);
+        String basePath = getLiteralProperty(displayModel, styleResource, customCssPathProperty);
         customCssFileUri = getLiteralProperty(displayModel, styleResource, customCssFileUriProperty);
+        customCssVersion = getLiteralProperty(displayModel, styleResource, customCssVersionProperty);
+        customCssUrl = appendVersion(basePath, customCssVersion);
 
         customCssUrlLoaded = true;
+    }
+
+    private static String appendVersion(String basePath, String version) {
+        if (basePath == null || basePath.isEmpty()) {
+            return basePath;
+        }
+        if (version == null || version.isEmpty()) {
+            return basePath;
+        }
+        String separator = basePath.contains("?") ? "&" : "?";
+        return basePath + separator + "version=" + version;
     }
 
     private static String getLiteralProperty(OntModel model, Resource subject, Property property) {
@@ -316,6 +348,7 @@ public class SiteStyleController extends FreemarkerHttpServlet {
         customCssUrlLoaded = false;
         customCssUrl = null;
         customCssFileUri = null;
+        customCssVersion = null;
     }
 
     public static String getCustomCssUrlCache() {

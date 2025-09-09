@@ -124,6 +124,7 @@ public class VitroVocabulary {
     public static final String PORTAL_COPYRIGHTANCHOR = vitroURI+"copyrightAnchor";
     public static final String PORTAL_CUSTOMCSSPATH = vitroURI+"customCssPath";
     public static final String PORTAL_CUSTOMCSSFILEURI = vitroURI+"customCssFileUri";
+    public static final String PORTAL_CUSTOMCSSVERSION = vitroURI+"customCssVersion";
 
 
     // reusing displayRank property above

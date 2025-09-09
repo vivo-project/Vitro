@@ -43,7 +43,7 @@
         <br><br>
         
         <label for="fileUpload" class="">${i18n.text('custom_css_style')}</label>
-        <input type="file" id="fileUpload" name="fileUpload" accept=".css" style="margin-bottom: 10px; display: ${not empty customCssPath and customCssPath != 'null' ? 'none' : 'inline'};">
+        <input type="file" id="fileUpload" name="fileUpload" accept=".css" class="css-file-upload ${not empty customCssPath and customCssPath != 'null' ? 'hidden' : ''}">
         <c:if test="${not empty customCssPath and customCssPath != 'null'}">
             <br>
             <button id="resetAction" type="button" class="button red" onclick="resetStyles()">${i18n.text('remove_custom_css')}</button>

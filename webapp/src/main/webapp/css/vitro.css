@@ -532,6 +532,10 @@ a.button.blue {
     background-color: #b40000
 }
 
+.css-file-upload {
+    margin-bottom: 10px;
+}
+
 .clear-file-btn {
     margin-left: 10px;
     padding: 2px 6px;
