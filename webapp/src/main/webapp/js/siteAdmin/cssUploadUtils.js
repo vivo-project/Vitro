@@ -83,15 +83,7 @@
         clearBtn.type = 'button';
         clearBtn.innerHTML = '✕';
         clearBtn.title = 'Remove selected file';
-        
-        // Style the clear button
-        Object.assign(clearBtn.style, {
-            marginLeft: '10px',
-            padding: '2px 6px',
-            border: '1px solid #ccc',
-            background: '#f5f5f5',
-            cursor: 'pointer'
-        });
+        clearBtn.classList.add('clear-file-btn');
         
         clearBtn.addEventListener('click', function() {
             clearFileSelection(fileInput, clearBtn);
@@ -166,10 +158,9 @@
 
 
     function showFileInput() {
-        document.getElementById('fileUpload').style.display = 'inline';
+        document.getElementById('fileUpload').classList.remove('hidden');
         document.getElementById('fileUpload').click();
-
-        document.getElementById('uploadNewAction').style.display = 'none';
+        document.getElementById('uploadNewAction').classList.add('hidden');
     }
     
 </script>
