@@ -147,72 +147,40 @@ $(document).ready(function(){
     // Creating the editor
     function renderEditor() {
         
-        $('body').css('margin-bottom', '150px');
+        $('body').addClass('branding-editor-body');
         var $footer = $('<footer>', {
             id: 'fixed-footer',
-            css: {
-                position: 'fixed',
-                bottom: '0',
-                width: '100%',
-                background: 'rgb(243 243 240)',
-                borderTop: '1px solid #ccc',
-                color: '#fff',
-                textAlign: 'center',
-                padding: '10px',
-                height: 'auto',
-                maxHeight: '160px',
-                overflowY: 'auto',
-                zIndex: '10000'
-            }
+            class: 'branding-fixed-footer'
         }).appendTo('body');
 
         // Add color inputs
         var colors = {'primary': ['lighter', 'base', 'darker'], 'secondary': ['base'], 'accent': ['base'], 'text': ['base'], 'banner': ['base'], 'link': ['base']};
         var $colorContainer = $('<div>', {
             id: 'color-inputs',
-            css: {
-                display: 'flex',
-                justifyContent: 'center',
-                columnGap: '50px',
-                flexWrap: 'wrap',
-                padding: '0 10px',
-            }
+            class: 'branding-color-inputs'
         }).appendTo($footer);
 
         Object.keys(colors).forEach(function(color) {
             var $colorDiv = $('<div>', {
-                css: {
-                display: 'flex',
-                alignItems: 'center',
-                margin: '5px'
-                }
+                class: 'branding-color-row'
             }).appendTo($colorContainer);
 
             var $label = $('<label>', {
                 for: color + '-base-color',
                 text: color.charAt(0).toUpperCase() + color.slice(1) + ' Color: ',
-                css: {
-                marginRight: '10px',
-                color: '#000'
-                }
+                class: 'branding-color-label'
             }).appendTo($colorDiv);
 
             var $colorGroup = $('<div>', {
-                css: {
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    position: 'relative',
-                }
+                class: 'branding-color-group'
             }).appendTo($colorDiv);
 
             colors[color].forEach(function(shade) {
-                const inputCss = (shade === "lighter" || shade === "darker") ? { border: 0 } : {};
                 $('<input>', {
                     type: 'color',
                     id: color + '-' + shade + '-color',
                     name: color + '-' + shade + '-color',
-                    css: inputCss,
+                    class: 'branding-color-input' + ((shade === 'lighter' || shade === 'darker') ? ' shade-borderless' : ''),
                     on: {
                         input: function() {
                             handleColorInput(color, shade, $(this).val());
@@ -228,15 +196,7 @@ $(document).ready(function(){
             });
             $('<button>', {
                 text: 'Reset',
-                css: {
-                    marginLeft: '10px',
-                    padding: '5px 10px',
-                    background: '#f44336',
-                    color: '#fff',
-                    border: 'none',
-                    cursor: 'pointer',
-                    display: 'none'
-                },
+                class: 'branding-btn btn-danger branding-reset-btn',
                 id: color + '-reset',
                 click: function() {
                     handleResetButton(color);
@@ -248,47 +208,24 @@ $(document).ready(function(){
 
         // Add Submit and Cancel buttons
         var $buttonContainer = $('<div>', {
-            css: {
-                display: 'flex',
-                gap: '10px',
-                justifyContent: 'center',
-                marginTop: '10px'
-            }
+            class: 'branding-button-container'
         }).appendTo($footer);
 
 
 
         var $cancelButton = $('<button>', {
             text: 'Cancel',
-            css: {
-                padding: '5px 10px',
-                background: '#f44336',
-                color: '#fff',
-                border: 'none',
-                cursor: 'pointer'
-            }
+            class: 'branding-btn btn-danger'
         }).appendTo($buttonContainer);
 
         var $resetAllButton = $('<button>', {
             text: 'Reset All',
-            css: {
-                padding: '5px 10px',
-                background: '#f44336',
-                color: '#fff',
-                border: 'none',
-                cursor: 'pointer'
-            }
+            class: 'branding-btn btn-danger'
         }).appendTo($buttonContainer);
 
         var $submitButton = $('<button>', {
             text: 'Submit',
-            css: {
-                padding: '5px 10px',
-                background: '#4CAF50',
-                color: '#fff',
-                border: 'none',
-                cursor: 'pointer'
-            }
+            class: 'branding-btn btn-success'
         }).appendTo($buttonContainer);
 
 
