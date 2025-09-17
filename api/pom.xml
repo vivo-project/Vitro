@@ -107,16 +107,6 @@
             <artifactId>elasticsearch-java</artifactId>
             <version>8.9.0</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.apache.lucene</groupId>-->
-<!--            <artifactId>lucene-queryparser</artifactId>-->
-<!--            <version>9.12.2</version> &lt;!&ndash; Use the latest available version &ndash;&gt;-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.apache.lucene</groupId>-->
-<!--            <artifactId>lucene-core</artifactId>-->
-<!--            <version>9.12.2</version>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>fluent-hc</artifactId>

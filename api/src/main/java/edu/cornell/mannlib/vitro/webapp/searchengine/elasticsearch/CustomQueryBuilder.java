@@ -43,8 +43,8 @@ public class CustomQueryBuilder {
                 String[] values = value.split("TO");
                 return RangeQuery.of(m -> m
                     .field(field)
-                    .from(values[0].replace("[", "").trim())
-                    .to(values[1].replace("]", "").trim())
+                    .from(values[0].replace("[", "").replace("(", "").trim())
+                    .to(values[1].replace("]", "").replace(")", "").trim())
                 )._toQuery();
             case EXISTS:
                 return ExistsQuery.of(m -> m

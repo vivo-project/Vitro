@@ -35,17 +35,6 @@ public class ESQuery {
 
     public SearchResponse query(SearchQuery query)
             throws SearchEngineException {
-//        QueryParser parser = new QueryParser("defaultField", new StandardAnalyzer());
-//        boolean treatAsStructuredQuery = true;
-//        if (query.isSimpleQuery()) {
-//            treatAsStructuredQuery = false;
-//        } else {
-//            try {
-//                parser.parse(query.getQuery());
-//            } catch (ParseException ignored) {
-//                treatAsStructuredQuery = false;
-//            }
-//        }
         boolean treatAsStructuredQuery = !query.isSimpleQuery();
 
         String queryString = new QueryConverter(query, treatAsStructuredQuery).asString();
