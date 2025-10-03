@@ -162,7 +162,7 @@ public interface SearchQuery {
      */
     boolean isFacetTextCompareCaseInsensitive();
 
-	void setIsSimpleQuery(boolean value);
+	void setSimpleQuery(boolean value);
 
 	boolean isSimpleQuery();
 }

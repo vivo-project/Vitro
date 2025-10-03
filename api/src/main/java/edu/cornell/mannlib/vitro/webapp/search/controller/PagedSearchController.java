@@ -205,11 +205,11 @@ public class PagedSearchController extends FreemarkerHttpServlet {
 
             try {
                 if (((HttpServletRequest) vreq.getRequest()).getRequestURI().endsWith("/search")) {
-                    query.setIsSimpleQuery(true);
+                    query.setSimpleQuery(true);
                 }
 
                 if (query.isSimpleQuery() && query.getQuery().trim().equals("*:*")) {
-                    query.setIsSimpleQuery(false);
+                    query.setSimpleQuery(false);
                 }
 
                 response = search.query(query);
