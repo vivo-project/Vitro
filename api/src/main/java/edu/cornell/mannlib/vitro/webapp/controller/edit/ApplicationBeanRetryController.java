@@ -11,6 +11,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.SiteStyleController;
 import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,6 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 
 public class ApplicationBeanRetryController extends BaseEditController {
 
@@ -85,10 +87,18 @@ public class ApplicationBeanRetryController extends BaseEditController {
         FormUtils.populateFormFromBean(applicationForEditing, epo.getAction(), foo);
 
         request.setAttribute("formJsp","/templates/edit/specific/applicationBean_retry.jsp");
-        request.setAttribute("scripts","/templates/edit/formBasic.js");
+        request.setAttribute("scripts","/js/siteAdmin/cssUploadUtils.js");
         request.setAttribute("title","Site Information");
         request.setAttribute("_action",action);
         request.setAttribute("unqualifiedClassName","ApplicationBean");
+
+        request.setAttribute("customCssPath", SiteStyleController.getCustomCssUrlCache());
+        request.setAttribute("actionRemove", SiteStyleController.getRemovePathString());
+        request.setAttribute("actionUpload", SiteStyleController.getUploadPathString());
+
+        request.setAttribute("siteStyleUrl", SiteStyleController.URL_HERE);
+        request.setAttribute("i18n", I18n.bundle(request));
+
         setRequestAttributes(request,epo);
 
         try {
