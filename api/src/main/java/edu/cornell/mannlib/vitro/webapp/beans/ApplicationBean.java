@@ -31,7 +31,6 @@ public class ApplicationBean {
 
     // Default initializations, which may be overwritten in the AppBeanMapper
     // but are otherwise not changed there
-    private String    individualUri;
 
     private boolean   initialized             = false;
     private String    sessionIdStr            = null;
@@ -65,10 +64,6 @@ public class ApplicationBean {
     }
 
     /*************************** SET functions ****************************/
-
-    public void setIndividualUri( String string_val ) {
-        individualUri = string_val;
-    }
 
     public void setSessionIdStr( String string_val ) {
         sessionIdStr = string_val;
@@ -123,10 +118,6 @@ public class ApplicationBean {
 	}
 
     /*************************** GET functions ****************************/
-
-    public String getIndividualUri() {
-        return individualUri;
-    }
 
     public String getSessionIdStr() {
         return sessionIdStr;

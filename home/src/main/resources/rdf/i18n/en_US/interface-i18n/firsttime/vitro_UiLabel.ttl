@@ -6972,14 +6972,14 @@ uil-data:branding_colors_error_format_config.Vitro
         rdf:type         uil:UILabel ;
         rdfs:label       "The theme configuration file is not in the expected format. Please verify its structure."@en-US ;
         uil:hasApp       "Vitro" ;
-        uil:hasKey       "branding_colors_error_fetch_config" .
+        uil:hasKey       "branding_colors_error_format_config" .
 
 uil-data:branding_colors_error_unexpected_config.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
         rdfs:label       "An unexpected error occurred while loading the theme configuration. Please verify its structure."@en-US ;
         uil:hasApp       "Vitro" ;
-        uil:hasKey       "branding_colors_error_fetch_config" .
+        uil:hasKey       "branding_colors_error_unexpected_config" .
 
 uil-data:branding_colors_open_after_save.Vitro
         rdf:type         owl:NamedIndividual ;
