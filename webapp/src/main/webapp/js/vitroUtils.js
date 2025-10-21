@@ -20,7 +20,7 @@ $(document).ready(function(){
      var $searchFilterList = $('#filter-search-nav');
      var $isFilterOpen = false;
 
-     $('a.filter-search').click(function(e) {
+     $('a.filter-search').on("click", function(e) {
          e.preventDefault();
 
          if (!$isFilterOpen) {
@@ -52,7 +52,7 @@ $(document).ready(function(){
      // Collect users' selection
 
        $('#filter-search-nav li').each(function(index){
-           $(this).click(function(ev){
+           $(this).on("click", function(ev){
                ev.preventDefault();
 
                if ($(this).text() == i18nStrings.allCapitalized) {
@@ -79,7 +79,7 @@ $(document).ready(function(){
        });
 
        //When focus, hide filter select list and change filter button state to default
-       $('input.search-homepage').focus(function(){
+       $('input.search-homepage').on("focus", function(){
 
            $('input.search-homepage').attr("value","");
            $('input.search-homepage').css({

@@ -19,24 +19,24 @@ $(document).ready(function(){
 
     $('input').each(function() {
         if ( $(this).attr('type') != 'submit' && $(this).attr('name') != 'querytext') {
-            $(this).change(function() {
+            $(this).on("change", function() {
                 disableSubmit()
             });
-            $(this).bind("propertychange", function() {
+            $(this).on("propertychange", function() {
                 disableSubmit();
             });
-            $(this).bind("input", function() {
+            $(this).on('input', function() {
                 disableSubmit()
             });
         }
     });
     $('select').each(function() {
-        $(this).change(function() {
+        $(this).on("change", function() {
             disableSubmit()
         });
     });
 
-    $('.remove-proxy').click(function(){
+    $('.remove-proxy').on("click", function(){
         disableSubmit()
     })
 });

@@ -20,6 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
@@ -157,12 +158,12 @@ public class LoginRedirector {
 	}
 
 	private boolean isLoginPage(String page) {
-		return ((page != null) && page.endsWith(request.getContextPath()
+		return ((page != null) && page.endsWith(ContextPath.getPath(request)
 				+ Controllers.LOGIN));
 	}
 
 	private String getSiteAdminPageUrl() {
-		String contextPath = request.getContextPath();
+		String contextPath = ContextPath.getPath(request);
 		return contextPath + Controllers.SITE_ADMIN;
 	}
 
@@ -172,7 +173,7 @@ public class LoginRedirector {
 
 	private String getAssociatedIndividualHomePage() {
 		try {
-			return request.getContextPath() + "/individual?uri="
+			return ContextPath.getPath(request) + "/individual?uri="
 					+ URLEncoder.encode(uriOfAssociatedIndividual, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			throw new IllegalStateException("No UTF-8 encoding? Really?", e);
@@ -180,7 +181,7 @@ public class LoginRedirector {
 	}
 
 	private String getApplicationHomePageUrl() {
-		String contextPath = request.getContextPath();
+		String contextPath = ContextPath.getPath(request);
 		if (contextPath.equals("")) {
 			return "/";
 		}

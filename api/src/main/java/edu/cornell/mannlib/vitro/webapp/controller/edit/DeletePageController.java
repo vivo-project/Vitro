@@ -25,6 +25,7 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
@@ -50,7 +51,7 @@ public class DeletePageController extends VitroHttpServlet {
      	if(pageUri != null) {
     		doDeletePage(pageUri, vreq, resp);
     	}
-		resp.sendRedirect(rawRequest.getContextPath() + REDIRECT_URL);
+		resp.sendRedirect(ContextPath.getPath(rawRequest) + REDIRECT_URL);
     }
 
     protected void doGet(HttpServletRequest rawRequest, HttpServletResponse resp)  throws ServletException, IOException {

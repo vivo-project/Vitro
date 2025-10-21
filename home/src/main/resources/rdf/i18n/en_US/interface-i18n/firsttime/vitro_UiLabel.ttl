@@ -5881,7 +5881,7 @@ uil-data:search_for.Vitro
 uil-data:other.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "other"@en-US ;
+        rdfs:label       "Other"@en-US ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "other" ;
         uil:hasPackage  "Vitro-languages" .
@@ -7050,3 +7050,43 @@ uil-data:reset.Vitro
         rdfs:label       "Reset"@en-US ;
         uil:hasApp       "Vitro" ;
         uil:hasKey       "reset" .
+
+uil-data:remove_custom_css.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Remove CSS"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "remove_custom_css" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:download_custom_css.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Download CSS"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "download_custom_css" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:replace_custom_css.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Replace CSS"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "replace_custom_css" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:custom_css_style.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Custom css file"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "custom_css_style" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:confirm_remove_custom_css.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Are you sure you want to remove the custom CSS?"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "confirm_remove_custom_css" ;
+        uil:hasPackage   "Vitro-languages" .

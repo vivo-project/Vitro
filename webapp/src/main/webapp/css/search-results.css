@@ -103,8 +103,12 @@ input[type=checkbox]:not(:checked) + label {
   background-color: #8499A3;
 }
 
-#selected-filters > label{
-	display:inline-block;
+#selected-filters > label,button {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: inherit;
+  margin-top: unset;
+  margin-bottom: unset;
 }
 
 .user-filter-search-input{
@@ -116,7 +120,6 @@ input[type=checkbox]:not(:checked) + label {
 }
 
 .checked-search-input-label {
-  display: inline;
   background-color: #0F6568;
   color: #fff;
   padding: 2px 5px 2px 5px;

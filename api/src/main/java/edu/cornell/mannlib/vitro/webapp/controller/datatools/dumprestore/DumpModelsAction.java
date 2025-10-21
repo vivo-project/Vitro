@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore.DumpRestoreController.BadRequestException;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
@@ -46,7 +46,7 @@ class DumpModelsAction extends AbstractDumpRestoreAction {
 
 	void redirectToFilename() throws IOException {
 		String filename = which + N_QUADS_EXTENSION;
-		String urlPath = req.getContextPath() + req.getServletPath()
+		String urlPath = ContextPath.getPath(req) + req.getServletPath()
 				+ ACTION_DUMP;
 		resp.sendRedirect(urlPath + "/" + filename + "?" + queryString);
 	}

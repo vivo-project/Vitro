@@ -18,7 +18,7 @@
     </td>
 </tr>
 <script  type="text/javascript">
-    $('form#editForm').submit(function() {
+    $('form#editForm').on("submit", function() {
         var str = $('input[name=newURI]').val();
         if ( str.indexOf('http://') >= 0 || str.indexOf('https://') >= 0 ) {
             return true;

@@ -25,6 +25,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.shared.Lock;
 import edu.cornell.mannlib.vitro.webapp.auth.checks.UserOnThread;
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
@@ -59,7 +60,7 @@ public class MenuManagementEdit extends VitroHttpServlet {
     	}
         //Need to redirect correctly
     	if(!isReorder(command)){
-    		resp.sendRedirect(rawRequest.getContextPath() + REDIRECT_URL);
+    		resp.sendRedirect(ContextPath.getPath(rawRequest) + REDIRECT_URL);
     	}
     }
 

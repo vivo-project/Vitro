@@ -51,5 +51,8 @@ ${headContent!}
         brandingColorsOpenAfterSave: '${i18n().branding_colors_open_after_save?js_string}',
     }
 </script>
+<#if customCssPath?has_content>
+    <link id="custom-css-path" rel="stylesheet" href="${customCssPath}">
+</#if>
 
 <link rel="shortcut icon" type="image/x-icon" href="${urls.base}/favicon.ico">

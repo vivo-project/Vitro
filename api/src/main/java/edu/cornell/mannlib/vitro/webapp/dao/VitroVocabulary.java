@@ -130,6 +130,10 @@ public class VitroVocabulary {
     public static final String PORTAL_ACKNOWLEGETEXT = vitroURI+"acknowledgeText";
     public static final String PORTAL_COPYRIGHTURL = vitroURI+"copyrightURL";
     public static final String PORTAL_COPYRIGHTANCHOR = vitroURI+"copyrightAnchor";
+    public static final String PORTAL_CUSTOMCSSPATH = vitroURI+"customCssPath";
+    public static final String PORTAL_CUSTOMCSSFILEURI = vitroURI+"customCssFileUri";
+    public static final String PORTAL_CUSTOMCSSVERSION = vitroURI+"customCssVersion";
+
 
     public static final String PORTAL_LOGOURL = vitroURI+"logoUrl";
     public static final String PORTAL_LOGOSMALLURL = vitroURI+"logoSmallUrl";

@@ -29,6 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
+import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
@@ -505,7 +506,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 
     //Get submission url
     private String getSubmissionUrl(VitroRequest vreq) {
-    	return vreq.getContextPath() + "/edit/process";
+    	return ContextPath.getPath(vreq) + "/edit/process";
     }
 
 

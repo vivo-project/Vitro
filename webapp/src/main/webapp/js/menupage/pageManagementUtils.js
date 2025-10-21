@@ -202,7 +202,7 @@ var pageManagementUtils = {
 	},*/
 	bindEventListeners:function(){
 
-	    this.defaultTemplateRadio.click( function() {
+	    this.defaultTemplateRadio.on("click",  function() {
 	            pageManagementUtils.customTemplate.addClass('hidden');
 	            //Also clear custom template value so as not to submit it
 	            pageManagementUtils.clearInputs(pageManagementUtils.customTemplate);
@@ -214,17 +214,17 @@ var pageManagementUtils = {
 	        	}
 	    });
 
-	    this.customTemplateRadio.click( function() {
+	    this.customTemplateRadio.on("click",  function() {
 	            pageManagementUtils.handleSelectCustomTemplate();
 	    });
 
-	    this.selfContainedTemplateRadio.click( function() {
+	    this.selfContainedTemplateRadio.on("click",  function() {
 	            pageManagementUtils.customTemplate.removeClass('hidden');
 	            pageManagementUtils.rightSideDiv.hide();
 	            pageManagementUtils.enablePageSave();
 	    });
 
-	    this.isMenuCheckbox.click( function() {
+	    this.isMenuCheckbox.on("click",  function() {
 	        if ( pageManagementUtils.menuSection.is(':hidden') ) {
 	            pageManagementUtils.menuSection.show();
 	        }
@@ -235,11 +235,11 @@ var pageManagementUtils = {
 
 	    //Collapses the current content and creates a new section of content
 	    //Resets the content to be cloned to default settings
-	    this.doneButton.click( function() {
+	    this.doneButton.on("click",  function() {
 	       pageManagementUtils.handleClickDone();
 	    });
 
-	    this.cancelLink.click( function() {
+	    this.cancelLink.on("click",  function() {
 	        pageManagementUtils.clearSourceTemplateValues();
 	        pageManagementUtils.headerBar.hide();
             pageManagementUtils.classGroupSection.hide();
@@ -253,19 +253,19 @@ var pageManagementUtils = {
 	    });
 	    //replacing with menu management edit version which is extended with some of the logic below
 	    //This is technically content specific and should be moved into the individual processor classes somehow
-	    this.selectClassGroupDropdown.change(function() {
+	    this.selectClassGroupDropdown.on("change", function() {
             pageManagementUtils.chooseClassGroup();
         });
 
 
 
-	    this.contentTypeSelect.change( function() {
+	    this.contentTypeSelect.on("change", function() {
 	    	pageManagementUtils.handleContentTypeSelect();
 	    });
 
 
 	    //Submission: validate as well as create appropriate hidden json inputs
-	    $("form").submit(function (event) {
+	    $("form").on("submit", function(event) {
            pageManagementUtils.handleFormSubmission(event);
          });
 
@@ -514,7 +514,7 @@ var pageManagementUtils = {
     //For binding content type specific event handlers should they exist
     bindClonedContentEventHandlers:function($newContentObj) {
     	var dataGetterProcessorObj = pageManagementUtils.getDataGetterProcessorObject($newContentObj);
-    	if($.isFunction(dataGetterProcessorObj.bindEventHandlers)) {
+    	if(typeof dataGetterProcessorObj.bindEventHandlers === "function") {
     		dataGetterProcessorObj.bindEventHandlers($newContentObj);
     	}
     	//Bind done event as the done button is within the cloned content
@@ -546,7 +546,7 @@ var pageManagementUtils = {
     },
     bindClonedContentDoneEvent:function($newContentObj) {
     	//Done button should just collapse the cloned content
-        $newContentObj.find("input[name='doneWithContent']").click(function() {
+        $newContentObj.find("input[name='doneWithContent']").on("click", function() {
         		var thisInnerDiv = $(this).closest("div.pageContentWrapper");
                 var thisClickableSpan = thisInnerDiv.prev("span.pageContentExpand");
                 var thisArrowDiv = thisClickableSpan.find('div.arrow');
@@ -561,7 +561,7 @@ var pageManagementUtils = {
     	 var $clickableSpan = $newDivContainer.children('span#clickable' + counter);
          var $innerDiv = $newDivContainer.children('div#innerContainer' + counter);
     	 //Expand/collapse toggle
-        $clickableSpan.click(function() {
+        $clickableSpan.on("click", function() {
             if ( $innerDiv.is(':visible') ) {
                $innerDiv.slideUp(222);
                //$clickableSpan.find('img').attr("src","arrow-down.gif");
@@ -582,7 +582,7 @@ var pageManagementUtils = {
         //remove button
         $newRemoveLink = $innerDiv.find('a#remove' + counter);
         //remove the content entirely
-        $newRemoveLink.click(function(event) {
+        $newRemoveLink.on("click", function(event) {
         	//if content type of what is being deleted is browse class group, then
         	//add browse classgroup back to set of options
         	var contentType = $innerDiv.find("section.pageContent").attr("contentType");
@@ -780,7 +780,7 @@ var pageManagementUtils = {
     },
     toggleClassSelection: function() {
         // Check/unckeck all classes for selection
-        $('input:checkbox[name=allSelected]').click(function(){
+        $('input:checkbox[name=allSelected]').on("click", function(){
              if ( this.checked ) {
              // if checked, select all the checkboxes for this particular section
             $(this).closest("ul").find('input:checkbox[name=classInClassGroup]').prop('checked','checked');
@@ -794,7 +794,7 @@ var pageManagementUtils = {
              }
         });
 
-        $('input:checkbox[name=classInClassGroup]').click(function(){
+        $('input:checkbox[name=classInClassGroup]').on("click", function(){
             $(this).closest("ul").find('input:checkbox[name=allSelected]').prop('checked', null);
         });
     }, //This is SPECIFIC to VIVO so should be moved there
@@ -940,7 +940,7 @@ var pageManagementUtils = {
 	    			if(pageManagementUtils.dataGetterProcessorMap != null) {
 	    				var dataGetterProcessor = pageManagementUtils.dataGetterProcessorMap[dataGetterType];
 	    				//the content type specific processor will create the json object to be returned
-	    				if($.isFunction(dataGetterProcessor.validateFormSubmission)) {
+	    				if(typeof dataGetterProcessor.validateFormSubmission === "function") {
 	    					//Get label of page content section
 	    					var label = pageManagementUtils.getPageContentSectionLabel($(this));
 	    					validationErrorMsg += dataGetterProcessor.validateFormSubmission($(this), label);

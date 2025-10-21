@@ -88,6 +88,22 @@
             <span class="notice"><c:out value="${AccentColorError}"/></span>
         </c:if> -->
 
+        <br><br>
+        
+        <label for="fileUpload" class="">${i18n.text('custom_css_style')}</label>
+        <input type="file" id="fileUpload" name="fileUpload" accept=".css" class="css-file-upload ${not empty customCssPath and customCssPath != 'null' ? 'hidden' : ''}">
+        <c:if test="${not empty customCssPath and customCssPath != 'null'}">
+            <br>
+            <button id="resetAction" type="button" class="button red" onclick="resetStyles()">${i18n.text('remove_custom_css')}</button>
+            <button id="uploadNewAction" type="button" class="button blue" onclick="showFileInput()">${i18n.text('replace_custom_css')}</button>
+            <br><br>
+            <div class="uploaded-file-info">
+                <a href="${customCssPath}" download="custom.css">${i18n.text('download_custom_css')}</a>
+            </div>
+        </c:if>
+
+        <br><br>
+
         <label>Copyright text<span class="note"> used in footer (e.g., name of your institution)</span></label>
         <input type="text" name="CopyrightAnchor" value="<form:value name="CopyrightAnchor"/>" ${longField} maxlength="120" size="40" />
         <c:set var="CopyrightAnchorError"><form:error name="CopyrightAnchor"/></c:set>
@@ -105,7 +121,13 @@
         <script>
             var fromUrls = {
                 actionLogoUploadUrl: '${actionLogoUploadUrl}',
+                actionUploadUrl: '${actionUpload}',
+                actionRemoveUrl: '${actionRemove}',
             };
+            var i18nStrings = {
+                confirmRemove: '${i18n.text('confirm_remove_custom_css')}',
+            };
+
         </script>
 
 <!--
