@@ -2,14 +2,12 @@
 
 package edu.cornell.mannlib.vitro.webapp.searchengine.elasticsearch;
 
-import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
-import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpsBasicClientFactory;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
+import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpBasicClientFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-
-import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 
@@ -33,12 +31,7 @@ public class ESFlusher {
         try {
             String url = baseUrl + "/_flush"
                     + (wait ? "?wait_for_ongoing" : "");
-            HttpClient httpClient;
-            if (baseUrl.startsWith("https")) {
-                httpClient = ESHttpsBasicClientFactory.getHttpClient();
-            } else {
-                httpClient = HttpClientFactory.getHttpClient();
-            }
+            HttpClient httpClient = ESHttpBasicClientFactory.getHttpClient(baseUrl);
             HttpResponse response = httpClient.execute(new HttpGet(url));
             String json = EntityUtils.toString(response.getEntity());
             log.debug("flush response: " + json);

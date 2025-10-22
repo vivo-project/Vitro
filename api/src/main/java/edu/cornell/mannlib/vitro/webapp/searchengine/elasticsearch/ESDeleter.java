@@ -10,8 +10,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
-import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpsBasicClientFactory;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
+import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchQuery;
+import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpBasicClientFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
@@ -25,10 +27,6 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
-
-import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
-import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
-import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchQuery;
 
 /**
  * The nuts and bolts of deleting documents from the Elasticsearch index.
@@ -56,12 +54,7 @@ public class ESDeleter {
         try {
             String url = baseUrl + "/_doc/"
                     + URLEncoder.encode(id, "UTF8");
-            HttpClient httpClient;
-            if (baseUrl.startsWith("https")) {
-                httpClient = ESHttpsBasicClientFactory.getHttpClient();
-            } else {
-                httpClient = HttpClientFactory.getHttpClient();
-            }
+            HttpClient httpClient = ESHttpBasicClientFactory.getHttpClient(baseUrl);
 
             HttpResponse response = httpClient.execute(new HttpDelete(url));
             String json = EntityUtils.toString(response.getEntity());
@@ -88,12 +81,7 @@ public class ESDeleter {
         String queryJson = new QueryConverter(query, true).asString();
 
         try {
-            HttpClient httpClient;
-            if (baseUrl.startsWith("https")) {
-                httpClient = ESHttpsBasicClientFactory.getHttpClient();
-            } else {
-                httpClient = HttpClientFactory.getHttpClient();
-            }
+            HttpClient httpClient = ESHttpBasicClientFactory.getHttpClient(baseUrl);
 
             HttpPost request = new HttpPost(url);
             request.addHeader("Content-Type", "application/json");

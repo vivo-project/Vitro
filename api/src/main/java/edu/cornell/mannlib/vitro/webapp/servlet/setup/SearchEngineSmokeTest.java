@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.cornell.mannlib.vitro.webapp.searchengine.base.SearchEngineUtil;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
-import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpsBasicClientFactory;
+import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpBasicClientFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
@@ -33,7 +33,7 @@ public class SearchEngineSmokeTest implements ServletContextListener {
         String baseServiceUrl = getBaseServiceUrl(url);
 
         ServiceType serviceType = ServiceType.UNKNOWN;
-        HttpClient httpClient = ESHttpsBasicClientFactory.getHttpClient();
+        HttpClient httpClient = ESHttpBasicClientFactory.getHttpClient();
         HttpGet request = new HttpGet(baseServiceUrl);
 
         try {

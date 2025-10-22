@@ -5,14 +5,11 @@ package edu.cornell.mannlib.vitro.webapp.searchengine.elasticsearch;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
-import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpsBasicClientFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
+import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpBasicClientFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 
@@ -30,12 +27,7 @@ public class ESCounter {
     public int count() throws SearchEngineException {
         try {
             String url = baseUrl + "/_count";
-            HttpClient httpClient;
-            if (baseUrl.startsWith("https")) {
-                httpClient = ESHttpsBasicClientFactory.getHttpClient();
-            } else {
-                httpClient = HttpClientFactory.getHttpClient();
-            }
+            HttpClient httpClient = ESHttpBasicClientFactory.getHttpClient(baseUrl);
             HttpResponse response = httpClient.execute(new HttpGet(url));
             String json = EntityUtils.toString(response.getEntity());
 

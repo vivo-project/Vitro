@@ -7,7 +7,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
-import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpsBasicClientFactory;
+import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpBasicClientFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -95,7 +95,7 @@ public class ESQuery {
         public HttpResponse execute() throws SearchEngineException {
             try {
                 if (this.getURI().getScheme().equals("https")) {
-                    return ESHttpsBasicClientFactory.getHttpClient().execute(this);
+                    return ESHttpBasicClientFactory.getHttpClient().execute(this);
                 }
                 return HttpClientFactory.getHttpClient().execute(this);
             } catch (IOException e) {

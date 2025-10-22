@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.searchengine.elasticsearch;
 
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -12,20 +11,17 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputField;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
-import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
-import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpsBasicClientFactory;
+import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpBasicClientFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPut;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
-import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
-import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputField;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 
@@ -119,12 +115,7 @@ public class ESAdder {
         try {
             String url = baseUrl + "/_doc/"
                     + URLEncoder.encode(docId, "UTF8");
-            HttpClient httpClient;
-            if (baseUrl.startsWith("https")) {
-                httpClient = ESHttpsBasicClientFactory.getHttpClient();
-            } else {
-                httpClient = HttpClientFactory.getHttpClient();
-            }
+            HttpClient httpClient = ESHttpBasicClientFactory.getHttpClient(baseUrl);
 
             HttpPut request = new HttpPut(url);
             request.addHeader("Content-Type", "application/json");

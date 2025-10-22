@@ -4,7 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
-import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpsBasicClientFactory;
+import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpBasicClientFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
@@ -83,7 +83,7 @@ public class ElasticSmokeTest {
      */
     private static class ElasticPinger {
         private final URL elasticUrl;
-        private final HttpClient httpClient = ESHttpsBasicClientFactory.getHttpClient();
+        private final HttpClient httpClient = ESHttpBasicClientFactory.getHttpClient();
 
         public ElasticPinger(URL elasticUrl) {
             this.elasticUrl = elasticUrl;
