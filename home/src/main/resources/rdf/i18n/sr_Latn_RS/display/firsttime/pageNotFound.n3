@@ -1,0 +1,17 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix default: <http://vitro.mannlib.cornell.edu/ns/default/pages#> .
+@prefix display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> .
+
+default:page_not_found_dg display:htmlValue
+  """
+  <h2>Stranica nije pronađena</h2>
+  <p>Izgleda da stranica kojoj ste pokušali pristupiti više nije dostupna ili je uklonjena.</p>
+  <p>Možete se vratiti na početnu stranicu ili koristiti pretragu da pronađete ono što tražite.</p>
+  """@sr-Latn-RS ;
+  display:saveToVar "pageNotFound"@sr-Latn-RS ;
+  .
+default:page_not_found
+  display:title "Stranica nije pronađena"@sr-Latn-RS ;
+  display:urlMapping "/page_not_found"@sr-Latn-RS ;
+  .
