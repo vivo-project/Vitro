@@ -6493,28 +6493,28 @@ uil-data:dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute
 uil-data:dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.RdfGraphDistributor.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Distribuidor de Gráficos RDF"@pt-BR ;
+        rdfs:label       "Distribuidor de Gráficos em RDF"@pt-BR ;
         uil:hasApp       "Vitro" ;
         uil:hasKey       "dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.RdfGraphDistributor" .
 
 uil-data:dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.SelectFromContentDistributor.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Selecionar do Distribuidor de Conteúdo"@pt-BR ;
+        rdfs:label       "Selecionar o Distribuidor de Conteúdo"@pt-BR ;
         uil:hasApp       "Vitro" ;
         uil:hasKey       "dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.SelectFromContentDistributor" .
 
 uil-data:dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.SelectFromGraphDistributor.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Selecionar do Distribuidor de Gráficos"@pt-BR ;
+        rdfs:label       "Selecionar o Distribuidor de Gráficos"@pt-BR ;
         uil:hasApp       "Vitro" ;
         uil:hasKey       "dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.SelectFromGraphDistributor" .
 
 uil-data:dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.ConstructQueryGraphBuilder.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Construir Consulta Construtor de Gráficos"@pt-BR ;
+        rdfs:label       "Construir a Consulta para o Construtor de Gráficos"@pt-BR ;
         uil:hasApp       "Vitro" ;
         uil:hasKey       "dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.ConstructQueryGraphBuilder" .
 
