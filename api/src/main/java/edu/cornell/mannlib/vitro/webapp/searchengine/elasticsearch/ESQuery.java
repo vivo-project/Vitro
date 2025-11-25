@@ -95,9 +95,9 @@ public class ESQuery {
         public HttpResponse execute() throws SearchEngineException {
             try {
                 if (this.getURI().getScheme().equals("https")) {
-                    return ESHttpBasicClientFactory.getHttpClient().execute(this);
+                    return ESHttpBasicClientFactory.getHttpsClient().execute(this);
                 }
-                return HttpClientFactory.getHttpClient().execute(this);
+                return ESHttpBasicClientFactory.getHttpClient().execute(this);
             } catch (IOException e) {
                 throw new SearchEngineException(e);
             }

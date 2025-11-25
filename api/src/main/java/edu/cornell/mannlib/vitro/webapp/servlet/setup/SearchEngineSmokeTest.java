@@ -33,7 +33,7 @@ public class SearchEngineSmokeTest implements ServletContextListener {
         String baseServiceUrl = getBaseServiceUrl(url);
 
         ServiceType serviceType = ServiceType.UNKNOWN;
-        HttpClient httpClient = ESHttpBasicClientFactory.getHttpClient();
+        HttpClient httpClient = ESHttpBasicClientFactory.getHttpClient(baseServiceUrl);
         HttpGet request = new HttpGet(baseServiceUrl);
 
         try {

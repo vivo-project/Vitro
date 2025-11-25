@@ -83,10 +83,11 @@ public class ElasticSmokeTest {
      */
     private static class ElasticPinger {
         private final URL elasticUrl;
-        private final HttpClient httpClient = ESHttpBasicClientFactory.getHttpClient();
+        private final HttpClient httpClient;
 
         public ElasticPinger(URL elasticUrl) {
             this.elasticUrl = elasticUrl;
+            this.httpClient = ESHttpBasicClientFactory.getHttpClient(elasticUrl.toString());
         }
 
         public void ping() throws ElasticProblemException {

@@ -14,7 +14,6 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -71,13 +70,13 @@ public class ESHttpBasicClientFactory {
             if (isHttps) {
                 try {
                     SSLContext sslContext = SSLContextBuilder.create()
-                        .loadTrustMaterial(null, new TrustSelfSignedStrategy())
+                        .loadTrustMaterial(null, (chain, authType) -> true) // Trust all certificates
                         .build();
 
                     connectionManager = new PoolingHttpClientConnectionManager(
                         RegistryBuilder.<ConnectionSocketFactory>create()
                             .register("https", new SSLConnectionSocketFactory(sslContext,
-                                SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER))
+                                (hostname, session) -> true)) // Allow all hostnames
                             .build()
                     );
                 } catch (Exception e) {
@@ -89,7 +88,6 @@ public class ESHttpBasicClientFactory {
 
             connectionManager.setDefaultMaxPerRoute(50);
             connectionManager.setMaxTotal(300);
-
             connectionManager.setValidateAfterInactivity(30000);
         }
         return connectionManager;
