@@ -23,6 +23,20 @@
 .disabledSubmit {
 	cursor:default ! important;
 }
+
+.nostyle {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nostyle > img {
+    display: block;
+    width: 100%;
+}
+
+
 /* <------ USER FEEDBACK*/
 #error-alert {
     color: #900;
@@ -82,6 +96,18 @@
   clear: both;
 }
 
+/* SCREEN READER ONLY */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
 /* <------ INDEX PAGE*/
 .siteMap h2 {
     padding-bottom: 0;
@@ -115,7 +141,7 @@
 .searchTOC ul {
     width: 180px;
     border: 1px solid #dde4e3;
-    background: #f1f2ee;
+    background: #F5F5F5;
     padding: 0;
     margin-top: 4px;
     text-align: left;
@@ -157,7 +183,30 @@ a.close {
     display: block;
     text-align: right;
     margin-right: .3em;
-    font-size: .8em;
+    font-size: 1em;
+    float: right;
+    opacity: 0.7;
+    font-weight: 700;
+    line-height: 1;
+}
+
+a.close:hover, a.close:focus {
+    opacity: 1;
+    text-decoration: none;
+}
+
+.ui-slider-vertical .ui-slider-range-min {
+    background: #0078D7;
+}
+
+#slider-vertical .ui-slider-handle.ui-state-active {
+    background: #0078D7;
+}
+
+#slider-vertical .ui-slider-handle {
+    background-color: #fff;
+    border: 2px solid #222;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
 }
 
 /* ------------------------------------------------->  */
@@ -246,7 +295,7 @@ ul.dropdown ul.sub_menu li.inactive {
 }
 ul.dropdown ul.sub_menu li a:hover,
 ul.dropdown ul.sub_menu li a.hover {
-    color: #999 !important;
+    color: #656565 !important;
 }
 /*  LEVEL THREE */
 ul.dropdown ul ul {
@@ -310,9 +359,7 @@ ul.language-dropdown ul.sub_menu li.inactive {
 }
 ul.language-dropdown ul.sub_menu li a:hover,
 ul.language-dropdown ul.sub_menu li a.hover {
-    color: #999 !important;
-	opacity: 0.6;
-	filter: alpha(opacity=60); /* For IE8 and earlier */
+    color: #656565 !important;
 }
 /* ------ MANAGE LABELS ------ */
 section#rdfsLabels {
@@ -329,7 +376,7 @@ section#rdfsLabels li label {
     padding-left:5px;
 }
 section#rdfsLabels a.cancel {
-    color:#F70;
+    color:#B50;
 }
 p#mngLabelsText {
     margin-left:25px;
@@ -357,8 +404,8 @@ p#mngLabelsText {
 	 	text-decoration: none;
 		font-size: 18px;
 		border: none;
-	  padding-left: 13px;
-	  padding-top: 8px;
+        width: 104px;
+        height: 43px;
 	  cursor: pointer;
 }
 span.search-filter-selected {
@@ -376,6 +423,10 @@ input.search-homepage {
 		width: 351px;
 		background-position: right;
 }
+input.search-homepage::placeholder {
+        color: #676767;
+}
+
 a.filter-search {
 		position: absolute;
 		vertical-align: middle;
@@ -386,12 +437,6 @@ a.filter-search {
 		top: 0;
 		right: 135px;
 		z-index: 9999;
-}
-.filter-default {
-
-}
-.filter-active {
-
 }
 #filter-search-nav {
 		position: absolute;
@@ -520,6 +565,11 @@ table#table-listing td {
 }
 table#table-listing td  a {
 	word-wrap: break-word;
+}
+
+/* browseByVClass view browse people */
+.individual > p {
+    margin-bottom: 0;
 }
 
 a.button.blue {

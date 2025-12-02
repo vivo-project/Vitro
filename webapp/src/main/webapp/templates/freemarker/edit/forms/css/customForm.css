@@ -13,7 +13,7 @@ form.customForm div.addNewLink {
     margin-top: .9em;
     width: 200px;
     padding: .8em;
-    border: 1px solid #9c9c9c;
+    border: 1px solid #656565;
     display: none; /* Hide if Javascript disabled. Javascript will show. */
 }
 form.customForm .existing span.requiredHint,
@@ -31,7 +31,7 @@ form.customForm .existing {
 }
 .new {
     padding: .6em 0 .6em 1.5em;
-    border: 1px solid #9c9c9c;
+    border: 1px solid #656565;
     width: 300px;
 }
 form.customForm p.inline input,
@@ -55,7 +55,7 @@ option {
     padding: 0 2px;
 }
 form.customForm .hint {
-    color: #9c9c9c;
+    color: #656565;
     font-weight: normal;
 }
 form.customForm .requiredHint {
@@ -82,8 +82,8 @@ form.customForm a.close {
 }
 form.customForm a.close:link,
 form.customForm a.close:visited {
-    border-color: #ff7700;
-    color: #ff7700;
+    border-color: #B05200;
+    color: #B05200;
 }
 form.customForm textarea {
     width: 30%;

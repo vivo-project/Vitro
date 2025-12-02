@@ -54,7 +54,7 @@
                     </#if>
                     <#--  Most-specific types -->
                     <@p.mostSpecificTypes individual />
-                    <span id="iconControlsVitro"><img id="uriIcon" title="${individual.uri}" class="middle" src="${urls.images}/individual/uriIcon.gif" alt="uri icon"/></span>
+                    <span id="iconControlsVitro"><img id="uriIcon" title="${individual.uri}" class="middle" src="${urls.images}/individual/uriIcon_darkened.gif" alt="uri icon"/></span>
                 </h1>
             </#if>
         </header>
