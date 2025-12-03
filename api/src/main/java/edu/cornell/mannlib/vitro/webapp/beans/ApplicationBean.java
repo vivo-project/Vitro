@@ -31,7 +31,6 @@ public class ApplicationBean {
 
     // Default initializations, which may be overwritten in the AppBeanMapper
     // but are otherwise not changed there
-
     private boolean   initialized             = false;
     private String    sessionIdStr            = null;
     private String    applicationName         = DEFAULT_APPLICATION_NAME;

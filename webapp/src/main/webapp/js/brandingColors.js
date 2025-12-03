@@ -1,45 +1,21 @@
 /* $This file is distributed under the terms of the license in LICENSE$ */
-
 $.extend(this, globalI18nStrings);
 
-const colorNameConvertor = {
-    "primary-lighter": "themePrimaryColorLighter",
-    "primary-base": "themePrimaryColor",
-    "primary-darker": "themePrimaryColorDarker",
-    "banner-base": "themeBannerColor",
-    "secondary-base": "themeSecondaryColor",
-    "accent-base": "themeAccentColor",
-    "text-base": "themeTextColor",
-    "link-base": "themeLinkColor"
-}
+let brandingColors = null;
 
-const colorNameConvertorInverse = Object.keys(colorNameConvertor).reduce((acc, key) => {
-        acc[colorNameConvertor[key]] = key;
-        return acc;
-    }, {})
-
-const colorPallete = {
-    "primary-lighter": "--primary-color-lighter",
-    "primary-base": "--primary-color",
-    "primary-darker": "--primary-color-darker",
-    "banner-base": "--banner-color",
-    "secondary-base": "--secondary-color",
-    "accent-base": "--accent-color",
-    "text-base": "--text-color",
-    "link-base": "--link-color"
-};
-
-const resetLinks = {
-    "primary": ["primary-lighter", "primary-base", "primary-darker"],
-    "banner": ["banner-base"],
-    "secondary": ["secondary-base"],
-    "accent": ["accent-base"],
-    "text": ["text-base"],
-    "link": ["link-base"],
-};
-
-$(document).ready(function(){
+function initBrandingColors() {
     showColorSchemeEditor();
+
+    async function showColorSchemeEditor() {
+        await loadThemeConfig();
+        if (!brandingColors) {
+            return;
+        }
+
+        renderEditor();
+        initColors();
+        loadDateFromLocalStorage();
+    }
 
     function getSchemaData() {
         return JSON.parse(localStorage.getItem('colorSchemeEditor'));
@@ -47,30 +23,40 @@ $(document).ready(function(){
 
     function saveDateToLocalStorage() {
         let data = getSchemaData();
-        Object.keys(colorPallete).forEach(function(color) {
-            const colorInput = $('#' + color + '-color');
-            data.colors[colorNameConvertor[color]] = colorInput.attr('default-color') === 'true' ? undefined : colorInput.val();
+        brandingColors.pallete.forEach(colorPaletteGroup => {
+            colorPaletteGroup.colors.forEach(color => {
+                const colorInput = $('#' + color.name + '-color');
+
+                if (colorInput.attr('default-color') === 'true') {
+                    data.updatedColors[color.cssVariable] = undefined;
+                } else {
+                    data.updatedColors[color.cssVariable] = colorInput.val();
+                }
+            });
         });
         localStorage.setItem('colorSchemeEditor', JSON.stringify(data));        
     }
 
     function loadDateFromLocalStorage() {
         let data = getSchemaData();
-        Object.keys(data.colors).forEach(function(color) {
-            let colorFormated = colorNameConvertorInverse[color]; // Convert format from themePrimaryColor to primary-base etc.
-
-            if (!data.colors[color]) return;
-            $('#' + colorFormated + '-color').val(data.colors[color]);
-            handleColorInput(colorFormated.split('-')[0], colorFormated.split('-')[1], data.colors[color], false);
+        brandingColors.pallete.forEach(colorPaletteGroup => {
+            colorPaletteGroup.colors.forEach(color => {
+                if (data.updatedColors[color.cssVariable]) {
+                    const colorInput = $('#' + color.name + '-color');
+                    colorInput.val(data.updatedColors[color.cssVariable]);
+                    colorInput.attr('default-color', false);
+                    colorInput.attr('user-changed', true);
+                    handleColorInput(colorPaletteGroup, color, data.updatedColors[color.cssVariable], false, true);
+                }
+            });
         });
     }
 
     function toggleResetButton(inputId, show) {
         const resetLink = document.getElementById(inputId);
-        resetLink.style.display = show ? '' : 'none';
+        resetLink.style.display = show ? 'block' : 'none';
     }
 
-    // SITE THEMES SETTINGS
     function adjustHexColor(hex, percent) {
         if (hex.startsWith("#")) hex = hex.slice(1);
         if (hex.length !== 6) throw new Error("Invalid hex color format.");
@@ -81,47 +67,62 @@ $(document).ready(function(){
         return `#${[r, g, b].map(value => value.toString(16).padStart(2, "0")).join("")}`;
     }
     
-    function resetColor(inputId) {
-        let pallete = getSchemaData().defaultColors || {};
+    function resetColor(color) {
+        let pallete = color.value;
+        
+        const colorInput = $('#' + color.name + '-color');
+        colorInput.val(pallete);
+        colorInput.attr('default-color', true);
+        colorInput.attr('user-changed', false);
 
-        $('#' + inputId + '-color').val(pallete[inputId]);
-        $('#' + inputId + '-color').attr('default-color', true);
-        $('#' + inputId + '-color').attr('user-changed', false);
-
-        updateCSSVariable(colorPallete[inputId], null);
+        updateCSSVariable(color.cssVariable, null);
     }
 
-    function handleResetButton(buttonName) {
-        resetLinks[buttonName].forEach(inputId => {
-            resetColor(inputId);
+    function handleResetButton(colorPaletteGroup) {
+        colorPaletteGroup.colors.forEach(color => {
+            resetColor(color);
         });
 
-        toggleResetButton(buttonName + "-reset", false);
+        toggleResetButton(colorPaletteGroup.groupName + "-reset", false);
         saveDateToLocalStorage();
     }
 
-    function handleColorInput(color, shade, value, updateShades = true, userChanged = true) {
-        updateCSSVariable(colorPallete[color + '-' + shade], value);
-        toggleResetButton(color + '-reset', true);
-        const colorInput = $('#' + color + '-' + shade + '-color')
+    function handleColorInput(group, color, value, updateShades = true, userChanged = true) {        
+        const colorInput = $('#' + color.name + '-color')
+        updateCSSVariable(color.cssVariable, value);
+        toggleResetButton(group.groupName + '-reset', true);
         colorInput.attr('default-color', false);
         colorInput.attr('user-changed', userChanged);
 
-        if (updateShades && color === 'primary' && shade === 'base') {
-            ["lighter", "darker"].forEach(newShade => {
-                const variation = color + '-' + newShade
-                const variationId = variation + '-color';
-                const adjustedValue = adjustHexColor(value, variation === "primary-lighter" ? 40 : -40);
-                
-                const shadeColorInput = $('#' + variationId)
+        if (updateShades) {
+            const palleteGroup = brandingColors.pallete.find(x => x.groupName == group.groupName)
+            const dependentColors = palleteGroup.colors.filter(x => x.shade?.base == color.name)
+            dependentColors.forEach(dependentColor => {
+
+                const shadeColorInput = $('#' + dependentColor.name + '-color');
                 if (shadeColorInput.attr('user-changed') === 'true') {
-                    return
+                    return;
                 }
-                
+                const adjustedValue = applyShadeTransformation(value, dependentColor.shade);
                 shadeColorInput.val(adjustedValue);
-                handleColorInput(color, newShade, adjustedValue, false, false);
+                handleColorInput(group, dependentColor, adjustedValue, false, false);
             });
         }
+    }
+        
+    function applyShadeTransformation(color, shadeConfig) {
+        if (!shadeConfig) return color;
+        
+        const amount = shadeConfig.amount || 0;
+        const type = shadeConfig.type;
+        
+        if (type === 'lighten') {
+            return adjustHexColor(color, amount);
+        } else if (type === 'darken') {
+            return adjustHexColor(color, -amount);
+        }
+        
+        return color;
     }
 
     function updateCSSVariable(cssVar, value) {
@@ -129,22 +130,19 @@ $(document).ready(function(){
         
     }
 
-
-
-    // Create fixed footer
-    function showColorSchemeEditor() {
-        renderEditor();
-        initColors();
-        loadDateFromLocalStorage();
+    async function loadThemeConfig() {
+        let data = getSchemaData();
+        brandingColors = data.brandingColors;
     }
 
     function initColors() {
-        Object.keys(colorPallete).forEach(function(color) {
-            resetColor(color);
+        brandingColors.pallete.forEach(colorPaletteGroup => {
+            colorPaletteGroup.colors.forEach(color => {
+                resetColor(color);
+            });
         });
     }
 
-    // Creating the editor
     function renderEditor() {
         
         $('body').addClass('branding-editor-body');
@@ -153,21 +151,20 @@ $(document).ready(function(){
             class: 'branding-fixed-footer'
         }).appendTo('body');
 
-        // Add color inputs
-        var colors = {'primary': ['lighter', 'base', 'darker'], 'secondary': ['base'], 'accent': ['base'], 'text': ['base'], 'banner': ['base'], 'link': ['base']};
+        var pallete = brandingColors?.pallete
         var $colorContainer = $('<div>', {
             id: 'color-inputs',
             class: 'branding-color-inputs'
         }).appendTo($footer);
 
-        Object.keys(colors).forEach(function(color) {
+        pallete.forEach((colorPaletteGroup) => {
             var $colorDiv = $('<div>', {
-                class: 'branding-color-row'
+                class: 'branding-color-col'
             }).appendTo($colorContainer);
 
             var $label = $('<label>', {
-                for: color + '-base-color',
-                text: color.charAt(0).toUpperCase() + color.slice(1) + ' Color: ',
+                for: colorPaletteGroup.groupName + '-base-color',
+                text: colorPaletteGroup.groupName + ' Color: ',
                 class: 'branding-color-label'
             }).appendTo($colorDiv);
 
@@ -175,43 +172,45 @@ $(document).ready(function(){
                 class: 'branding-color-group'
             }).appendTo($colorDiv);
 
-            colors[color].forEach(function(shade) {
+            colorPaletteGroup.colors.forEach((color) => {
+
+                var $relativeWrapper = $('<div>', {
+                    class: 'relative'
+                }).appendTo($colorGroup);
+
                 $('<input>', {
                     type: 'color',
-                    id: color + '-' + shade + '-color',
-                    name: color + '-' + shade + '-color',
-                    class: 'branding-color-input' + ((shade === 'lighter' || shade === 'darker') ? ' shade-borderless' : ''),
+                    id: color.name + '-color',
+                    name: color.name + '-color',
+                    class: 'branding-color-input' + (color?.shade ? ' shade-borderless' : ''),
                     on: {
                         input: function() {
-                            handleColorInput(color, shade, $(this).val());
+                            handleColorInput(colorPaletteGroup, color, $(this).val());
                         },
                         change: function() {
                             saveDateToLocalStorage();
                         }
                     }
-                }).appendTo($colorGroup);
+                }).appendTo($relativeWrapper);
                 $('<div>', {
                     class: 'chain'
-                }).appendTo($colorGroup);
+                }).appendTo($relativeWrapper);
             });
             $('<button>', {
                 text: 'Reset',
                 class: 'branding-btn btn-danger branding-reset-btn',
-                id: color + '-reset',
+                id: colorPaletteGroup.groupName + '-reset',
                 click: function() {
-                    handleResetButton(color);
+                    handleResetButton(colorPaletteGroup);
                 }
             }).appendTo($colorDiv);
 
             
         });
 
-        // Add Submit and Cancel buttons
         var $buttonContainer = $('<div>', {
             class: 'branding-button-container'
         }).appendTo($footer);
-
-
 
         var $cancelButton = $('<button>', {
             text: 'Cancel',
@@ -228,26 +227,20 @@ $(document).ready(function(){
             class: 'branding-btn btn-success'
         }).appendTo($buttonContainer);
 
-
-        // Event handlers for buttons
         $submitButton.click(function() {
             saveDateToLocalStorage();
             const data = getSchemaData();
+
+            const postData = {
+                action: "update",
+                colors: JSON.stringify(data.updatedColors)
+            };
+            
             $.ajax({
                 url: baseUrl + "/siteBranding",
                 dataType: 'json',
                 type: 'POST',
-                data: {
-                    action: "update",
-                    themePrimaryColor: data.colors["themePrimaryColor"] || null,
-                    themePrimaryColorLighter: data.colors["themePrimaryColorLighter"] || null,
-                    themePrimaryColorDarker: data.colors["themePrimaryColorDarker"] || null,
-                    themeSecondaryColor: data.colors["themeSecondaryColor"] || null,
-                    themeAccentColor: data.colors["themeAccentColor"] || null,
-                    themeLinkColor: data.colors["themeLinkColor"] || null,
-                    themeTextColor: data.colors["themeTextColor"] || null,
-                    themeBannerColor: data.colors["themeBannerColor"] || null,
-                },
+                data: postData,
                 complete: function(xhr, status) {
                     alert(globalI18nStrings.brandingColorsSubmitAlert);
                     var location = getSchemaData().lastUrl;
@@ -287,7 +280,14 @@ $(document).ready(function(){
 
         
     }
-    // End of Creating the editor
+
+};
 
 
-});
+if (document.readyState === "complete" || document.readyState === "interactive") {
+    initBrandingColors();
+} else {
+    $(document).ready(function() {
+        initBrandingColors();
+    });
+}

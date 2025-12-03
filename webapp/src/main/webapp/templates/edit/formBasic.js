@@ -45,7 +45,7 @@
         })
     }
 
-    async function onSave(e) {
+    async function onSaveSiteInfo(e) {
         if (isLogoChanges()) {
             e.preventDefault();
             await saveLogoInput();
@@ -77,13 +77,14 @@
                 if (!data) return null;
                 if (
                     !data ||
-                    !data.defaultBrandingColors
+                    !data.themeColors ||
+                    !data.themeColors.pallete
                 ) {
                     console.error("Invalid theme-config.json format");
                     alert(globalI18nStrings.brandingColorsErrorFormatConfig);
                     return null;
                 }
-                return data.defaultBrandingColors;
+                return data.themeColors;
             })
             .catch((error) => {
                 console.error("Error fetching theme-config.json:", error);
@@ -95,15 +96,15 @@
         let baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
         let themeDir = document.getElementById('ThemeDir').value;
         let themeConfigUrl = baseUrl + "/" + themeDir + "theme-config.json";
-        let defaultColors = await getThemeDefaultColors(themeConfigUrl);
+        let defaultColorsConfig = await getThemeDefaultColors(themeConfigUrl);
 
         let data = {
                 enabled: true,
                 lastUrl: window.location.href,
                 script: baseUrl + "/js/brandingColors.js",
-                colors: themeBrandingColors,
+                updatedColors: themeBrandingColors,
                 theme: document.getElementById('ThemeDir').value,
-                defaultColors: defaultColors
+                brandingColors: defaultColorsConfig
             }
 
         localStorage.setItem('colorSchemeEditor', JSON.stringify(data));
@@ -119,7 +120,7 @@
 
         document.getElementById("ThemeDir").addEventListener('change', handleThemeChange);
 
-        document.querySelector("[name=_update][type=submit]").addEventListener('click', onSave);
+        document.querySelector("[name=_update][type=submit]").addEventListener('click', onSaveSiteInfo);
 
         document.getElementById('changeColorsButton').addEventListener('click', (event) => {
             event.preventDefault();

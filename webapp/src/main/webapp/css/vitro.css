@@ -23,6 +23,9 @@
 .disabledSubmit {
 	cursor:default ! important;
 }
+.relative {
+    position: relative;
+}
 /* <------ USER FEEDBACK*/
 #error-alert {
     color: #900;
@@ -572,28 +575,13 @@ table#table-listing td  a {
 }
 
 /* If input selector have attribute [user-changed="false"] then .chain gets this style */
-input#primary-lighter-color[user-changed="false"] + .chain {
+input.shade-borderless[type="color"][user-changed="false"] + .chain {
     content: "";
     color: #888;    
     position: absolute;
-    top: 16px;
     right: -3px;
     width: 13px;
-    height: 22px;
-    background-image: url('../images/link-chain.png');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    user-select: none;
-}
-
-input#primary-darker-color[user-changed="false"] + .chain {
-    content: "";
-    color: #888;    
-    position: absolute;
-    bottom: 16px;
-    right: -3px;
-    width: 13px;
+    top: 1px;
     height: 22px;
     background-image: url('../images/link-chain.png');
     background-repeat: no-repeat;
@@ -604,7 +592,7 @@ input#primary-darker-color[user-changed="false"] + .chain {
 
 /* Branding Colors Editor */
 .branding-editor-body {
-    margin-bottom: 150px;
+    margin-bottom: 180px;
 }
 
 footer#fixed-footer.branding-fixed-footer {
@@ -616,10 +604,13 @@ footer#fixed-footer.branding-fixed-footer {
     color: #fff;
     text-align: center;
     padding: 10px;
-    height: auto;
+    height: 180px;
     max-height: 160px;
     overflow-y: auto;
     z-index: 10000;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
 }
 
 #color-inputs.branding-color-inputs {
@@ -630,15 +621,19 @@ footer#fixed-footer.branding-fixed-footer {
     padding: 0 10px;
 }
 
-.branding-color-row {
-    display: flex;
+.branding-color-col {
     align-items: center;
     margin: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .branding-color-label {
-    margin-right: 10px;
     color: #000;
+    margin-bottom: 10px;
+    margin-top: 0;
+    font-weight: 600;
 }
 
 .branding-color-group {
@@ -654,6 +649,7 @@ input.branding-color-input.shade-borderless {
 
 .branding-button-container {
     display: flex;
+    flex-direction: column;
     gap: 10px;
     justify-content: center;
     margin-top: 10px;
@@ -675,7 +671,7 @@ input.branding-color-input.shade-borderless {
 }
 
 .branding-reset-btn {
-    margin-left: 10px;
+    margin-top: 10px;
     display: none;
 }
 

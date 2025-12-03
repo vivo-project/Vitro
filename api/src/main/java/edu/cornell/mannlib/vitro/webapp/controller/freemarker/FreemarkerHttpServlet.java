@@ -453,7 +453,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
 
         map.put("siteName", vreq.getAppBean().getApplicationName());
 
-        map.putAll(SiteBrandingController.getThemeBrandingCache(vreq.getAppBean().getThemeDir()));
+        map.put("brandingColors", SiteBrandingController.getThemeBrandingCache(vreq.getAppBean().getThemeDir()));
 
         map.put("urls", buildRequestUrls(vreq));
 

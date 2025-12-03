@@ -116,14 +116,7 @@ public class VitroVocabulary {
 
     public static final String PORTAL = vitroURI+"Portal";
     public static final String PORTAL_THEMEDIR = vitroURI+"themeDir";
-    public static final String PORTAL_THEMEPRIMARYCOLORLIGHTER = vitroURI+"themePrimaryColorLighter";
-    public static final String PORTAL_THEMEPRIMARYCOLOR = vitroURI+"themePrimaryColor";
-    public static final String PORTAL_THEMEPRIMARYCOLORDARKER = vitroURI+"themePrimaryColorDarker";
-    public static final String PORTAL_THEMEBANNERCOLOR = vitroURI+"themeBannerColor";
-    public static final String PORTAL_THEMESECONDARYCOLOR = vitroURI+"themeSecondaryColor";
-    public static final String PORTAL_THEMEACCENTCOLOR = vitroURI+"themeAccentColor";
-    public static final String PORTAL_THEMETEXTCOLOR = vitroURI+"themeTextColor";
-    public static final String PORTAL_THEMELINKCOLOR = vitroURI+"themeLinkColor";
+    public static final String PORTAL_THEMECOLORS = vitroURI+"themeColors";
     public static final String PORTAL_CONTACTMAIL = vitroURI+"contactMail";
     public static final String PORTAL_CORRECTIONMAIL = vitroURI+"correctionMail";
     public static final String PORTAL_ABOUTTEXT = vitroURI+"aboutText";
