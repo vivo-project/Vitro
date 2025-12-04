@@ -175,7 +175,7 @@ function initBrandingColors() {
             colorPaletteGroup.colors.forEach((color) => {
 
                 var $relativeWrapper = $('<div>', {
-                    class: 'relative'
+                    class: 'relative' + (color?.hidden ? ' hidden' : '')
                 }).appendTo($colorGroup);
 
                 $('<input>', {
