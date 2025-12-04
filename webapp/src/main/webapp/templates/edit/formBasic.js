@@ -78,7 +78,7 @@
                 if (
                     !data ||
                     !data.themeColors ||
-                    !data.themeColors.pallete
+                    !data.themeColors.palette
                 ) {
                     console.error("Invalid theme-config.json format");
                     alert(globalI18nStrings.brandingColorsErrorFormatConfig);

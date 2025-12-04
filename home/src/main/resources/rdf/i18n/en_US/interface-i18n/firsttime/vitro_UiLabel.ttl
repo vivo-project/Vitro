@@ -6963,7 +6963,7 @@ uil-data:branding_colors_reset_alert.Vitro
 uil-data:branding_colors_error_fetch_config.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Failed to load default theme pallete. Please check if 'theme-config.json' file exists and is accessible."@en-US ;
+        rdfs:label       "Failed to load default theme palette. Please check if 'theme-config.json' file exists and is accessible."@en-US ;
         uil:hasApp       "Vitro" ;
         uil:hasKey       "branding_colors_error_fetch_config" .
 

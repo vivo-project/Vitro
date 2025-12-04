@@ -23,7 +23,7 @@ function initBrandingColors() {
 
     function saveDateToLocalStorage() {
         let data = getSchemaData();
-        brandingColors.pallete.forEach(colorPaletteGroup => {
+        brandingColors.palette.forEach(colorPaletteGroup => {
             colorPaletteGroup.colors.forEach(color => {
                 const colorInput = $('#' + color.name + '-color');
 
@@ -39,7 +39,7 @@ function initBrandingColors() {
 
     function loadDateFromLocalStorage() {
         let data = getSchemaData();
-        brandingColors.pallete.forEach(colorPaletteGroup => {
+        brandingColors.palette.forEach(colorPaletteGroup => {
             colorPaletteGroup.colors.forEach(color => {
                 if (data.updatedColors[color.cssVariable]) {
                     const colorInput = $('#' + color.name + '-color');
@@ -68,10 +68,10 @@ function initBrandingColors() {
     }
     
     function resetColor(color) {
-        let pallete = color.value;
+        let palette = color.value;
         
         const colorInput = $('#' + color.name + '-color');
-        colorInput.val(pallete);
+        colorInput.val(palette);
         colorInput.attr('default-color', true);
         colorInput.attr('user-changed', false);
 
@@ -95,8 +95,8 @@ function initBrandingColors() {
         colorInput.attr('user-changed', userChanged);
 
         if (updateShades) {
-            const palleteGroup = brandingColors.pallete.find(x => x.groupName == group.groupName)
-            const dependentColors = palleteGroup.colors.filter(x => x.shade?.base == color.name)
+            const paletteGroup = brandingColors.palette.find(x => x.groupName == group.groupName)
+            const dependentColors = paletteGroup.colors.filter(x => x.shade?.base == color.name)
             dependentColors.forEach(dependentColor => {
 
                 const shadeColorInput = $('#' + dependentColor.name + '-color');
@@ -136,7 +136,7 @@ function initBrandingColors() {
     }
 
     function initColors() {
-        brandingColors.pallete.forEach(colorPaletteGroup => {
+        brandingColors.palette.forEach(colorPaletteGroup => {
             colorPaletteGroup.colors.forEach(color => {
                 resetColor(color);
             });
@@ -151,13 +151,13 @@ function initBrandingColors() {
             class: 'branding-fixed-footer'
         }).appendTo('body');
 
-        var pallete = brandingColors?.pallete
+        var palette = brandingColors?.palette
         var $colorContainer = $('<div>', {
             id: 'color-inputs',
             class: 'branding-color-inputs'
         }).appendTo($footer);
 
-        pallete.forEach((colorPaletteGroup) => {
+        palette.forEach((colorPaletteGroup) => {
             var $colorDiv = $('<div>', {
                 class: 'branding-color-col'
             }).appendTo($colorContainer);
