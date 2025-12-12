@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.jena.query.ParameterizedSparqlString;
 import org.apache.jena.query.QueryParseException;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -111,7 +111,9 @@ public class IndividualListRdfController extends VitroApiServlet {
 	}
 
 	private String buildQuery(String vclassUri) {
-		return QUERY_TEMPLATE.replace("?vclass", "<" + vclassUri + ">");
+		ParameterizedSparqlString pss = new ParameterizedSparqlString(QUERY_TEMPLATE);
+		pss.setIri("vclass", vclassUri);
+		return pss.toString();
 	}
 
 	private RDFService getRdfService(HttpServletRequest req) {
