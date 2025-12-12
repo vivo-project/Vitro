@@ -10,21 +10,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
+import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchQuery;
+import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpBasicClientFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.fluent.Request;
-import org.apache.http.client.fluent.Response;
-import org.apache.http.entity.ContentType;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
-
-import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
-import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
-import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchQuery;
 
 /**
  * The nuts and bolts of deleting documents from the Elasticsearch index.
@@ -52,8 +54,10 @@ public class ESDeleter {
         try {
             String url = baseUrl + "/_doc/"
                     + URLEncoder.encode(id, "UTF8");
-            Response response = Request.Delete(url).execute();
-            String json = response.returnContent().asString();
+            HttpClient httpClient = ESHttpBasicClientFactory.getHttpClient(baseUrl);
+
+            HttpResponse response = httpClient.execute(new HttpDelete(url));
+            String json = EntityUtils.toString(response.getEntity());
         } catch (HttpResponseException e) {
             if (e.getStatusCode() == 404) {
                 // Don't care if it has already been deleted.
@@ -69,16 +73,23 @@ public class ESDeleter {
 
     public void deleteByQuery(String queryString) throws SearchEngineException {
         String url = baseUrl + "/_delete_by_query";
+        queryString = queryString.replace(" ", "");
+        if (queryString.contains("*TO")) {
+            queryString = queryString.replace("[", "").replace("]", "").replace("*", "0");
+        }
         SearchQuery query = new BaseSearchQuery().setQuery(queryString);
-        String queryJson = new QueryConverter(query).asString();
+        String queryJson = new QueryConverter(query, true).asString();
 
         try {
-            Response response = Request.Post(url)
-                    .bodyString(queryJson, ContentType.APPLICATION_JSON)
-                    .execute();
+            HttpClient httpClient = ESHttpBasicClientFactory.getHttpClient(baseUrl);
+
+            HttpPost request = new HttpPost(url);
+            request.addHeader("Content-Type", "application/json");
+            request.setEntity(new StringEntity(queryJson));
+            HttpResponse response = httpClient.execute(request);
 
             BaseResponseHandler handler = new BaseResponseHandler();
-            response.handleResponse(handler);
+            handler.handleResponse(response);
             if (handler.getStatusCode() >= 400) {
                 log.warn(String.format(
                         "Failed to delete Elasticsearch documents by query: %s, %d - %s\n%s",

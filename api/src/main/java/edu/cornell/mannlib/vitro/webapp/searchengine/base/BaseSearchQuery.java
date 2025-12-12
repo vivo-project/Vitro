@@ -29,6 +29,7 @@ public class BaseSearchQuery implements SearchQuery {
 	private int facetMinCount = -1;
     private boolean facetTextToCompareIgnoreCase;
     private String facetContainsText;
+	private boolean simpleQuery = false;
 
 	@Override
 	public SearchQuery setQuery(String query) {
@@ -171,4 +172,13 @@ public class BaseSearchQuery implements SearchQuery {
         return facetTextToCompareIgnoreCase;
     }
 
+	@Override
+	public void setSimpleQuery(boolean value) {
+		this.simpleQuery = value;
+	}
+
+	@Override
+	public boolean isSimpleQuery() {
+		return this.simpleQuery;
+	}
 }

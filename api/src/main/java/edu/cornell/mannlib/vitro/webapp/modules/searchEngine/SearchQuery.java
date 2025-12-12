@@ -161,4 +161,8 @@ public interface SearchQuery {
      * @return defines whether the text of a facet field should be compared case insensitively.
      */
     boolean isFacetTextCompareCaseInsensitive();
+
+	void setSimpleQuery(boolean value);
+
+	boolean isSimpleQuery();
 }

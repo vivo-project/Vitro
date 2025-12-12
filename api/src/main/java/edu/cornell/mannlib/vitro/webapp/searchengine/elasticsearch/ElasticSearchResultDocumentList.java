@@ -30,7 +30,7 @@ class ElasticSearchResultDocumentList implements SearchResultDocumentList {
 
     @Override
     public long getNumFound() {
-        return documents.size();
+        return numberFound;
     }
 
     @Override

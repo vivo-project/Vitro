@@ -4,7 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
-import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
+import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpBasicClientFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
@@ -15,6 +15,7 @@ import org.apache.http.util.EntityUtils;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -35,11 +36,11 @@ public class ElasticSmokeTest {
     public void doTest(ServletContextEvent sce) {
         final StartupStatus ss = StartupStatus.getBean(sce.getServletContext());
 
-        String elasticUrlString = ConfigurationProperties.getBean(sce).getProperty("vitro.local.elastic.url", "");
+        String elasticUrlString = ConfigurationProperties.getBean(sce).getProperty("vitro.local.searchengine.url", "");
         if (elasticUrlString.isEmpty()) {
             ss.fatal(listener, "Can't connect to ElasticSearch engine. "
-                    + "runtime.properties must contain a value for "
-                    + "vitro.local.elastic.url");
+                + "runtime.properties must contain a value for "
+                + "vitro.local.searchengine.url");
             return;
         }
 
@@ -49,9 +50,9 @@ public class ElasticSmokeTest {
             elasticUrl = new URL(elasticUrlString);
         } catch (MalformedURLException e) {
             ss.fatal(listener, "Can't connect to ElasticSearch engine. "
-                    + "The value for vitro.local.elastic.url "
-                    + "in runtime.properties is not a valid URL: '"
-                    + elasticUrlString + "'", e);
+                + "The value for vitro.local.searchengine.url "
+                + "in runtime.properties is not a valid URL: '"
+                + elasticUrlString + "'", e);
         }
 
         ss.info(listener, "Starting ElasticSearch test.");
@@ -82,10 +83,11 @@ public class ElasticSmokeTest {
      */
     private static class ElasticPinger {
         private final URL elasticUrl;
-        private final HttpClient httpClient = HttpClientFactory.getHttpClient();
+        private final HttpClient httpClient;
 
         public ElasticPinger(URL elasticUrl) {
             this.elasticUrl = elasticUrl;
+            this.httpClient = ESHttpBasicClientFactory.getHttpClient(elasticUrl.toString());
         }
 
         public void ping() throws ElasticProblemException {

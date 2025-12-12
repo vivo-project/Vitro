@@ -11,6 +11,7 @@
 * Create a search index with the appropriate mapping (see below).
 * Check out VIVO and this branch of Vitro (see below), and do the usual installation procedure.
 * Modify `{vitro_home}/config/applicationSetup.n3` to use this driver (see below).
+* Modify the `vitro.local.searchengine.url` configuration property to contain ES index base URL
 * Start elasticsearch
 * Start VIVO
 
@@ -65,57 +66,192 @@ git clone -b feature/elasticsearchExperiments https://github.com/j2blake/Vitro.g
 ```
 curl -X PUT "localhost:9200/vivo?pretty" -H 'Content-Type: application/json' -d'
 {
-  "mappings": {
-    "_doc": { 
-      "properties": { 
-        "ALLTEXT": { 
-          "type": "text",
-          "analyzer": "english"
-        }, 
-        "ALLTEXTUNSTEMMED": { 
-          "type": "text",
-          "analyzer": "standard"
-        }, 
-        "DocId": {
-          "type": "keyword"  
-        }, 
-        "classgroup": {
-          "type": "keyword"  
-        }, 
-        "type": {
-          "type": "keyword"  
-        }, 
-        "mostSpecificTypeURIs": {
-          "type": "keyword"  
-        }, 
-        "indexedTime": { 
-          "type": "long" 
+  "settings":{
+    "index":{
+      "analysis":{
+        "tokenizer":{
+          "keyword_tokenizer":{
+            "type":"keyword"
+          },
+          "whitespace_tokenizer":{
+            "type":"whitespace"
+          }
         },
-        "nameRaw": { 
-          "type": "keyword" 
+        "filter":{
+          "lowercase_filter":{
+            "type":"lowercase"
+          },
+          "edgengram_filter":{
+            "type":"edge_ngram",
+            "min_gram":2,
+            "max_gram":25
+          },
+          "word_delimiter_filter":{
+            "type":"word_delimiter",
+            "generate_word_parts":true,
+            "generate_number_parts":true,
+            "catenate_words":false,
+            "catenate_numbers":false,
+            "catenate_all":false,
+            "split_on_case_change":true
+          },
+          "porter_stem_filter":{
+            "type":"snowball",
+            "language":"English"
+          }
         },
-        "URI": { 
-          "type": "keyword" 
-        },
-        "THUMBNAIL": { 
-          "type": "integer" 
-        },
-        "THUMBNAIL_URL": { 
-          "type": "keyword" 
-        },
-        "nameLowercaseSingleValued": {
-          "type": "text",
-          "analyzer": "standard",
-          "fielddata": "true"
-        },
-        "BETA" : {
-          "type" : "float"
+        "analyzer":{
+          "default":{
+            "type":"english"
+          },
+          "edgengram_untokenized":{
+            "type":"custom",
+            "tokenizer":"keyword_tokenizer",
+            "filter":[
+              "lowercase_filter",
+              "edgengram_filter"
+            ]
+          },
+          "edgengram_untokenized_query":{
+            "type":"custom",
+            "tokenizer":"keyword_tokenizer",
+            "filter":[
+              "lowercase_filter"
+            ]
+          },
+          "edgengram_stemmed":{
+            "type":"custom",
+            "tokenizer":"whitespace_tokenizer",
+            "filter":[
+              "word_delimiter_filter",
+              "lowercase_filter",
+              "porter_stem_filter",
+              "edgengram_filter"
+            ]
+          },
+          "edgengram_stemmed_query":{
+            "type":"custom",
+            "tokenizer":"whitespace_tokenizer",
+            "filter":[
+              "word_delimiter_filter",
+              "lowercase_filter",
+              "porter_stem_filter"
+            ]
+          },
+          "sort_field_analyzer":{
+            "type":"custom",
+            "tokenizer":"keyword",
+            "filter":[
+              "lowercase"
+            ]
+          }
         }
       }
     }
   },
-  "query": {
-    "default_field": "ALLTEXT"
+  "mappings":{
+    "dynamic_templates":[
+      {
+        "field_sort_template":{
+          "match":"*_label_sort",
+          "mapping":{
+            "type":"text",
+            "fields":{
+              "keyword":{
+                "type":"keyword"
+              }
+            },
+            "fielddata":true,
+            "analyzer":"sort_field_analyzer"
+          }
+        }
+      },
+      {
+        "field_ss_template":{
+          "match":"*_ss",
+          "mapping":{
+            "type":"text",
+            "fields":{
+              "keyword":{
+                "type":"keyword",
+                "ignore_above":256
+              }
+            },
+            "fielddata":true
+          }
+        }
+      },
+      {
+        "date_range_template":{
+          "match":"*_drsim",
+          "mapping":{
+            "type":"date_range",
+            "format":"strict_date_optional_time||epoch_millis"
+          }
+        }
+      }
+    ],
+    "properties":{
+      "ALLTEXT":{
+        "type":"text",
+        "analyzer":"english",
+        "fields":{
+          "keyword":{
+            "type":"keyword",
+            "ignore_above":256
+          }
+        }
+      },
+      "ALLTEXTUNSTEMMED":{
+        "type":"text",
+        "analyzer":"standard"
+      },
+      "DocId":{
+        "type":"keyword"
+      },
+      "classgroup":{
+        "type":"keyword"
+      },
+      "type":{
+        "type":"keyword"
+      },
+      "mostSpecificTypeURIs":{
+        "type":"keyword"
+      },
+      "indexedTime":{
+        "type":"long"
+      },
+      "nameRaw":{
+        "type":"keyword"
+      },
+      "URI":{
+        "type":"keyword"
+      },
+      "THUMBNAIL":{
+        "type":"integer"
+      },
+      "THUMBNAIL_URL":{
+        "type":"keyword"
+      },
+      "nameLowercaseSingleValued":{
+        "type":"text",
+        "analyzer":"standard",
+        "fielddata":true
+      },
+      "BETA":{
+        "type":"float"
+      },
+      "acNameUntokenized":{
+        "type":"text",
+        "analyzer":"edgengram_untokenized",
+        "search_analyzer":"edgengram_untokenized_query"
+      },
+      "acNameStemmed":{
+        "type":"text",
+        "analyzer":"edgengram_stemmed",
+        "search_analyzer":"edgengram_stemmed_query"
+      }
+    }
   }
 }
 '
@@ -165,6 +301,7 @@ Again, any location and port may be used, but they must match the "base URL" in 
         <java:edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine> ;
     :hasBaseUrl "http://localhost:9200/vivo" .
 ```
+Note that `hasBaseUrl "http://localhost:9200/vivo" .` can be omitted.
 
 ## Enhance the contents of the search index
 ### An example: Publication URIs in the author's search document

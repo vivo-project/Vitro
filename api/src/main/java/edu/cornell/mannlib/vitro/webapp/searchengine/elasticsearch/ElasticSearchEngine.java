@@ -2,12 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.searchengine.elasticsearch;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
@@ -17,11 +16,15 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
 import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchInputDocument;
 import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchQuery;
-import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
-import edu.cornell.mannlib.vitro.webapp.utils.configuration.Validation;
+import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpBasicClientFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpHead;
 
 /**
- * A first draft of an Elasticsearch implementation.
+ * A first version of an Elasticsearch engine implementation.
  */
 public class ElasticSearchEngine implements SearchEngine {
     private static final Log log = LogFactory.getLog(ElasticSearchEngine.class);
@@ -32,47 +35,47 @@ public class ElasticSearchEngine implements SearchEngine {
 
     private String baseUrl;
 
-    @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasBaseUrl")
-    public void setBaseUrl(String url) {
-        if (baseUrl == null) {
-            if (url.endsWith("/")) {
-                url = url.substring(0, url.length() - 1);
-            }
-            baseUrl = url;
-        } else {
-            throw new IllegalStateException(
-                    "Configuration includes multiple base URLs: " + url
-                            + ", and " + baseUrl);
-        }
-    }
-
-    @Validation
-    public void validate() throws Exception {
-        if (baseUrl == null) {
-            throw new IllegalStateException(
-                    "Configuration did not include a base URL.");
-        }
-    }
-
     // ----------------------------------------------------------------------
     // The instance
     // ----------------------------------------------------------------------
 
     @Override
-    public void startup(Application application, ComponentStartupStatus ss) {
-        log.warn("ElasticSearchEngine.startup() not implemented."); // TODO
+    public void startup(Application application, ComponentStartupStatus css) {
+        String elasticUrlString = ConfigurationProperties.getInstance().getProperty("vitro.local.searchengine.url", "");
+        if (elasticUrlString.isEmpty()) {
+            css.fatal("Can't connect to ElasticSearch engine. "
+                + "runtime.properties must contain a value for "
+                + "vitro.local.searchengine.url");
+        }
+
+        baseUrl = elasticUrlString;
     }
 
     @Override
     public void shutdown(Application application) {
-        // TODO Flush the buffers
-        log.warn("ElasticSearchEngine.shutdown not implemented.");
+        try {
+            new ESFlusher(baseUrl).flush(true);
+        } catch (SearchEngineException e) {
+            log.warn("Unexpected error upon Elasticsearch engine shutdown. A component has thrown an error: " +
+                e.getMessage());
+        }
     }
 
     @Override
     public void ping() throws SearchEngineException {
-        // TODO What's the simplest we can do? Another smoke test?
-        log.warn("ElasticSearchEngine.ping() not implemented."); // TODO
+        HttpHead httpHead = new HttpHead(baseUrl);
+        HttpClient httpClient = ESHttpBasicClientFactory.getHttpClient(baseUrl);
+
+        try {
+            HttpResponse response = httpClient.execute(httpHead);
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode != 200) {
+                throw new SearchEngineException(
+                    "Failed to ping Elasticsearch - ES responded with status code " + statusCode);
+            }
+        } catch (SearchEngineException | IOException e) {
+            throw new SearchEngineException("Failed to put to Elasticsearch - request failed");
+        }
     }
 
     @Override
@@ -87,7 +90,7 @@ public class ElasticSearchEngine implements SearchEngine {
 
     @Override
     public void add(Collection<SearchInputDocument> docs)
-            throws SearchEngineException {
+        throws SearchEngineException {
         new ESAdder(baseUrl).add(docs);
     }
 
@@ -108,7 +111,7 @@ public class ElasticSearchEngine implements SearchEngine {
 
     @Override
     public void deleteById(Collection<String> ids)
-            throws SearchEngineException {
+        throws SearchEngineException {
         new ESDeleter(baseUrl).deleteByIds(ids);
     }
 
@@ -131,7 +134,7 @@ public class ElasticSearchEngine implements SearchEngine {
 
     @Override
     public SearchResponse query(SearchQuery query)
-            throws SearchEngineException {
+        throws SearchEngineException {
         return new ESQuery(baseUrl).query(query);
     }
 

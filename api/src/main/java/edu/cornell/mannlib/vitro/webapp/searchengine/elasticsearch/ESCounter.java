@@ -5,12 +5,13 @@ package edu.cornell.mannlib.vitro.webapp.searchengine.elasticsearch;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.http.client.fluent.Request;
-import org.apache.http.client.fluent.Response;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
+import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpBasicClientFactory;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.util.EntityUtils;
 
 /**
  * The nuts and bolts of getting the number of documents in the Elasticsearch
@@ -25,9 +26,10 @@ public class ESCounter {
 
     public int count() throws SearchEngineException {
         try {
-            String url = baseUrl + "/_doc/_count";
-            Response response = Request.Get(url).execute();
-            String json = response.returnContent().asString();
+            String url = baseUrl + "/_count";
+            HttpClient httpClient = ESHttpBasicClientFactory.getHttpClient(baseUrl);
+            HttpResponse response = httpClient.execute(new HttpGet(url));
+            String json = EntityUtils.toString(response.getEntity());
 
             @SuppressWarnings("unchecked")
             Map<String, Object> map = new ObjectMapper().readValue(json,
