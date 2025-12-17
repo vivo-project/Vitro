@@ -521,3 +521,25 @@ table#table-listing td {
 table#table-listing td  a {
 	word-wrap: break-word;
 }
+
+a.button.blue {
+    padding: 7px 22px 8px;
+    font-family: sans-serif;
+    display: inline-block;
+}
+
+.button.red {
+    background-color: #b40000
+}
+
+.css-file-upload {
+    margin-bottom: 10px;
+}
+
+.clear-file-btn {
+    margin-left: 10px;
+    padding: 2px 6px;
+    border: 1px solid #ccc;
+    background: #f5f5f5;
+    cursor: pointer;
+}

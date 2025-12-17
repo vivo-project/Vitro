@@ -95,6 +95,7 @@ public class VitroVocabulary {
     public static final String PROPERTY_STUBOBJECTPROPERTYANNOT = vitroURI + "stubObjectPropertyAnnot";
 	public static final String PROPERTY_COLLATEBYSUBCLASSANNOT = vitroURI + "collateBySubclassAnnot";
     public static final String IS_INTERNAL_CLASSANNOT = vitroURI + "isMenuPageIntersectionClass";
+    public static final String PROPERTY_CUSTOMSTYLE = vitroURI + "customStyle";
     // ================== link related =====================================
 
     public static final String LINK = vitroURI+"Link";
@@ -121,6 +122,10 @@ public class VitroVocabulary {
     public static final String PORTAL_ACKNOWLEGETEXT = vitroURI+"acknowledgeText";
     public static final String PORTAL_COPYRIGHTURL = vitroURI+"copyrightURL";
     public static final String PORTAL_COPYRIGHTANCHOR = vitroURI+"copyrightAnchor";
+    public static final String PORTAL_CUSTOMCSSPATH = vitroURI+"customCssPath";
+    public static final String PORTAL_CUSTOMCSSFILEURI = vitroURI+"customCssFileUri";
+    public static final String PORTAL_CUSTOMCSSVERSION = vitroURI+"customCssVersion";
+
 
     // reusing displayRank property above
     public static final String PORTAL_URLPREFIX = vitroURI + "urlPrefix";
