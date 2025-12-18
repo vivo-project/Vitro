@@ -42,13 +42,13 @@
             <a href="${submitUrlBase}">cancel</a>
         <#else>
         <input type="hidden" name="submitted" value="submitted" />
-        <input id="save" value="${i18n().dd_config_save}" role="button" type="submit" class="submit" />
+        <input id="save" value="${i18n().save_button}" role="button" type="submit" class="submit" />
             <a href="${submitUrlBase}">cancel</a>
         <#if addType??>
         <#else>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <button onclick="return confirmDeleteThis()">
-                <img src="${urls.images!}/individual/deleteIcon.gif" alt="${i18n().dd_config_delete}"> ${i18n().dd_config_delete}
+                <img src="${urls.images!}/individual/deleteIcon.gif" alt="${i18n().delete_button}"> ${i18n().delete_button}
             </button>
             <script lang="text/javascript">
                 function confirmDeleteThis() {

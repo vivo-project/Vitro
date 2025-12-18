@@ -19,7 +19,7 @@
         <tr>
             <th>${i18n().reporting_config_name}</th>
             <th>${i18n().reporting_config_type}</th>
-            <th>${i18n().reporting_config_edit}</th>
+            <th>${i18n().edit_capitalized}</th>
         </tr>
         <#if reports??>
             <#list reports as report>
@@ -31,7 +31,7 @@
                         ${i18n()["reporting_config_" + report.className]}
                     </td>
                     <td>
-                        <a href="${submitUrlBase}?editUri=${report.uri?url}"><img src="${urls.images!}/individual/editIcon.gif" alt="${i18n().reporting_config_edit}"></a>
+                        <a href="${submitUrlBase}?editUri=${report.uri?url}"><img src="${urls.images!}/individual/editIcon.gif" alt="${i18n().edit_capitalized}"></a>
                         <#if report.implementsXml>
                             <a href="${submitUrlBase}/${report.reportName}?download=xml">${i18n().reporting_download_xml}</a>
                         </#if>
