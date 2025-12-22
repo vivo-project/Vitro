@@ -182,8 +182,9 @@
                         </executions>
                     </plugin>
                     <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
+                        <groupId>org.sonatype.central</groupId>
                         <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.6.0</version>
                         <extensions>true</extensions>
                         <configuration>
                             <publishingServerId>central</publishingServerId>
@@ -392,11 +393,6 @@
                     <artifactId>buildnumber-maven-plugin</artifactId>
                     <version>1.4</version>
                 </plugin>
-                <plugin>
-                    <groupId>org.sonatype.plugins</groupId>
-                    <artifactId>central-publishing-maven-plugin</artifactId>
-                    <version>0.7.0</version>
-                </plugin>
             </plugins>
         </pluginManagement>
     </build>
@@ -456,37 +452,13 @@
             <id>vivo-project</id>
             <url>https://vivo-project.github.io/</url>
         </site>
-        <snapshotRepository>
+        <repository>
             <id>central</id>
-            <name>Sonatype Central Snapshots</name>
-            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </snapshotRepository>
+            <url>https://central.sonatype.com/api/v1/publisher</url>
+        </repository>
     </distributionManagement>
 
     <repositories>
-        <repository>
-            <id>central</id>
-            <name>Sonatype Central Snapshots</name>
-            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-
-        <repository>
-            <id>central-maven</id>
-            <url>https://repo.maven.apache.org/maven2</url>
-        </repository>
-
         <repository>
             <snapshots>
                 <enabled>false</enabled>
