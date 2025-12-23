@@ -106,4 +106,17 @@ $(document).ready(function(){
              }
 
        });
+
+    let colorSchemeEditor = localStorage.getItem('colorSchemeEditor');
+    if (colorSchemeEditor) {
+        try {
+            let colorSchemeEditorData = JSON.parse(colorSchemeEditor);
+            if (colorSchemeEditorData.enabled) {
+                $.getScript(colorSchemeEditorData.script);
+            }
+        } catch (error) {
+            localStorage.removeItem('colorSchemeEditor');
+        }
+    }
+
 });

@@ -11,6 +11,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.SiteBrandingLogoController;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.SiteStyleController;
 import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
@@ -87,10 +89,17 @@ public class ApplicationBeanRetryController extends BaseEditController {
         FormUtils.populateFormFromBean(applicationForEditing, epo.getAction(), foo);
 
         request.setAttribute("formJsp","/templates/edit/specific/applicationBean_retry.jsp");
-        request.setAttribute("scripts","/js/siteAdmin/cssUploadUtils.js");
+        request.setAttribute("scripts","/templates/edit/specific/applicationBeanRetry_scripts.jsp");
         request.setAttribute("title","Site Information");
         request.setAttribute("_action",action);
         request.setAttribute("unqualifiedClassName","ApplicationBean");
+        request.setAttribute("i18n", I18n.bundle(request));
+
+        request.setAttribute("actionLogoUploadUrl", SiteBrandingLogoController.getLogoUploadUrlString());
+        request.setAttribute("logoUrl", SiteBrandingLogoController.getLogoUrlCache());
+        request.setAttribute("logoSmallUrl", SiteBrandingLogoController.getMobileLogoUrlCache());
+
+        request.setAttribute("updateLogoUrl", UrlBuilder.getUrl("site-branding-logo"));
 
         request.setAttribute("customCssPath", SiteStyleController.getCustomCssUrlCache());
         request.setAttribute("actionRemove", SiteStyleController.getRemovePathString());
