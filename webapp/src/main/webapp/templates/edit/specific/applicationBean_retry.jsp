@@ -8,7 +8,6 @@
 <%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission" %>
 <% request.setAttribute("requestedActions", SimplePermission.EDIT_SITE_INFORMATION.ACTION); %>
-<script type="text/javascript" src="${urls.base}/js/siteAdmin/cssUploadUtils.js"></script>
 
 <vitro:confirmAuthorization />
 
