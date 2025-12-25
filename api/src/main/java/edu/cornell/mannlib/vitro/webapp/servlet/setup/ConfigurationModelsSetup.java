@@ -8,6 +8,7 @@ import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_TB
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.USER_ACCOUNTS;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.ACCESS_CONTROL;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.INTERFACE_I18N;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.INTEGRATION_SETTINGS;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -43,6 +44,7 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 			setupModel(ctx, USER_ACCOUNTS, "auth");
 			setupModel(ctx, ACCESS_CONTROL, "accessControl");
 			setupModel(ctx, INTERFACE_I18N, "interface-i18n");
+			setupModel(ctx, INTEGRATION_SETTINGS, "integrationSettings");
 			ss.info(this, "Set up the display models and the user accounts model.");
 		} catch (Exception e) {
 			ss.fatal(this, e.getMessage(), e.getCause());
