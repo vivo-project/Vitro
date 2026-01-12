@@ -242,7 +242,7 @@ li.individual h1 {
     line-height: 1.2em;
     font-weight: bold;
 }
-li.individual h1.thumb {
+li.individual p.thumb {
     padding-top: 30px;
 }
 #individuals-in-class span.title {

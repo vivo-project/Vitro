@@ -522,6 +522,11 @@ table#table-listing td  a {
 	word-wrap: break-word;
 }
 
+/* browseByVClass view browse people */
+.individual > p {
+    margin-bottom: 0;
+}
+
 a.button.blue {
     padding: 7px 22px 8px;
     font-family: sans-serif;
