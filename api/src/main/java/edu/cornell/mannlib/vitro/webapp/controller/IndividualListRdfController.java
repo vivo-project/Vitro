@@ -22,7 +22,7 @@ import org.apache.jena.query.ParameterizedSparqlString;
 import org.apache.jena.query.QueryParseException;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-
+import org.apache.jena.sparql.ARQException;
 import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.ObjectPropertyStatementAccessObject;
@@ -63,6 +63,9 @@ public class IndividualListRdfController extends VitroApiServlet {
 			}
 		} catch (BadParameterException e) {
 			sendShortResponse(SC_BAD_REQUEST, e.getMessage(), resp);
+		} catch (ARQException e) {
+		    log.error(e, e);
+		    sendShortResponse(SC_BAD_REQUEST, "", resp);
 		} catch (NotAcceptableException | AcceptHeaderParsingException e) {
 			sendShortResponse(SC_NOT_ACCEPTABLE,
 					"The accept header does not include any "
