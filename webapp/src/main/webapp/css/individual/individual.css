@@ -164,10 +164,10 @@ article.property {
     width: 93%;
     margin: 0 auto;
     margin-bottom: 20px;
-    border: 1px solid #dfe6e5;
+    border: 1px solid var(--secondary-color-lighter, #dfe6e5);
 }
 article.property h3 {
-    border-bottom: 1px solid #dfe6e5;
+    border-bottom: 1px solid var(--secondary-color-lighter, #dfe6e5);
     padding: 10px 20px 10px 20px;
 }
 article.property ul.property-list li.subclass h3 {

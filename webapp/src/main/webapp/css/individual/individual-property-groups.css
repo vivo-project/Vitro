@@ -41,8 +41,8 @@ ul.propertyTabsList li:first-child {
 }
 li.nonSelectedGroupTab {
     float:left;
-    border: 1px solid #DFE6E5;
-    background-color:#E4ECF3;
+    border: 1px solid var(--secondary-color-lighter, #dfe6e5);
+    background-color: var(--secondary-color-extralight, #E4ECF3);
     padding: 6px 8px 6px 8px;
     cursor:pointer;
     border-top-right-radius: 4px;
@@ -54,7 +54,7 @@ li.nonSelectedGroupTab {
 }
 li.selectedGroupTab {
     float:left;
-    border: 1px solid #DFE6E5;
+    border: 1px solid var(--secondary-color-lighter, #dfe6e5);
     border-bottom-color:#fff;
     background-color:#FFF;
     padding: 6px 8px 6px 8px;
@@ -66,7 +66,7 @@ li.selectedGroupTab {
     -webkit-border-top-left-radius: 4px;
 }
 li.groupTabSpacer {
-    float:left;border-bottom: 1px solid #DFE6E5;background-color:#fff;width:3px;height:37px
+    float:left;border-bottom: 1px solid var(--secondary-color-lighter, #dfe6e5);background-color:#fff;width:3px;height:37px
 }
 div.additionalItems {
 	margin-top: 0 !important;
