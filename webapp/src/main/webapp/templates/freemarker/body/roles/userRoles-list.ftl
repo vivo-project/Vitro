@@ -1,4 +1,4 @@
-<h2>User roles</h2>
+<h2>${i18n().user_roles?html}</h2>
 
 <section id="show-auth" role="region">
 	<#assign rolesControllerUrl = urls.base + "/admin/roles" >
