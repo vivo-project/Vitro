@@ -9,14 +9,6 @@
 
 auth:ADMIN
     a auth:PermissionSet ;
-    rdfs:label "Site Admin"@en-US , 
-               "Administrator sajta"@sr-Latn-RS ,
-               "Site Admin"@en-CA ,
-               "Administrateur du site"@fr-CA ,
-               "Administrador do site"@pt-BR ,
-               "Site-Administrator"@de-DE ,
-               "Администратор сайта"@ru-RU ,
-               "Administrador del sitio"@es ;
 
     # ADMIN-only permissions
     auth:hasPermission simplePermission:AccessSpecialDataModels ;
@@ -78,14 +70,6 @@ auth:ADMIN
 
 auth:CURATOR
     a auth:PermissionSet ;
-    rdfs:label "Curator"@en-US , 
-               "Kurator"@sr-Latn-RS ,
-               "Curator"@en-CA ,
-               "Conservateur"@fr-CA ,
-               "Curador"@pt-BR ,
-               "Kurator"@de-DE ,
-               "Куратор"@ru-RU ,
-               "Curador"@es ;
 
     # permissions for CURATOR and above.
     auth:hasPermission simplePermission:EditOntology ;
@@ -124,14 +108,6 @@ auth:CURATOR
 
 auth:EDITOR
     a auth:PermissionSet ;
-    rdfs:label "Editor"@en-US , 
-               "Urednik"@sr-Latn-RS ,
-               "Editor"@en-CA ,
-               "Éditeur"@fr-CA ,
-               "Editor"@pt-BR ,
-               "Editor"@de-DE ,
-               "Редактор"@ru-RU ,
-               "Editor"@es ;
 
     # permissions for EDITOR and above.
     auth:hasPermission simplePermission:ExecuteReports ;
@@ -164,14 +140,6 @@ auth:EDITOR
 auth:SELF_EDITOR
     a auth:PermissionSet ;
     a auth:PermissionSetForNewUsers ;
-    rdfs:label "Self Editor"@en-US , 
-               "Samostalni urednik"@sr-Latn-RS ,
-               "Self Editor"@en-CA ,
-               "Auto-éditeur"@fr-CA ,
-               "Autoeditor"@pt-BR ,
-               "Selbst-Editor"@de-DE ,
-               "Саморедактор"@ru-RU ,
-               "Autoeditor"@es ;
 
     # permissions for ANY logged-in user.
     auth:hasPermission simplePermission:DoFrontEndEditing ;
@@ -196,14 +164,6 @@ auth:SELF_EDITOR
 auth:PUBLIC
     a auth:PermissionSet ;
     a auth:PermissionSetForPublic ;
-    rdfs:label "Public"@en-US , 
-               "Javno"@sr-Latn-RS ,
-               "Public"@en-CA ,
-               "Public"@fr-CA ,
-               "Público"@pt-BR ,
-               "Öffentlich"@de-DE ,
-               "Публичный"@ru-RU ,
-               "Público"@es ;
 
     # permissions for ANY user, even if they are not logged in.
     auth:hasPermission simplePermission:QueryFullModel ;

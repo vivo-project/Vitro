@@ -1,0 +1,14 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+
+auth:ADMIN rdfs:label "Site-Administrator"@de-DE .
+
+auth:CURATOR rdfs:label "Kurator"@de-DE .
+
+auth:EDITOR rdfs:label "Editor"@de-DE .
+
+auth:SELF_EDITOR rdfs:label "Selbst-Editor"@de-DE .
+
+auth:PUBLIC rdfs:label "Öffentlich"@de-DE .
