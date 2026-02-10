@@ -16,6 +16,10 @@ function setTooltip(elementId, data) {
 }
 
 function setupTriggerHandlers(element, trigger, data) {
+    element.setAttribute('tabindex', '0');
+    element.setAttribute('aria-haspopup', 'dialog');
+    element.setAttribute('aria-expanded', 'false');
+
     if (trigger === 'click') {
         setupClickTrigger(element, data);
     } else if (trigger === 'hover') {
@@ -39,15 +43,15 @@ function setupClickTrigger(element, data) {
 
     const handleDocumentClick = (event) => {
         if (tooltip && !tooltip.contains(event.target) && !element.contains(event.target)) {
-            tooltip = removeTooltip(tooltip);
+            tooltip = removeTooltip(tooltip, element);
         }
     };
 
     element.addEventListener('click', () => {
         if (isTooltipHidden(tooltip)) {
-            tooltip = setupTooltip(element, data);
+            tooltip = setupTooltip(element, data, false);
         } else {
-            tooltip = removeTooltip(tooltip);
+            tooltip = removeTooltip(tooltip, element);
         }
     });
 
@@ -55,56 +59,173 @@ function setupClickTrigger(element, data) {
 
     element.cleanupListeners = () => {
         document.removeEventListener('click', handleDocumentClick);
-        tooltip = removeTooltip(toolip);
+        tooltip = removeTooltip(toolip, element);
     };
 }
 
 function setupHoverTrigger(element, data) {
+    
     let tooltip;
     let timeout;
 
     const showTooltip = () => {
+
         clearTimeout(timeout);
         if (isTooltipHidden(tooltip)) {
-            tooltip = setupTooltip(element, data);
+            tooltip = setupTooltip(element, data, true);
+
+            // Add aria-describedby for accessibility
+            if (tooltip && tooltip.querySelector('.tooltip-inner')) {
+                const tooltipId = tooltip.id || `tooltip-${Math.random().toString(36).substr(2, 9)}`;
+                tooltip.id = tooltipId;
+                element.setAttribute('aria-describedby', tooltipId);
+            }
+
             tooltip.addEventListener('mouseenter', () => clearTimeout(timeout));
-            tooltip.addEventListener('mouseleave', () => timeout = setTimeout(() => {tooltip = removeTooltip(tooltip)}, 300));
+            tooltip.addEventListener('focus', () => clearTimeout(timeout));
+            tooltip.addEventListener('mouseleave', () => timeout = setTimeout(() => {tooltip = removeTooltip(tooltip, element)}, 300));
+            
+            tooltip.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' || e.key === 'Esc') {
+
+                    element.focus();
+                    timeout = setTimeout(() => {tooltip = removeTooltip(tooltip, element)}, 300)
+                    
+                }
+            });
+            element.addEventListener('click', (e) => {
+                if (!tooltip) tooltip = setupTooltip(element, data, true);
+
+                const inner = tooltip?.querySelector('.tooltip-inner');
+                inner.setAttribute('role', 'dialog');
+                if (inner) {
+                    inner.focus();
+                    clearTimeout(timeout)
+                }
+            });
         }
     };
 
-    const handleMouseLeave = () => {
-        timeout = setTimeout(() => {tooltip = removeTooltip(tooltip)}, 300);
+    const handleSoftHide = (cooldown = 300) => {
+        timeout = setTimeout(() => {tooltip = removeTooltip(tooltip, element)}, cooldown);
     };
 
     element.addEventListener('mouseenter', showTooltip);
-    element.addEventListener('mouseleave', handleMouseLeave);
+    element.addEventListener('mouseleave', () => handleSoftHide());
+
+    element.addEventListener('focus', showTooltip);
+    element.addEventListener('click', showTooltip);
+    element.addEventListener('focusout', () => handleSoftHide());
+    element.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' || e.key === 'Esc') {
+            handleSoftHide(0);
+        }
+    });
 
     element.cleanupListeners = () => {
         element.removeEventListener('mouseenter', showTooltip);
-        element.removeEventListener('mouseleave', handleMouseLeave);
-        tooltip = removeTooltip(tooltip);
+        element.removeEventListener('mouseleave', () => handleSoftHide());
+        tooltip = removeTooltip(tooltip, element);
     };
 }
 
-function removeTooltip(tooltip) {
+function removeTooltip(tooltip, element) {
+    element.setAttribute('aria-expanded', 'false');
     if (tooltip) {
         if (tooltip.cleanup) {
             tooltip.cleanup();
         }
-        tooltip.remove();
+        tooltip?.remove();
         tooltip = undefined;
     }
     return tooltip
 }
 
-function setupTooltip(element, data) {
-    const tooltip = createTooltipElement(data);
+// tooltip is placed at the end of the body, because of that tab focus is not in order, this function corrects that
+function trapFocus(container, initButton, hoverState = false) {
+    const focusableSelectors = `
+        button:not(:disabled),
+        [href]:not([aria-disabled]),
+        input:not(:disabled),
+        select:not(:disabled),
+        textarea:not(:disabled),
+        [tabindex]:not([tabindex="-1"]):not(:disabled):not([aria-disabled])
+    `;
+
+    const focusableElements = Array.from(container.querySelectorAll(focusableSelectors));
+    const first = focusableElements[0];
+    const last = focusableElements[focusableElements.length - 1];
+
+    function handleKeyDown(e) {
+        if (e.key === 'Tab') {
+            if (e.shiftKey) {
+                // Shift + Tab
+                if (document.activeElement === first) {
+                    e.preventDefault();
+
+                    if (hoverState) {
+                        initButton.focus();
+                        removeTooltip(container, initButton);
+                    } else {
+                        last.focus();
+                    }
+                }
+            } else {
+                // Tab
+                if (document.activeElement === last) {
+                    e.preventDefault();
+                    
+                    if (hoverState) {
+                        initButton.focus();
+                        removeTooltip(container, initButton);
+                    } else {
+                        first.focus();
+                    }
+                }
+            }
+            if ( focusableElements.length === 0 ) {
+                e.preventDefault();
+                initButton.focus();
+                removeTooltip(container, element);
+            }
+        }
+    }
+
+    container.addEventListener('keydown', handleKeyDown);
+
+    // Focus the first element when trap starts
+    setTimeout(() => {
+        if (!hoverState) {
+            const inner = container.querySelector('.tooltip-inner');
+            if (inner) {
+                inner.focus();
+            } else {
+                first?.focus();
+            }
+        }
+    }, 50)
+
+    // Return a cleanup function in case you want to remove the trap later
+    return () => container.removeEventListener('keydown', handleKeyDown);
+}
+
+function setupTooltip(element, data, hover = false) {
+    element.setAttribute('aria-expanded', 'true');
+    const tooltip = createTooltipElement(data, hover);
     document.body.appendChild(tooltip);
-    setupCloseButtonHandler(tooltip);
+    setupCloseButtonHandler(element, tooltip);
 
     const updatePosition = () => updateTooltipPosition(element, tooltip, data);
 
     updatePosition();
+
+    if (hover) {
+        // Tab focus loop elements in modal
+        trapFocus(tooltip, element, true);
+    } else {
+        // Tab focus go back to the element that triggered the tooltip
+        trapFocus(tooltip, element);
+    }
 
     const cleanup = FloatingUIDOM.autoUpdate(element, tooltip, updatePosition);
 
@@ -115,7 +236,7 @@ function setupTooltip(element, data) {
     return Object.assign(tooltip, { cleanup });
 }
 
-function createTooltipElement(data) {
+function createTooltipElement(data, hover = false) {
     const tooltip = document.createElement('div');
     tooltip.className = `vitroTooltip tooltip ${data.customClass}`;
 
@@ -126,16 +247,24 @@ function createTooltipElement(data) {
 
     const innerTooltip = document.createElement('div');
     innerTooltip.className = 'tooltip-inner';
+    innerTooltip.setAttribute('role', hover ? 'tooltip' : 'dialog');
+    innerTooltip.setAttribute('aria-modal', 'true');
+    innerTooltip.setAttribute('tabindex', '-1');
     innerTooltip.innerHTML = data.title;
     tooltip.appendChild(innerTooltip);
-
+    
+    // requestAnimationFrame(() => {
+    //     innerTooltip.focus();
+    // });
+    
     return tooltip;
 }
 
-function setupCloseButtonHandler(tooltip) {
-    $('.tooltip a.close').on("click", (event) => {
+function setupCloseButtonHandler(element, tooltip) {
+    $('.tooltip a.close').click((event) => {
         event.preventDefault();
-        removeTooltip(tooltip);
+        removeTooltip(tooltip, element);
+        element.focus();
         // $(event.target).closest('.tooltip').remove();
     });
 }
