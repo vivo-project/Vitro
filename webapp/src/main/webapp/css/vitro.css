@@ -157,7 +157,30 @@ a.close {
     display: block;
     text-align: right;
     margin-right: .3em;
-    font-size: .8em;
+    font-size: 1em;
+    float: right;
+    opacity: 0.7;
+    font-weight: 700;
+    line-height: 1;
+}
+
+a.close:hover, a.close:focus {
+    opacity: 1;
+    text-decoration: none;
+}
+
+.ui-slider-vertical .ui-slider-range-min {
+    background: #0078D7;
+}
+
+#slider-vertical .ui-slider-handle.ui-state-active {
+    background: #0078D7;
+}
+
+#slider-vertical .ui-slider-handle {
+    background-color: #fff;
+    border: 2px solid #222;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
 }
 
 /* ------------------------------------------------->  */

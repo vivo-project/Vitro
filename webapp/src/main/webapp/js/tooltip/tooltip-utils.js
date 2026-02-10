@@ -16,6 +16,8 @@ function setTooltip(elementId, data) {
 }
 
 function setupTriggerHandlers(element, trigger, data) {
+    element.setAttribute('tabindex', '0');
+
     if (trigger === 'click') {
         setupClickTrigger(element, data);
     } else if (trigger === 'hover') {
@@ -45,7 +47,7 @@ function setupClickTrigger(element, data) {
 
     element.addEventListener('click', () => {
         if (isTooltipHidden(tooltip)) {
-            tooltip = setupTooltip(element, data);
+            tooltip = setupTooltip(element, data, true);
         } else {
             tooltip = removeTooltip(tooltip);
         }
@@ -66,7 +68,7 @@ function setupHoverTrigger(element, data) {
     const showTooltip = () => {
         clearTimeout(timeout);
         if (isTooltipHidden(tooltip)) {
-            tooltip = setupTooltip(element, data);
+            tooltip = setupTooltip(element, data, false);
             tooltip.addEventListener('mouseenter', () => clearTimeout(timeout));
             tooltip.addEventListener('mouseleave', () => timeout = setTimeout(() => {tooltip = removeTooltip(tooltip)}, 300));
         }
@@ -78,6 +80,9 @@ function setupHoverTrigger(element, data) {
 
     element.addEventListener('mouseenter', showTooltip);
     element.addEventListener('mouseleave', handleMouseLeave);
+
+    element.addEventListener('focus', showTooltip);
+    element.addEventListener('blur', handleMouseLeave);
 
     element.cleanupListeners = () => {
         element.removeEventListener('mouseenter', showTooltip);
@@ -97,14 +102,80 @@ function removeTooltip(tooltip) {
     return tooltip
 }
 
-function setupTooltip(element, data) {
+function trapFocus(container, focusOutElement = undefined ) {
+    const focusableSelectors = `
+        button:not(:disabled),
+        [href]:not([aria-disabled]),
+        input:not(:disabled),
+        select:not(:disabled),
+        textarea:not(:disabled),
+        [tabindex]:not([tabindex="-1"]):not(:disabled):not([aria-disabled])
+    `;
+
+    const focusableElements = Array.from(container.querySelectorAll(focusableSelectors));
+    const first = focusableElements[0];
+    const last = focusableElements[focusableElements.length - 1];
+
+    function handleKeyDown(e) {
+        if (e.key === 'Tab') {
+            if (e.shiftKey) {
+                // Shift + Tab
+                if (document.activeElement === first) {
+                    e.preventDefault();
+
+                    if (focusOutElement) {
+                        focusOutElement.focus();
+                    } else {
+                        last.focus();
+                    }
+                }
+            } else {
+                // Tab
+                if (document.activeElement === last) {
+                    e.preventDefault();
+                    
+                    if (focusOutElement) {
+                        focusOutElement.focus();
+                    } else {
+                        first.focus();
+                    }
+                }
+            }
+        }
+    }
+
+    container.addEventListener('keydown', handleKeyDown);
+
+    // Focus the first element when trap starts
+    setTimeout(() => {
+        const inner = container.querySelector('.tooltip-inner');
+        if (inner) {
+            inner.focus();
+        } else {
+            first?.focus();
+        }
+    }, 50)
+
+    // Return a cleanup function in case you want to remove the trap later
+    return () => container.removeEventListener('keydown', handleKeyDown);
+}
+
+function setupTooltip(element, data, trapFocusRotate = false) {
     const tooltip = createTooltipElement(data);
     document.body.appendChild(tooltip);
-    setupCloseButtonHandler(tooltip);
+    setupCloseButtonHandler(element, tooltip);
 
     const updatePosition = () => updateTooltipPosition(element, tooltip, data);
 
     updatePosition();
+
+    if (trapFocusRotate) {
+        // Tab focus loop elements in modal
+        trapFocus(tooltip);
+    } else {
+        // Tab focus go back to the element that triggered the tooltip
+        trapFocus(tooltip, element);
+    }
 
     const cleanup = FloatingUIDOM.autoUpdate(element, tooltip, updatePosition);
 
@@ -126,16 +197,24 @@ function createTooltipElement(data) {
 
     const innerTooltip = document.createElement('div');
     innerTooltip.className = 'tooltip-inner';
+    innerTooltip.setAttribute('role', 'dialog');
+    innerTooltip.setAttribute('aria-modal', 'true');
+    innerTooltip.setAttribute('tabindex', '-1');
     innerTooltip.innerHTML = data.title;
     tooltip.appendChild(innerTooltip);
-
+    
+    requestAnimationFrame(() => {
+        innerTooltip.focus();
+    });
+    
     return tooltip;
 }
 
-function setupCloseButtonHandler(tooltip) {
-    $('.tooltip a.close').on("click", (event) => {
+function setupCloseButtonHandler(element, tooltip) {
+    $('.tooltip a.close').click((event) => {
         event.preventDefault();
         removeTooltip(tooltip);
+        element.focus();
         // $(event.target).closest('.tooltip').remove();
     });
 }
