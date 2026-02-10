@@ -31,6 +31,12 @@ button.nostyle {
     margin: 0;
 }
 
+button.nostyle > img {
+    display: block;
+    width: 100%;
+}
+
+
 /* <------ USER FEEDBACK*/
 #error-alert {
     color: #900;
