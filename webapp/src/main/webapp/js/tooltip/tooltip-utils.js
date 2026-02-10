@@ -64,7 +64,6 @@ function setupClickTrigger(element, data) {
 }
 
 function setupHoverTrigger(element, data) {
-    console.log("setup");
     
     let tooltip;
     let timeout;
@@ -85,18 +84,13 @@ function setupHoverTrigger(element, data) {
             tooltip.addEventListener('mouseenter', () => clearTimeout(timeout));
             tooltip.addEventListener('focus', () => clearTimeout(timeout));
             tooltip.addEventListener('mouseleave', () => timeout = setTimeout(() => {tooltip = removeTooltip(tooltip, element)}, 300));
-            // tooltip.addEventListener('focusout', (e) => {
-            //     if (!tooltip.contains(e.relatedTarget)) {
-            //         tooltip = removeTooltip(tooltip, element);
-            //     }
-            // });
+            
             tooltip.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' || e.key === 'Esc') {
-                    // tooltip = removeTooltip(tooltip, element);
+
                     element.focus();
                     timeout = setTimeout(() => {tooltip = removeTooltip(tooltip, element)}, 300)
-                    // setTimeout(() => {
-                    // }, 100);
+                    
                 }
             });
             element.addEventListener('click', (e) => {
