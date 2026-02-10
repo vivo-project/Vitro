@@ -106,20 +106,25 @@ function setupHoverTrigger(element, data) {
         }
     };
 
-    const handleMouseLeave = () => {
-        timeout = setTimeout(() => {tooltip = removeTooltip(tooltip, element)}, 300);
+    const handleSoftHide = (cooldown = 300) => {
+        timeout = setTimeout(() => {tooltip = removeTooltip(tooltip, element)}, cooldown);
     };
 
     element.addEventListener('mouseenter', showTooltip);
-    element.addEventListener('mouseleave', handleMouseLeave);
+    element.addEventListener('mouseleave', () => handleSoftHide);
 
     element.addEventListener('focus', showTooltip);
     element.addEventListener('click', showTooltip);
-    element.addEventListener('focusout', handleMouseLeave);
+    element.addEventListener('focusout', () => handleSoftHide);
+    element.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' || e.key === 'Esc') {
+            handleSoftHide(0);
+        }
+    });
 
     element.cleanupListeners = () => {
         element.removeEventListener('mouseenter', showTooltip);
-        element.removeEventListener('mouseleave', handleMouseLeave);
+        element.removeEventListener('mouseleave', () => handleSoftHide);
         tooltip = removeTooltip(tooltip, element);
     };
 }
