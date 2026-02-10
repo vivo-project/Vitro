@@ -64,14 +64,12 @@ function setupClickTrigger(element, data) {
 }
 
 function setupHoverTrigger(element, data) {
+    console.log("setup");
+    
     let tooltip;
     let timeout;
 
     const showTooltip = () => {
-        if (element.hasAttribute('noaction')) {
-            element.removeAttribute('noaction');
-            return;
-        }
 
         clearTimeout(timeout);
         if (isTooltipHidden(tooltip)) {
@@ -85,10 +83,30 @@ function setupHoverTrigger(element, data) {
             }
 
             tooltip.addEventListener('mouseenter', () => clearTimeout(timeout));
+            tooltip.addEventListener('focus', () => clearTimeout(timeout));
             tooltip.addEventListener('mouseleave', () => timeout = setTimeout(() => {tooltip = removeTooltip(tooltip, element)}, 300));
-            tooltip.addEventListener('focusout', (e) => {
-                if (!tooltip.contains(e.relatedTarget)) {
-                    tooltip = removeTooltip(tooltip, element);
+            // tooltip.addEventListener('focusout', (e) => {
+            //     if (!tooltip.contains(e.relatedTarget)) {
+            //         tooltip = removeTooltip(tooltip, element);
+            //     }
+            // });
+            tooltip.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' || e.key === 'Esc') {
+                    // tooltip = removeTooltip(tooltip, element);
+                    element.focus();
+                    timeout = setTimeout(() => {tooltip = removeTooltip(tooltip, element)}, 300)
+                    // setTimeout(() => {
+                    // }, 100);
+                }
+            });
+            element.addEventListener('click', (e) => {
+                if (!tooltip) tooltip = setupTooltip(element, data, true);
+
+                const inner = tooltip?.querySelector('.tooltip-inner');
+                inner.setAttribute('role', 'dialog');
+                if (inner) {
+                    inner.focus();
+                    clearTimeout(timeout)
                 }
             });
         }
@@ -102,6 +120,7 @@ function setupHoverTrigger(element, data) {
     element.addEventListener('mouseleave', handleMouseLeave);
 
     element.addEventListener('focus', showTooltip);
+    element.addEventListener('click', showTooltip);
     element.addEventListener('focusout', handleMouseLeave);
 
     element.cleanupListeners = () => {
@@ -117,7 +136,7 @@ function removeTooltip(tooltip, element) {
         if (tooltip.cleanup) {
             tooltip.cleanup();
         }
-        tooltip.remove();
+        tooltip?.remove();
         tooltip = undefined;
     }
     return tooltip
@@ -147,7 +166,7 @@ function trapFocus(container, initButton, hoverState = false) {
 
                     if (hoverState) {
                         initButton.focus();
-                        removeTooltip(container, element);
+                        removeTooltip(container, initButton);
                     } else {
                         last.focus();
                     }
@@ -159,7 +178,7 @@ function trapFocus(container, initButton, hoverState = false) {
                     
                     if (hoverState) {
                         initButton.focus();
-                        removeTooltip(container, element);
+                        removeTooltip(container, initButton);
                     } else {
                         first.focus();
                     }
@@ -177,12 +196,7 @@ function trapFocus(container, initButton, hoverState = false) {
 
     // Focus the first element when trap starts
     setTimeout(() => {
-        // first?.focus();
-
-        if (hoverState) {
-            first?.focus();
-        } else {
-
+        if (!hoverState) {
             const inner = container.querySelector('.tooltip-inner');
             if (inner) {
                 inner.focus();
