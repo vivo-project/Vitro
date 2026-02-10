@@ -23,6 +23,14 @@
 .disabledSubmit {
 	cursor:default ! important;
 }
+
+button.nostyle {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
 /* <------ USER FEEDBACK*/
 #error-alert {
     color: #900;

@@ -17,6 +17,8 @@ function setTooltip(elementId, data) {
 
 function setupTriggerHandlers(element, trigger, data) {
     element.setAttribute('tabindex', '0');
+    element.setAttribute('aria-haspopup', 'dialog');
+    element.setAttribute('aria-expanded', 'false');
 
     if (trigger === 'click') {
         setupClickTrigger(element, data);
@@ -41,7 +43,7 @@ function setupClickTrigger(element, data) {
 
     const handleDocumentClick = (event) => {
         if (tooltip && !tooltip.contains(event.target) && !element.contains(event.target)) {
-            tooltip = removeTooltip(tooltip);
+            tooltip = removeTooltip(tooltip, element);
         }
     };
 
@@ -49,7 +51,7 @@ function setupClickTrigger(element, data) {
         if (isTooltipHidden(tooltip)) {
             tooltip = setupTooltip(element, data, false);
         } else {
-            tooltip = removeTooltip(tooltip);
+            tooltip = removeTooltip(tooltip, element);
         }
     });
 
@@ -57,7 +59,7 @@ function setupClickTrigger(element, data) {
 
     element.cleanupListeners = () => {
         document.removeEventListener('click', handleDocumentClick);
-        tooltip = removeTooltip(toolip);
+        tooltip = removeTooltip(toolip, element);
     };
 }
 
@@ -83,17 +85,17 @@ function setupHoverTrigger(element, data) {
             }
 
             tooltip.addEventListener('mouseenter', () => clearTimeout(timeout));
-            tooltip.addEventListener('mouseleave', () => timeout = setTimeout(() => {tooltip = removeTooltip(tooltip)}, 300));
+            tooltip.addEventListener('mouseleave', () => timeout = setTimeout(() => {tooltip = removeTooltip(tooltip, element)}, 300));
             tooltip.addEventListener('focusout', (e) => {
                 if (!tooltip.contains(e.relatedTarget)) {
-                    tooltip = removeTooltip(tooltip);
+                    tooltip = removeTooltip(tooltip, element);
                 }
             });
         }
     };
 
     const handleMouseLeave = () => {
-        timeout = setTimeout(() => {tooltip = removeTooltip(tooltip)}, 300);
+        timeout = setTimeout(() => {tooltip = removeTooltip(tooltip, element)}, 300);
     };
 
     element.addEventListener('mouseenter', showTooltip);
@@ -105,11 +107,12 @@ function setupHoverTrigger(element, data) {
     element.cleanupListeners = () => {
         element.removeEventListener('mouseenter', showTooltip);
         element.removeEventListener('mouseleave', handleMouseLeave);
-        tooltip = removeTooltip(tooltip);
+        tooltip = removeTooltip(tooltip, element);
     };
 }
 
-function removeTooltip(tooltip) {
+function removeTooltip(tooltip, element) {
+    element.setAttribute('aria-expanded', 'false');
     if (tooltip) {
         if (tooltip.cleanup) {
             tooltip.cleanup();
@@ -144,7 +147,7 @@ function trapFocus(container, initButton, hoverState = false) {
 
                     if (hoverState) {
                         initButton.focus();
-                        removeTooltip(container);
+                        removeTooltip(container, element);
                     } else {
                         last.focus();
                     }
@@ -156,7 +159,7 @@ function trapFocus(container, initButton, hoverState = false) {
                     
                     if (hoverState) {
                         initButton.focus();
-                        removeTooltip(container);
+                        removeTooltip(container, element);
                     } else {
                         first.focus();
                     }
@@ -165,7 +168,7 @@ function trapFocus(container, initButton, hoverState = false) {
             if ( focusableElements.length === 0 ) {
                 e.preventDefault();
                 initButton.focus();
-                removeTooltip(container);
+                removeTooltip(container, element);
             }
         }
     }
@@ -194,7 +197,8 @@ function trapFocus(container, initButton, hoverState = false) {
 }
 
 function setupTooltip(element, data, hover = false) {
-    const tooltip = createTooltipElement(data);
+    element.setAttribute('aria-expanded', 'true');
+    const tooltip = createTooltipElement(data, hover);
     document.body.appendChild(tooltip);
     setupCloseButtonHandler(element, tooltip);
 
@@ -219,7 +223,7 @@ function setupTooltip(element, data, hover = false) {
     return Object.assign(tooltip, { cleanup });
 }
 
-function createTooltipElement(data) {
+function createTooltipElement(data, hover = false) {
     const tooltip = document.createElement('div');
     tooltip.className = `vitroTooltip tooltip ${data.customClass}`;
 
@@ -230,7 +234,7 @@ function createTooltipElement(data) {
 
     const innerTooltip = document.createElement('div');
     innerTooltip.className = 'tooltip-inner';
-    innerTooltip.setAttribute('role', 'dialog');
+    innerTooltip.setAttribute('role', hover ? 'tooltip' : 'dialog');
     innerTooltip.setAttribute('aria-modal', 'true');
     innerTooltip.setAttribute('tabindex', '-1');
     innerTooltip.innerHTML = data.title;
@@ -246,7 +250,7 @@ function createTooltipElement(data) {
 function setupCloseButtonHandler(element, tooltip) {
     $('.tooltip a.close').click((event) => {
         event.preventDefault();
-        removeTooltip(tooltip);
+        removeTooltip(tooltip, element);
         element.focus();
         // $(event.target).closest('.tooltip').remove();
     });
