@@ -47,7 +47,7 @@ function setupClickTrigger(element, data) {
 
     element.addEventListener('click', () => {
         if (isTooltipHidden(tooltip)) {
-            tooltip = setupTooltip(element, data, true);
+            tooltip = setupTooltip(element, data, false);
         } else {
             tooltip = removeTooltip(tooltip);
         }
@@ -66,11 +66,29 @@ function setupHoverTrigger(element, data) {
     let timeout;
 
     const showTooltip = () => {
+        if (element.hasAttribute('noaction')) {
+            element.removeAttribute('noaction');
+            return;
+        }
+
         clearTimeout(timeout);
         if (isTooltipHidden(tooltip)) {
-            tooltip = setupTooltip(element, data, false);
+            tooltip = setupTooltip(element, data, true);
+
+            // Add aria-describedby for accessibility
+            if (tooltip && tooltip.querySelector('.tooltip-inner')) {
+                const tooltipId = tooltip.id || `tooltip-${Math.random().toString(36).substr(2, 9)}`;
+                tooltip.id = tooltipId;
+                element.setAttribute('aria-describedby', tooltipId);
+            }
+
             tooltip.addEventListener('mouseenter', () => clearTimeout(timeout));
             tooltip.addEventListener('mouseleave', () => timeout = setTimeout(() => {tooltip = removeTooltip(tooltip)}, 300));
+            tooltip.addEventListener('focusout', (e) => {
+                if (!tooltip.contains(e.relatedTarget)) {
+                    tooltip = removeTooltip(tooltip);
+                }
+            });
         }
     };
 
@@ -82,7 +100,7 @@ function setupHoverTrigger(element, data) {
     element.addEventListener('mouseleave', handleMouseLeave);
 
     element.addEventListener('focus', showTooltip);
-    element.addEventListener('blur', handleMouseLeave);
+    element.addEventListener('focusout', handleMouseLeave);
 
     element.cleanupListeners = () => {
         element.removeEventListener('mouseenter', showTooltip);
@@ -102,7 +120,8 @@ function removeTooltip(tooltip) {
     return tooltip
 }
 
-function trapFocus(container, focusOutElement = undefined ) {
+// tooltip is placed at the end of the body, because of that tab focus is not in order, this function corrects that
+function trapFocus(container, initButton, hoverState = false) {
     const focusableSelectors = `
         button:not(:disabled),
         [href]:not([aria-disabled]),
@@ -123,8 +142,9 @@ function trapFocus(container, focusOutElement = undefined ) {
                 if (document.activeElement === first) {
                     e.preventDefault();
 
-                    if (focusOutElement) {
-                        focusOutElement.focus();
+                    if (hoverState) {
+                        initButton.focus();
+                        removeTooltip(container);
                     } else {
                         last.focus();
                     }
@@ -134,12 +154,18 @@ function trapFocus(container, focusOutElement = undefined ) {
                 if (document.activeElement === last) {
                     e.preventDefault();
                     
-                    if (focusOutElement) {
-                        focusOutElement.focus();
+                    if (hoverState) {
+                        initButton.focus();
+                        removeTooltip(container);
                     } else {
                         first.focus();
                     }
                 }
+            }
+            if ( focusableElements.length === 0 ) {
+                e.preventDefault();
+                initButton.focus();
+                removeTooltip(container);
             }
         }
     }
@@ -148,11 +174,18 @@ function trapFocus(container, focusOutElement = undefined ) {
 
     // Focus the first element when trap starts
     setTimeout(() => {
-        const inner = container.querySelector('.tooltip-inner');
-        if (inner) {
-            inner.focus();
-        } else {
+        // first?.focus();
+
+        if (hoverState) {
             first?.focus();
+        } else {
+
+            const inner = container.querySelector('.tooltip-inner');
+            if (inner) {
+                inner.focus();
+            } else {
+                first?.focus();
+            }
         }
     }, 50)
 
@@ -160,7 +193,7 @@ function trapFocus(container, focusOutElement = undefined ) {
     return () => container.removeEventListener('keydown', handleKeyDown);
 }
 
-function setupTooltip(element, data, trapFocusRotate = false) {
+function setupTooltip(element, data, hover = false) {
     const tooltip = createTooltipElement(data);
     document.body.appendChild(tooltip);
     setupCloseButtonHandler(element, tooltip);
@@ -169,9 +202,9 @@ function setupTooltip(element, data, trapFocusRotate = false) {
 
     updatePosition();
 
-    if (trapFocusRotate) {
+    if (hover) {
         // Tab focus loop elements in modal
-        trapFocus(tooltip);
+        trapFocus(tooltip, element, true);
     } else {
         // Tab focus go back to the element that triggered the tooltip
         trapFocus(tooltip, element);
@@ -203,9 +236,9 @@ function createTooltipElement(data) {
     innerTooltip.innerHTML = data.title;
     tooltip.appendChild(innerTooltip);
     
-    requestAnimationFrame(() => {
-        innerTooltip.focus();
-    });
+    // requestAnimationFrame(() => {
+    //     innerTooltip.focus();
+    // });
     
     return tooltip;
 }
