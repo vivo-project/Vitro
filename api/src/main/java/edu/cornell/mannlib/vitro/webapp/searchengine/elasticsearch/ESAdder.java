@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.searchengine.elasticsearch;
 
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,10 +20,10 @@ import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpBasicClientFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 
 /**
@@ -114,19 +115,20 @@ public class ESAdder {
             throws SearchEngineException {
         try {
             String url = baseUrl + "/_doc/"
-                    + URLEncoder.encode(docId, "UTF8");
-            HttpClient httpClient = ESHttpBasicClientFactory.getHttpClient(baseUrl);
+                    + URLEncoder.encode(docId, StandardCharsets.UTF_8);
+            CloseableHttpClient httpClient = ESHttpBasicClientFactory.getHttpClient(baseUrl);
 
             HttpPut request = new HttpPut(url);
             request.addHeader("Content-Type", "application/json");
-            request.setEntity(new StringEntity(json, "UTF-8"));
-            HttpResponse response = httpClient.execute(request);
-            if (response.getStatusLine().getStatusCode() >= 400) {
-                log.warn("Response from Elasticsearch: "
-                    + EntityUtils.toString(response.getEntity()));
-            } else {
-                log.debug("Response from Elasticsearch: "
-                    + EntityUtils.toString(response.getEntity()));
+            request.setEntity(new StringEntity(json, StandardCharsets.UTF_8));
+            try (CloseableHttpResponse response = httpClient.execute(request)) {
+                if (response.getStatusLine().getStatusCode() >= 400) {
+                    log.warn("Response from Elasticsearch: "
+                        + EntityUtils.toString(response.getEntity()));
+                } else {
+                    log.debug("Response from Elasticsearch: "
+                        + EntityUtils.toString(response.getEntity()));
+                }
             }
         } catch (Exception e) {
             throw new SearchEngineException("Failed to put to Elasticsearch",
