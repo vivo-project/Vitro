@@ -278,7 +278,7 @@ name will be used as the label. -->
         <#local imageLabel><@addLinkWithLabel mainImage editable "${i18n().photo}" /></#local>
         ${imageLabel}
         <#if showPlaceholder == "always" || (showPlaceholder="with_add_link" && imageLabel?has_content)>
-            <img class="individual-photo" src="${placeholderImageUrl(individual.uri)}" title = "${i18n().no_image}" alt="${i18n().placeholder_image}" width="${imageWidth!}" />
+            <img class="individual-photo" src="${placeholderImageUrl(individual.uri)}" title = "${i18n().no_image}" alt="" width="${imageWidth!}" />
         </#if>
     </#if>
 </#macro>
