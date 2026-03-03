@@ -543,3 +543,12 @@ a.button.blue {
     background: #f5f5f5;
     cursor: pointer;
 }
+
+.mt-5 {
+    margin-top: 3.5rem;
+}
+
+.section-title-small {
+    margin-bottom: 0rem !important;
+}
+
