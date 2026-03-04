@@ -6,19 +6,17 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
 import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpBasicClientFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-
-import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
-import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
-import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
 
 /**
  * Convert a SearchQuery to JSON, send it to Elasticsearch, and convert the JSON
@@ -45,11 +43,11 @@ public class ESQuery {
 
     private String doTheQuery(String queryString) {
         log.debug("QUERY: " + queryString);
-        try {
-            String url = baseUrl + "/_search";
-            HttpResponse response = new ESFunkyGetRequest(url)
-                    .bodyString(queryString, ContentType.APPLICATION_JSON)
-                    .execute();
+        String url = baseUrl + "/_search";
+
+        try(CloseableHttpResponse response = new ESFunkyGetRequest(url)
+            .bodyString(queryString, ContentType.APPLICATION_JSON)
+            .execute()) {
             String responseString = IOUtils
                     .toString(response.getEntity().getContent());
             log.debug("RESPONSE: " + responseString);
@@ -92,7 +90,7 @@ public class ESQuery {
             return this;
         }
 
-        public HttpResponse execute() throws SearchEngineException {
+        public CloseableHttpResponse execute() throws SearchEngineException {
             try {
                 if (this.getURI().getScheme().equals("https")) {
                     return ESHttpBasicClientFactory.getHttpsClient().execute(this);
