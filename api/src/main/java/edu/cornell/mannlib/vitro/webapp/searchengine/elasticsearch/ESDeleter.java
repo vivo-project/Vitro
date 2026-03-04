@@ -18,14 +18,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 
 /**
@@ -54,10 +54,11 @@ public class ESDeleter {
         try {
             String url = baseUrl + "/_doc/"
                     + URLEncoder.encode(id, "UTF8");
-            HttpClient httpClient = ESHttpBasicClientFactory.getHttpClient(baseUrl);
+            CloseableHttpClient httpClient = ESHttpBasicClientFactory.getHttpClient(baseUrl);
 
-            HttpResponse response = httpClient.execute(new HttpDelete(url));
-            String json = EntityUtils.toString(response.getEntity());
+            try (CloseableHttpResponse response = httpClient.execute(new HttpDelete(url))) {
+                String json = EntityUtils.toString(response.getEntity());
+            }
         } catch (HttpResponseException e) {
             if (e.getStatusCode() == 404) {
                 // Don't care if it has already been deleted.
@@ -81,20 +82,20 @@ public class ESDeleter {
         String queryJson = new QueryConverter(query, true).asString();
 
         try {
-            HttpClient httpClient = ESHttpBasicClientFactory.getHttpClient(baseUrl);
+            CloseableHttpClient httpClient = ESHttpBasicClientFactory.getHttpClient(baseUrl);
 
             HttpPost request = new HttpPost(url);
             request.addHeader("Content-Type", "application/json");
             request.setEntity(new StringEntity(queryJson));
-            HttpResponse response = httpClient.execute(request);
-
-            BaseResponseHandler handler = new BaseResponseHandler();
-            handler.handleResponse(response);
-            if (handler.getStatusCode() >= 400) {
-                log.warn(String.format(
+            try (CloseableHttpResponse response = httpClient.execute(request)) {
+                BaseResponseHandler handler = new BaseResponseHandler();
+                handler.handleResponse(response);
+                if (handler.getStatusCode() >= 400) {
+                    log.warn(String.format(
                         "Failed to delete Elasticsearch documents by query: %s, %d - %s\n%s",
                         queryString, handler.getStatusCode(),
                         handler.getReasonPhrase(), handler.getContentString()));
+                }
             }
         } catch (IOException e) {
             throw new SearchEngineException("Failed to delete Elasticsearch "

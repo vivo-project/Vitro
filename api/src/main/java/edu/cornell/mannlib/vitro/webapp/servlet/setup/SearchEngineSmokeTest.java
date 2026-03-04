@@ -17,9 +17,9 @@ import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpBasicClientFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 
 /**
@@ -33,11 +33,10 @@ public class SearchEngineSmokeTest implements ServletContextListener {
         String baseServiceUrl = getBaseServiceUrl(url);
 
         ServiceType serviceType = ServiceType.UNKNOWN;
-        HttpClient httpClient = ESHttpBasicClientFactory.getHttpClient(baseServiceUrl);
+        CloseableHttpClient httpClient = ESHttpBasicClientFactory.getHttpClient(baseServiceUrl);
         HttpGet request = new HttpGet(baseServiceUrl);
 
-        try {
-            HttpResponse response = httpClient.execute(request);
+        try(CloseableHttpResponse response = httpClient.execute(request)) {
             HttpEntity entity = response.getEntity();
             if (entity != null) {
                 String result = EntityUtils.toString(entity);
