@@ -1,8 +1,12 @@
 package edu.cornell.mannlib.vitro.webapp.utils.http;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import org.apache.commons.logging.Log;
@@ -129,5 +133,35 @@ public class ESHttpBasicClientFactory {
             .setDefaultRequestConfig(requestConfig)
             .setConnectionTimeToLive(60, TimeUnit.SECONDS) // TTL for persistent connections
             .build();
+    }
+
+    public static void shutdown() {
+        try {
+            if (httpClient != null) {
+                httpClient.close();
+            }
+            if (httpsClient != null) {
+                httpsClient.close();
+            }
+            if (connectionManager != null) {
+                connectionManager.close();
+            }
+        } catch (IOException e) {
+            log.error("Error closing HttpClient.", e);
+        }
+    }
+
+    @WebListener
+    public static class HttpClientShutdownListener implements ServletContextListener {
+
+        @Override
+        public void contextInitialized(ServletContextEvent sce) {
+            // nothing needed
+        }
+
+        @Override
+        public void contextDestroyed(ServletContextEvent sce) {
+            ESHttpBasicClientFactory.shutdown();
+        }
     }
 }
