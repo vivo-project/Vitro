@@ -176,7 +176,7 @@ var browseByVClass = {
             pagination += '<li class="round';
             // Test for active page
             if ( pages[i].text == page) {
-                pagination += ' selected';
+                pagination += ' selected aria-current="page"';
                 anchorOpen = "";
                 anchorClose = "";
             }
@@ -197,10 +197,14 @@ var browseByVClass = {
     // Toggle the active class so it's clear which is selected
     selectedVClass: function(vclassUri) {
         // Remove active class on all vClasses
-        $('#browse-classes li a.selected').removeClass('selected');
+        $('#browse-classes li a.selected')
+            .removeClass('selected')
+            .$('aria-current', 'false');
 
         // Add active class for requested vClass
-        $('#browse-classes li a[data-uri="'+ vclassUri +'"]').addClass('selected');
+        $('#browse-classes li a[data-uri="'+ vclassUri +'"]')
+            .addClass('selected')
+            .$('aria-current', 'true');
     },
 
     // Toggle the active letter so it's clear which is selected
@@ -210,10 +214,15 @@ var browseByVClass = {
             alpha = "all";
         }
         // Remove active class on all letters
-        $('#alpha-browse-individuals li a.selected').removeClass('selected');
+        // Remove active class and aria-selected on all letters
+        $('#alpha-browse-individuals li a.selected')
+            .removeClass('selected')
+            .attr('aria-current', 'false');
 
-        // Add active class for requested alpha
-        $('#alpha-browse-individuals li a[data-alpha="'+ alpha +'"]').addClass('selected');
+        // Add active class and aria-selected for requested alpha
+        $('#alpha-browse-individuals li a[data-alpha="'+ alpha +'"]')
+            .addClass('selected')
+            .attr('aria-current', 'true');
 
         return alpha;
     },

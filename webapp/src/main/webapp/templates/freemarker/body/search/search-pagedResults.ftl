@@ -310,7 +310,7 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/wNumb.min
 </#macro>
 
 <#macro createUserInput filter>
-    <input form="search-form" id="filter_input_${filter.id?html}"  placeholder="${i18n().search_field_placeholder}" class="search-vivo" type="text" name="filter_input_${filter.id?html}" value="${filter.inputText?html}" autocapitalize="none" />
+	<input form="search-form" id="filter_input_${filter.id?html}"  placeholder="${i18n().search_field_placeholder}" aria-label="${i18n().search_field_placeholder}" class="search-vivo" type="text" name="filter_input_${filter.id?html}" value="${filter.inputText?html}" autocapitalize="none" />
 </#macro>
 
 <#macro getInput filter filterValue valueID valueNumber form="search-form">

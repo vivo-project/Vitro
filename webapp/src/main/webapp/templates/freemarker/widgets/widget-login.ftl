@@ -56,10 +56,10 @@
             <div ${infoClassHide} ${infoClassShow}>
 
                 <label for="loginName">${i18n().email_capitalized}</label>
-                <input id="loginName" name="loginName" class="text-field focus" type="text" value="${loginName!}" autocapitalize="off" required autofocus />
+                <input id="loginName" name="loginName" class="text-field focus" type="text" value="${loginName!}" autocapitalize="off" autocomplete="username" required autofocus />
 
                 <label for="loginPassword">${i18n().password_capitalized}</label>
-                <input id="loginPassword" name="loginPassword" class="text-field" type="password" required />
+                <input id="loginPassword" name="loginPassword" class="text-field" type="password" autocomplete="current-password" required />
 
                 <p class="submit">
                     <input name="loginForm" class="green button" type="submit" value="${i18n().login_button}"/>

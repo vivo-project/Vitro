@@ -30,18 +30,18 @@
                 </ul>
 
                 <section id="search-home" role="region">
-                    <h3>${i18n().search_vitro} <span class="search-filter-selected">filteredSearch</span></h3>
+                    <h3 id="search-input-label">${i18n().search_vitro} <span class="search-filter-selected">filteredSearch</span></h3>
 
                     <fieldset>
                         <legend>${i18n().search_form}</legend>
                         <form id="search-homepage" action="${urls.search}" name="search-home" role="search" method="GET" >
                             <div id="search-home-field">
-                                <input type="text" name="querytext" class="search-homepage" value="${querytext!}" autocapitalize="off" />
+                                <input type="text" name="querytext" aria-label="${i18n().search_vitro}" aria-labelledby="search-input-label" class="search-homepage" value="${querytext!}" autocapitalize="off" />
+                                <a class="filter-search filter-default" href="#" aria-expanded="false" title="${i18n().filter_search}"><span class="displace">${i18n().filter_search}</span></a>
                                 <input type="submit" value="${i18n().search_button}" class="search" />
                                 <input type="hidden" name="filters_category" class="search-homepage" value="" autocapitalize="off" />
                             </div>
 
-                            <a class="filter-search filter-default" href="#" title="${i18n().filter_search}"><span class="displace">${i18n().filter_search}</span></a>
 
                             <ul id="filter-search-nav">
                                 <li><a class="active" href="">${i18n().all_capitalized}</a></li>
