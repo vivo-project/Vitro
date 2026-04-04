@@ -176,11 +176,13 @@ var browseByVClass = {
             pagination += '<li class="round';
             // Test for active page
             if ( pages[i].text == page) {
-                pagination += ' selected aria-current="page"';
+                pagination += ' selected" aria-current="page"';
                 anchorOpen = "";
                 anchorClose = "";
+            } else {
+                pagination += '"';
             }
-            pagination += '" role="listitem">';
+            pagination += ' role="listitem">';
             pagination += anchorOpen;
             pagination += pages[i].text;
             pagination += anchorClose;
@@ -199,12 +201,12 @@ var browseByVClass = {
         // Remove active class on all vClasses
         $('#browse-classes li a.selected')
             .removeClass('selected')
-            .$('aria-current', 'false');
+            .removeAttr('aria-current');
 
         // Add active class for requested vClass
         $('#browse-classes li a[data-uri="'+ vclassUri +'"]')
             .addClass('selected')
-            .$('aria-current', 'true');
+            .attr('aria-current', 'true');
     },
 
     // Toggle the active letter so it's clear which is selected
@@ -217,7 +219,7 @@ var browseByVClass = {
         // Remove active class and aria-selected on all letters
         $('#alpha-browse-individuals li a.selected')
             .removeClass('selected')
-            .attr('aria-current', 'false');
+            .removeAttr('aria-current');
 
         // Add active class and aria-selected for requested alpha
         $('#alpha-browse-individuals li a[data-alpha="'+ alpha +'"]')
