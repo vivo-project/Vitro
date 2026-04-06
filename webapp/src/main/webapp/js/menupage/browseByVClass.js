@@ -25,6 +25,7 @@ var browseByVClass = {
         this.alphaIndexLinks = $('#alpha-browse-individuals li a');
         this.individualsInVClass = $('#individuals-in-class ul');
         this.individualsContainer = $('#individuals-in-class');
+        this.individualsListInfo = $('#individuals-list-info');
     },
 
     // Event listeners. Called on page load
@@ -231,8 +232,8 @@ var browseByVClass = {
 
     // Wipe the currently displayed individuals, no-content message, and existing pagination
     wipeSlate: function() {
-        browseByVClass.individualsInVClass.empty();
-        $('div.no-individuals-container').remove();
+        browseByVClass.individualsInVClass.children(':not(#individuals-list-info)').remove();
+        $('#individuals-list-info > .no-individuals').remove();
         $('.pagination').remove();
     },
 
@@ -244,12 +245,11 @@ var browseByVClass = {
         var alpha = this.selectedAlpha(alpha);
 
         if ( alpha != "all" ) {
-            nothingToSeeHere = '<div aria-live="polite" class="no-individuals-container"><p class="no-individuals">' + browseByVClass.thereAreNoEntriesStartingWith + ' <em>'+ alpha.toUpperCase() +'</em>.</p> <p class="no-individuals">' + browseByVClass.tryAnotherLetter + '</p></div>';
+            nothingToSeeHere = '<p class="no-individuals aria-atomic="true">' + browseByVClass.thereAreNoEntriesStartingWith + ' '+ alpha.toUpperCase() +'.</p> <p class="no-individuals">' + browseByVClass.tryAnotherLetter + '</p>';
         } else {
-            nothingToSeeHere = '<div aria-live="polite" class="no-individuals-container"><p class="no-individuals">' + browseByVClass.thereAreNoEntriesStartingWith + '</p> <p class="no-individuals">' + browseByVClass.selectAnotherClass + '</p></div>';
+            nothingToSeeHere = '<p class="no-individuals" aria-atomic="true">' + browseByVClass.thereAreNoEntriesStartingWith + '</p> <p class="no-individuals">' + browseByVClass.selectAnotherClass + '</p>';
         }
-
-        browseByVClass.individualsContainer.prepend(nothingToSeeHere);
+        browseByVClass.individualsListInfo.append(nothingToSeeHere);
     }
 
 };
