@@ -232,7 +232,7 @@ var browseByVClass = {
     // Wipe the currently displayed individuals, no-content message, and existing pagination
     wipeSlate: function() {
         browseByVClass.individualsInVClass.empty();
-        $('p.no-individuals').remove();
+        $('div.no-individuals-container').remove();
         $('.pagination').remove();
     },
 
@@ -244,9 +244,9 @@ var browseByVClass = {
         var alpha = this.selectedAlpha(alpha);
 
         if ( alpha != "all" ) {
-            nothingToSeeHere = '<div aria-live="polite"><p class="no-individuals">' + browseByVClass.thereAreNoEntriesStartingWith + ' <em>'+ alpha.toUpperCase() +'</em>.</p> <p class="no-individuals">' + browseByVClass.tryAnotherLetter + '</p></div>';
+            nothingToSeeHere = '<div aria-live="polite" class="no-individuals-container"><p class="no-individuals">' + browseByVClass.thereAreNoEntriesStartingWith + ' <em>'+ alpha.toUpperCase() +'</em>.</p> <p class="no-individuals">' + browseByVClass.tryAnotherLetter + '</p></div>';
         } else {
-            nothingToSeeHere = '<div aria-live="polite"><p class="no-individuals">' + browseByVClass.thereAreNoEntriesStartingWith + '</p> <p class="no-individuals">' + browseByVClass.selectAnotherClass + '</p></div>';
+            nothingToSeeHere = '<div aria-live="polite" class="no-individuals-container"><p class="no-individuals">' + browseByVClass.thereAreNoEntriesStartingWith + '</p> <p class="no-individuals">' + browseByVClass.selectAnotherClass + '</p></div>';
         }
 
         browseByVClass.individualsContainer.prepend(nothingToSeeHere);
