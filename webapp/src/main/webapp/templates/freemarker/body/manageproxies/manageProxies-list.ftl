@@ -28,7 +28,7 @@
         <fieldset class="proxy">
             <legend>${i18n().select_editors}</legend>
 
-            <section name="proxyProxiesPanel" role="section">
+            <section name="proxyProxiesPanel">
                 <label for="selectProfileEditors">${i18n().select_editors}</label>
                 <input id="selectProfileEditors" type="text" name="proxySelectorAC" class="acSelector" size="35" value="${i18n().select_last_name}" role="input" /><span><img class="loading-relateEditor hidden" src="${urls.images}/indicatorWhite.gif" alt="${i18n().processing_indicator}"/></span>
                 <p class="search-status"><span name='proxySelectorSearchStatus' moreCharsText='${i18n().type_more_chars}' noMatchText='${i18n().no_match}'>&nbsp;</span></p>
