@@ -244,9 +244,9 @@ var browseByVClass = {
         var alpha = this.selectedAlpha(alpha);
 
         if ( alpha != "all" ) {
-            nothingToSeeHere = '<p class="no-individuals">' + browseByVClass.thereAreNoEntriesStartingWith + ' <em>'+ alpha.toUpperCase() +'</em>.</p> <p class="no-individuals">' + browseByVClass.tryAnotherLetter + '</p>';
+            nothingToSeeHere = '<div aria-live="polite"><p class="no-individuals">' + browseByVClass.thereAreNoEntriesStartingWith + ' <em>'+ alpha.toUpperCase() +'</em>.</p> <p class="no-individuals">' + browseByVClass.tryAnotherLetter + '</p></div>';
         } else {
-            nothingToSeeHere = '<p class="no-individuals">' + browseByVClass.thereAreNoEntriesStartingWith + '</p> <p class="no-individuals">' + browseByVClass.selectAnotherClass + '</p>';
+            nothingToSeeHere = '<div aria-live="polite"><p class="no-individuals">' + browseByVClass.thereAreNoEntriesStartingWith + '</p> <p class="no-individuals">' + browseByVClass.selectAnotherClass + '</p></div>';
         }
 
         browseByVClass.individualsContainer.prepend(nothingToSeeHere);
