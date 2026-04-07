@@ -45,14 +45,14 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/wNumb.min
 
 <#-- Paging controls -->
     <#if (pagingLinks?size > 0)>
-        <div class="searchpages">
+        <div class="searchpages" aria-label="${i18n().pagination}">
             ${i18n().pages}:
             <#if prevPage??><a class="prev" href="${prevPage?html}" title="${i18n().previous}">${i18n().previous}</a></#if>
             <#list pagingLinks as link>
                 <#if link.url??>
                     <a href="${link.url?html}" title="${i18n().page_link}">${link.text?html}</a>
                 <#else>
-                    <span>${link.text?html}</span> <#-- no link if current page -->
+                    <span aria-current="page">${link.text?html}</span> <#-- no link if current page -->
                 </#if>
             </#list>
             <#if nextPage??><a class="next" href="${nextPage?html}" title="${i18n().next_capitalized}">${i18n().next_capitalized}</a></#if>
