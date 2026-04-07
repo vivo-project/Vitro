@@ -135,6 +135,11 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 	}
 
     public String getPageTitle() {
+		String title = editConfig.getNewResources().get("pageTitle");
+		if (title != null && !title.isEmpty()) {
+			return title;
+		}
+
         String pageTitle = i18n.text("edit_page_title");
         return pageTitle != null ? pageTitle : "Edit";
     }
