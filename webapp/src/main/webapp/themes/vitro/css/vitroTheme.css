@@ -1213,7 +1213,7 @@ h1.fn .display-title {
     border-left: 1px solid #a6b1b0;
 }
 ul#individual-tools {
-    color: #8AA149;
+    color: #536520;
 }
 ul#individual-tools li{
     float: left;
@@ -1225,10 +1225,10 @@ img.individual-photo {
 }
 ul#individual-tools-people {
     border-bottom: 1px solid #e8ece9;
-    color: #47b6d0;
+    color: #334144;
 }
 ul#individual-tools {
-    color: #8AA149
+    color: #536520
 }
 #share-contact a.email,
 #share-contact a.tel,
