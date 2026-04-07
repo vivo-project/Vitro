@@ -206,7 +206,7 @@ form textarea {
 form a:link.cancel,
 form a:visited.cancel {
     text-decoration: underline;
-    color: #f70;
+    color: #B50;
     border-color: none;
     padding-left: 3px;
 }
@@ -219,7 +219,7 @@ form a:visited.cancel {
 form a:hover.cancel,
 form a:active.cancel {
     text-decoration: none;
-    color: #f70;
+    color: #B50;
     background: none;
 }
 .validationError {
@@ -959,7 +959,7 @@ p {
 }
 .individualList li,
 .individualList li span {
-  color: #9c9c9c;
+  color: #656565;
  }
 .individualList li a {
     font-weight: normal;
@@ -1469,7 +1469,7 @@ h2#hasResearchArea .verbosePropertyListing {
     display: block;
 }
 form.customForm .hint {
-    color: #9c9c9c;
+    color: #656565;
     font-weight: normal;
 }
 form.customForm .requiredHint {
