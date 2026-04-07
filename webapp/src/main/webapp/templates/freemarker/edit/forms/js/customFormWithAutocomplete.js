@@ -557,6 +557,7 @@ var customForm = {
         // boolean controls whether the acSelector value gets cleared.
 
         var clearAcSelectorVal = true;
+        let focus = null;
 
         if ( $(selectedObj).attr('id') == "typeSelector" ) {
             $acSelectionObj = customForm.acSelections[$(selectedObj).attr('acGroupName')];
