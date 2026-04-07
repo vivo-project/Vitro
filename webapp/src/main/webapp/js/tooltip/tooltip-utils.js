@@ -89,7 +89,7 @@ function setupHoverTrigger(element, data) {
             tooltip.addEventListener('mouseleave', () => timeout = setTimeout(() => {tooltip = removeTooltip(tooltip, element)}, 300));
             tooltip.addEventListener('focusout', (e) => {
                 if (!tooltip.contains(e.relatedTarget)) {
-                    tooltip = removeTooltip(tooltip);
+                    tooltip = removeTooltip(tooltip, element);
                 }
             });
         }
@@ -97,6 +97,9 @@ function setupHoverTrigger(element, data) {
 
     const handleSoftHide = (cooldown = 300) => {
         timeout = setTimeout(() => {tooltip = removeTooltip(tooltip, element)}, cooldown);
+    }
+    const handleMouseLeave = () => {
+        timeout = setTimeout(() => {tooltip = removeTooltip(tooltip, element)}, 300);
     };
 
     element.addEventListener('mouseenter', showTooltip);
@@ -107,7 +110,7 @@ function setupHoverTrigger(element, data) {
 
     element.cleanupListeners = () => {
         element.removeEventListener('mouseenter', showTooltip);
-        element.removeEventListener('mouseleave', () => handleSoftHide());
+        element.removeEventListener('mouseleave', handleMouseLeave);
         tooltip = removeTooltip(tooltip, element);
     };
 }
@@ -148,7 +151,7 @@ function trapFocus(container, initButton, hoverState = false) {
 
                     if (hoverState) {
                         initButton.focus();
-                        removeTooltip(container, initButton);
+                        removeTooltip(container, element);
                     } else {
                         last.focus();
                     }
@@ -160,7 +163,7 @@ function trapFocus(container, initButton, hoverState = false) {
                     
                     if (hoverState) {
                         initButton.focus();
-                        removeTooltip(container, initButton);
+                        removeTooltip(container, element);
                     } else {
                         first.focus();
                     }
@@ -198,7 +201,8 @@ function trapFocus(container, initButton, hoverState = false) {
 }
 
 function setupTooltip(element, data, hover = false) {
-    const tooltip = createTooltipElement(data);
+    element.setAttribute('aria-expanded', 'true');
+    const tooltip = createTooltipElement(data, hover);
     document.body.appendChild(tooltip);
     setupCloseButtonHandler(element, tooltip);
 
