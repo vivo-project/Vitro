@@ -26,6 +26,7 @@ $(document).ready(function(){
                 $itemContainer.hide();
                 $(this).attr('href', '#show more content');
                 $(this).text(i18nStrings.displayMoreEllipsis);
+                $(this).focus();
                 togglePropDisplay.showMore($toggleLink, $itemContainer);
                 return false;
             });
