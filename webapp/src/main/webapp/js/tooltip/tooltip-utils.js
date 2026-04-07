@@ -116,11 +116,11 @@ function setupHoverTrigger(element, data) {
     };
 
     element.addEventListener('mouseenter', showTooltip);
-    element.addEventListener('mouseleave', () => handleSoftHide);
+    element.addEventListener('mouseleave', () => handleSoftHide());
 
     element.addEventListener('focus', showTooltip);
     element.addEventListener('click', showTooltip);
-    element.addEventListener('focusout', () => handleSoftHide);
+    element.addEventListener('focusout', () => handleSoftHide());
     element.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' || e.key === 'Esc') {
             handleSoftHide(0);
@@ -129,7 +129,7 @@ function setupHoverTrigger(element, data) {
 
     element.cleanupListeners = () => {
         element.removeEventListener('mouseenter', showTooltip);
-        element.removeEventListener('mouseleave', () => handleSoftHide);
+        element.removeEventListener('mouseleave', () => handleSoftHide());
         tooltip = removeTooltip(tooltip, element);
     };
 }
