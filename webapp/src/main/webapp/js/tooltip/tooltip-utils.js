@@ -69,6 +69,10 @@ function setupHoverTrigger(element, data) {
     let timeout;
 
     const showTooltip = () => {
+        if (element.hasAttribute('noaction')) {
+            element.removeAttribute('noaction');
+            return;
+        }
 
         clearTimeout(timeout);
         if (isTooltipHidden(tooltip)) {
@@ -82,25 +86,10 @@ function setupHoverTrigger(element, data) {
             }
 
             tooltip.addEventListener('mouseenter', () => clearTimeout(timeout));
-            tooltip.addEventListener('focus', () => clearTimeout(timeout));
             tooltip.addEventListener('mouseleave', () => timeout = setTimeout(() => {tooltip = removeTooltip(tooltip, element)}, 300));
-            
-            tooltip.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' || e.key === 'Esc') {
-
-                    element.focus();
-                    timeout = setTimeout(() => {tooltip = removeTooltip(tooltip, element)}, 300)
-                    
-                }
-            });
-            element.addEventListener('click', (e) => {
-                if (!tooltip) tooltip = setupTooltip(element, data, true);
-
-                const inner = tooltip?.querySelector('.tooltip-inner');
-                inner.setAttribute('role', 'dialog');
-                if (inner) {
-                    inner.focus();
-                    clearTimeout(timeout)
+            tooltip.addEventListener('focusout', (e) => {
+                if (!tooltip.contains(e.relatedTarget)) {
+                    tooltip = removeTooltip(tooltip);
                 }
             });
         }
@@ -114,13 +103,7 @@ function setupHoverTrigger(element, data) {
     element.addEventListener('mouseleave', () => handleSoftHide());
 
     element.addEventListener('focus', showTooltip);
-    element.addEventListener('click', showTooltip);
-    element.addEventListener('focusout', () => handleSoftHide());
-    element.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' || e.key === 'Esc') {
-            handleSoftHide(0);
-        }
-    });
+    element.addEventListener('focusout', handleMouseLeave);
 
     element.cleanupListeners = () => {
         element.removeEventListener('mouseenter', showTooltip);
@@ -195,7 +178,12 @@ function trapFocus(container, initButton, hoverState = false) {
 
     // Focus the first element when trap starts
     setTimeout(() => {
-        if (!hoverState) {
+        // first?.focus();
+
+        if (hoverState) {
+            first?.focus();
+        } else {
+
             const inner = container.querySelector('.tooltip-inner');
             if (inner) {
                 inner.focus();
@@ -210,8 +198,7 @@ function trapFocus(container, initButton, hoverState = false) {
 }
 
 function setupTooltip(element, data, hover = false) {
-    element.setAttribute('aria-expanded', 'true');
-    const tooltip = createTooltipElement(data, hover);
+    const tooltip = createTooltipElement(data);
     document.body.appendChild(tooltip);
     setupCloseButtonHandler(element, tooltip);
 
