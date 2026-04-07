@@ -24,14 +24,14 @@
 	cursor:default ! important;
 }
 
-button.nostyle {
+.nostyle {
     background: transparent;
     border: none;
     padding: 0;
     margin: 0;
 }
 
-button.nostyle > img {
+.nostyle > img {
     display: block;
     width: 100%;
 }
