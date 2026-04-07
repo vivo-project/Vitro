@@ -85,7 +85,7 @@ input[type="password"] {
     font-size: 14px;
     padding: .5em;
     background: #fff;
-    border: 1px solid #e0dfdf;
+    border: 1px solid #898989;
     border-radius: 5px;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
@@ -190,7 +190,7 @@ input.form-button:active,
     top: 1px;
 }
 form textarea {
-    border: 1px solid #e0dfdf;
+    border: 1px solid #898989;
     border-radius: 4px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
@@ -244,7 +244,7 @@ p.submit {
 .form-item {
     margin-top:.3em;
     background-color: #fff;
-    border-color: #e0dfdf;
+    border-color: #898989;
     font-size: .8em;
     border-width: 1px;
     color: #595B5B;
@@ -348,7 +348,7 @@ form select {
    font-size: 14px;
    padding: .5em;
    background: #fff;
-   border: 1px solid #e0dfdf;
+   border: 1px solid #898989;
    border-radius: 5px;
    -moz-border-radius: 5px;
    -webkit-border-radius: 5px;
@@ -482,7 +482,7 @@ ul#header-nav a.log-out {
 #search-field {
     width: 332px;
     height: 37px;
-    background: url(../images/search-interior-pages.png) 0 0 no-repeat;
+    background: url(../images/search-interior-pages-darkened.png) 0 0 no-repeat;
 }
 #search-field input.search {
     text-decoration: none;
@@ -636,7 +636,7 @@ body.login #login {
     height: 24px;
     margin-left: 38px;
     background: #fff;
-    border: 1px solid #e0dfdf;
+    border: 1px solid #898989;
     border-radius: 5px;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
@@ -720,7 +720,7 @@ p.password-note {
 /* SEARCH HOME------>  */
 
 #search-home-field {
-		background: url(../images/search-field-and-button.gif) 0 0 no-repeat;
+		background: url(../images/search-field-and-button-darkened.gif) 0 0 no-repeat;
 }
 #search-home-field input.search {
 	 	background-color: transparent;
