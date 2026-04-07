@@ -53,7 +53,8 @@ public class HomePageController extends FreemarkerHttpServlet {
         }*/
         body.put("dataServiceUrlVClassesForVClassGroup", UrlBuilder.getUrl("/dataservice?getVClassesForVClassGroup=1&classgroupUri="));
 	    body.put("geoFocusMapsEnabled", getGeoFocusMapsFlag(vreq));
-
+        body.put("title","Home");
+        
         return new TemplateResponseValues(BODY_TEMPLATE, body);
     }
 
