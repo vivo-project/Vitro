@@ -50,7 +50,7 @@
         <#if groupName?has_content>
 		    <#--the function replaces spaces in the name with underscores, also called for the property group menu-->
     	    <#assign groupNameHtmlId = p.createPropertyGroupHtmlId(groupName) >
-            <h2 id="${groupNameHtmlId?replace("/","-")}" pgroup="tabs" class="hidden">${groupName}</h2>
+            <h2 id="${groupNameHtmlId?replace("/","-")}" pgroup="tabs" class="hidden">${p.capitalizeGroupName(groupName)}</h2>
         <#else>
             <h2 id="properties" pgroup="tabs" class="hidden">${i18n().properties_capitalized}</h2>
         </#if>
