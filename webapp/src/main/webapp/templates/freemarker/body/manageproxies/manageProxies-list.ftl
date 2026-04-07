@@ -30,7 +30,7 @@
 
             <section name="proxyProxiesPanel">
                 <label for="selectProfileEditors">${i18n().select_editors}</label>
-                <input id="selectProfileEditors" type="text" name="proxySelectorAC" class="acSelector" size="35" value="${i18n().select_last_name}" role="input" /><span><img class="loading-relateEditor hidden" src="${urls.images}/indicatorWhite.gif" alt="${i18n().processing_indicator}"/></span>
+                <input id="selectProfileEditors" type="text" name="proxySelectorAC" class="acSelector" size="35" value="${i18n().select_last_name}" /><span><img class="loading-relateEditor hidden" src="${urls.images}/indicatorWhite.gif" alt="${i18n().processing_indicator}"/></span>
                 <p class="search-status"><span name='proxySelectorSearchStatus' moreCharsText='${i18n().type_more_chars}' noMatchText='${i18n().no_match}'>&nbsp;</span></p>
 
                 <#-- Magic div that holds all of the proxy data and the template that shows how to display it. -->
@@ -62,7 +62,7 @@
 
           <section name="proxyProfilesPanel" role="region">
               <label for="selectProfiles">${i18n().select_profiles}</label>
-              <input id="selectProfiles" type="text" name="proxySelectorAC" class="acSelector" size="35" value="${i18n().select_last_name}" role="input" /><span><img class="loading-relateProfile hidden" src="${urls.images}/indicatorWhite.gif"  alt="${i18n().processing_indicator}"/></span>
+              <input id="selectProfiles" type="text" name="proxySelectorAC" class="acSelector" size="35" value="${i18n().select_last_name}" /><span><img class="loading-relateProfile hidden" src="${urls.images}/indicatorWhite.gif"  alt="${i18n().processing_indicator}"/></span>
 
               <p class="search-status"><span name='proxySelectorSearchStatus' moreCharsText='${i18n().type_more_chars}' noMatchText='${i18n().no_match}'>&nbsp;</span></p>
 
@@ -82,7 +82,7 @@
                                 <br /><a class='remove-proxy' href="." templatePart="remove" title="${i18n().remove_selection}">${i18n().remove_selection}</a>
                             </p>
 
-                            <input type="hidden" name="profileUri" templatePart="uriField" value="%uri%" role="input" />
+                            <input type="hidden" name="profileUri" templatePart="uriField" value="%uri%" />
                         </li>
                     </div>
                 </ul>
@@ -98,7 +98,7 @@
 
 <section id="search-proxy" role="region">
     <form action="${formUrls.list}" method="POST">
-        <input type="text" name="searchTerm" role="input" />
+        <input type="text" name="searchTerm" />
         <input class="submit" type="submit" name="searchByProxy" value="${i18n().search_button}" role="button" />
             <#if page.previous??>
                | <a href="${formUrls.list}?pageIndex=${page.previous}&searchTerm=${searchTerm}" title="${i18n().previous}">${i18n().previous}</a>
@@ -140,7 +140,7 @@
 
             <section name="proxyProfilesPanel" role="region">
                 <label for="addProfile">${i18n().add_profile}</label>
-                <input id="addProfile" type="text" name="proxySelectorAC" class="acSelector" size="35" value="${i18n().select_last_name}" role="input" /><span><img class="loading-addProfile hidden"  alt="${i18n().processing_indicator}" src="${urls.images}/indicatorWhite.gif" /></span>
+                <input id="addProfile" type="text" name="proxySelectorAC" class="acSelector" size="35" value="${i18n().select_last_name}" /><span><img class="loading-addProfile hidden"  alt="${i18n().processing_indicator}" src="${urls.images}/indicatorWhite.gif" /></span>
 
                 <p class="search-status"><span name='proxySelectorSearchStatus' moreCharsText='${i18n().type_more_chars}' noMatchText='${i18n().no_match}'>&nbsp;</span></p>
                 <p name="excludeUri" style="display: none">${r.proxyInfos[0].profileUri}<p>
@@ -172,7 +172,7 @@
                             </p>
                         </li>
 
-                        <input type="hidden" name="profileUri" templatePart="uriField" value="%uri%" role="input" />
+                        <input type="hidden" name="profileUri" templatePart="uriField" value="%uri%" />
                     </div>
                 </ul>
             </section>

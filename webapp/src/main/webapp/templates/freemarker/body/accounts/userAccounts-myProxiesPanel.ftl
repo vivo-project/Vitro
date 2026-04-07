@@ -9,7 +9,7 @@
 
     <label for="addProfileEditor">${strings.add_profile_editor}</label>
     <input id="addProfileEditor" type="text" name="proxySelectorAC" class="acSelector" size="35"
-            value="${strings.select_existing_last_name}" role="input" />
+            value="${strings.select_existing_last_name}" />
     <span><img class="loading-profileMyAccoount hidden" src="${urls.images}/indicatorWhite.gif" /></span>
 
     <p class="search-status">
@@ -43,7 +43,7 @@
                     <br />
                     <a class='remove-proxy' href="." templatePart="remove" title="${strings.remove_selection_title}">${strings.remove_selection}</a>
 
-                    <input type="hidden" name="proxyUri" value="%uri%" role="input" />
+                    <input type="hidden" name="proxyUri" value="%uri%" />
                 </p>
             </li>
         </div>
