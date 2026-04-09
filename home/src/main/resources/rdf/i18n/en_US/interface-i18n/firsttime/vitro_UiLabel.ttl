@@ -3062,6 +3062,14 @@ uil-data:share_profile_uri.Vitro
         uil:hasKey      "share_profile_uri" ;
         uil:hasPackage  "Vitro-languages" .
 
+uil-data:uri_input_label.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "URI Link"@en-US ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "uri_input_label" ;
+        uil:hasPackage  "Vitro-languages" .
+
 uil-data:no_html_specified.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
