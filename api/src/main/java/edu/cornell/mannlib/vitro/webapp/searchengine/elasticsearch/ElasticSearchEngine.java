@@ -16,11 +16,9 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
 import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchInputDocument;
 import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchQuery;
-import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpBasicClientFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpHead;
 
 /**
@@ -47,7 +45,7 @@ public class ElasticSearchEngine implements SearchEngine {
                 + "runtime.properties must contain a value for "
                 + "vitro.local.searchengine.url");
         }
-
+        ESHttpClient.initialize(elasticUrlString);
         baseUrl = elasticUrlString;
     }
 
@@ -64,10 +62,7 @@ public class ElasticSearchEngine implements SearchEngine {
     @Override
     public void ping() throws SearchEngineException {
         HttpHead httpHead = new HttpHead(baseUrl);
-        HttpClient httpClient = ESHttpBasicClientFactory.getHttpClient(baseUrl);
-
-        try {
-            HttpResponse response = httpClient.execute(httpHead);
+        try (CloseableHttpResponse response = ESHttpClient.execute(httpHead)) {
             int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode != 200) {
                 throw new SearchEngineException(
