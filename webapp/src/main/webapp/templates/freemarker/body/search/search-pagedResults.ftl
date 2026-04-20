@@ -45,14 +45,14 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/wNumb.min
 
 <#-- Paging controls -->
     <#if (pagingLinks?size > 0)>
-        <div class="searchpages">
+        <div class="searchpages" aria-label="${i18n().pagination}">
             ${i18n().pages}:
             <#if prevPage??><a class="prev" href="${prevPage?html}" title="${i18n().previous}">${i18n().previous}</a></#if>
             <#list pagingLinks as link>
                 <#if link.url??>
                     <a href="${link.url?html}" title="${i18n().page_link}">${link.text?html}</a>
                 <#else>
-                    <span>${link.text?html}</span> <#-- no link if current page -->
+                    <span aria-current="page">${link.text?html}</span> <#-- no link if current page -->
                 </#if>
             </#list>
             <#if nextPage??><a class="next" href="${nextPage?html}" title="${i18n().next_capitalized}">${i18n().next_capitalized}</a></#if>
@@ -310,7 +310,7 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/wNumb.min
 </#macro>
 
 <#macro createUserInput filter>
-    <input form="search-form" id="filter_input_${filter.id?html}"  placeholder="${i18n().search_field_placeholder}" class="search-vivo" type="text" name="filter_input_${filter.id?html}" value="${filter.inputText?html}" autocapitalize="none" />
+	<input form="search-form" id="filter_input_${filter.id?html}"  placeholder="${i18n().search_field_placeholder}" aria-label="${i18n().search_field_placeholder}" class="search-vivo" type="text" name="filter_input_${filter.id?html}" value="${filter.inputText?html}" autocapitalize="none" />
 </#macro>
 
 <#macro getInput filter filterValue valueID valueNumber form="search-form">

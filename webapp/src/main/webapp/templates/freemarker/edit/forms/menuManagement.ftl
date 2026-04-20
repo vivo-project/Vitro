@@ -19,15 +19,15 @@
 
 <section id="${menuAction?lower_case}-menu-item" role="region">
     <form method="POST" action="${formUrls}" class="customForm" role="${menuAction} menu item">
-        <input type="hidden" name="cmd" id="cmd" value="${menuAction}" role="input" />
-        <input type="hidden" name="menuItem" id="menuItem" value="${menuItem}" role="input" />
-        <input type="hidden" name="switchToDisplayModel" id="switchToDisplayModel" value="true" role="input" />
+        <input type="hidden" name="cmd" id="cmd" value="${menuAction}" />
+        <input type="hidden" name="menuItem" id="menuItem" value="${menuItem}" />
+        <input type="hidden" name="switchToDisplayModel" id="switchToDisplayModel" value="true" />
 
         <label for="menu-name">${i18n().name}<span class="requiredHint"> *</span></label>
-        <input type="text" name="menuName" value="${menuName}" role="input" />
+        <input type="text" name="menuName" value="${menuName}" />
 
         <label for="pretty-url">${i18n().pretty_url}<span class="requiredHint"> *</span></label>
-        <input type="text" name="prettyUrl" value="${prettyUrl}" role="input" />
+        <input type="text" name="prettyUrl" value="${prettyUrl}" />
         <p class="note">${i18n().start_with_leading_slash}</p>
 
         <p>${i18n().template_capitalized}<span class="requiredHint"> *</span></p>
@@ -35,11 +35,11 @@
         <input type="radio" class="default-template" name="selectedTemplate" value="default" <#if selectedTemplateType = "default">checked</#if> role="radio" />
         <label class="inline" for="default"> ${i18n().default}</label>
         <br />
-        <input type="radio" name="selectedTemplate" class="custom-template" value="custom" <#if selectedTemplateType = "custom">checked</#if> role="input" />
+        <input type="radio" name="selectedTemplate" class="custom-template" value="custom" <#if selectedTemplateType = "custom">checked</#if> />
         <label class="inline" for="custom"> ${i18n().custom_template_mixed_caps}</label>
 
         <section id="custom-template" <#if selectedTemplateType != 'custom'>class="hidden" </#if>role="region">
-            <input type="text" name="customTemplate" value="${customTemplate!}" size="40" role="input" /><span class="requiredHint"> *</span>
+            <input type="text" name="customTemplate" value="${customTemplate!}" size="40" /><span class="requiredHint"> *</span>
         </section>
 
         <section id="existingContentType" name="existingContentType" ${existingClassGroupStyle} role="region">
@@ -92,7 +92,7 @@
             </ul>
         </section>
 
-        <input type="submit" name="submit-${menuAction}" value="${i18n().save_changes}" class="submit" role="input" /> ${i18n().or} <a class="cancel" href="${cancelUrl}" title="${i18n().cancel_title}">${i18n().cancel_link}</a>
+        <input type="submit" name="submit-${menuAction}" value="${i18n().save_changes}" class="submit" /> ${i18n().or} <a class="cancel" href="${cancelUrl}" title="${i18n().cancel_title}">${i18n().cancel_link}</a>
 
         <p class="requiredHint">* ${i18n().required_fields}</p>
     </form>

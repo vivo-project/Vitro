@@ -13,7 +13,7 @@
             <select id="VClassURI" name="typeOfNew" class="form-item long-options" role="select">
                 <@form.optionGroups groups=dataInput.groupedClassOptions />
             </select>
-            <input type="hidden" name="editForm" value="${generators.NewIndividualFormGenerator}" role="input" />
+            <input type="hidden" name="editForm" value="${generators.NewIndividualFormGenerator}" />
             <input type="submit" id="submit" value="${i18n().add_individual_of_class}" role="button" />
         </form>
 
