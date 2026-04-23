@@ -22,7 +22,7 @@
 
                     <li class="wookmark-group" style="float: left;">
                     <h2>${classGroup.displayName}</h2>
-                        <ul id="class-group-list" role="list">
+                        <ul class="class-group-list" role="list">
                             <#list classGroup.classes as class>
                                 <#-- Only render populated classes -->
                                 <#if (class.individualCount > 0)>
