@@ -4,6 +4,9 @@ package edu.cornell.mannlib.vitro.webapp.modules.searchEngine;
 
 import java.util.Collection;
 
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 
 /**
@@ -96,4 +99,9 @@ public interface SearchEngine extends Application.Module {
 	 * Find the number of documents in the search index.
 	 */
 	int documentCount() throws SearchEngineException;
+
+	/**
+	 * Execute engine tests
+	 */
+	void test(ServletContextListener scl, ServletContextEvent sce);
 }

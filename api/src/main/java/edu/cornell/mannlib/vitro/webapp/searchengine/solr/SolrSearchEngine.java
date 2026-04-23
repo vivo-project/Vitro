@@ -9,9 +9,12 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 
 import edu.cornell.mannlib.vitro.webapp.searchengine.base.SearchEngineUtil;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.SearchEngineSmokeTest;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.SolrSmokeTest;
+
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.StandardHttpRequestRetryHandler;
 import org.apache.solr.client.solrj.SolrClient;
@@ -21,7 +24,6 @@ import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.config.ContextPath;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
@@ -203,6 +205,10 @@ public class SolrSearchEngine implements SearchEngine {
 		return (int) response.getResults().getNumFound();
 	}
 
+	@Override
+	public void test(ServletContextListener scl, ServletContextEvent sce) {
+		new SolrSmokeTest(scl).doTest(sce);
+	}
 	/**
 	 * If there is a SocketTimeoutException in the causal chain for this
 	 * exception, then wrap it in a SearchEngineNotRespondingException instead
