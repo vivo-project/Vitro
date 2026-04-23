@@ -6,6 +6,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
@@ -122,5 +125,11 @@ public class SearchEngineStub implements SearchEngine {
 	public int documentCount() throws SearchEngineException {
 		throw new RuntimeException(
 				"SearchEngineStub.documentCount() not implemented.");
+	}
+
+	@Override
+	public void test(ServletContextListener scl, ServletContextEvent sce) {
+		throw new RuntimeException(
+				"SearchEngineStub.test() not implemented.");
 	}
 }

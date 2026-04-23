@@ -54,6 +54,9 @@ public class SolrSmokeTest {
 		final StartupStatus ss = StartupStatus.getBean(sce.getServletContext());
 
 		String solrUrlString = SearchEngineUtil.getSearchEngineURLProperty();
+
+		log.debug("Initializing Solr: " + solrUrlString);
+
 		if (Objects.isNull(solrUrlString) || solrUrlString.isEmpty()) {
 			ss.fatal(listener, "Can't connect to Solr search engine. "
 					+ "runtime.properties must contain a value for "

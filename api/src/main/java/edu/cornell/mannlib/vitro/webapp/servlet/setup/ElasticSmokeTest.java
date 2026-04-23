@@ -36,6 +36,9 @@ public class ElasticSmokeTest {
         final StartupStatus ss = StartupStatus.getBean(sce.getServletContext());
 
         String elasticUrlString = ConfigurationProperties.getInstance().getProperty("vitro.local.searchengine.url", "");
+
+        log.debug("Initializing ElasticSearch: " + elasticUrlString);
+
         if (elasticUrlString.isEmpty()) {
             ss.fatal(listener, "Can't connect to ElasticSearch engine. "
                 + "runtime.properties must contain a value for "
