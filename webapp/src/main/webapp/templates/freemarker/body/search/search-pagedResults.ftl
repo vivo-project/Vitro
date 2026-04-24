@@ -13,13 +13,22 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/wNumb.min
 <#include "search-lib.ftl">
 
 <script>
-	let searchFormId = "search-form";
-	let urlsBase = "${urls.base}";
-	if (window.location.toString().indexOf("?") == -1){
-		var queryText = 'querytext=${querytext?js_string}';
-	} else {
-		var queryText = window.location.toString().split("?")[1];
-	}
+    var searchFormId = "search-form";
+    var urlsBase = "${urls.base}";
+    var i18nStrings = {
+        closeString: '${i18n().close?js_string}',
+        downloadResultsModalTitleString: '${i18n().download_results_modal_title?js_string}',
+        downloadResultsXmlFormatString: '${i18n().download_results_xml_format?js_string}',
+        downloadResultsCsvFormatString: '${i18n().download_results_csv_format?js_string}',
+        downloadResultsMaxResultsTitleString: '${i18n().download_results_max_results_title?js_string}',
+        downloadResultsMaxResultsSliderString: '${i18n().download_results_max_results_slider?js_string}',
+    };
+    var url = window.location.toString();
+    if (url.indexOf("?") == -1){
+        var queryText = 'querytext=${querytext?js_string}';
+    } else {
+        var queryText = url.split("?")[1];
+    }
 </script>
 
 <@searchForm  />
@@ -61,45 +70,52 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/wNumb.min
 </#macro>
 
 <#macro printResultNumbers>
-    <h2 class="searchResultsHeader">
-        <#escape x as x?html>
-            ${i18n().results_found(hitCount)} 
-        </#escape>
-        <img id="downloadIcon" src="images/download-icon.png" alt="${i18n().download_results}" title="${i18n().download_results}" />
-    </h2>
+    <div style="display: flex">
+        <h2 class="searchResultsHeader">
+            <#escape x as x?html>
+                ${i18n().results_found(hitCount)} 
+            </#escape>
+        </h2>
+        <button id="downloadIcon" type="button" aria-label="${i18n().download_results}" title="${i18n().download_results}" style="background:none;border:none;padding:0;">
+            <img src="images/download-icon.png" alt="${i18n().download_results}" />
+        </button>
+        <#-- <span id="downloadResults" style="float:left"></span>  -->
+    </div>
 </#macro>
 
 <#macro searchForm>
-        <div id="selected-filters">
-            <@printSelectedFilterValueLabels filters />
-        </div>  
-        <div id="filter-groups">
-            <ul class="nav nav-tabs">
-                <#assign active = true>
-                <#list filterGroups as group>
-                    <#if ( user.loggedIn || group.public ) && !group.hidden >
-                        <@searchFormGroupTab group active/>
-                        <#assign active = false>
-                    </#if>  
-                </#list>
-            </ul>
-            <#assign active = true>
-            <#list filterGroups as group>
-                <#if ( user.loggedIn || group.public ) && !group.hidden >
-                      <@groupFilters group active/>
-                      <#assign active = false>
-                </#if>
-            </#list>
-        </div>
-        <div id="search-form-footer">
-            <div>
-                <@printResultNumbers />
-            </div>
-            <div>
-                <@printHits />
-                <@printSorting />
-            </div>
-        </div> 
+	<form id="search-form" name="search-form" autocomplete="off" method="get" action="${urls.base}/search">
+		<div id="selected-filters">
+			<@printSelectedFilterValueLabels filters />
+		</div>  
+		<div id="filter-groups">
+			<ul class="nav nav-tabs">
+				<#assign active = true>
+				<#list filterGroups as group>
+					<#if ( user.loggedIn || group.public ) && !group.hidden >
+						<@searchFormGroupTab group active/>
+						<#assign active = false>
+					</#if>  
+				</#list>
+			</ul>
+			<#assign active = true>
+			<#list filterGroups as group>
+				<#if ( user.loggedIn || group.public ) && !group.hidden >
+			  		<@groupFilters group active/>
+			  		<#assign active = false>
+				</#if>
+			</#list>
+		</div>
+		<div id="search-form-footer">
+			<div class="results-title">
+				<@printResultNumbers />
+			</div>
+			<div>
+				<@printHits />
+				<@printSorting />
+			</div>
+		</div> 
+	</form>
 </#macro>
 
 <#macro groupFilters group active>
@@ -299,13 +315,17 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/wNumb.min
 
 <#macro userSelectedInput filter>
     <#if filter.inputText?has_content>
-        <button form="search-form" type="button" id="button_filter_input_${filter.id?html}" onclick="clearInput('filter_input_${filter.id?js_string?html}')" class="checked-search-input-label">${filter.name?html} : ${filter.inputText?html}</button>
+        <#assign inputID = "filter_input_" + filter.id >
+        <#if filter.id == "querytext">
+            <#assign inputID = filter.id >
+        </#if>
+        <button form="search-form" type="button" id="button_filter_input_${filter.id?html}" onclick="clearInput(event,'${inputID?js_string?html}')" class="checked-search-input-label">${filter.name?html} : ${filter.inputText?html}</button>
     </#if>
     <#assign from = filter.fromYear >
     <#assign to = filter.toYear >
     <#if from?has_content && to?has_content >
         <#assign range = i18n().from + " " + from + " " + i18n().to + " " + to >
-        <button form="search-form" type="button" id="button_filter_range_${filter.id?html}" onclick="clearInput('filter_range_${filter.id?js_string?html}')" class="checked-search-input-label">${filter.name?html} : ${range?html}</button>
+        <button form="search-form" type="button" id="button_filter_range_${filter.id?html}" onclick="clearInput(event,'filter_range_${filter.id?js_string?html}')" class="checked-search-input-label">${filter.name?html} : ${range?html}</button>
     </#if>
 </#macro>
 
