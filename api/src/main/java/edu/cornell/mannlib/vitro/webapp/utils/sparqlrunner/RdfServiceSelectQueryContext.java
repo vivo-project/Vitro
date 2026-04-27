@@ -14,8 +14,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jena.query.ResultSet;
-
+import org.apache.jena.riot.Lang;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ResultFormat;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.SparqlQueryRunner.ExecutingSelectQueryContext;
 import edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.SparqlQueryRunner.SelectQueryContext;
@@ -102,15 +103,20 @@ class RdfServiceSelectQueryContext implements SelectQueryContext {
 
 		@Override
 		public void writeToOutput(OutputStream output) {
-			try {
-				InputStream resultStream = rdfService.sparqlSelectQuery(
-						query.getQueryString(), JSON);
-				IOUtils.copy(resultStream, output);
-			} catch (Exception e) {
-				log.error(
-						"problem while running query '"
-								+ query.getQueryString() + "'", e);
-			}
+		    writeToOutput(output, JSON);
 		}
+
+        @Override
+        public void writeToOutput(OutputStream output, ResultFormat format) {
+            try {
+                InputStream resultStream = rdfService.sparqlSelectQuery(
+                        query.getQueryString(), format);
+                IOUtils.copy(resultStream, output);
+            } catch (Exception e) {
+                log.error(
+                        "problem while running query '"
+                                + query.getQueryString() + "'", e);
+            }
+        }		
 	}
 }

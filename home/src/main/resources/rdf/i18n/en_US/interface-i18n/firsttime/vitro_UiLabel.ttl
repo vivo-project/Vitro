@@ -1273,6 +1273,7 @@ uil-data:rebuild_search_index.Vitro
 uil-data:password_saved.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        
         rdfs:label       "Your password has been saved."@en-US ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "password_saved" ;
@@ -6569,6 +6570,13 @@ uil-data:dd_config_rdfLang.Vitro
         rdfs:label       "RDF serialization language"@en-US ;
         uil:hasApp       "Vitro" ;
         uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#rdfLang" .
+
+uil-data:dd_config_resultFormat.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Result format"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#resultFormat" .
 
 uil-data:dd_config_uriBinding.Vitro
         rdf:type         owl:NamedIndividual ;

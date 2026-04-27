@@ -2,6 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner;
 
+import static org.apache.jena.riot.resultset.ResultSetLang.SPARQLResultSetJSON;
+import static org.apache.jena.riot.resultset.ResultSetLang.SPARQLResultSetCSV;
+import static org.apache.jena.riot.resultset.ResultSetLang.SPARQLResultSetXML;
+
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -17,7 +21,8 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.query.Syntax;
 import org.apache.jena.rdf.model.Model;
-
+import org.apache.jena.riot.Lang;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ResultFormat;
 import edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.SparqlQueryRunner.ExecutingSelectQueryContext;
 import edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.SparqlQueryRunner.SelectQueryContext;
 
@@ -111,19 +116,43 @@ class ModelSelectQueryContext implements SelectQueryContext {
 
 		@Override
 		public void writeToOutput(OutputStream output) {
-			String qString = query.getQueryString();
-			try {
-				Query q = QueryFactory.create(qString, SYNTAX);
-				QueryExecution qexec = QueryExecutionFactory.create(q, model);
-				try {
-					ResultSetFormatter.outputAsJSON(output, qexec.execSelect());
-				} finally {
-					qexec.close();
-				}
-			} catch (Exception e) {
-				log.error("problem while running query '" + qString + "'", e);
-			}
+		    writeToOutput(output, ResultFormat.JSON);
 		}
+
+        @Override
+        public void writeToOutput(OutputStream output, ResultFormat format) {
+            String qString = query.getQueryString();
+            try {
+                Query q = QueryFactory.create(qString, SYNTAX);
+                QueryExecution qexec = QueryExecutionFactory.create(q, model);
+                try {
+                    ResultSetFormatter.output(output, qexec.execSelect(), getLang(format)) ;
+                } finally {
+                    qexec.close();
+                }
+            } catch (Exception e) {
+                log.error("problem while running query '" + qString + "'", e);
+            }
+            
+        }
+        
+        public static Lang getLang(ResultFormat format) {
+            Lang result;
+            switch (format) {
+                case CSV:
+                    result = SPARQLResultSetCSV;
+                    break;
+                case JSON:
+                    result = SPARQLResultSetJSON;
+                    break;
+                case XML:
+                    result = SPARQLResultSetXML;
+                    break;
+                default:
+                    throw new RuntimeException("Unrecognized result format");
+            }
+            return result;
+        }
 
 	}
 }

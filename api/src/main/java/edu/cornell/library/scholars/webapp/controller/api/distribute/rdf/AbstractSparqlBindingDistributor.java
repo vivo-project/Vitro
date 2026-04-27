@@ -8,6 +8,7 @@ import java.util.Set;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.AbstractDataDistributor;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContext;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.util.VariableBinder;
+import edu.cornell.mannlib.vitro.webapp.controller.api.sparqlquery.ResultSetMediaType;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 /**
@@ -34,5 +35,21 @@ public abstract class AbstractSparqlBindingDistributor extends AbstractDataDistr
     @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#literalBinding")
     public void addLiteralBindingName(String literalBindingName) {
         this.literalBindingNames.add(literalBindingName);
+    }
+
+    protected String getContentType(String format) {
+        String contentType;
+        switch (format) {
+            case "JSON":
+                contentType = ResultSetMediaType.JSON.getContentType();
+                break;
+            case "CSV":
+                contentType = ResultSetMediaType.CSV.getContentType();
+                break;
+            default:
+                contentType = ResultSetMediaType.JSON.getContentType();
+                break;
+        }
+        return contentType;
     }
 }

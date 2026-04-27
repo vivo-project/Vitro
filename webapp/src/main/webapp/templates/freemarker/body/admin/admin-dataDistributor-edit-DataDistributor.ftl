@@ -85,6 +85,11 @@
                         <option value="TTL" <#if fields[property.propertyUri]?? && fields[property.propertyUri]?seq_contains('TTL')>selected</#if> >TTL</option>
                         <option value="RDF/XML" <#if fields[property.propertyUri]?? && fields[property.propertyUri]?seq_contains('RDF/XML')>selected</#if> >RDF/XML</option>
 	                </select>
+                <#elseif property.propertyUri == "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#resultFormat">
+	                <select name="${property.propertyUri}">
+                        <option value="JSON" <#if fields[property.propertyUri]?? && fields[property.propertyUri]?seq_contains('JSON')>selected</#if> >JSON</option>
+                        <option value="CSV" <#if fields[property.propertyUri]?? && fields[property.propertyUri]?seq_contains('CSV')>selected</#if> >CSV</option>
+	                </select>
                 <#else>
                 	<#if fields[property.propertyUri]??>
 	                    <#assign values = fields[property.propertyUri] />
