@@ -1,8 +1,8 @@
 /* $This file is distributed under the terms of the license in LICENSE$ */
 package edu.cornell.mannlib.vitro.webapp.dao;
 
+import java.security.SecureRandom;
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -18,7 +18,7 @@ public class NewURIMakerVitro implements NewURIMaker {
     private static final int MAX_ATTEMPTS = 20;
     WebappDaoFactory wdf;
     Set<String> madeURIs = new HashSet<String>();
-    static Random random = new Random();
+    static SecureRandom random = new SecureRandom();
 
     public NewURIMakerVitro( WebappDaoFactory wdf){
         this.wdf = wdf;
