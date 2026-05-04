@@ -6563,6 +6563,13 @@ uil-data:dd_config_actionName.Vitro
         uil:hasApp       "Vitro" ;
         uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#actionName" .
 
+uil-data:dd_config_rdfLang.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "RDF serialization language"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#rdfLang" .
+
 uil-data:dd_config_uriBinding.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
