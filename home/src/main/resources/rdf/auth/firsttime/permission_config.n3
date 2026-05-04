@@ -9,7 +9,6 @@
 
 auth:ADMIN
     a auth:PermissionSet ;
-    rdfs:label "Site Admin" ;
 
     # ADMIN-only permissions
     auth:hasPermission simplePermission:AccessSpecialDataModels ;
@@ -71,7 +70,6 @@ auth:ADMIN
 
 auth:CURATOR
     a auth:PermissionSet ;
-    rdfs:label "Curator" ;
 
     # permissions for CURATOR and above.
     auth:hasPermission simplePermission:EditOntology ;
@@ -110,7 +108,6 @@ auth:CURATOR
 
 auth:EDITOR
     a auth:PermissionSet ;
-    rdfs:label "Editor" ;
 
     # permissions for EDITOR and above.
     auth:hasPermission simplePermission:ExecuteReports ;
@@ -143,7 +140,6 @@ auth:EDITOR
 auth:SELF_EDITOR
     a auth:PermissionSet ;
     a auth:PermissionSetForNewUsers ;
-    rdfs:label "Self Editor" ;
 
     # permissions for ANY logged-in user.
     auth:hasPermission simplePermission:DoFrontEndEditing ;
@@ -168,7 +164,6 @@ auth:SELF_EDITOR
 auth:PUBLIC
     a auth:PermissionSet ;
     a auth:PermissionSetForPublic ;
-    rdfs:label "Public" ;
 
     # permissions for ANY user, even if they are not logged in.
     auth:hasPermission simplePermission:QueryFullModel ;

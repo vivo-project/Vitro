@@ -89,7 +89,7 @@ uil-data:accounts_search_results.Vitro
 uil-data:search_individual_results.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Pretražite pojedince klase"@sr-Latn-RS ;
+        rdfs:label       "Pretraži instance klase"@sr-Latn-RS ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "search_individual_results" ;
         uil:hasPackage  "Vitro-languages" .
@@ -1353,7 +1353,7 @@ uil-data:close_capitalized.Vitro
 uil-data:browse_class_group.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Pretražite grupe klasa"@sr-Latn-RS ;
+        rdfs:label       "Pregledaj grupu klase"@sr-Latn-RS ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "browse_class_group" ;
         uil:hasPackage  "Vitro-languages" .
@@ -6406,6 +6406,405 @@ uil-data:suppress_operation_for_unrelated_individuals_of_this_class.Vitro
         uil:hasKey       "suppress_operation_for_unrelated_individuals_of_this_class" ;
         uil:hasPackage   "Vitro-languages" .
 
+uil-data:manage_datadistributors.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Upravljanje distributerima podataka"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "manage_datadistributors" .
+
+uil-data:page_datadistributor_config.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Admin: Distributer podataka"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "page_datadistributor_config" .
+
+uil-data:dd_config_title.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Distributer podataka"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_title" .
+
+uil-data:dd_graphbuilder_config_title.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Konstruktor grafova"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_graphbuilder_config_title" .
+
+uil-data:dd_config_name.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Ime"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_name" .
+
+uil-data:dd_config_type.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Tip"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_type" .
+
+uil-data:dd_config_add.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Dodaj distributera"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_add" .
+
+uil-data:dd_config_delete_confirm.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Da li ste sigurni da želite da obrišete ovaj unos?"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_delete_confirm" .
+
+uil-data:dd_config_add_field.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Dodaj polje"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_add_field" .
+
+uil-data:dd_config_run.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "POKRENI"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_run" .
+
+uil-data:dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.file.FileDistributor.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Distributer dokumenata"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.file.FileDistributor" .
+
+uil-data:dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.file.SelectingFileDistributor.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Izbor distributera dokumenata"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.file.SelectingFileDistributor" .
+
+uil-data:dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.RdfGraphDistributor.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Distributer RDF grafa"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.RdfGraphDistributor" .
+
+uil-data:dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.SelectFromContentDistributor.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Izaberi iz distributera sadržaja"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.SelectFromContentDistributor" .
+
+uil-data:dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.SelectFromGraphDistributor.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Izaberi iz distributera grafa"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.SelectFromGraphDistributor" .
+
+uil-data:dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.ConstructQueryGraphBuilder.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Konstruiši upit konstruktor grafa"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.ConstructQueryGraphBuilder" .
+
+uil-data:dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.DrillDownGraphBuilder.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Detaljni konstruktor grafa"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.DrillDownGraphBuilder" .
+
+uil-data:dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.IteratingGraphBuilder.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Iterirajući konstruktor grafa"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.IteratingGraphBuilder" .
+
+uil-data:dd_config_actionName.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Naziv akcije"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#actionName" .
+
+uil-data:dd_config_uriBinding.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "URI povezivanje"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#uriBinding" .
+
+uil-data:dd_config_literalBinding.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Povezivanje literala"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#literalBinding" .
+
+uil-data:dd_config_query.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "SPARQL upit"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#query" .
+
+uil-data:dd_config_contentType.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "MIME tip"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#contentType" .
+
+uil-data:dd_config_path.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Putanja dokumenta"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#path" .
+
+uil-data:dd_config_supportingScript.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Putanja do ugrađenog skripta"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#supportingScript" .
+
+uil-data:dd_config_script.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Skript"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#script" .
+
+uil-data:dd_config_child.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Umotani distributer"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#child" .
+
+uil-data:dd_config_graphBuilder.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Konstruktor grafa"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#graphBuilder" .
+
+uil-data:dd_config_emptyResponse.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Odgovor za prazan skup podataka"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#emptyResponse" .
+
+uil-data:dd_config_parameterName.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Parametar zahteva"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#parameterName" .
+
+uil-data:dd_config_filepathTemplate.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Šablon za putanju dokumenta"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#filepathTemplate" .
+
+uil-data:dd_config_parameterPattern.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Regularni izraz za izdvajanje selektora dokumenta iz parametra zahteva"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#parameterPattern" .
+
+uil-data:dd_config_builderName.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Naziv konstruktora"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#builderName" .
+
+uil-data:dd_config_parameterValue.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Vrednost parametra"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#parameterValue" .
+
+uil-data:dd_config_childGraphBuilder.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Nasleđeni konstruktor grafa"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#childGraphBuilder" .
+
+uil-data:dd_config_topLevelGraphBuilder.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Najviši nivo konstruktora grafa"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#topLevelGraphBuilder" .
+
+uil-data:dd_config_drillDownQuery.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Detaljni upit"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#drillDownQuery" .
+
+uil-data:dd_config_constructQuery.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Konstruiši upit"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#constructQuery" .
+
+uil-data:manage_reports.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Upravljanje izveštajima"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "manage_reports" .
+
+uil-data:page_reporting_config.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Admin: Izveštaji"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "page_reporting_config" .
+
+uil-data:reporting_config_title.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Izveštavanje"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_config_title" .
+
+uil-data:reporting_title.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Izveštavanje"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_title" .
+
+uil-data:reporting_config_add.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Dodaj izveštaj"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_config_add" .
+
+uil-data:reporting_config_name.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Ime"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_config_name" .
+
+uil-data:reporting_config_type.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Tip"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_config_type" .
+
+uil-data:reporting_config_add_datasource.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Dodaj izvor podataka"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_config_add_datasource" .
+
+uil-data:reporting_download_template.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Preuzmi šablon"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_download_template" .
+
+uil-data:reporting_template.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "<b>Šablon:</b>"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_template" .
+
+uil-data:reporting_download_xml.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "XML"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_download_xml" .
+
+uil-data:reporting_run.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "POKRENI"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_run" .
+
+uil-data:reporting_config_edu.cornell.mannlib.vitro.webapp.reporting.OpenDopeWordReport.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "OpenDope Word šablon"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_config_edu.cornell.mannlib.vitro.webapp.reporting.OpenDopeWordReport" .
+
+uil-data:reporting_config_edu.cornell.mannlib.vitro.webapp.reporting.TemplateExcelReport.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Excel šablon"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_config_edu.cornell.mannlib.vitro.webapp.reporting.TemplateExcelReport" .
+
+uil-data:reporting_config_edu.cornell.mannlib.vitro.webapp.reporting.TemplateWordReport.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Word šablon"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_config_edu.cornell.mannlib.vitro.webapp.reporting.TemplateWordReport" .
+
+uil-data:reporting_config_field_reportName.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Naziv izveštaja"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_config_field_reportName" .
+
+uil-data:reporting_config_dataSource_distributor.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Distributer"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_config_dataSource_distributor" .
+
+uil-data:reporting_config_dataSource_rank.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Rang"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_config_dataSource_rank" .
+
+uil-data:reporting_config_dataSource_outputName.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Naziv generisanog dokumenta"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_config_dataSource_outputName" .
+
 uil-data:password_reset_admin_notification_email_subject.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
@@ -6453,3 +6852,80 @@ uil-data:select_search_filter_to_browse.Vitro
         uil:hasApp       "Vitro" ;
         uil:hasKey       "select_search_filter_to_browse" ;
         uil:hasPackage   "Vitro-languages" .
+
+uil-data:user_roles.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Korisničke uloge"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "user_roles" .
+
+uil-data:add_new_role.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Dodaj novu ulogu"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "add_new_role" .
+
+uil-data:role_rename_prompt.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Unesite naziv nove uloge"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "role_rename_prompt" .
+
+uil-data:remove_role_confirmation.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Da li ste sigurni da želite ukloniti ulogu?"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "remove_role_confirmation" .
+
+uil-data:there_are_no_results_to_display.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Nema rezultata za prikaz."@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "there_are_no_results_to_display" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:remove_custom_css.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Ukloni CSS"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "remove_custom_css" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:download_custom_css.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Preuzmi CSS"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "download_custom_css" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:replace_custom_css.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Zameni CSS"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "replace_custom_css" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:custom_css_style.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Prilagođena CSS datoteka"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "custom_css_style" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:confirm_remove_custom_css.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Da li ste sigurni da želite ukloniti prilagođeni CSS?"@sr-Latn-RS ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "confirm_remove_custom_css" ;
+        uil:hasPackage   "Vitro-languages" .
+

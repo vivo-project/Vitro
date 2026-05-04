@@ -89,7 +89,7 @@ uil-data:accounts_search_results.Vitro
 uil-data:search_individual_results.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Individuos de la clase de búsqueda"@es ;
+        rdfs:label       "Buscar instancias de la clase"@es ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "search_individual_results" ;
         uil:hasPackage  "Vitro-languages" .
@@ -1353,7 +1353,7 @@ uil-data:close_capitalized.Vitro
 uil-data:browse_class_group.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Examinar grupo de clase"@es ;
+        rdfs:label       "Examinar grupo de la clase"@es ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "browse_class_group" ;
         uil:hasPackage  "Vitro-languages" .
@@ -2433,7 +2433,7 @@ uil-data:upload_photo.Vitro
 uil-data:sparql_query_results.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
-        rdfs:label       "Resultados de consulta SPARQL"@es ;
+        rdfs:label       "Resultados de la consulta SPARQL"@es ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "sparql_query_results" ;
         uil:hasPackage  "Vitro-languages" .
@@ -6406,6 +6406,405 @@ uil-data:suppress_operation_for_unrelated_individuals_of_this_class.Vitro
         uil:hasKey       "suppress_operation_for_unrelated_individuals_of_this_class" ;
         uil:hasPackage   "Vitro-languages" .
 
+uil-data:manage_datadistributors.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Administrar distribuidores de datos"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "manage_datadistributors" .
+
+uil-data:page_datadistributor_config.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Admin: Distribuidor de Datos"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "page_datadistributor_config" .
+
+uil-data:dd_config_title.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Distribuidor de Datos"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_title" .
+
+uil-data:dd_graphbuilder_config_title.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Constructor de Grafos"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_graphbuilder_config_title" .
+
+uil-data:dd_config_name.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Nombre"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_name" .
+
+uil-data:dd_config_type.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Tipo"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_type" .
+
+uil-data:dd_config_add.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Agregar distribuidor"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_add" .
+
+uil-data:dd_config_delete_confirm.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "¿Está seguro de que desea eliminar esta entrada?"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_delete_confirm" .
+
+uil-data:dd_config_add_field.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Agregar campo"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_add_field" .
+
+uil-data:dd_config_run.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "EJECUTAR"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_run" .
+
+uil-data:dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.file.FileDistributor.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Distribuidor de Archivos"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.file.FileDistributor" .
+
+uil-data:dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.file.SelectingFileDistributor.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Seleccionando Distribuidor de Archivos"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.file.SelectingFileDistributor" .
+
+uil-data:dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.RdfGraphDistributor.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Distribuidor de Grafos RDF"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.RdfGraphDistributor" .
+
+uil-data:dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.SelectFromContentDistributor.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Seleccionar desde Distribuidor de Contenido"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.SelectFromContentDistributor" .
+
+uil-data:dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.SelectFromGraphDistributor.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Seleccionar desde Distribuidor de Grafos"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.SelectFromGraphDistributor" .
+
+uil-data:dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.ConstructQueryGraphBuilder.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Constructor de Consultas CONSTRUCT de Grafos"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.ConstructQueryGraphBuilder" .
+
+uil-data:dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.DrillDownGraphBuilder.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Constructor de Grafos Detallado"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.DrillDownGraphBuilder" .
+
+uil-data:dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.IteratingGraphBuilder.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Iterando Constructor de Grafos"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.IteratingGraphBuilder" .
+
+uil-data:dd_config_actionName.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Nombre de la acción"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#actionName" .
+
+uil-data:dd_config_uriBinding.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Vinculación de URI"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#uriBinding" .
+
+uil-data:dd_config_literalBinding.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Vinculación de Literale"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#literalBinding" .
+
+uil-data:dd_config_query.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Consulta SPARQL"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#query" .
+
+uil-data:dd_config_contentType.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Tipo MIME"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#contentType" .
+
+uil-data:dd_config_path.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Ruta del archivo"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#path" .
+
+uil-data:dd_config_supportingScript.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Ruta al script embebido"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#supportingScript" .
+
+uil-data:dd_config_script.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Script"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#script" .
+
+uil-data:dd_config_child.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Distribuidor empaquetado"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#child" .
+
+uil-data:dd_config_graphBuilder.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Constructor de Grafos"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#graphBuilder" .
+
+uil-data:dd_config_emptyResponse.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Respuesta para conjunto de datos vacío"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#emptyResponse" .
+
+uil-data:dd_config_parameterName.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Parámetro de solicitud"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#parameterName" .
+
+uil-data:dd_config_filepathTemplate.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Plantilla para ruta de archivo"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#filepathTemplate" .
+
+uil-data:dd_config_parameterPattern.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Expresión regular para extraer el selector de archivo del parámetro de solicitud"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#parameterPattern" .
+
+uil-data:dd_config_builderName.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Nombre del Constructor"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#builderName" .
+
+uil-data:dd_config_parameterValue.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Valor del parámetro"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#parameterValue" .
+
+uil-data:dd_config_childGraphBuilder.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Constructor de Grafos Secundarios"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#childGraphBuilder" .
+
+uil-data:dd_config_topLevelGraphBuilder.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Constructor de Grafo de Nivel Superior"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#topLevelGraphBuilder" .
+
+uil-data:dd_config_drillDownQuery.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Consulta de Detallada"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#drillDownQuery" .
+
+uil-data:dd_config_constructQuery.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Consulta CONSTRUCT"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#constructQuery" .
+
+uil-data:manage_reports.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Administrar reportes"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "manage_reports" .
+
+uil-data:page_reporting_config.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Admin: Reportes"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "page_reporting_config" .
+
+uil-data:reporting_config_title.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Reportes"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_config_title" .
+
+uil-data:reporting_title.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Reportes"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_title" .
+
+uil-data:reporting_config_add.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Agregar reporte"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_config_add" .
+
+uil-data:reporting_config_name.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Nombre"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_config_name" .
+
+uil-data:reporting_config_type.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Tipo"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_config_type" .
+
+uil-data:reporting_config_add_datasource.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Agregar fuente de datos"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_config_add_datasource" .
+
+uil-data:reporting_download_template.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Descargar plantilla"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_download_template" .
+
+uil-data:reporting_template.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "<b>Plantilla:</b>"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_template" .
+
+uil-data:reporting_download_xml.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "XML"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_download_xml" .
+
+uil-data:reporting_run.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "EJECUTAR"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_run" .
+
+uil-data:reporting_config_edu.cornell.mannlib.vitro.webapp.reporting.OpenDopeWordReport.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Plantilla de Word OpenDope"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_config_edu.cornell.mannlib.vitro.webapp.reporting.OpenDopeWordReport" .
+
+uil-data:reporting_config_edu.cornell.mannlib.vitro.webapp.reporting.TemplateExcelReport.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Plantilla de Excel"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_config_edu.cornell.mannlib.vitro.webapp.reporting.TemplateExcelReport" .
+
+uil-data:reporting_config_edu.cornell.mannlib.vitro.webapp.reporting.TemplateWordReport.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Plantilla de Word"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_config_edu.cornell.mannlib.vitro.webapp.reporting.TemplateWordReport" .
+
+uil-data:reporting_config_field_reportName.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Nombre del reporte"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_config_field_reportName" .
+
+uil-data:reporting_config_dataSource_distributor.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Distribuidor"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_config_dataSource_distributor" .
+
+uil-data:reporting_config_dataSource_rank.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Rango"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_config_dataSource_rank" .
+
+uil-data:reporting_config_dataSource_outputName.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Nombre de la salida"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "reporting_config_dataSource_outputName" .
+
 uil-data:password_reset_admin_notification_email_subject.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
@@ -6452,5 +6851,81 @@ uil-data:select_search_filter_to_browse.Vitro
         rdfs:label       "Seleccionar filtro de búsqueda"@es ;
         uil:hasApp       "Vitro" ;
         uil:hasKey       "select_search_filter_to_browse" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:user_roles.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Roles de usuario"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "user_roles" .
+
+uil-data:add_new_role.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Agregar nuevo rol"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "add_new_role" .
+
+uil-data:role_rename_prompt.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Por favor, ingrese la etiqueta del nuevo rol"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "role_rename_prompt" .
+
+uil-data:remove_role_confirmation.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "¿Está seguro de que desea eliminar el rol?"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "remove_role_confirmation" .
+
+uil-data:there_are_no_results_to_display.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "No hay resultados para mostrar."@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "there_are_no_results_to_display" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:remove_custom_css.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Eliminar CSS"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "remove_custom_css" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:download_custom_css.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Descargar CSS"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "download_custom_css" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:replace_custom_css.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Reemplazar CSS"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "replace_custom_css" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:custom_css_style.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Archivo CSS personalizado"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "custom_css_style" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:confirm_remove_custom_css.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "¿Está seguro de que desea eliminar el CSS personalizado?"@es ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "confirm_remove_custom_css" ;
         uil:hasPackage   "Vitro-languages" .
 
