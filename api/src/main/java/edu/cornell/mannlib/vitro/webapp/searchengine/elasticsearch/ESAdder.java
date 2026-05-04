@@ -17,13 +17,11 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineExcepti
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputField;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
-import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpBasicClientFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 
 /**
@@ -111,28 +109,23 @@ public class ESAdder {
         return result.toString().replace("[\"{", "{").replace("}\"]", "}");
     }
 
-    private void putToElastic(String json, String docId)
-            throws SearchEngineException {
-        try {
-            String url = baseUrl + "/_doc/"
-                    + URLEncoder.encode(docId, StandardCharsets.UTF_8);
-            CloseableHttpClient httpClient = ESHttpBasicClientFactory.getHttpClient(baseUrl);
-
-            HttpPut request = new HttpPut(url);
-            request.addHeader("Content-Type", "application/json");
-            request.setEntity(new StringEntity(json, StandardCharsets.UTF_8));
-            try (CloseableHttpResponse response = httpClient.execute(request)) {
-                if (response.getStatusLine().getStatusCode() >= 400) {
-                    log.warn("Response from Elasticsearch: "
-                        + EntityUtils.toString(response.getEntity()));
-                } else {
-                    log.debug("Response from Elasticsearch: "
-                        + EntityUtils.toString(response.getEntity()));
-                }
+    private void putToElastic(String json, String docId) throws SearchEngineException {
+        try (CloseableHttpResponse response = ESHttpClient.execute(getPutRequest(json, docId))) {
+            if (response.getStatusLine().getStatusCode() >= 400) {
+                log.warn("Response from Elasticsearch: " + EntityUtils.toString(response.getEntity()));
+            } else {
+                log.debug("Response from Elasticsearch: " + EntityUtils.toString(response.getEntity()));
             }
         } catch (Exception e) {
-            throw new SearchEngineException("Failed to put to Elasticsearch",
-                    e);
+            throw new SearchEngineException("Failed to put to Elasticsearch", e);
         }
+    }
+
+    private HttpPut getPutRequest(String json, String docId) {
+        String url = baseUrl + "/_doc/" + URLEncoder.encode(docId, StandardCharsets.UTF_8);
+        HttpPut request = new HttpPut(url);
+        request.addHeader("Content-Type", "application/json");
+        request.setEntity(new StringEntity(json, StandardCharsets.UTF_8));
+        return request;
     }
 }

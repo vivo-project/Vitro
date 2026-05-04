@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
@@ -16,12 +19,11 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
 import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchInputDocument;
 import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchQuery;
-import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpBasicClientFactory;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.ElasticSmokeTest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpHead;
-import org.apache.http.impl.client.CloseableHttpClient;
 
 /**
  * A first version of an Elasticsearch engine implementation.
@@ -47,7 +49,7 @@ public class ElasticSearchEngine implements SearchEngine {
                 + "runtime.properties must contain a value for "
                 + "vitro.local.searchengine.url");
         }
-
+        ESHttpClient.initialize(elasticUrlString);
         baseUrl = elasticUrlString;
     }
 
@@ -64,9 +66,7 @@ public class ElasticSearchEngine implements SearchEngine {
     @Override
     public void ping() throws SearchEngineException {
         HttpHead httpHead = new HttpHead(baseUrl);
-        CloseableHttpClient httpClient = ESHttpBasicClientFactory.getHttpClient(baseUrl);
-
-        try (CloseableHttpResponse response = httpClient.execute(httpHead)) {
+        try (CloseableHttpResponse response = ESHttpClient.execute(httpHead)) {
             int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode != 200) {
                 throw new SearchEngineException(
@@ -141,4 +141,9 @@ public class ElasticSearchEngine implements SearchEngine {
     public int documentCount() throws SearchEngineException {
         return new ESCounter(baseUrl).count();
     }
+
+	@Override
+	public void test(ServletContextListener scl, ServletContextEvent sce) {
+		new ElasticSmokeTest(scl).doTest(sce);
+	}
 }

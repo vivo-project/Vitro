@@ -12,6 +12,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -261,6 +264,11 @@ public class InstrumentedSearchEngineWrapper implements SearchEngine {
 				throw new ArrayIndexOutOfBoundsException(i);
 			}
 		}
+	}
+
+	@Override
+	public void test(ServletContextListener scl, ServletContextEvent sce) {
+		innerEngine.test(scl, sce);
 	}
 
 }

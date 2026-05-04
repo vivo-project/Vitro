@@ -13,7 +13,7 @@
         <tr>
             <th>${i18n().dd_config_name}</th>
             <th>${i18n().dd_config_type}</th>
-            <th>${i18n().dd_config_edit}</th>
+            <th>${i18n().edit_capitalized}</th>
         </tr>
         <#list distributors as distributor>
             <tr>
@@ -24,9 +24,9 @@
                     ${i18n()["dd_config_" + distributor.className]}
                 </td>
                 <td>
-                    <a href="${submitUrlBase}?editUri=${distributor.uri?url}"><img src="${urls.images!}/individual/editIcon.gif" alt="${i18n().dd_config_edit}"></a>
+                    <a href="${submitUrlBase}?editUri=${distributor.uri?url}"><img src="${urls.images!}/individual/editIcon.gif" alt="${i18n().edit_capitalized}"></a>
                     <#-- if distributor.persistent>
-                        <a href="${submitUrlBase}?deleteUri=${distributor.uri?url}"><img src="${urls.images!}/individual/deleteIcon.gif" alt="${i18n().dd_config_delete}"></a>
+                        <a href="${submitUrlBase}?deleteUri=${distributor.uri?url}"><img src="${urls.images!}/individual/deleteIcon.gif" alt="${i18n().delete_button}"></a>
                     </#if -->
                     <a href="${urls.base}/api/dataRequest/${distributor.name}"><img src="${urls.images!}/run.png" alt="${i18n().dd_config_run}"></a>
                 </td>
@@ -49,7 +49,7 @@
         <tr>
             <th>${i18n().dd_config_name}</th>
             <th>${i18n().dd_config_type}</th>
-            <th>${i18n().dd_config_edit}</th>
+            <th>${i18n().edit_capitalized}</th>
         </tr>
         <#list graphbuilders as graphbuilder>
             <tr>
@@ -60,9 +60,9 @@
                     ${i18n()["dd_config_" + graphbuilder.className]}
                 </td>
                 <td>
-                    <a href="${submitUrlBase}?editUri=${graphbuilder.uri?url}"><img src="${urls.images!}/individual/editIcon.gif" alt="${i18n().dd_config_edit}"></a>
+                    <a href="${submitUrlBase}?editUri=${graphbuilder.uri?url}"><img src="${urls.images!}/individual/editIcon.gif" alt="${i18n().edit_capitalized}"></a>
                     <#-- if graphbuilder.persistent>
-                        <a href="${submitUrlBase}?deleteUri=${graphbuilder.uri?url}"><img src="${urls.images!}/individual/deleteIcon.gif" alt="${i18n().dd_config_delete}"></a>
+                        <a href="${submitUrlBase}?deleteUri=${graphbuilder.uri?url}"><img src="${urls.images!}/individual/deleteIcon.gif" alt="${i18n().delete_button}"></a>
                     </#if -->
                 </td>
             </tr>

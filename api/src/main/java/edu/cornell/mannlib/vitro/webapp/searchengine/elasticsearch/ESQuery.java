@@ -5,11 +5,11 @@ package edu.cornell.mannlib.vitro.webapp.searchengine.elasticsearch;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
-import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpBasicClientFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,7 +49,7 @@ public class ESQuery {
             .bodyString(queryString, ContentType.APPLICATION_JSON)
             .execute()) {
             String responseString = IOUtils
-                    .toString(response.getEntity().getContent());
+                    .toString(response.getEntity().getContent(), Charset.defaultCharset());
             log.debug("RESPONSE: " + responseString);
             return responseString;
         } catch (Exception e) {
@@ -92,10 +92,7 @@ public class ESQuery {
 
         public CloseableHttpResponse execute() throws SearchEngineException {
             try {
-                if (this.getURI().getScheme().equals("https")) {
-                    return ESHttpBasicClientFactory.getHttpsClient().execute(this);
-                }
-                return ESHttpBasicClientFactory.getHttpClient().execute(this);
+                return ESHttpClient.execute(this);
             } catch (IOException e) {
                 throw new SearchEngineException(e);
             }

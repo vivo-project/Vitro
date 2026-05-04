@@ -1,0 +1,17 @@
+# $This file is distributed under the terms of the license in LICENSE$
+
+@prefix default: <http://vitro.mannlib.cornell.edu/ns/default/pages#> .
+@prefix display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> .
+
+default:page_not_found_dg display:htmlValue
+  """
+  <h2>Página no encontrada</h2>
+  <p>Parece que la página a la que intentaba acceder ya no está disponible o ha sido eliminada.</p>
+  <p>Puede volver a la página de inicio o usar la búsqueda para encontrar lo que busca.</p>
+  """@es ;
+  display:saveToVar "pageNotFound"@es ;
+  .
+default:page_not_found
+  display:title "Página no encontrada"@es ;
+  display:urlMapping "/page_not_found"@es ;
+  .

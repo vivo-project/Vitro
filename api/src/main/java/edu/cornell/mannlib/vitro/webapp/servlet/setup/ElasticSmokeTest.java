@@ -3,21 +3,20 @@
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.searchengine.elasticsearch.ESHttpClient;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
-import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpBasicClientFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 
 /**
@@ -36,7 +35,10 @@ public class ElasticSmokeTest {
     public void doTest(ServletContextEvent sce) {
         final StartupStatus ss = StartupStatus.getBean(sce.getServletContext());
 
-        String elasticUrlString = ConfigurationProperties.getBean(sce).getProperty("vitro.local.searchengine.url", "");
+        String elasticUrlString = ConfigurationProperties.getInstance().getProperty("vitro.local.searchengine.url", "");
+
+        log.debug("Initializing ElasticSearch: " + elasticUrlString);
+
         if (elasticUrlString.isEmpty()) {
             ss.fatal(listener, "Can't connect to ElasticSearch engine. "
                 + "runtime.properties must contain a value for "
@@ -47,8 +49,8 @@ public class ElasticSmokeTest {
         URL elasticUrl = null;
 
         try {
-            elasticUrl = new URL(elasticUrlString);
-        } catch (MalformedURLException e) {
+            elasticUrl = new URI(elasticUrlString).toURL();
+        } catch (Exception e) {
             ss.fatal(listener, "Can't connect to ElasticSearch engine. "
                 + "The value for vitro.local.searchengine.url "
                 + "in runtime.properties is not a valid URL: '"
@@ -83,18 +85,16 @@ public class ElasticSmokeTest {
      */
     private static class ElasticPinger {
         private final URL elasticUrl;
-        private final CloseableHttpClient httpClient;
 
         public ElasticPinger(URL elasticUrl) {
             this.elasticUrl = elasticUrl;
-            this.httpClient = ESHttpBasicClientFactory.getHttpClient(elasticUrl.toString());
         }
 
         public void ping() throws ElasticProblemException {
             HttpGet method = new HttpGet(elasticUrl.toExternalForm());
             log.debug("Trying to ping ElasticSearch");
 
-            try(CloseableHttpResponse response = httpClient.execute(method)) {
+            try(CloseableHttpResponse response = ESHttpClient.execute(method)) {
                 try {
                     log.debug("Finished pinging ElasticSearch");
                     int statusCode = response.getStatusLine().getStatusCode();

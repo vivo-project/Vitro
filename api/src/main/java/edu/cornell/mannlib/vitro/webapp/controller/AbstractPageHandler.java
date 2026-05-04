@@ -61,7 +61,7 @@ public abstract class AbstractPageHandler {
 		userAccountsModel = ModelAccess.on(ctx).getOntModel(USER_ACCOUNTS);
 		unionModel = ModelAccess.on(ctx).getOntModel(FULL_UNION);
 
-		WebappDaoFactory wdf = ModelAccess.on(ctx).getWebappDaoFactory();
+		WebappDaoFactory wdf = ModelAccess.on(vreq).getWebappDaoFactory();
 		userAccountsDao = wdf.getUserAccountsDao();
 		vclassDao = wdf.getVClassDao();
 		indDao = wdf.getIndividualDao();

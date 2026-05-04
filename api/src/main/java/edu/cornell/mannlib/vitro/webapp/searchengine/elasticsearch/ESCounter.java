@@ -7,10 +7,8 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
-import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpBasicClientFactory;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 
 /**
@@ -26,9 +24,7 @@ public class ESCounter {
 
     public int count() throws SearchEngineException {
         String url = baseUrl + "/_count";
-        CloseableHttpClient httpClient = ESHttpBasicClientFactory.getHttpClient(baseUrl);
-
-        try(CloseableHttpResponse response = httpClient.execute(new HttpGet(url))) {
+        try(CloseableHttpResponse response = ESHttpClient.execute(new HttpGet(url))) {
             String json = EntityUtils.toString(response.getEntity());
 
             @SuppressWarnings("unchecked")

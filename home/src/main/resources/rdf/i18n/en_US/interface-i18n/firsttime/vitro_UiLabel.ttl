@@ -6479,27 +6479,6 @@ uil-data:dd_config_add.Vitro
         uil:hasApp       "Vitro" ;
         uil:hasKey       "dd_config_add" .
 
-uil-data:dd_config_edit.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        rdfs:label       "Edit"@en-US ;
-        uil:hasApp       "Vitro" ;
-        uil:hasKey       "dd_config_edit" .
-
-uil-data:dd_config_save.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        rdfs:label       "Save"@en-US ;
-        uil:hasApp       "Vitro" ;
-        uil:hasKey       "dd_config_save" .
-
-uil-data:dd_config_delete.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        rdfs:label       "Delete"@en-US ;
-        uil:hasApp       "Vitro" ;
-        uil:hasKey       "dd_config_delete" .
-
 uil-data:dd_config_delete_confirm.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
@@ -6765,27 +6744,6 @@ uil-data:reporting_config_type.Vitro
         rdfs:label       "Type"@en-US ;
         uil:hasApp       "Vitro" ;
         uil:hasKey       "reporting_config_type" .
-
-uil-data:reporting_config_edit.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        rdfs:label       "Edit"@en-US ;
-        uil:hasApp       "Vitro" ;
-        uil:hasKey       "reporting_config_edit" .
-
-uil-data:reporting_config_save.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        rdfs:label       "Save"@en-US ;
-        uil:hasApp       "Vitro" ;
-        uil:hasKey       "reporting_config_save" .
-
-uil-data:reporting_config_delete.Vitro
-        rdf:type         owl:NamedIndividual ;
-        rdf:type         uil:UILabel ;
-        rdfs:label       "Delete"@en-US ;
-        uil:hasApp       "Vitro" ;
-        uil:hasKey       "reporting_config_delete" .
 
 uil-data:reporting_config_add_datasource.Vitro
         rdf:type         owl:NamedIndividual ;
