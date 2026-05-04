@@ -1,0 +1,19 @@
+@prefix : <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+:vitrodocumentModifier_modification_date
+    a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.SelectQueryDocumentModifier> ,
+        <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier> ;
+    rdfs:label "modification date" ;
+    :hasTargetField "mod_date_drsim" ;
+    :hasSelectQuery """
+		SELECT ?range
+		WHERE {
+		  BIND(NOW() as ?dateUnf)
+		  BIND(TIMEZONE(?dateUnf) as ?tz)
+		  BIND(NOW() - ?tz as ?dateMod)
+		  BIND(CONCAT(STR(YEAR(?dateMod)),'-',STR(MONTH(?dateMod)),'-',STR(DAY(?dateMod)),'T',STR(HOURS(?dateMod)),":",STR(MINUTES(?dateMod)),':',SUBSTR(STR(SECONDS(?dateMod)),1,2),'Z') as ?dateUTC)  
+		  BIND(CONCAT('[',?dateUTC,' TO ', ?dateUTC,']') as ?range)
+		}
+""" .
+
