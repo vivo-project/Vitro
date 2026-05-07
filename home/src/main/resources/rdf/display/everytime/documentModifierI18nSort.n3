@@ -9,8 +9,11 @@
     :hasTargetSuffix "_label_sort" ;
     :hasSelectQuery """
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-        SELECT ( LCASE(MIN(?label)) AS ?singleLabel ) WHERE {
-        	?uri rdfs:label ?label .
-            BIND (LANG(?label) as ?lang )
+        # Re-add language tag after comparing plain strings in MIN() aggregation to work around Jena bug.
+        # This can be changed back to SELECT (LCASE(MIN(?label)) AS ?singleLabel) when Jena is upgraded.
+        SELECT (LCASE(IF(?lang = "", MIN(STR(?label)), STRLANG(MIN(STR(?label)), ?lang))) AS ?singleLabel)
+        WHERE {
+            ?uri rdfs:label ?label .
+            BIND (LANG(?label) as ?lang)
         } GROUP BY ?lang ORDER BY ?lang
     """ .
