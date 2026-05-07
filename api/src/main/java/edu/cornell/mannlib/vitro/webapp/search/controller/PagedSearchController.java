@@ -241,9 +241,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                     String uri = doc.getStringValue(VitroSearchTermNames.URI);
                     Individual ind = iDao.getIndividualByURI(uri);
                     if (ind != null) {
-                        String modDate = doc.getStringValue("mod_date_drsim");
-                        Instant instant = Instant.parse(StringUtils.substring(modDate, 0, 20));
-                        ind.setModTime(Timestamp.from(instant));
+                        setModDate(doc, ind);
                         ind.setSearchSnippet(getSnippet(doc, response));
                         individuals.add(ind);
                     }
@@ -321,6 +319,18 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             return templateResponseValues;
         } catch (Throwable e) {
             return doSearchError(e, format);
+        }
+    }
+
+    private static void setModDate(SearchResultDocument doc, Individual ind) {
+        String modDate = doc.getStringValue("mod_date_drsim");
+        if (StringUtils.isNotBlank(modDate)) {
+            if (modDate.startsWith("[")) {
+                modDate = StringUtils.substring(modDate, 1);
+            }
+            modDate = StringUtils.substring(modDate, 0, 20);
+            Instant instant = Instant.parse(modDate);
+            ind.setModTime(Timestamp.from(instant));
         }
     }
 
