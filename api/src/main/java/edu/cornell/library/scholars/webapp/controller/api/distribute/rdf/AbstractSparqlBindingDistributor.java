@@ -40,9 +40,6 @@ public abstract class AbstractSparqlBindingDistributor extends AbstractDataDistr
     protected String getContentType(String format) {
         String contentType;
         switch (format) {
-            case "JSON":
-                contentType = ResultSetMediaType.JSON.getContentType();
-                break;
             case "CSV":
                 contentType = ResultSetMediaType.CSV.getContentType();
                 break;
