@@ -3,6 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.search.controller;
 
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -239,6 +241,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                     String uri = doc.getStringValue(VitroSearchTermNames.URI);
                     Individual ind = iDao.getIndividualByURI(uri);
                     if (ind != null) {
+                        setModDate(doc, ind);
                         ind.setSearchSnippet(getSnippet(doc, response));
                         individuals.add(ind);
                     }
@@ -316,6 +319,18 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             return templateResponseValues;
         } catch (Throwable e) {
             return doSearchError(e, format);
+        }
+    }
+
+    private static void setModDate(SearchResultDocument doc, Individual ind) {
+        String modDate = doc.getStringValue("mod_date_drsim");
+        if (StringUtils.isNotBlank(modDate)) {
+            if (modDate.startsWith("[")) {
+                modDate = StringUtils.substring(modDate, 1);
+            }
+            modDate = StringUtils.substring(modDate, 0, 20);
+            Instant instant = Instant.parse(modDate);
+            ind.setModTime(Timestamp.from(instant));
         }
     }
 
