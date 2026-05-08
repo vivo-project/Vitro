@@ -146,19 +146,19 @@ public class DistributeDataApiController extends VitroApiServlet {
     }
 
     private void do400BadRequest(String message, HttpServletResponse resp) throws IOException {
-        log.debug("400BadRequest: " + message);
+        log.debug("400 Bad Request: " + message);
         resp.setStatus(400);
         resp.getWriter().println(message);
     }
 
     private void do403Forbidden(HttpServletResponse resp) throws IOException {
-        log.debug("403Forbidden");
+        log.debug("403 Forbidden");
         resp.setStatus(403);
         resp.getWriter().println(NOT_AUTHORIZED_FOR_THIS_ACTION);
     }
 
     private void do500InternalServerError(String message, Exception e, HttpServletResponse resp) throws IOException {
-        log.warn("500InternalServerError " + message, e);
+        log.warn("500 Internal Server Error: " + message, e);
         resp.setStatus(500);
         try {
             PrintWriter w = resp.getWriter();
