@@ -7,8 +7,8 @@ import java.io.OutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jena.rdf.model.Model;
-
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ResultFormat;
 
 /**
  * A conversational tool for handling SPARQL queries.
@@ -87,6 +87,8 @@ public final class SparqlQueryRunner {
 		public <T> T parse(ResultSetParser<T> parser);
 
 		public void writeToOutput(OutputStream output);
+		
+		public void writeToOutput(OutputStream output, ResultFormat format);
 	}
 
 	// ------------- CONSTRUCT ----------- //

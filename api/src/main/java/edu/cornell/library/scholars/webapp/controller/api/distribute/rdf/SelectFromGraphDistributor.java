@@ -11,6 +11,7 @@ import java.util.List;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContext;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.GraphBuilder;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.GraphBuilderUtilities.GraphBuilders;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ResultFormat;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.QueryHolder;
 import org.apache.jena.rdf.model.Model;
@@ -76,6 +77,7 @@ import org.apache.jena.rdf.model.Model;
 public class SelectFromGraphDistributor extends AbstractSparqlBindingDistributor {
     private String rawQuery;
     private List<GraphBuilder> graphBuilders = new ArrayList<>();
+    private String resultFormat = "JSON";
 
     @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#query", minOccurs = 1, maxOccurs = 1)
     public void setRawQuery(String query) {
@@ -87,6 +89,11 @@ public class SelectFromGraphDistributor extends AbstractSparqlBindingDistributor
         graphBuilders.add(builder);
     }
 
+    @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#resultFormat", maxOccurs = 1)
+    public void setResultFormat(String resultFormat) {
+        this.resultFormat  = resultFormat;
+    }
+
     @Override
     public void init(DataDistributorContext ddc) throws DataDistributorException {
         super.init(ddc);
@@ -94,7 +101,7 @@ public class SelectFromGraphDistributor extends AbstractSparqlBindingDistributor
 
     @Override
     public String getContentType() throws DataDistributorException {
-        return "application/sparql-results+json";
+        return getContentType(resultFormat);
     }
 
     @Override
@@ -102,7 +109,8 @@ public class SelectFromGraphDistributor extends AbstractSparqlBindingDistributor
         QueryHolder boundQuery = binder.bindValuesToQuery(uriBindingNames, literalBindingNames,
                 new QueryHolder(rawQuery));
         Model graph = new GraphBuilders(ddContext, graphBuilders).run();
-        createSelectQueryContext(graph, boundQuery).execute().writeToOutput(output);
+        createSelectQueryContext(graph, boundQuery).execute().writeToOutput(output,
+                ResultFormat.valueOf(resultFormat));
     }
 
     @Override
