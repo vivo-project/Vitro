@@ -3,7 +3,7 @@
 
 <section id="fixedHtml" class="contentSectionContainer">
     <label id="fixedHTMLVariableLabel" for="fixedHTMLVariable">${i18n().variable_name_all_caps}<span class="requiredHint"> *</span></label>
-    <input type="text" name="saveToVar" size="20" value="" id="fixedHTMLSaveToVar" role="input" />
+    <input type="text" name="saveToVar" size="20" value="" id="fixedHTMLSaveToVar" />
     <label id="fixedHTMLValueLabel" for="fixedHTMLValue">${i18n().enter_fixed_html_here}<span id="fixedHTMLValueSpan"></span><span class="requiredHint"> *</span></label>
     <textarea id="fixedHTMLValue" name="htmlValue" cols="70" rows="15" style="margin-bottom:7px"></textarea><br />
     <input  type="button" id="doneWithContent" name="doneWithContent" value="${i18n().save_this_content}" class="doneWithContent" />

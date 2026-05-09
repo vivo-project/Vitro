@@ -1,7 +1,7 @@
 <#-- $This file is distributed under the terms of the license in LICENSE$ -->
 
 <fieldset class="dateTime">
-  <input type="hidden" id="literal" name="literal" value="${literalValues}" role="input"/>
+  <input type="hidden" id="literal" name="literal" value="${literalValues}"/>
   <#if datatype?contains("#date") || datatype?contains("Year") >
     <label for="dateTimeField-year">${i18n()[('label.dateTimeWithPrecision.year_capitalized')]}</label>
     <input class="text-field" name="dateTimeField-year" id="dateTimeField-year" type="text" value="" size="4" maxlength="4" />

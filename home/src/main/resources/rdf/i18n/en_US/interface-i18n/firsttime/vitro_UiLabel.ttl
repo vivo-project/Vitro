@@ -5566,6 +5566,14 @@ uil-data:page.Vitro
         uil:hasKey      "page" ;
         uil:hasPackage  "Vitro-languages" .
 
+uil-data:pagination.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Pagination"@en-US ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "pagination" ;
+        uil:hasPackage  "Vitro-languages" .
+
 uil-data:type_more_characters.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;

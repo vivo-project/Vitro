@@ -25,6 +25,7 @@ var browseByVClass = {
         this.alphaIndexLinks = $('#alpha-browse-individuals li a');
         this.individualsInVClass = $('#individuals-in-class ul');
         this.individualsContainer = $('#individuals-in-class');
+        this.individualsListInfo = $('#individuals-list-info');
     },
 
     // Event listeners. Called on page load
@@ -176,11 +177,13 @@ var browseByVClass = {
             pagination += '<li class="round';
             // Test for active page
             if ( pages[i].text == page) {
-                pagination += ' selected';
+                pagination += ' selected" aria-current="page"';
                 anchorOpen = "";
                 anchorClose = "";
+            } else {
+                pagination += '"';
             }
-            pagination += '" role="listitem">';
+            pagination += ' role="listitem">';
             pagination += anchorOpen;
             pagination += pages[i].text;
             pagination += anchorClose;
@@ -197,10 +200,14 @@ var browseByVClass = {
     // Toggle the active class so it's clear which is selected
     selectedVClass: function(vclassUri) {
         // Remove active class on all vClasses
-        $('#browse-classes li a.selected').removeClass('selected');
+        $('#browse-classes li a.selected')
+            .removeClass('selected')
+            .removeAttr('aria-current');
 
         // Add active class for requested vClass
-        $('#browse-classes li a[data-uri="'+ vclassUri +'"]').addClass('selected');
+        $('#browse-classes li a[data-uri="'+ vclassUri +'"]')
+            .addClass('selected')
+            .attr('aria-current', 'true');
     },
 
     // Toggle the active letter so it's clear which is selected
@@ -210,18 +217,23 @@ var browseByVClass = {
             alpha = "all";
         }
         // Remove active class on all letters
-        $('#alpha-browse-individuals li a.selected').removeClass('selected');
+        // Remove active class and aria-selected on all letters
+        $('#alpha-browse-individuals li a.selected')
+            .removeClass('selected')
+            .removeAttr('aria-current');
 
-        // Add active class for requested alpha
-        $('#alpha-browse-individuals li a[data-alpha="'+ alpha +'"]').addClass('selected');
+        // Add active class and aria-selected for requested alpha
+        $('#alpha-browse-individuals li a[data-alpha="'+ alpha +'"]')
+            .addClass('selected')
+            .attr('aria-current', 'true');
 
         return alpha;
     },
 
     // Wipe the currently displayed individuals, no-content message, and existing pagination
     wipeSlate: function() {
-        browseByVClass.individualsInVClass.empty();
-        $('p.no-individuals').remove();
+        browseByVClass.individualsInVClass.children(':not(#individuals-list-info)').remove();
+        $('#individuals-list-info > .no-individuals').remove();
         $('.pagination').remove();
     },
 
@@ -233,12 +245,11 @@ var browseByVClass = {
         var alpha = this.selectedAlpha(alpha);
 
         if ( alpha != "all" ) {
-            nothingToSeeHere = '<p class="no-individuals">' + browseByVClass.thereAreNoEntriesStartingWith + ' <em>'+ alpha.toUpperCase() +'</em>.</p> <p class="no-individuals">' + browseByVClass.tryAnotherLetter + '</p>';
+            nothingToSeeHere = '<p class="no-individuals aria-atomic="true">' + browseByVClass.thereAreNoEntriesStartingWith + ' '+ alpha.toUpperCase() +'.</p> <p class="no-individuals">' + browseByVClass.tryAnotherLetter + '</p>';
         } else {
-            nothingToSeeHere = '<p class="no-individuals">' + browseByVClass.thereAreNoEntriesStartingWith + '</p> <p class="no-individuals">' + browseByVClass.selectAnotherClass + '</p>';
+            nothingToSeeHere = '<p class="no-individuals" aria-atomic="true">' + browseByVClass.thereAreNoEntriesStartingWith + '</p> <p class="no-individuals">' + browseByVClass.selectAnotherClass + '</p>';
         }
-
-        browseByVClass.individualsContainer.prepend(nothingToSeeHere);
+        browseByVClass.individualsListInfo.append(nothingToSeeHere);
     }
 
 };

@@ -4,7 +4,10 @@ $(function(){
 
     $("ul.dropdown li").on("mouseenter", function(){
         $(this).addClass("hover");
-        $('ul:first',this).css('visibility', 'visible');
+        $('ul:first',this)
+			.css('visibility', 'visible')
+			.attr('aria-hidden', 'false');
+		$(this).attr('aria-expanded', 'true');
         if ( $('ul.dropdown').width() > 88 ) {
             $('ul:first li',this).css('width', ($("ul.dropdown").width() - 22) + 'px');
         }
@@ -13,7 +16,10 @@ $(function(){
     }).on("mouseleave", function(){
 
         $(this).removeClass("hover");
-        $('ul:first',this).css('visibility', 'hidden');
+        $('ul:first',this)
+			.css('visibility', 'hidden')
+			.attr('aria-hidden', 'true');
+		$(this).attr('aria-expanded', 'false');
 
     });
 

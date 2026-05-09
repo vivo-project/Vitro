@@ -29,17 +29,17 @@
     <p>${strings.please_provide_contact_information}</p>
 
     <form method="POST" action="${formUrls.firstTimeExternal}" class="customForm" role="my account">
-        <input type="hidden" name="externalAuthId" value="${externalAuthId}" role="input" />
-        <input type="hidden" name="afterLoginUrl" value="${afterLoginUrl}" role="input" />
+        <input type="hidden" name="externalAuthId" value="${externalAuthId}" />
+        <input type="hidden" name="afterLoginUrl" value="${afterLoginUrl}" />
 
         <label for="first-name">${strings.first_name}<span class="requiredHint"> *</span></label>
-        <input type="text" name="firstName" value="${firstName}" id="first-name" role="input" />
+        <input type="text" name="firstName" value="${firstName}" id="first-name" />
 
         <label for="last-name">${strings.last_name}<span class="requiredHint"> *</span></label>
-        <input type="text" name="lastName" value="${lastName}" id="last-name" role="input" />
+        <input type="text" name="lastName" value="${lastName}" id="last-name" />
 
         <label for="email-address">${strings.email_address}<span class="requiredHint"> *</span></label>
-        <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" role="input" />
+        <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" />
 
         <#if emailIsEnabled??>
             <p class="note">${strings.first_time_login_note}</p>
