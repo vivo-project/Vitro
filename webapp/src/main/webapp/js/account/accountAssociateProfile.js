@@ -217,7 +217,7 @@ var associateProfileFields = {
             this.associatedProfileUriField.val(uri);
             this.verifyUrl = url;
             this.associatedArea.show();
-            this.associateProfileBackgroundOneArea.css("background-color","#f1f2ee");
+            this.associateProfileBackgroundOneArea.css("background-color","#F5F5F5");
             this.associateProfileBackgroundOneArea.css("border","1px solid #ccc");
         }
     },
@@ -229,7 +229,7 @@ var associateProfileFields = {
         if (this.associationEnabled) {
             this.newProfileClassHasChanged();
             this.associationOptionsArea.show();
-            this.associateProfileBackgroundOneArea.css("background-color","#f1f2ee");
+            this.associateProfileBackgroundOneArea.css("background-color","#F5F5F5");
             this.associateProfileBackgroundOneArea.css("border","1px solid #ccc");
         }
     }
