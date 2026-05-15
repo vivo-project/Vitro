@@ -38,8 +38,8 @@ public class ModelNames {
 	public static final String INTERFACE_I18N_FIRSTTIME_BACKUP = INTERFACE_I18N + "FirsttimeBackup";
 	public static final String ACCESS_CONTROL = "http://vitro.mannlib.cornell.edu/default/access-control";
 	public static final String ACCESS_CONTROL_FIRSTTIME_BACKUP = ACCESS_CONTROL + "FirsttimeBackup";
-
-
+	public static final String INTEGRATION_SETTINGS = "http://vitro.mannlib.cornell.edu/default/vitro-kb-integrationSettings";
+	public static final String INTEGRATION_SETTINGS_FIRSTTIME_BACKUP = INTEGRATION_SETTINGS + "FirsttimeBackup";
 
 	/**
 	 * A map of the URIS, keyed by their short names, intended only for display
@@ -74,6 +74,8 @@ public class ModelNames {
 		map.put("INTERFACE_I18N_FIRSTTIME_BACKUP", INTERFACE_I18N_FIRSTTIME_BACKUP);
 		map.put("INTERFACE_I18N", ACCESS_CONTROL);
 		map.put("INTERFACE_I18N_FIRSTTIME_BACKUP", ACCESS_CONTROL_FIRSTTIME_BACKUP);
+		map.put("INTEGRATION_SETTINGS", INTEGRATION_SETTINGS);
+		map.put("INTEGRATION_SETTINGS_FIRSTTIME_BACKUP", INTEGRATION_SETTINGS_FIRSTTIME_BACKUP);
 		return Collections.unmodifiableMap(map);
 	}
 
