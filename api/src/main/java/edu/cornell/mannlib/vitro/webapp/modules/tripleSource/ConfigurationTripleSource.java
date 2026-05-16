@@ -5,6 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.modules.tripleSource;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_DISPLAY;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_TBOX;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.SCHEDULED_WORKFLOWS;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.SCHEDULED_WORKFLOWS_FIRSTTIME_BACKUP;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.USER_ACCOUNTS;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.ABOX_ASSERTIONS_FIRSTTIME_BACKUP;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_ASSERTIONS_FIRSTTIME_BACKUP;
@@ -46,6 +48,8 @@ public abstract class ConfigurationTripleSource implements TripleSource {
 			INTERFACE_I18N_FIRSTTIME_BACKUP,
 			ACCESS_CONTROL, 
 			ACCESS_CONTROL_FIRSTTIME_BACKUP,
+			SCHEDULED_WORKFLOWS,
+			SCHEDULED_WORKFLOWS_FIRSTTIME_BACKUP
 	};
 
 	/**

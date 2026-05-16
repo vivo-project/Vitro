@@ -20,7 +20,6 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
 import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchInputDocument;
 import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchQuery;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.ElasticSmokeTest;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.methods.CloseableHttpResponse;
