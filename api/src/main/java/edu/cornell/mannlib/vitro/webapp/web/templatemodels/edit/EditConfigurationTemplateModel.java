@@ -141,7 +141,14 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 		}
 
         String pageTitle = i18n.text("edit_page_title");
-        return pageTitle != null ? pageTitle : "Edit";
+        if (StringUtils.isBlank(pageTitle)) {
+            pageTitle = "Edit";
+        }
+        Individual subject = EditConfigurationUtils.getSubjectIndividual(vreq);
+        if (subject != null && StringUtils.isNotBlank(subject.getName())) {
+            pageTitle = pageTitle + " - " + subject.getName();
+        }
+        return pageTitle;
     }
 
 	private void setFormTitle() {

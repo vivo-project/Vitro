@@ -44,8 +44,6 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTw
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditSubmissionUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmission;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.EditConfigurationGenerator;
-import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
-import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.edit.EditConfigurationTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.edit.MultiValueEditSubmissionTemplateModel;
@@ -269,15 +267,9 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
     	String editKey = EditConfigurationUtils.getEditKey(vreq);
     	editConfig.setEditKey(editKey);
 
-
-		I18nBundle i18n = I18n.bundle(vreq);
-        String title = i18n.text("manage_positions");
-        Individual subject = vreq.getWebappDaoFactory().getIndividualDao().getIndividualByURI(editConfig.getSubjectUri());
-        if( subject != null && subject.getName() != null ){
-            title += " - " + subject.getName();
-        }
-		editConfig.addNewResource("pageTitle", title);
-
+        // Browser/tab title comes from EditConfigurationTemplateModel#getPageTitle:
+        // optional editConfig newResource "pageTitle" (set by a generator if needed),
+        // otherwise i18n key edit_page_title with optional subject name suffix.
 
         //put edit configuration in session so it can be accessed on form submit.
         EditConfigurationVTwo.putConfigInSession(editConfig, session);
