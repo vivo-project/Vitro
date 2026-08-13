@@ -24,4 +24,4 @@ Vitro and [VIVO](https://github.com/vivo-project/VIVO) are closely tied. If you 
 
 ## Contributing Code
 
-If you would like to contribute code to the Vitro, please read the instructions at [this page](https://github.com/vivo-project/VIVO/wiki/Development-Processes#process-for-suggesting-contribution). Contributors welcome! Tickets are being managed [in the VIVO repository.](https://github.com/vivo-project/VIVO/issues). 
+If you would like to contribute code to the Vitro, please read the instructions at [this page](https://github.com/vivo-project/VIVO/wiki/Development-Processes#process-for-suggesting-contribution). Contributors welcome! Tickets are being managed [in the VIVO repository](https://github.com/vivo-project/VIVO/issues). 
