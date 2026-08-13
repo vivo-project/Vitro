@@ -20,7 +20,7 @@ research and scholarship portal, [VIVO](https://vivo.lyrasis.org/).
 
 ## Community
 
-Vitro and [VIVO](https://github.com/vivo-project/VIVO) are closely tied. If you want to get engaged with Vitro, please contact and join the VIVO community. Different ways are are listed at https://vivoweb.org/contact/.
+Vitro and [VIVO](https://github.com/vivo-project/VIVO) are closely tied. If you want to get engaged with Vitro, please contact and join the VIVO community. Different ways are listed at https://vivoweb.org/contact/.
 
 ## Contributing Code
 
