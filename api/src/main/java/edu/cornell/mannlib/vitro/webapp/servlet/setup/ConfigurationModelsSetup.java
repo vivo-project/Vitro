@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_DISPLAY;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_TBOX;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.SCHEDULED_WORKFLOWS;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.USER_ACCOUNTS;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.ACCESS_CONTROL;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.INTERFACE_I18N;
@@ -43,6 +44,7 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 			setupModel(ctx, USER_ACCOUNTS, "auth");
 			setupModel(ctx, ACCESS_CONTROL, "accessControl");
 			setupModel(ctx, INTERFACE_I18N, "interface-i18n");
+			setupModel(ctx, SCHEDULED_WORKFLOWS, "scheduledWorkflows");
 			ss.info(this, "Set up the display models and the user accounts model.");
 		} catch (Exception e) {
 			ss.fatal(this, e.getMessage(), e.getCause());
