@@ -138,7 +138,7 @@ padding-right: 5px;
     margin-bottom: 10px;
 }
 #externalAuthIdInUse {
-    color: #f70;
+    color: #B50;
     display: none;
 }
 #alignExternalAuthId {
@@ -161,7 +161,7 @@ padding-right: 5px;
     -webkit-border-top-left-radius: 5px;
 }
 #associateProfileBackgroundTwo {
-    background-color:#f1f2ee;
+    background-color:#F5F5F5;
     padding:7px 94px 33px 0;
     margin-top:-129px;
     margin-right:-8px;
@@ -176,7 +176,7 @@ padding-right: 5px;
     -webkit-border-bottom-right-radius: 5px;
 }
 #associateProfileBackgroundThree {
-    background-color:#f1f2ee;
+    background-color:#F5F5F5;
     padding:7px 94px 26px 12px;
     margin-top:-129px;
     margin-left:-12px;
@@ -190,7 +190,7 @@ padding-right: 5px;
     -webkit-border-top-right-radius: 5px;
 }
 #associateProfileBackgroundFour {
-    background-color:#f1f2ee;
+    background-color:#F5F5F5;
     padding:0 94px 26px 13px;
     margin-top:-3px;
     margin-left:-12px;
@@ -237,7 +237,7 @@ form.customForm input[name="confirmPassword"] {
 
 #edit-myProxy li.proxyInfoElement {
     padding-top: .8em;
-    border-bottom: 1px dotted #E0DFDF;
+    border-bottom: 1px dotted #898989;
     padding-bottom: 2em;
     padding-left: 0;
     clear: both;
@@ -251,7 +251,7 @@ form.customForm input[name="confirmPassword"] {
 }
 #edit-myProxy p.selected-editors {
     padding-top: 1.2em;
-    border-top: 1px solid #E0DFDF;
+    border-top: 1px solid #898989;
     padding-left: 0;
 }
 #edit-myProxy span.class-label {
@@ -338,7 +338,7 @@ li.proxyInfoElement {
 }
 p.selected-editors {
     padding-top: 1.2em;
-    border-top: 1px solid #E0DFDF;
+    border-top: 1px solid #898989;
     padding-left: 1.2em;
 }
 img.photo-profile,
