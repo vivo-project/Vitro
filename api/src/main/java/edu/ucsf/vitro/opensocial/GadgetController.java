@@ -15,6 +15,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Exc
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 
 import javax.servlet.annotation.WebServlet;
 
@@ -47,7 +48,7 @@ public class GadgetController extends FreemarkerHttpServlet {
     	try {
 	        Map<String, Object> body = new HashMap<String, Object>();
 
-            body.put("title", "Gadget Details");
+            body.put("title", I18n.text(vreq, "gadget_details"));
 	        // VIVO OpenSocial Extension by UCSF
 	        try {
 		        OpenSocialManager openSocialManager = new OpenSocialManager(vreq, "gadgetDetails");
@@ -83,7 +84,7 @@ public class GadgetController extends FreemarkerHttpServlet {
     	}
 
         Map<String, Object> body = new HashMap<String, Object>();
-        body.put("title", "Gadget Sandbox");
+        body.put("title", I18n.text(vreq, "gadget_sandbox"));
 
         try {
 	        OpenSocialManager openSocialManager = new OpenSocialManager(vreq, "gadgetSandbox");
