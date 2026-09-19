@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.searchengine.elasticsearch;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,16 +14,14 @@ import java.util.Map;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchQuery;
-import edu.cornell.mannlib.vitro.webapp.utils.http.ESHttpBasicClientFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -51,24 +50,21 @@ public class ESDeleter {
     }
 
     private void deleteById(String id) throws SearchEngineException {
-        try {
-            String url = baseUrl + "/_doc/"
-                    + URLEncoder.encode(id, "UTF8");
-            HttpClient httpClient = ESHttpBasicClientFactory.getHttpClient(baseUrl);
-
-            HttpResponse response = httpClient.execute(new HttpDelete(url));
-            String json = EntityUtils.toString(response.getEntity());
+        try (CloseableHttpResponse response = ESHttpClient.execute(getDeleteRequest(id))) {
+            EntityUtils.toString(response.getEntity());
         } catch (HttpResponseException e) {
             if (e.getStatusCode() == 404) {
                 // Don't care if it has already been deleted.
             } else {
-                throw new SearchEngineException(
-                        "Failed to delete Elasticsearch document " + id, e);
+                throw new SearchEngineException("Failed to delete Elasticsearch document " + id, e);
             }
         } catch (Exception e) {
-            throw new SearchEngineException(
-                    "Failed to delete Elasticsearch document " + id, e);
+            throw new SearchEngineException("Failed to delete Elasticsearch document " + id, e);
         }
+    }
+
+    private HttpDelete getDeleteRequest(String id) throws UnsupportedEncodingException {
+        return new HttpDelete(baseUrl + "/_doc/" + URLEncoder.encode(id, "UTF8"));
     }
 
     public void deleteByQuery(String queryString) throws SearchEngineException {
@@ -80,26 +76,23 @@ public class ESDeleter {
         SearchQuery query = new BaseSearchQuery().setQuery(queryString);
         String queryJson = new QueryConverter(query, true).asString();
 
-        try {
-            HttpClient httpClient = ESHttpBasicClientFactory.getHttpClient(baseUrl);
-
-            HttpPost request = new HttpPost(url);
-            request.addHeader("Content-Type", "application/json");
-            request.setEntity(new StringEntity(queryJson));
-            HttpResponse response = httpClient.execute(request);
-
+        try (CloseableHttpResponse response = ESHttpClient.execute(getPostRequest(url, queryJson))) {
             BaseResponseHandler handler = new BaseResponseHandler();
             handler.handleResponse(response);
             if (handler.getStatusCode() >= 400) {
-                log.warn(String.format(
-                        "Failed to delete Elasticsearch documents by query: %s, %d - %s\n%s",
-                        queryString, handler.getStatusCode(),
-                        handler.getReasonPhrase(), handler.getContentString()));
+                log.warn(String.format("Failed to delete Elasticsearch documents by query: %s, %d - %s\n%s",
+                        queryString, handler.getStatusCode(), handler.getReasonPhrase(), handler.getContentString()));
             }
         } catch (IOException e) {
-            throw new SearchEngineException("Failed to delete Elasticsearch "
-                    + "documents by query " + queryString, e);
+            throw new SearchEngineException("Failed to delete Elasticsearch " + "documents by query " + queryString, e);
         }
+    }
+
+    private HttpPost getPostRequest(String url, String queryJson) throws UnsupportedEncodingException {
+        HttpPost request = new HttpPost(url);
+        request.addHeader("Content-Type", "application/json");
+        request.setEntity(new StringEntity(queryJson));
+        return request;
     }
 
     // ----------------------------------------------------------------------

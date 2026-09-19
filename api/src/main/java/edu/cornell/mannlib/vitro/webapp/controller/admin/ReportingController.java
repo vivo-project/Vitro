@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.admin;
 
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessObjectType.REPORT_GENERATOR;
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation.EXECUTE;
+import static javax.servlet.http.HttpServletResponse.SC_SEE_OTHER;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -25,7 +26,7 @@ import edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.SelectF
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.controller.OperationController;
 import edu.cornell.mannlib.vitro.webapp.auth.checks.UserOnThread;
-import edu.cornell.mannlib.vitro.webapp.auth.objects.DataDistributorAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.ReportGeneratorAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
@@ -143,11 +144,14 @@ public class ReportingController extends FreemarkerHttpServlet {
             if (!StringUtils.isBlank(reportName) &&
                 ArrayUtils.isEmpty(download)) {
                 String uri = getReportUri(request, reportName);
-                if (PolicyHelper.isAuthorizedForActions(request, new DataDistributorAccessObject(uri), EXECUTE)) {
+                if (PolicyHelper.isAuthorizedForActions(request, new ReportGeneratorAccessObject(uri), EXECUTE)) {
                     request.setAttribute(EXECUTE_ONLY_ATTR, Boolean.TRUE);
+                } else {
+                    redirectToLogin(request, response);
+                    return;
                 }
             } else {
-                // Can't run or administer reports, so bail out here
+                redirectToLogin(request, response);
                 return;
             }
         }
@@ -179,6 +183,11 @@ public class ReportingController extends FreemarkerHttpServlet {
         }
 
         super.doGet(request, response);
+    }
+
+    private void redirectToLogin(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        doRedirect(request, response, new RedirectResponseValues("/login", SC_SEE_OTHER));
     }
 
     private String getReportUri(HttpServletRequest request, String reportName) {

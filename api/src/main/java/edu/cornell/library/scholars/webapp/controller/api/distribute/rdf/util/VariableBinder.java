@@ -10,7 +10,17 @@ import java.util.Objects;
 import java.util.Set;
 
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor.MissingParametersException;
+import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor.NotAuthorizedException;
+import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContext;
+import edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.objects.IndividualAccessObject;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.QueryHolder;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Start with a parameter map, like from an HTTPServletRequest.
@@ -69,6 +79,25 @@ public class VariableBinder {
             throw new MissingParametersException("Unexpected multiple values for '" + name + "' parameter.");
         }
         return uris[0];
+    }
+
+    public void checkAuthorization(DataDistributorContext ddContext, Set<String> uriBindingNames)
+            throws NotAuthorizedException {
+        for (String name : uriBindingNames) {
+            if (parameters.containsKey(name)) {
+                String[] uris = parameters.get(name);
+                for (String uri : uris) {
+                    if (StringUtils.isNotBlank(uri)) {
+                        AccessObject ao = new IndividualAccessObject(uri);
+                        ao.setModel(ModelAccess.getInstance().getOntModel(ModelNames.FULL_UNION));
+                        AuthorizationRequest request = new SimpleAuthorizationRequest(ao, AccessOperation.DISPLAY);
+                        if (!ddContext.isAuthorized(request)) {
+                            throw new NotAuthorizedException();
+                        }
+                    }
+                }
+            }
+        }
     }
 
 }

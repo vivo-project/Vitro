@@ -71,6 +71,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.BlankNodeFilteringModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.N3EditUtils;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
@@ -203,6 +204,7 @@ public class JenaIngestController extends BaseEditController {
         }
 
         request.setAttribute("modelNames", modelNames);
+        request.setAttribute("i18n", I18n.bundle(request));
 
         try {
             JSPPageHandler.renderBasicPage(request, response, bodyJsp);

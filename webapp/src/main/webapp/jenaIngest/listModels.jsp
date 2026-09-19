@@ -67,7 +67,7 @@ function init(){
             <a href="${outputModelURL}">output model</a>
             </td>
             <td>
-            <form action="ingest" method="post">
+            <form action="ingest" method="post" onsubmit="return confirm('${i18n.text('confirm_clear_model')}');">
                 <input type="hidden" name="action" value="clearModel"/>
                 <input type="hidden" name="modelName" value="${modelName}"/>
                 <input type="hidden" name="modelType" value="${modelType}"/>
@@ -75,7 +75,7 @@ function init(){
             </form>
             </td>
             <td>
-            <form action="ingest" method="post">
+            <form action="ingest" method="post" onsubmit="return confirm('${i18n.text('confirm_remove_model')}');">
                 <input type="hidden" name="action" value="removeModel"/>
                 <input type="hidden" name="modelName" value="${modelName}"/>
                 <input type="hidden" name="modelType" value="${modelType}"/>

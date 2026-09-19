@@ -309,6 +309,7 @@ public class FreemarkerConfigurationImpl extends Configuration {
 			urls.put("login", UrlBuilder.getLoginUrl());
 			urls.put("logout", UrlBuilder.getLogoutUrl());
 			urls.put("siteAdmin", UrlBuilder.getUrl(Route.SITE_ADMIN));
+			urls.put("orcidAuth", UrlBuilder.getUrl(Route.ORCID_AUTH));
 
 			urls.put("themeImages", UrlBuilder.getUrl(themeDir + "/images"));
 			urls.put("images", UrlBuilder.getUrl("/images"));

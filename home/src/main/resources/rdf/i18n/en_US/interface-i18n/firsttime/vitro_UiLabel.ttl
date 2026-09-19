@@ -1273,6 +1273,7 @@ uil-data:rebuild_search_index.Vitro
 uil-data:password_saved.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
+        
         rdfs:label       "Your password has been saved."@en-US ;
         uil:hasApp      "Vitro" ;
         uil:hasKey      "password_saved" ;
@@ -6571,6 +6572,20 @@ uil-data:dd_config_actionName.Vitro
         uil:hasApp       "Vitro" ;
         uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#actionName" .
 
+uil-data:dd_config_rdfLang.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "RDF serialization language"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#rdfLang" .
+
+uil-data:dd_config_resultFormat.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Result format"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "dd_config_http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#resultFormat" .
+
 uil-data:dd_config_uriBinding.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
@@ -6975,4 +6990,20 @@ uil-data:freemarker_samples.Vitro
         rdfs:label       "Freemarker Samples"@en-US ;
         uil:hasApp       "Vitro" ;
         uil:hasKey       "freemarker_samples" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:confirm_clear_model.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Are you sure you want to clear the model?"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "confirm_clear_model" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:confirm_remove_model.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Are you sure you want to remove the model?"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "confirm_remove_model" ;
         uil:hasPackage   "Vitro-languages" .

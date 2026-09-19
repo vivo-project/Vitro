@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.beans;
 
+import java.security.SecureRandom;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -136,7 +137,7 @@ public class UserAccount {
 		boolean useLetters = true;
 		boolean useNumbers = true;
 		int length = 64;
-		emailKey = RandomStringUtils.random(length, useLetters, useNumbers);
+		emailKey = RandomStringUtils.random(length, 0, 0, useLetters, useNumbers, null, new SecureRandom());
 	}
 	
 	public void setEmailKey(String emailKey) {

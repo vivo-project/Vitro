@@ -5,7 +5,7 @@ package edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphb
 import java.util.HashSet;
 import java.util.Set;
 
-import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor.MissingParametersException;
+import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor.DataDistributorException;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContext;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.util.VariableBinder;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
@@ -30,8 +30,9 @@ public abstract class AbstractSparqlBindingGraphBuilder extends AbstractGraphBui
     }
 
     protected QueryHolder bindParametersToQuery(DataDistributorContext ddContext, QueryHolder rawQuery)
-            throws MissingParametersException {
-        return new VariableBinder(ddContext.getRequestParameters()).bindValuesToQuery(uriBindingNames,
-                literalBindingNames, rawQuery);
+            throws DataDistributorException {
+        VariableBinder binder = new VariableBinder(ddContext.getRequestParameters());
+        binder.checkAuthorization(ddContext, uriBindingNames);
+        return binder.bindValuesToQuery(uriBindingNames, literalBindingNames, rawQuery);
     }
 }

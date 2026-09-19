@@ -94,4 +94,9 @@ public class GraphBuilderUtilities {
         }
 
     }
+
+    public static boolean isLanguageFilteringDisabledForRequest(DataDistributorContext ddContext) {
+        String[] lang = ddContext.getRequestParameters().get("lang");
+        return lang != null && lang.length == 1 && "*".equals(lang[0]);
+    }
 }

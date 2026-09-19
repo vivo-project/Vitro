@@ -44,5 +44,5 @@
 
 
 <#-- Script to enable browsing individuals within a class -->
-${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery_plugins/jquery.scrollTo-min.js"></script>',
+${scripts.add('<script type="text/javascript" src="${urls.base}/webjars/jquery.scrollTo/jquery.scrollTo.min.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/menupage/browseByVClass.js"></script>')}

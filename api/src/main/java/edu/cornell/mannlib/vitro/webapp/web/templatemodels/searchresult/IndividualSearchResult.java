@@ -14,6 +14,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -70,6 +71,11 @@ public class IndividualSearchResult extends BaseTemplateModel {
 
     public String getName() {
         return individual.getName();
+    }
+
+    public String getModTime() {
+        return individual.getModTime().toInstant().toString();
+        		
     }
 
     public Collection<String> getMostSpecificTypes() {
