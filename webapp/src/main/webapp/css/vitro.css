@@ -23,6 +23,19 @@
 .disabledSubmit {
 	cursor:default ! important;
 }
+
+.nostyle {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nostyle > img {
+    display: block;
+    width: 100%;
+}
+
 /* <------ USER FEEDBACK*/
 #error-alert {
     color: #900;
