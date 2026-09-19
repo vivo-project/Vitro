@@ -18,7 +18,7 @@
     <#assign selected = 'class="selected" ' />
     <#assign classGroupList>
         <section id="home-stats" class="home-sections" >
-            <h4>${i18n().statistics}</h4>
+            <h2>${i18n().statistics}</h2>
             <ul id="stats">
                 <#assign groupCount = 1>
                 <#list classGroups as group>
@@ -62,7 +62,7 @@
     <#if firstPopulatedClassGroup??>
             ${classGroupList}
     <#else>
-        <h3 id="noContentMsg">${i18n().no_content_create_groups_classes}</h3>
+        <h2 id="noContentMsg">${i18n().no_content_create_groups_classes}</h2>
 
         <#if user.loggedIn>
             <#if user.hasSiteAdminAccess>

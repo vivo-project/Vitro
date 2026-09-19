@@ -44,6 +44,7 @@ em {
     font-style: italic;
 }
 /* h1,h2,h3,h4,h5,h6 ------>  */
+h1,
 h2 {
     padding: 10px 0 12px 0;
     margin: 0;
@@ -427,7 +428,7 @@ hr.formDivider {
     margin: 0 auto;
 }
 /* BRANDING ------>  */
-h1.vitro-logo {
+.vitro-logo {
     position: absolute;
     width: 386px;
     height: 59px;
@@ -435,7 +436,7 @@ h1.vitro-logo {
     left: 0;
     background: url(../images/VITRO-logo.png) 0 0 no-repeat;
 }
-h1.vitro-logo a {
+.vitro-logo a {
     display: block;
     width: 386px;
     height: 59px;
@@ -559,10 +560,13 @@ ul#main-nav {
 body.loggedIn #intro {
     width: 98%;
 }
-#intro h2 {
+#intro h1 {
     padding: 35px 0 12px 24px;
+    margin: 0;
     border-bottom: none;
     color: #006279;
+    font-size: 1.375em;
+    line-height: 1.5em;
 }
 #intro p {
     font-size: 16px;
@@ -816,7 +820,7 @@ a.view-all-style {
 		border-bottom: 1px dotted #dbe3e3; /* stroke */
 		background-color: #fff; /* layer fill content */
 }
-.home-sections h4 {
+.home-sections h2 {
 		border-top: 1px solid rgba(220,228,227,.42); /* stroke */
 		border-bottom: 1px solid rgba(220,228,227,.42); /* stroke */
 		background-color: #395d7f; /* layer fill content */
@@ -976,11 +980,13 @@ p {
     width: 920px;
     background: #fff;
 }
+#menupage-intro h1,
 #menupage-intro h2 {
     font-size: 1.375em;
     color: #47B6D0;
     font-weight: normal;
 }
+#menupage-intro.people h1,
 #menupage-intro.people h2 {
     float: left;
 }
@@ -1073,10 +1079,14 @@ nav#alpha-browse-container {
 #browse-by {
     width: 920px;
 }
-#browse-by h2 {
+#browse-by h2:not(.selected-class) {
     background: #5e6363;
     font-size: 1.375em;
     color: #fff;
+}
+#browse-by h2.selected-class {
+    background: none;
+    color: #006279;
 }
 /* BROWSE CLASSES ------>  */
 ul#browse-classes {
@@ -1187,7 +1197,8 @@ article.property ul.property-list {
 #admin {
     background-color: #f2f9fb;
 }
-#admin h3 {
+#admin h3,
+#admin #adminPanel {
     background: #47B6D0;
     color: #fff;
 }
@@ -1320,7 +1331,8 @@ a.all-vivo-publications {
     color: #5e6363;
 }
 /* <------ TEMPORAL GRAPH  */
-#temporal-graph h3 a {
+#temporal-graph h3 a,
+#temporal-graph p a {
     color: #47B6D0;
     font-size: .8em !important;
     text-decoration: underline;

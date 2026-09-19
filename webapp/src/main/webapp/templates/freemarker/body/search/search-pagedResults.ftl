@@ -61,12 +61,12 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/wNumb.min
 </#macro>
 
 <#macro printResultNumbers>
-    <h2 class="searchResultsHeader">
+    <h1 class="searchResultsHeader">
         <#escape x as x?html>
             ${i18n().results_found(hitCount)} 
         </#escape>
         <img id="downloadIcon" src="images/download-icon.png" alt="${i18n().download_results}" title="${i18n().download_results}" />
-    </h2>
+    </h1>
 </#macro>
 
 <#macro searchForm>

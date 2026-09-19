@@ -109,9 +109,10 @@ Assumes property is non-null. -->
 <#-- Some properties usually display without a label. But if there's an add link,
 we need to also show the property label. If no label is specified, the property
 name will be used as the label. -->
-<#macro addLinkWithLabel property editable label="${property.name?capitalize}">
+<#macro addLinkWithLabel property editable label="${property.name?capitalize}" headingTag="h2">
     <#local addLink><@addLink property editable label /></#local>
     <#local verboseDisplay><@verboseDisplay property /></#local>
+    <#local headingTag = headingTag!'h2'>
     <#-- Changed to display the label when user is in edit mode, even if there's no add link (due to
     displayLimitAnnot, for example). Otherwise the display looks odd, since neighboring
     properties have labels.
@@ -120,7 +121,11 @@ name will be used as the label. -->
     </#if>
     -->
     <#if editable>
-        <h2 class="${property.localName!}" title="${property.publicDescription!}">${label}  ${addLink!}</h2>
+        <#local labelClass = property.localName!>
+        <#if headingTag == "p">
+            <#local labelClass = labelClass + " individual-section-label">
+        </#if>
+        <${headingTag} class="${labelClass}" title="${property.publicDescription!}">${label}  ${addLink!}</${headingTag}>
         ${verboseDisplay!}
     </#if>
 </#macro>
@@ -275,7 +280,7 @@ name will be used as the label. -->
         </a>
         <@editingLinks "${mainImage.localName}" "" mainImage.first() editable />
     <#else>
-        <#local imageLabel><@addLinkWithLabel mainImage editable "${i18n().photo}" /></#local>
+        <#local imageLabel><@addLinkWithLabel property=mainImage editable=editable label="${i18n().photo}" headingTag="p" /></#local>
         ${imageLabel}
         <#if showPlaceholder == "always" || (showPlaceholder="with_add_link" && imageLabel?has_content)>
             <img class="individual-photo" src="${placeholderImageUrl(individual.uri)}" title = "${i18n().no_image}" alt="${i18n().placeholder_image}" width="${imageWidth!}" />

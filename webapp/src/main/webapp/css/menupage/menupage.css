@@ -6,6 +6,7 @@
     width: 100%;
     margin: 1em auto;
 }
+#menupage-intro h1,
 #menupage-intro h2 {
     padding: 0 25px 20px 0;
 }
@@ -152,7 +153,7 @@ ul#find-filters a {
     margin: 0 auto;
     overflow: hidden;
 }
-#browse-by h2 {
+#browse-by h2:not(.selected-class) {
     width: 120px;
     height: 44px;
     line-height: 44px;
@@ -220,8 +221,25 @@ nav#alpha-browse-container {
     margin-right: 17px;
     min-height: 170px;
 }
+h2.selected-class,
 h3.selected-class {
     padding: .8em 0 0 0;
+    margin-bottom: 0;
+    width: auto;
+    height: auto;
+    line-height: inherit;
+    background: none;
+    font-size: 1.125em;
+}
+#browse-by h2.selected-class {
+    background: none;
+    color: #064d68;
+    width: auto;
+    height: auto;
+    line-height: inherit;
+    padding: .8em 0 0 0;
+    margin-bottom: 0;
+    font-size: 1.125em;
 }
 #individuals-in-class ul {
     list-style: none;

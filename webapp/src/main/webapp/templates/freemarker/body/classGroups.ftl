@@ -5,6 +5,7 @@
 <#include "classgroups-checkForData.ftl">
 
 <#if (!noData)>
+    <h1>${title!}</h1>
     <section class="siteMap" role="region">
         <ul id="wookmark-container" style="position: relative;">
             <#list classGroups as classGroup>

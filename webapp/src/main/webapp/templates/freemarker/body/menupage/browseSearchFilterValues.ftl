@@ -23,7 +23,7 @@
     </script>
 
     <section id="menupage-intro" role="region">
-        <h2>${page.title}</h2>
+        <h1>${page.title}</h1>
     </section>
     <form id="filter-form" name="filter-form" autocomplete="off" method="get" action="${urls.currentPage}">
         <section id="noJavascriptContainer">

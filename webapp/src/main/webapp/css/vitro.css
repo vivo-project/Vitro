@@ -342,8 +342,9 @@ p#mngLabelsText {
 		width: 570px;
 }
 
-#search-home h3 {
+#search-home h2 {
 		padding-left: 24px;
+		font-size: 1.125em;
 }
 #search-homepage {
 		position: relative;
@@ -432,7 +433,7 @@ a.filter-search {
 		height: 213px;
 		clear: both;
 }
-.home-sections h4 {
+.home-sections h2 {
 		margin-top: 0;
 		height: 34px;
 		font-size: 18px;
@@ -441,7 +442,7 @@ a.filter-search {
 		padding: 0;
 		line-height: 35px;
 }
-#home-stats h4 {
+#home-stats h2 {
     display: inline;
     padding: 3px 10px;
 }
