@@ -14,6 +14,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetter;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetterUtils;
 
@@ -53,7 +54,8 @@ public class HomePageController extends FreemarkerHttpServlet {
         }*/
         body.put("dataServiceUrlVClassesForVClassGroup", UrlBuilder.getUrl("/dataservice?getVClassesForVClassGroup=1&classgroupUri="));
 	    body.put("geoFocusMapsEnabled", getGeoFocusMapsFlag(vreq));
-
+        body.put("title", I18n.text(vreq, "home"));
+        
         return new TemplateResponseValues(BODY_TEMPLATE, body);
     }
 
