@@ -6,7 +6,7 @@ $(document).ready(function(){
 
     let tooltips = [
         {
-            querySelector: "span#iconControlsLeftSide > img#uriIcon",
+            querySelector: "span#iconControlsLeftSide > #uriIcon",
             data: {
                 title: '<h5>' + i18nStringsUriRdf.shareProfileUri + '</h5> <input id="uriLink" type="text" value="' + $('#uriIcon').attr('title') + '" /><h5><a class ="rdf-url" href="' + individualRdfUrl + '">' + i18nStringsUriRdf.viewRDFProfile + '</a></h5><div class="close-footer"><a class="close" href="#">' + i18nStringsUriRdf.closeString + '</a></div>',
                 trigger: "click",
@@ -16,7 +16,7 @@ $(document).ready(function(){
             }
         },
         {
-            querySelector: "span#iconControlsVitro > img#uriIcon",
+            querySelector: "span#iconControlsVitro > #uriIcon",
             data: {
                 title: '<h5>' + i18nStringsUriRdf.shareProfileUri + '</h5> <input id="uriLink" type="text" value="' + $('#uriIcon').attr('title') + '" /><h5><a class ="rdf-url" href="' + individualRdfUrl + '">' + i18nStringsUriRdf.viewRDFProfile + '</a></h5><div class="close-footer"><a class="close" href="#">' + i18nStringsUriRdf.closeString + '</a></div>',
                 trigger: "click",
@@ -26,7 +26,7 @@ $(document).ready(function(){
             }
         },
         {
-            querySelector: "span#iconControlsRightSide > img#uriIcon",
+            querySelector: "span#iconControlsRightSide > #uriIcon",
             data: {
                 title: '<h5>' + i18nStringsUriRdf.shareProfileUri + '</h5> <input id="uriLink" type="text" value="' + $('#uriIcon').attr('title') + '" /><h5><a class ="rdf-url" href="' + individualRdfUrl + '">' + i18nStringsUriRdf.viewRDFProfile + '</a></h5><div class="close-footer"><a class="close" href="#">' + i18nStringsUriRdf.closeString + '</a></div>',
                 trigger: "click",
