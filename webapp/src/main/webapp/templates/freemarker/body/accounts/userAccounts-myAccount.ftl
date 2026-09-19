@@ -54,24 +54,24 @@
         </#if>
 
         <label for="email-address">${strings.email_address}<span class="requiredHint"> *</span></label>
-        <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" role="input" />
+        <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" />
 
         <p class="note">${strings.email_change_will_be_confirmed}</p>
 
         <label for="first-name">${strings.first_name}<span class="requiredHint"> *</span></label>
-        <input type="text" name="firstName" value="${firstName}" id="first-name" role="input" />
+        <input type="text" name="firstName" value="${firstName}" id="first-name" />
 
         <label for="last-name">${strings.last_name}<span class="requiredHint"> *</span></label>
-        <input type="text" name="lastName" value="${lastName}" id="last-name" role="input" />
+        <input type="text" name="lastName" value="${lastName}" id="last-name" />
 
         <#if !externalAuth??>
             <label for="new-password">${strings.new_password}</label>
-            <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />
+            <input type="password" name="newPassword" value="${newPassword}" id="new-password" />
 
             <p class="note">${strings.minimum_password_length(minimumLength, maximumLength)}<br />${strings.leave_password_unchanged}</p>
 
             <label for="confirm-password">${strings.confirm_password}</label>
-            <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
+            <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" />
         </#if>
 
         <p>

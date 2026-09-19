@@ -14,8 +14,8 @@
 <form action="${editConfiguration.deleteIndividualProcessingUrl}" method="get">
     <h2>${i18n().confirm_individual_deletion} </h2>
 
-    <input type="hidden" name="individualUri"    value="${editConfiguration.objectUri}" role="input" />
-    <input type="hidden" name="redirectUrl"    value="${redirectUrl}" role="input" />
+    <input type="hidden" name="individualUri" value="${editConfiguration.objectUri}" />
+    <input type="hidden" name="redirectUrl" value="${redirectUrl}" />
     <p>
       <#if individualType??>
        ${individualType}

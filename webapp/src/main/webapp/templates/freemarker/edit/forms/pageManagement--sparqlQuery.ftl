@@ -2,10 +2,10 @@
 <#--This contains the template for the Sparql Query content type that is to be cloned and used in page management-->
 <section id="sparqlQuery" class="contentSectionContainer">
     <label id="variableLabel" for="variable">${i18n().variable_name_all_caps}<span class="requiredHint"> *</span></label>
-    <input type="text" name="saveToVar" size="20" value="" id="saveToVar" role="input" />
+    <input type="text" name="saveToVar" size="20" value="" id="saveToVar" />
     <#--Hiding query model for now-->
     <#-- <label id="queryModelLabel" for="queryModel">${i18n().query_model}</label>  -->
-    <input type="text" name="queryModel" size="20" value="" id="queryModel" role="input" style="display:none"/>
+    <input type="text" name="queryModel" size="20" value="" id="queryModel" style="display:none"/>
     <label id="queryLabel" for="queryLabel"><span id="querySpan">${i18n().enter_sparql_query_here}</span><span class="requiredHint"> *</span></label>
     <textarea id="query" name="query" cols="70" rows="15" style="margin-bottom:7px"></textarea><br />
     <input  type="button" id="doneWithContent" class="doneWithContent" name="doneWithContent" value="${i18n().save_this_content}" />

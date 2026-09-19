@@ -11,12 +11,12 @@
 <#assign literalValues = "${editConfiguration.dataLiteralValuesAsString}" />
 
 <form class="editForm" action = "${submitUrl}" method="post">
-    <input type="text" name="${editConfiguration.varNameForObject}" id="label" size="70" value="${literalValues?html}" role="input"/>
-    <input type="hidden" name="editKey" id="editKey" value="${editKey}" role="input"/>
-    <input type="hidden" name="vitroNsProp" value="true" role="input"/>
+    <input type="text" name="${editConfiguration.varNameForObject}" id="label" size="70" value="${literalValues?html}"/>
+    <input type="hidden" name="editKey" id="editKey" value="${editKey}"/>
+    <input type="hidden" name="vitroNsProp" value="true"/>
 
     <p class="submit">
-        <input type="submit" id="submit" value="${submitLabel}" role="input"/>
+        <input type="submit" id="submit" value="${submitLabel}"/>
         or <a href="${cancelUrl}" class="cancel" title="${i18n().cancel_title}">${i18n().cancel_link}</a>
     </p>
 
