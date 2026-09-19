@@ -348,7 +348,3 @@ name will be used as the label. -->
     <#local groupName = groupName?replace("&", "-and-")>
     <#return groupName>
 </#function>
-
-<#function capitalizeGroupName propertyGroupName>
-    <#return propertyGroupName?cap_first>
-</#function>
