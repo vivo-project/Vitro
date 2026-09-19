@@ -140,7 +140,7 @@ var browseByVClass = {
 
             // Set selected class, alpha and page
             // Do this whether or not there are any results
-            $('h3.selected-class').text(results.vclass.name);
+            $('.selected-class').text(results.vclass.name);
             browseByVClass.selectedVClass(results.vclass.URI);
             browseByVClass.selectedAlpha(alpha);
         });
