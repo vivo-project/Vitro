@@ -8,6 +8,7 @@
 <%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission" %>
 <% request.setAttribute("requestedActions", SimplePermission.EDIT_SITE_INFORMATION.ACTION); %>
+
 <vitro:confirmAuthorization />
 
 <c:set var="appNameLabel" value="Site name"/>
@@ -39,6 +40,50 @@
         <select id="ThemeDir" name="ThemeDir">
             <form:option name="ThemeDir" />
         </select>
+        <span id="themeChangeIndicator" style="display: none;" class="note">${i18n.text('branding_colors_modified')}</span>
+        <br />
+        <a id="changeColorsButton" href="#">${i18n.text('change_branding_colors_link')}</a>
+        <br>
+
+
+        <br>
+        <div>
+            <div class="logo-section">
+                <label class="logo-label">${i18n.text('desktop_logo')}</label>
+                <div class="logo-preview">
+                    <c:set var="portalLogoPreviewStyle">
+                        <c:if test="${not empty logoUrl}">display: block;</c:if>
+                    </c:set>
+                    <img id="portalLogoPreview" src="${logoUrl}" alt="${i18n.text('desktop_logo_preview')}"
+                         style="${portalLogoPreviewStyle}" />
+                </div>
+                <div class="logo-controls">
+                    <input type="hidden" id="portalLogoActionInput" name="portalLogoAction" value="keep" />
+                    <input type="file" name="portalLogo" accept="image/*" id="portalLogoInput" />
+                    <button type="button" id="portalLogoResetButton">${i18n.text('reset')}</button>
+                </div>
+            </div>
+
+            <!-- Mobile Logo Section -->
+            <div class="logo-section">
+                <label class="logo-label">${i18n.text('mobile_logo')}</label>
+                <div class="logo-preview">
+                    <c:set var="mobileLogoPreviewStyle">
+                        <c:if test="${not empty logoSmallUrl}">display: block;</c:if>
+                    </c:set>
+                    <img id="mobilePortalLogoPreview" src="${logoSmallUrl}" alt="${i18n.text('mobile_logo_preview')}"
+                         style="${mobileLogoPreviewStyle}" />
+                </div>
+
+                <div class="logo-controls">
+                    <input type="hidden" id="mobilePortalLogoActionInput" name="mobilePortalLogoAction" value="keep" />
+                    <input type="file" name="mobilePortalLogo" accept="image/*" id="mobilePortalLogoInput" />
+                    <button type="button" id="mobilePortalLogoResetButton">${i18n.text('reset')}</button>
+                </div>
+            </div>
+        </div>
+
+        <br>
 
         <br><br>
         
@@ -72,12 +117,14 @@
 
         <script>
             var fromUrls = {
+                actionLogoUploadUrl: '${actionLogoUploadUrl}',
                 actionUploadUrl: '${actionUpload}',
                 actionRemoveUrl: '${actionRemove}',
             };
             var i18nStrings = {
                 confirmRemove: '${i18n.text('confirm_remove_custom_css')}',
             };
+
         </script>
 
 <!--

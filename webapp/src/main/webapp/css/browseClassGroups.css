@@ -48,7 +48,7 @@ ul#browse-classgroups a {
     display: block;
     padding-left: 15px;
     width: 200px;
-    color: #5e6363;
+    color: var(--text-color, #5E6363);
     text-decoration: none;
     padding-top: 8px;
     padding-bottom: 8px;
@@ -99,7 +99,7 @@ ul#classes-in-classgroup a {
     display: block;
     padding-left: 15px;
     height: 35px;
-    color: #5e6363;
+    color: var(--text-color, #5E6363);
     text-decoration: none;
 }
 ul#classes-in-classgroup .count-individuals {

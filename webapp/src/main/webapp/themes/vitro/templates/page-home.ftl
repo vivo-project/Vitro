@@ -10,6 +10,7 @@
     </head>
 
     <body class="${bodyClasses!}">
+        <div class="banner"></div>
         <header id="branding" role="banner">
             <#include "identity.ftl">
         </header>
