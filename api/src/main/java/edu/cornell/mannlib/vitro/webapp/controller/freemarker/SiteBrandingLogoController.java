@@ -17,6 +17,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.UserMistakeException;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.filestorage.UploadedFileHelper;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
@@ -130,38 +132,57 @@ public class SiteBrandingLogoController extends FreemarkerHttpServlet {
     }
 
     private void uploadLogoFiles(VitroRequest vreq) {
-        ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
-            vreq.getUnfilteredWebappDaoFactory(), getServletContext());
-
+        WebappDaoFactory wadf = vreq.getUnfilteredWebappDaoFactory();
+        ImageUploadHelper helper = new ImageUploadHelper(fileStorage, wadf, getServletContext());
+        UploadedFileHelper fileHelper = new UploadedFileHelper(fileStorage, wadf, getServletContext());
 
         String desktopLogoAction = vreq.getParameter(LOGO_PARAMETER_ACTION);
         String mobileLogoAction = vreq.getParameter(MOBILE_LOGO_PARAMETER_ACTION);
 
         try {
-            if (desktopLogoAction.equals("update")) {
+            if ("update".equals(desktopLogoAction)) {
                 FileItem desktopLogoFileItem = helper.validateImageFromRequest(vreq, "portalLogo");
                 FileInfo desktopLogoFileInfo = helper.storeNewImage(desktopLogoFileItem, vreq, false);
                 String desktopLogoUrl = UrlBuilder.getUrl(desktopLogoFileInfo.getBytestreamAliasUrl());
-                updateDesktopLogo(desktopLogoUrl);
-            } else if (desktopLogoAction.equals("reset")) {
-                updateDesktopLogo("");
+                replaceLogo(VitroVocabulary.PORTAL_LOGOURL, desktopLogoUrl, fileHelper, wadf);
+            } else if ("reset".equals(desktopLogoAction)) {
+                replaceLogo(VitroVocabulary.PORTAL_LOGOURL, "", fileHelper, wadf);
             }
 
-            if (mobileLogoAction.equals("update")) {
+            if ("update".equals(mobileLogoAction)) {
                 FileItem mobileLogoFileItem = helper.validateImageFromRequest(vreq, "mobilePortalLogo");
                 FileInfo mobileLogoFileInfo = helper.storeNewImage(mobileLogoFileItem, vreq, false);
                 String mobileLogoUrl = UrlBuilder.getUrl(mobileLogoFileInfo.getBytestreamAliasUrl());
-                updateMobileLogo(mobileLogoUrl);
-            } else if (mobileLogoAction.equals("reset")) {
-                updateMobileLogo("");
+                replaceLogo(VitroVocabulary.PORTAL_LOGOSMALLURL, mobileLogoUrl, fileHelper, wadf);
+            } else if ("reset".equals(mobileLogoAction)) {
+                replaceLogo(VitroVocabulary.PORTAL_LOGOSMALLURL, "", fileHelper, wadf);
             }
             updateLogoUrlCache();
 
         } catch (UserMistakeException e) {
             log.error("Error validating image from request: " + e.getMessage());
-            // Handle the exception appropriately, e.g., return an error response or rethrow it
         }
 
+    }
+
+    private void replaceLogo(String propertyUri, String newUrl, UploadedFileHelper fileHelper,
+            WebappDaoFactory wadf) {
+        removeExistingLogo(propertyUri, fileHelper, wadf);
+        updateLogoPath(propertyUri, newUrl);
+    }
+
+    private void removeExistingLogo(String propertyUri, UploadedFileHelper fileHelper, WebappDaoFactory wadf) {
+        String currentUrl = getLogo(propertyUri);
+        if (currentUrl == null || currentUrl.isEmpty()) {
+            return;
+        }
+        FileInfo fileInfo = FileInfo.instanceFromAliasUrl(wadf, toAliasPath(currentUrl), getServletContext());
+        fileHelper.deleteUnusedFile(fileInfo);
+    }
+
+    private String toAliasPath(String logoUrl) {
+        int fileIndex = logoUrl.indexOf("/file/");
+        return fileIndex == -1 ? logoUrl : logoUrl.substring(fileIndex);
     }
 
     private void printDefaultPage(HttpServletRequest request, HttpServletResponse response, String info) {
@@ -189,14 +210,6 @@ public class SiteBrandingLogoController extends FreemarkerHttpServlet {
                 new StatementImpl(portalResource, property, ResourceFactory.createTypedLiteral(value));
             displayModel.add(statement);
         }
-    }
-
-    private void updateDesktopLogo(String cssFilePath) {
-        updateLogoPath(VitroVocabulary.PORTAL_LOGOURL, cssFilePath);
-    }
-
-    private void updateMobileLogo(String cssFilePath) {
-        updateLogoPath(VitroVocabulary.PORTAL_LOGOSMALLURL, cssFilePath);
     }
 
     public static String getLogoUploadUrlString() {
