@@ -197,9 +197,12 @@ class IndividualResponseBuilder {
 	}
 
     private boolean getMapOfScienceVisualizationFlag() {
-        String property = ConfigurationProperties.getBean(vreq).getProperty(
-                "visualization.mapOfScience");
-        return "enabled".equals(property);
+        ConfigurationProperties properties = ConfigurationProperties.getBean(vreq);
+        String property = properties.getProperty("visualization.mapOfScience");
+        String googleMapsKey = properties.getProperty("google.maps.key");
+        return "enabled".equals(property)
+                && googleMapsKey != null
+                && !googleMapsKey.trim().isEmpty();
     }
 
 	private boolean getprofilePageTypesFlag() {
