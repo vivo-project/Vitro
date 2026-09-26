@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
@@ -42,35 +42,36 @@ public class VitroApiServlet extends HttpServlet {
 	 */
 	protected void confirmAuthorization(HttpServletRequest req,
 	        AuthorizationRequest requiredActions) throws AuthException {
-		String email = req.getParameter("email");
-		String password = req.getParameter("password");
-
-		Authenticator auth = Authenticator.getInstance(req);
-		UserAccount account = auth.getAccountForInternalAuth(email);
-
-		if (auth.accountRequiresEditing(account)) {
-			log.debug("Account " + email + " requires editing.");
-			throw new AuthException("user account must include first and "
-					+ "last names and a valid email address.");
-		}
-
-		if (!auth.isCurrentPasswordArgon2(account, password)) {
-			log.debug("Invalid: '" + email + "'/'" + password + "'");
-			throw new AuthException("email/password combination is not valid");
-		}
-
-		if (!PolicyHelper.isAuthorizedForActions(req, email, password,
-				requiredActions)) {
-			log.debug("Not authorized: '" + email + "'");
+	    UserAccount account = LoginStatusBean.getCurrentUser(req);
+	    if (account == null) {
+    		String email = req.getParameter("email");
+    		String password = req.getParameter("password");
+    
+    		Authenticator auth = Authenticator.getInstance(req);
+    		 account = auth.getAccountForInternalAuth(email);
+    
+    		if (auth.accountRequiresEditing(account)) {
+    			log.debug("Account " + email + " requires editing.");
+    			throw new AuthException("user account must include first and "
+    					+ "last names and a valid email address.");
+    		}
+    
+    		if (!auth.isCurrentPasswordArgon2(account, password)) {
+    			log.debug("Invalid: '" + email + "'/'" + password + "'");
+    			throw new AuthException("email/password combination is not valid");
+    		}
+	    }
+		if (!PolicyHelper.isAuthorizedForActions(account, requiredActions)) {
+			log.debug("Not authorized: '" + account.getEmailAddress() + "'");
 			throw new AuthException("Account is not authorized");
 		}
 
 		if (account.isPasswordChangeRequired()) {
-			log.debug("Account " + email + " requires a new password.");
+			log.debug("Account " + account.getEmailAddress() + " requires a new password.");
 			throw new AuthException("user account requires a new password.");
 		}
 
-		log.debug("Authorized for '" + email + "'");
+		log.debug("Authorized for '" + account.getEmailAddress() + "'");
 	}
 
 	protected String parseAcceptHeader(HttpServletRequest req,

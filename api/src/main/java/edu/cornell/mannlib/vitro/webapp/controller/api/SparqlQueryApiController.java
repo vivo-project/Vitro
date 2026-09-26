@@ -6,6 +6,7 @@ import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_ACCEPTABLE;
+import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 import java.io.IOException;
 
@@ -15,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.jena.query.QueryParseException;
-
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.api.sparqlquery.InvalidQueryTypeException;
@@ -69,7 +70,12 @@ public class SparqlQueryApiController extends VitroApiServlet {
 			resp.setContentType(core.getMediaType());
 			core.executeAndFormat(resp.getOutputStream());
 		} catch (AuthException e) {
-			sendShortResponse(SC_FORBIDDEN, e.getMessage(), resp);
+		    if (LoginStatusBean.getCurrentUser(req) == null) {
+		        resp.setHeader("WWW-Authenticate", "Basic realm=\"Secure Servlet Realm\"");
+		        sendShortResponse(SC_UNAUTHORIZED, e.getMessage(), resp);
+            } else {
+                sendShortResponse(SC_FORBIDDEN, e.getMessage(), resp);
+            }
 		} catch (BadParameterException e) {
 			sendShortResponse(SC_BAD_REQUEST, e.getMessage(), resp);
 		} catch (InvalidQueryTypeException e) {
