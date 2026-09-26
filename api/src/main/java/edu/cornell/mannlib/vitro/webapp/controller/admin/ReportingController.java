@@ -429,7 +429,7 @@ public class ReportingController extends FreemarkerHttpServlet {
             UserAccount account = PolicyHelper.getUserAccount(vreq);
             RequestModelAccess rma = ModelAccess.on(vreq);
             // Generate the report directly into the output stream
-            report.generateReport(response.getOutputStream(), rma, account);
+            report.generateReport(response.getOutputStream(), rma, account, request.getParameterMap());
         } catch (IOException | ReportGeneratorException e) {
             log.error("Unable to generate the report", e);
         }

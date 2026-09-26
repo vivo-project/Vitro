@@ -112,8 +112,8 @@ public class OpenDopeWordReport extends AbstractTemplateReport implements XmlGen
     }
 
     @Override
-    public void generateReport(OutputStream outputStream, RequestModelAccess request, UserAccount account)
-            throws ReportGeneratorException {
+    public void generateReport(OutputStream outputStream, RequestModelAccess request, UserAccount account,
+            Map<String, String[]> parameters) throws ReportGeneratorException {
         // Get the XML
         Document xmlDoc = generateXml(request, account);
         try {
