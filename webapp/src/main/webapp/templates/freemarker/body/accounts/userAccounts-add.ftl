@@ -38,13 +38,13 @@
 <section id="add-account" role="region">
     <form method="POST" action="${formUrls.add}" class="customForm" role="add new account">
         <label for="email-address">${strings.email_address}<span class="requiredHint"> *</span></label>
-        <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" role="input" />
+        <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" />
 
         <label for="first-name">${strings.first_name}<span class="requiredHint"> *</span></label>
-        <input type="text" name="firstName" value="${firstName}" id="first-name" role="input" />
+        <input type="text" name="firstName" value="${firstName}" id="first-name" />
 
         <label for="last-name">${strings.last_name}<span class="requiredHint"> *</span></label>
-        <input type="text" name="lastName" value="${lastName}" id="last-name" role="input" />
+        <input type="text" name="lastName" value="${lastName}" id="last-name" />
 
         <#include "userAccounts-associateProfilePanel.ftl">
 
@@ -61,11 +61,11 @@
         <#else>
             <section id="passwordContainer" role="region">
                 <label for="initial-password">${strings.initial_password}<span class="requiredHint"> *</span></label>
-                <input type="password" name="initialPassword" value="${initialPassword}" id="initial-password" role="input" />
+                <input type="password" name="initialPassword" value="${initialPassword}" id="initial-password" />
                 <p class="note">${strings.minimum_password_length(minimumLength, maximumLength)}</p>
 
                 <label for="confirm-password">${strings.confirm_initial_password}<span class="requiredHint"> *</span></label>
-                <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
+                <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" />
             </section>
         </#if>
 

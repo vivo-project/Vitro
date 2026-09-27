@@ -29,6 +29,7 @@ $(document).ready(function(){
              //$(this).css('background','url(../../themes/vivo-cornell/images/filteredSearchActive.gif) no-repeat right top');
              $(this).removeClass('filter-default');
              $(this).addClass('filter-active');
+             $(this).attr('aria-expanded', 'true');
 
              //Reveal filter select list
              $searchFilterList.css('display','block');
@@ -40,6 +41,7 @@ $(document).ready(function(){
              //$('a.filter-search').css('background','url(../../themes/vivo-cornell/images/filteredSearch.gif) no-repeat right top');
              $(this).removeClass('filter-active');
              $(this).addClass('filter-default');
+             $(this).attr('aria-expanded', 'false');
 
              //Hide filter select list
              $searchFilterList.css('display','none');
