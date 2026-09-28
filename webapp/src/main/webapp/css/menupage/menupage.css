@@ -94,7 +94,7 @@ ul#find-filters a {
     width: 150px;
     padding: 20px 12px 10px 12px;
     font-size: 1.25em;
-    color: #2485ae;
+    color: var(--primary-color, #2485ae);
     font-weight: normal;
     background: url(../images/arrow.gif) 140px 27px no-repeat;
 }

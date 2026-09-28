@@ -116,6 +116,7 @@ public class VitroVocabulary {
 
     public static final String PORTAL = vitroURI+"Portal";
     public static final String PORTAL_THEMEDIR = vitroURI+"themeDir";
+    public static final String PORTAL_THEMECOLORS = vitroURI+"themeColors";
     public static final String PORTAL_CONTACTMAIL = vitroURI+"contactMail";
     public static final String PORTAL_CORRECTIONMAIL = vitroURI+"correctionMail";
     public static final String PORTAL_ABOUTTEXT = vitroURI+"aboutText";
@@ -126,6 +127,9 @@ public class VitroVocabulary {
     public static final String PORTAL_CUSTOMCSSFILEURI = vitroURI+"customCssFileUri";
     public static final String PORTAL_CUSTOMCSSVERSION = vitroURI+"customCssVersion";
 
+
+    public static final String PORTAL_LOGOURL = vitroURI+"logoUrl";
+    public static final String PORTAL_LOGOSMALLURL = vitroURI+"logoSmallUrl";
 
     // reusing displayRank property above
     public static final String PORTAL_URLPREFIX = vitroURI + "urlPrefix";

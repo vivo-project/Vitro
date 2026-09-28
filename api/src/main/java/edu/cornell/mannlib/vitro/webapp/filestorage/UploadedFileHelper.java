@@ -261,6 +261,12 @@ public class UploadedFileHelper {
 		deleteIfNotReferenced(fileInfo);
 	}
 
+	public void deleteUnusedFile(FileInfo fileInfo) {
+		if (fileInfo != null) {
+			deleteIfNotReferenced(fileInfo);
+		}
+	}
+
 	public void attachFileToSubject(FileInfo fileInfo, String subjectUri, String predicateUri) {
 		objectPropertyStatementDao
 				.insertNewObjectPropertyStatement(new ObjectPropertyStatementImpl(subjectUri, predicateUri, fileInfo.getUri()));

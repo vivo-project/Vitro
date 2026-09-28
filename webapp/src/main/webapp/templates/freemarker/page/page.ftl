@@ -5,6 +5,7 @@
 <#include "head.ftl">
 
 <body class="${bodyClasses!}">
+    <div class="banner"></div>
     <div id="wrap" class="container">
         <div id="header">
 
