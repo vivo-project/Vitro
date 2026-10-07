@@ -1166,6 +1166,54 @@ uil-data:download_results.Vitro
         uil:hasKey      "download_results" ;
         uil:hasPackage  "Vitro-languages" .
 
+uil-data:download_results_modal_title.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Download the results from this search"@en-US ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "download_results_modal_title" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:download_results_xml_format.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "download results in XML format"@en-US ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "download_results_xml_format" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:download_results_csv_format.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "download results in CSV format"@en-US ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "download_results_csv_format" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:download_results_max_results_title.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Maximum Records:"@en-US ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "download_results_max_results_title" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:download_results_max_results_slider.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Maximum Records Slider"@en-US ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "download_results_max_results_slider" ;
+        uil:hasPackage  "Vitro-languages" .
+
+uil-data:download_results_max_results_slider_label.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Maximum Records Slider"@en-US ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "download_results_max_results_slider" ;
+        uil:hasPackage  "Vitro-languages" .
+
 uil-data:selected_profiles.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
