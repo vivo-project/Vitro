@@ -267,6 +267,9 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
     	String editKey = EditConfigurationUtils.getEditKey(vreq);
     	editConfig.setEditKey(editKey);
 
+        // Browser/tab title comes from EditConfigurationTemplateModel#getPageTitle:
+        // optional editConfig newResource "pageTitle" (set by a generator if needed),
+        // otherwise i18n key edit_page_title with optional subject name suffix.
 
         //put edit configuration in session so it can be accessed on form submit.
         EditConfigurationVTwo.putConfigInSession(editConfig, session);
