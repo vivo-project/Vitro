@@ -7,7 +7,13 @@
 	<#assign htmlExists = true />
 </#if>
 <#if htmlExists>
-	${.globals[variableName]}
+    <#-- Promote a stored page-title h2 to h1 when it is the first element. -->
+    <#assign html = .globals[variableName]!"">
+    <#if html?trim?starts_with("<h2>")>
+        ${html?replace("<h2>", "<h1>", "f")?replace("</h2>", "</h1>", "f")}
+    <#else>
+        ${html}
+    </#if>
 <#else>
 	${i18n().no_html_specified}
 </#if>

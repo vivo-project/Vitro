@@ -17,7 +17,7 @@
 
         <div id="wrapper-content" role="main">
             <section id="intro" role="region">
-                <h2>${i18n().what_is_vitro}</h2>
+                <h1>${i18n().what_is_vitro}</h1>
 
                 <p>${i18n().vitro_description}</p>
                 <p>${i18n().with_vitro}</p>
@@ -30,7 +30,7 @@
                 </ul>
 
                 <section id="search-home" role="region">
-                    <h3>${i18n().search_vitro} <span class="search-filter-selected">filteredSearch</span></h3>
+                    <h2>${i18n().search_vitro} <span class="search-filter-selected">filteredSearch</span></h2>
 
                     <fieldset>
                         <legend>${i18n().search_form}</legend>

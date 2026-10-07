@@ -5,7 +5,8 @@
     font-size: .8em;
     padding-top: 0;
 }
-#admin h3 {
+#admin h3,
+#admin #adminPanel {
     display: inline-block;
     padding: 3px 6px 3px 10px;
     margin-bottom: 5px;
@@ -86,10 +87,25 @@ img.individual-photo {
     top: 6px;
     left: 6px;
 }
-h2#mainImage, #share-contact h2 {
+h2#mainImage, #share-contact h2, #share-contact .individual-section-label {
     font-size: 1em;
     line-height: 1em;
     padding-bottom: 0.6em
+}
+.individual-section-label {
+    font-size: 1em;
+    font-weight: bold;
+    line-height: 1.2em;
+    margin: 0;
+    padding: 0 0 4px 0;
+    color: #5e6363;
+}
+#individual-intro header.individual-heading {
+    padding-bottom: 8px;
+}
+#individual-intro header.individual-heading h1.fn {
+    display: inline;
+    padding-bottom: 0;
 }
 #photo-wrapper {
     position: relative;

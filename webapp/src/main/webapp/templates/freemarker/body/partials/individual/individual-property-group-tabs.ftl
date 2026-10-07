@@ -40,7 +40,7 @@
         <#assign groupNameHtmlId = p.createPropertyGroupHtmlId(groupName) >
         <#assign verbose = (verbosePropertySwitch.currentValue)!false>
         <section id="${groupNameHtmlId?replace("/","-")}" class="property-group" role="region" style="<#if (sectionCount > 1) >display:none<#else>display:block</#if>">
-        <nav id="scroller" class="scroll-up hidden" role="navigation">
+        <nav class="scroller scroll-up hidden" role="navigation">
             <a href="#branding" title="${i18n().scroll_to_menus}" >
                 <img src="${urls.images}/individual/scroll-up.gif" alt="${i18n().scroll_to_menus}" />
             </a>

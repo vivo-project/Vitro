@@ -25,7 +25,7 @@
             </#list>
         </ul>
         <nav id="alpha-browse-container" role="navigation">
-            <h3 class="selected-class"></h3>
+            <h2 class="selected-class"></h2>
             <#assign alphabet = ["A", "B", "C", "D", "E", "F", "G" "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"] />
             <ul id="alpha-browse-individuals">
                 <li><a href="#" class="selected" data-alpha="all" title="${i18n().select_all}">${i18n().all}</a></li>

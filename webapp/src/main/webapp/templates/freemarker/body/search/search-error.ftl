@@ -3,7 +3,7 @@
 <#-- Template for displaying search error message -->
 
 <#if title??>
-    <h2>${title?html}</h2>
+    <h1>${title?html}</h1>
 </#if>
 
 <p>
