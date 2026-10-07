@@ -248,7 +248,7 @@ class PropInfo {
 			rawText.setAttribute("style", "width:100%; ");
 			if (overridenTranslations.has(key)) {
 				rawText.value = overridenTranslations.get(key);
-				rawText.style.backgroundColor = "#8BAB2E";
+				rawText.style.backgroundColor = "#536520";
 			} else {
 				rawText.value = propInfo.rawText;
 			}
@@ -277,7 +277,7 @@ class PropInfo {
 			} else {
 				var value = input.value;
 				if (pageTranslations.get(key).rawText != escapeHTML(value)) {
-					input.style.backgroundColor = "#8BAB2E";
+					input.style.backgroundColor = "#536520";
 					overridenTranslations.set(key, value);
 				} else {
 					input.style.backgroundColor = "white";

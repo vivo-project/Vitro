@@ -36,7 +36,7 @@
     <section class="property-group" role="region">
         <nav class="scroll-up" role="navigation">
             <a href="#branding" title="${i18n().scroll_to_menus}">
-                <img src="${urls.images}/individual/scroll-up.gif" alt="${i18n().scroll_to_menus}" />
+                <img src="${urls.images}/individual/scroll-up-darkened.gif" alt="${i18n().scroll_to_menus}" />
             </a>
         </nav>
 

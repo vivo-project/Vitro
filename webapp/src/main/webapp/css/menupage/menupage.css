@@ -94,9 +94,9 @@ ul#find-filters a {
     width: 150px;
     padding: 20px 12px 10px 12px;
     font-size: 1.25em;
-    color: #2485ae;
+    color: #12739D;
     font-weight: normal;
-    background: url(../images/arrow.gif) 140px 27px no-repeat;
+    background: url(../images/arrow_darkened.gif) 140px 27px no-repeat;
 }
 #researchers p {
     padding: 17px 15px 15px 175px;
@@ -242,7 +242,7 @@ li.individual h1 {
     line-height: 1.2em;
     font-weight: bold;
 }
-li.individual h1.thumb {
+li.individual p.thumb {
     padding-top: 30px;
 }
 #individuals-in-class span.title {

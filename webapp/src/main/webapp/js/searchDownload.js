@@ -21,7 +21,7 @@ $(document).ready(function(){
     setTooltip("#downloadIcon", {
         title: '<div class="clearfix"><div style="float:right; width:150px;border-left: 1px solid #A6B1B0; padding: 3px 0 0 20px">'
                     	+'<p><label for="amount" style="font-size:14px;">Maximum Records:</label>'
-                    	+'<input disabled type="text" id="amount" style="margin-left:35px; border: 0; color: #f6931f; font-weight: bold; width:45px" /></p>'
+                    	+'<input disabled type="text" id="amount" style="margin-left:35px; border: 0; color: #91540F; font-weight: bold; width:45px" /></p>'
                     	+'<div id="slider-vertical" style="margin-left:52px; margin-top: -20px; height: 100px; background-color:white"></div>'
                     	+'<br /><a class="close" href="#">close</a></div>'
                     	+'<div style="float:left; font-size:14px; width:280px; padding: 3px 0 0 20px"><p><label>Download the results from this search</label></p> '
