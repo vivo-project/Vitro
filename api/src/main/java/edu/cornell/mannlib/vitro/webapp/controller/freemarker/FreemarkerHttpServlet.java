@@ -453,6 +453,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
 
         map.put("siteName", vreq.getAppBean().getApplicationName());
 
+        map.put("brandingColors", SiteBrandingController.getThemeBrandingCache(vreq.getAppBean().getThemeDir()));
+
         map.put("urls", buildRequestUrls(vreq));
 
         map.put("menu", getDisplayModelMenu(vreq));
@@ -479,6 +481,10 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
         map.put("scripts", new Tags().wrap());
         map.put("headScripts", new Tags().wrap());
         map.put("metaTags", new Tags().wrap());
+
+
+        map.put("logoUrl", SiteBrandingLogoController.getLogoUrlCache());
+        map.put("logoSmallUrl", SiteBrandingLogoController.getMobileLogoUrlCache());
 
         return map;
     }
