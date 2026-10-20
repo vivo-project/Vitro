@@ -48,7 +48,7 @@ public class UserMailController extends VitroHttpServlet{
             else
                 request.getSession().setAttribute("commentsFormReferer",request.getHeader("Referer"));
 
-            request.setAttribute("title", appBean.getApplicationName()+" Mail Users Form");
+            request.setAttribute("title", "Mail Users Form");
             JSPPageHandler.renderBasicPage(request, response, "/templates/parts/emailUsers.jsp");// <<< this is where the body gets set
         } catch (Throwable e) {
             // This is how we use an error.jsp

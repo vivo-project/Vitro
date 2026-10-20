@@ -38,7 +38,7 @@ public class StaticPageController extends FreemarkerHttpServlet {
         String requestedUrl = vreq.getServletPath();
         String title = null;
         if (requestedUrl.equals("/login")) {
-            title = StringUtils.capitalize(I18n.text(vreq, "log_in")) + " - " + siteName;
+            title = StringUtils.capitalize(I18n.text(vreq, "log_in"));
         }
         return title;
     }
