@@ -11,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 
 import javax.servlet.annotation.WebServlet;
 
@@ -32,7 +33,7 @@ public class TestController extends FreemarkerHttpServlet {
 
         Map<String, Object> body = new HashMap<String, Object>();
 
-        body.put("title", "Freemarker Test");
+        body.put("title", I18n.text(vreq, "freemarker_test"));
 
         return new TemplateResponseValues(TEMPLATE_DEFAULT, body);
     }

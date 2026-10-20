@@ -557,6 +557,7 @@ var customForm = {
         // boolean controls whether the acSelector value gets cleared.
 
         var clearAcSelectorVal = true;
+        let focus = null;
 
         if ( $(selectedObj).attr('id') == "typeSelector" ) {
             $acSelectionObj = customForm.acSelections[$(selectedObj).attr('acGroupName')];
@@ -585,12 +586,17 @@ var customForm = {
                     if (customTypeAttr && currAttr === customTypeAttr) {
                         $(customTypeSelector).val('');
                     }
+
+                    if (!focus) focus = $(customTypeSelector);
                 }
             }
         }
 
         $acSelector = this.getAcSelector($acSelectionObj);
         $acSelector.parent('p').show();
+
+        if (!focus) focus = $acSelector.parent('p')
+
         this.resetAcSelection($acSelectionObj);
         if ( clearAcSelectorVal == true ) {
             $acSelector.val('');
@@ -603,6 +609,8 @@ var customForm = {
         	this.disableSubmit();
         }
         this.clearAcSelections = false;
+
+        focus.focus();
     },
 
     // this is essentially a subtask of undoAutocompleteSelection

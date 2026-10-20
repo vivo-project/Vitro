@@ -3063,6 +3063,14 @@ uil-data:share_profile_uri.Vitro
         uil:hasKey      "share_profile_uri" ;
         uil:hasPackage  "Vitro-languages" .
 
+uil-data:uri_input_label.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "URI Link"@en-US ;
+        uil:hasApp      "Vitro" ;
+        uil:hasKey      "uri_input_label" ;
+        uil:hasPackage  "Vitro-languages" .
+
 uil-data:no_html_specified.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
@@ -6944,6 +6952,46 @@ uil-data:confirm_remove_custom_css.Vitro
         uil:hasKey       "confirm_remove_custom_css" ;
         uil:hasPackage   "Vitro-languages" .
 
+uil-data:home.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Home"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "home" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:gadget_details.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Gadget Details"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "gadget_details" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:gadget_sandbox.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Gadget Sandbox"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "gadget_sandbox" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:freemarker_test.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Freemarker Test"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "freemarker_test" ;
+        uil:hasPackage   "Vitro-languages" .
+
+uil-data:freemarker_samples.Vitro
+        rdf:type         owl:NamedIndividual ;
+        rdf:type         uil:UILabel ;
+        rdfs:label       "Freemarker Samples"@en-US ;
+        uil:hasApp       "Vitro" ;
+        uil:hasKey       "freemarker_samples" ;
+        uil:hasPackage   "Vitro-languages" .
+
 uil-data:confirm_clear_model.Vitro
         rdf:type         owl:NamedIndividual ;
         rdf:type         uil:UILabel ;
@@ -6959,4 +7007,3 @@ uil-data:confirm_remove_model.Vitro
         uil:hasApp       "Vitro" ;
         uil:hasKey       "confirm_remove_model" ;
         uil:hasPackage   "Vitro-languages" .
-
