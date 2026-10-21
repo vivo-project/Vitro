@@ -6,14 +6,14 @@
     <h2>${title!}</h2>
 
     <#if errorMessage?has_content>
-        <section id="error-alert"><img src="${urls.images}/iconAlert.png" role="error alert"/>
+        <section id="error-alert" role="alert"><img src="${urls.images}/iconAlert.png" alt="${i18n().error_alert_icon?html}"/>
             <p>${errorMessage}</p>
         </section>
     </#if>
 
     <p>${i18n().interest_thanks(siteName)}</p>
 
-    <form name="contact_form" id="contact_form" class="customForm" action="${formAction!}" method="post" onSubmit="return ValidateForm('contact_form');" role="contact form">
+    <form name="contact_form" id="contact_form" class="customForm" action="${formAction!}" method="post" onSubmit="return ValidateForm('contact_form');">
         <div>
           <input type="hidden" name="RequiredFields" value="webusername,webuseremail,s34gfd88p9x1" />
           <input type="hidden" name="RequiredFieldsNames" value="Name,Email address,Comments" />

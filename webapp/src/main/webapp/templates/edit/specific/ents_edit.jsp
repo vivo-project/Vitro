@@ -27,7 +27,7 @@
     	<tr valign="top" align="center">
     	<td>
         	<form action="entity" method="get">
-            	<input type="submit" class="form-button" value="Display This Individual (public)"/>
+                <input type="submit" class="form-button" value="Display This Individual (public)" aria-label="Display This Individual (public)"/>
             	<input type="hidden" name="uri" value="${individual.URI}"/>
         	</form>
 
@@ -43,7 +43,7 @@
           <form action="admin/sparqlquery" method="get">
             <input type="hidden" name="query" value="${query}"/>
             <input type="hidden" name="resultFormat" value="text/plain"/>
-            <input type="submit" class="form-button" value="Raw Statements with This Resource as Subject"/>
+            <input type="submit" class="form-button" value="Raw Statements with This Resource as Subject" aria-label="Raw Statements with This Resource as Subject"/>
           </form>
 
           <c:set var="query"
@@ -58,7 +58,7 @@
           <form action="admin/sparqlquery" method="get">
             <input type="hidden" name="query" value="${query}"/>
             <input type="hidden" name="resultFormat" value="text/plain"/>
-            <input type="submit" class="form-button" value="Raw Statements with This Resource as Object"/>
+            <input type="submit" class="form-button" value="Raw Statements with This Resource as Object" aria-label="Raw Statements with This Resource as Object"/>
           </form>
 
     	</td>
@@ -66,30 +66,30 @@
         	<form action="editForm" method="get">
             	<input name="uri" type = "hidden" value="${individual.URI}" />
             	<input name="controller" type = "hidden" value="Entity" />
-            	<input type="submit" class="form-button" value="Edit This Individual"/>
+                <input type="submit" class="form-button" value="Edit This Individual" aria-label="Edit This Individual"/>
         	</form><br/>
 
         	<c:if test="${!empty individual.externalIds}">
 	        	<form action="editForm" method="get">
-	            	<select name="multiplexedParam" class="form-item">
+                    <select name="multiplexedParam" class="form-item" aria-label="External identifier">
 	            		<form:option name="externalIds"/>
 	            	</select><br/>
                     <input type="hidden" name="IndividualURI" value="${individual.URI}"/>
-	            	<input type="submit" class="form-button" value="Edit External Identifiers"/>
+                    <input type="submit" class="form-button" value="Edit External Identifiers" aria-label="Edit External Identifiers"/>
 	            	<input type="hidden" name="controller" value="ExternalId"/>
 	        	</form>
 	    	</c:if>
     	</td>
     	<td valign="bottom">
        		<form name="newEntityForm" action="editForm" method="get">
-            	<select id="VClassURI" name="VClassURI" class="form-item">
+                <select id="VClassURI" name="VClassURI" class="form-item" aria-label="Type of new individual">
                 	<form:option name="VClassURI"/>
             	</select><br/>
-            	<input type="submit" class="form-button" value="Add New Individual of above Type"/>
+                <input type="submit" class="form-button" value="Add New Individual of above Type" aria-label="Add New Individual of above Type"/>
             	<input type="hidden" name="controller" value="Entity"/>
         	</form>
         	<form action="editForm" method="get">
-            	<input type="submit" class="form-button" value="Change URI"/>
+                <input type="submit" class="form-button" value="Change URI" aria-label="Change URI"/>
             	<input type="hidden" name="oldURI" value="${individual.URI}"/>
             	<input type="hidden" name="mode" value="renameResource"/>
             	<input type="hidden" name="controller" value="Refactor"/>
@@ -112,11 +112,11 @@
 				<c:url var="typeURL" value="/vclassEdit">
 					<c:param name="uri" value="${type.URI}"/>
 				</c:url>
-				<li><input type="checkbox" name="TypeURI" value="${type.URI}" class="form-item"/><a href="${typeURL}"> ${type.pickListName} </a></li>
+                <li><input type="checkbox" name="TypeURI" value="${type.URI}" class="form-item" aria-label="<c:out value='${type.pickListName}'/>"/><a href="${typeURL}"> ${type.pickListName} </a></li>
 			</c:forEach>
 			</ul>
 			<input type="hidden" name="individualURI" value="${individual.URI}"/>
-			<input type="submit" class="form-button" value="Remove Checked Asserted Types"/>
+            <input type="submit" class="form-button" value="Remove Checked Asserted Types" aria-label="Remove Checked Asserted Types"/>
 			<input type="hidden" name="operation" value="remove"/>
 			<input type="hidden" name="_epoKey" value="${epoKey}"/>
 		</form>
@@ -124,7 +124,7 @@
         <form action="editForm" method="get">
 			<input type="hidden" name="controller" value="IndividualType"/>
 			<input type="hidden" name="IndividualURI" value="${individual.URI}"/>
-			<input type="submit" class="form-button" value="Add Type"/>
+            <input type="submit" class="form-button" value="Add Type" aria-label="Add Type"/>
 		</form>
 	</td>
 
@@ -141,8 +141,8 @@
     		<div>
         	<table class="form-background" border="0" cellpadding="2" cellspacing="2" width="100%">
             	<tr><td colspan="3" align="center"><h2>Object (individual-to-individual) Property Statements</h2></td></tr>
-            	<tr><td><input id="newPropButton" class="form-button" type="button" value="add new statement" onclick="newProp();"/></td>
-                	<td><input class="form-button" type="button" value="refresh list" onclick="update();"/></td>
+                <tr><td><input id="newPropButton" class="form-button" type="button" value="add new statement" aria-label="add new statement" onclick="newProp();"/></td>
+                    <td><input class="form-button" type="button" value="refresh list" aria-label="refresh list" onclick="update();"/></td>
             	</tr>
         	</table>
     		</div>
@@ -170,7 +170,7 @@
             	<table width="100%">
                 	<tr><td>Predicate:</td>
                     	<td colspan="9">
-                    		<select id="propertyList" class="form-item"
+                            <select id="propertyList" class="form-item" aria-label="Predicate"
                                     onchange="fillRangeVClassList();">
                             	<option value="">select property</option>
                             </select>
@@ -178,20 +178,20 @@
                     </tr>
                 	<tr><td>Object Class:</td>
                     	<td colspan="9">
-                    		<select id="vClassList" class="form-item" onchange="fillEntsList();">
+                            <select id="vClassList" class="form-item" aria-label="Object Class" onchange="fillEntsList();">
                             	<option value="">select type</option>
                             </select>
                         </td>
                 	</tr>
                 	<tr><td>Object Individual:</td>
-                    	<td colspan="9"><select id="entitiesList" class="form-item"><option>select individual</option></select></td>
+                        <td colspan="9"><select id="entitiesList" class="form-item" aria-label="Object Individual"><option>select individual</option></select></td>
                 	</tr>
 
 
                 	<tr>
                     	<td><input type="button" id="saveButt" class="form-button"
-                               	   value="Save" onclick="writeProp()"/></td>
-                    	<td><input type="button" id="dismissButt" class="form-button" value="cancel"
+                                   value="Save" aria-label="Save" onclick="writeProp()"/></td>
+                        <td><input type="button" id="dismissButt" class="form-button" value="cancel" aria-label="cancel"
                                    onclick="update()"/></td>
                 	</tr>
             	</table>

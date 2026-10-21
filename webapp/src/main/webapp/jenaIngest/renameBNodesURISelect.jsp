@@ -43,7 +43,7 @@ function disableProperties(){
     </c:if>
 
 	<p>URIs will be constructed using the following base string:</p>
-	<input id="namespace" type="text" style="width:65%;" name="namespaceEtcStr"/>
+    <input id="namespace" type="text" style="width:65%;" name="namespaceEtcStr" aria-label="URIs will be constructed using the following base string"/>
 
      <p/>
 
@@ -53,9 +53,9 @@ function disableProperties(){
      adding either a random integer, or a string based on the value of one of the
      the properties of the resource</p>
 
-    <input type="radio" value="integer" name="concatenate" checked="checked" onclick="disableProperties()">Use random integer</input>
+    <input type="radio" value="integer" name="concatenate" checked="checked" onclick="disableProperties()" aria-label="Use random integer">Use random integer</input>
     <br></br>
-    <input type="radio" value="pattern" name="concatenate" onclick="selectProperties()">Use pattern based on values of </input>
+    <input type="radio" value="pattern" name="concatenate" onclick="selectProperties()" aria-label="Use pattern based on values of">Use pattern based on values of </input>
 
 
     <% Map<String,LinkedList<String>> propertyMap = (Map) request.getAttribute("propertyMap");
@@ -64,7 +64,7 @@ function disableProperties(){
        Entry<String, LinkedList<String>> entry = null;
     %>
     <%if(itr.hasNext()){%>
-    <select name="property" id="properties" disabled="disabled">
+    <select name="property" id="properties" disabled="disabled" aria-label="Use pattern based on values of">
     <% while(itr.hasNext()){%>
 
     	<%entry = itr.next();
@@ -77,7 +77,7 @@ function disableProperties(){
     <br></br>
     <p>Enter a pattern using $$$ as the placeholder for the value of the property selected above.</p>
     <p>For example, entering dept_$$$ might generate URIs with endings such as dept_Art or dept_Classics.</p>
-    <input id="pattern" disabled="disabled" type="text" style="width:35%;" name="pattern"/>
+    <input id="pattern" disabled="disabled" type="text" style="width:35%;" name="pattern" aria-label="Enter a pattern using $$$ as the placeholder for the value of the property selected above"/>
 
   </c:when>
   <c:otherwise>
@@ -94,14 +94,14 @@ function disableProperties(){
 
     <h3>Select Destination Model</h3>
 
-    <select name="destinationModelName">
+    <select name="destinationModelName" aria-label="Select Destination Model">
         <option value="vitro:baseOntModel">webapp assertions</option>
         <c:forEach var="modelName" items="${modelNames}">
             <option value="${modelName}"/>${modelName}</option>
         </c:forEach>
     </select>
 
-    <input class="submit" type="submit" value="Rename Blank Nodes"/>
+    <input class="submit" type="submit" value="Rename Blank Nodes" aria-label="Rename Blank Nodes"/>
 
     </form>
 

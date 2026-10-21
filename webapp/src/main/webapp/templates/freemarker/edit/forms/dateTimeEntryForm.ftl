@@ -1,6 +1,7 @@
 <#-- $This file is distributed under the terms of the license in LICENSE$ -->
 
 <fieldset class="dateTime">
+  <legend>${i18n().formatted_date_time?html}</legend>
   <input type="hidden" id="literal" name="literal" value="${literalValues}"/>
   <#if datatype?contains("#date") || datatype?contains("Year") >
     <label for="dateTimeField-year">${i18n()[('label.dateTimeWithPrecision.year_capitalized')]}</label>

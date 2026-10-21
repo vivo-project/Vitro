@@ -36,7 +36,7 @@
     </#if>
 
 <section id="add-account" role="region">
-    <form method="POST" action="${formUrls.add}" class="customForm" role="add new account">
+    <form method="POST" action="${formUrls.add}" class="customForm">
         <label for="email-address">${strings.email_address}<span class="requiredHint"> *</span></label>
         <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" />
 
@@ -48,11 +48,11 @@
 
         <#include "userAccounts-associateProfilePanel.ftl">
 
-        <p><input id="externalAuthChkBox" type="checkbox" name="externalAuthOnly" <#if externalAuthOnly?? >checked</#if> />${strings.external_auth_only}</p>
+        <p><input id="externalAuthChkBox" type="checkbox" name="externalAuthOnly" <#if externalAuthOnly?? >checked</#if> /><label class="inline" for="externalAuthChkBox">${strings.external_auth_only}</label></p>
         <p>${strings.roles}<span class="requiredHint"> *</span></p>
         <#list roles as role>
-            <input type="radio" name="role" value="${role.uri}" role="radio" ${selectedRoles?seq_contains(role.uri)?string("checked", "")} />
-            <label class="inline" for="${role.label}"> ${role.label}</label>
+            <input type="radio" id="account-role-${role_index}" name="role" value="${role.uri}" role="radio" ${selectedRoles?seq_contains(role.uri)?string("checked", "")} />
+            <label class="inline" for="account-role-${role_index}"> ${role.label}</label>
             <br />
         </#list>
 
@@ -69,7 +69,7 @@
             </section>
         </#if>
 
-        <p><input type="submit" name="submitAdd" value="${strings.submit_add_new_account}" class="submit" /> ${strings.or} <a class="cancel" href="${formUrls.list}" title="${strings.cancel_title}">${strings.cancel_link}</a></p>
+        <p><input type="submit" name="submitAdd" value="${strings.submit_add_new_account}" aria-label="${strings.submit_add_new_account?html}" class="submit" /> ${strings.or} <a class="cancel" href="${formUrls.list}" title="${strings.cancel_title}">${strings.cancel_link}</a></p>
 
         <p class="requiredHint">* ${strings.required_fields}</p>
     </form>

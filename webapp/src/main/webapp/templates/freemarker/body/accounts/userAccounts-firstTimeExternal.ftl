@@ -28,7 +28,7 @@
 <section id="first-time-login" role="region">
     <p>${strings.please_provide_contact_information}</p>
 
-    <form method="POST" action="${formUrls.firstTimeExternal}" class="customForm" role="my account">
+    <form method="POST" action="${formUrls.firstTimeExternal}" class="customForm">
         <input type="hidden" name="externalAuthId" value="${externalAuthId}" />
         <input type="hidden" name="afterLoginUrl" value="${afterLoginUrl}" />
 

@@ -24,7 +24,7 @@
 <section id="create-password" role="region">
     <p>${strings.enter_new_password(userAccount.emailAddress)}</p>
 
-    <form method="POST" action="${formUrls.createPassword}" class="customForm" role="create password">
+    <form method="POST" action="${formUrls.createPassword}" class="customForm">
         <input type="hidden" name="user" value="${userAccount.emailAddress}" />
         <input type="hidden" name="key"  value="${userAccount.emailKey}" />
 

@@ -48,7 +48,7 @@
     </#if>
 
 <section id="my-account" role="region">
-    <form id="main-form" method="POST" action="${formUrls.myAccount}" class="customForm" role="my account">
+    <form id="main-form" method="POST" action="${formUrls.myAccount}" class="customForm">
         <#if showProxyPanel?? >
             <#include "userAccounts-myProxiesPanel.ftl">
         </#if>

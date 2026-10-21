@@ -29,13 +29,13 @@ function init(){
     <td>
      <form name="showContentModelsForm" action="ingest" method="get">
         <input type="hidden" name="action" value="contentModels"/>
-        <input type="submit" name="submit" value="Main Store Models"/>
+        <input type="submit" name="submit" value="Main Store Models" aria-label="Main Store Models"/>
     </form>
     </td>
     <td>
     <form name="showConfigurationModelsForm" action="ingest" method="get">
         <input type="hidden" name="action" value="configModels"/>
-        <input type="submit" name="submit" value="Configuration Models"/>
+        <input type="submit" name="submit" value="Configuration Models" aria-label="Configuration Models"/>
     </form>
     </td>
     </tr>
@@ -43,7 +43,7 @@ function init(){
     <form name="ingesting" action="ingest" method="get">
         <input type="hidden" name="action" value="createModel"/>
         <input type="hidden" name="modelType" value="${modelType}"/>
-        <input type="submit" name="submit" value="Create Model"/>
+        <input type="submit" name="submit" value="Create Model" aria-label="Create Model"/>
     </form>
 
             Currently showing <font color="red">${infoLine}</font>
@@ -56,7 +56,7 @@ function init(){
                 <input type="hidden" name="action" value="loadRDFData"/>
                 <input type="hidden" name="modelName" value="${modelName}"/>
                 <input type="hidden" name="modelType" value="${modelType}"/>
-                <input type="submit" name="submit" value="add/remove RDF data"/>
+                <input type="submit" name="submit" value="add/remove RDF data" aria-label="add/remove RDF data"/>
             </form>
             </td>
             <td>
@@ -71,7 +71,7 @@ function init(){
                 <input type="hidden" name="action" value="clearModel"/>
                 <input type="hidden" name="modelName" value="${modelName}"/>
                 <input type="hidden" name="modelType" value="${modelType}"/>
-                <input type="submit" name="submit" value="clear statements"/>
+                <input type="submit" name="submit" value="clear statements" aria-label="clear statements"/>
             </form>
             </td>
             <td>
@@ -79,7 +79,7 @@ function init(){
                 <input type="hidden" name="action" value="removeModel"/>
                 <input type="hidden" name="modelName" value="${modelName}"/>
                 <input type="hidden" name="modelType" value="${modelType}"/>
-                <input type="submit" name="submit" value="remove"/>
+                <input type="submit" name="submit" value="remove" aria-label="remove"/>
             </form>
             </td>
             </tr>
@@ -89,7 +89,7 @@ function init(){
                 <input type="hidden" name="action" value="attachModel"/>
                 <input type="hidden" name="modelName" value="${modelName}"/>
                 <input type="hidden" name="modelType" value="${modelType}"/>
-                <input type="submit" name="submit" value="attach snapshot to ontology"/>
+                <input type="submit" name="submit" value="attach snapshot to ontology" aria-label="attach snapshot to ontology"/>
             </form>
             </td>
             <td>
@@ -97,7 +97,7 @@ function init(){
                 <input type="hidden" name="action" value="detachModel"/>
                 <input type="hidden" name="modelName" value="${modelName}"/>
                 <input type="hidden" name="modelType" value="${modelType}"/>
-                <input type="submit" name="submit" value="detach snapshot from ontology"/>
+                <input type="submit" name="submit" value="detach snapshot from ontology" aria-label="detach snapshot from ontology"/>
             </form>
             </td>
             <td>
@@ -105,7 +105,7 @@ function init(){
 			    <input type="hidden" name="action" value="permanentURI" />
 			    <input type="hidden" name="modelName" value="${modelName}" />
 				<input type="hidden" name="modelType" value="${modelType}"/>
-				<input type="submit" name="submit" value="generate permanent URIs" /></form>
+                <input type="submit" name="submit" value="generate permanent URIs"  aria-label="generate permanent URIs"/></form>
 			</td>
             <td>&nbsp;</td>
             </tr>

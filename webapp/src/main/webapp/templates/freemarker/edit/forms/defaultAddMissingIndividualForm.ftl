@@ -18,7 +18,7 @@ ${i18n().new_entry_for(editConfiguration.propertyPublicDomainTitle, editConfigur
     <input type="text" name="name" id="name" label="name (required)" size="30" />
 
     <p class="submit">
-        <input type="submit" id="submit" value="${submitLabel}" role="submit" />
+        <input type="submit" id="submit" value="${submitLabel}" aria-label="${submitLabel}" />
         <span class="or"> ${i18n().or} </span>
         <a title="${i18n().cancel_title}" href="${editConfiguration.cancelUrl}">${i18n().cancel_link}</a>
     </p>

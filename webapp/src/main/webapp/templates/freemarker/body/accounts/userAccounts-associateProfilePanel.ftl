@@ -11,12 +11,12 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/templates/freemarke
         <div id="alignExternalAuthId">
         <#if showAssociation??>
              <label for="externalAuthId">${strings.auth_matching_id_label}</label>
-            <input type="text" name="externalAuthId" value="${externalAuthId}" id="externalAuthId" role="input "/>
+            <input type="text" name="externalAuthId" value="${externalAuthId}" id="externalAuthId"/>
             <span id="externalAuthIdInUse" >${strings.auth_id_in_use}</span>
             <p class="explanatoryText">${strings.auth_id_explanation}</p>
         <#else>
             <label for="externalAuthId">${strings.auth_id_label}</label>
-            <input type="text" name="externalAuthId" value="${externalAuthId}" id="externalAuthId" role="input "/>
+            <input type="text" name="externalAuthId" value="${externalAuthId}" id="externalAuthId"/>
             <span id="externalAuthIdInUse" >${strings.auth_id_in_use}</span>
         </#if>
         </div>
@@ -46,7 +46,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/templates/freemarke
         <div id="associateProfileBackgroundFour">
             <p> - ${strings.or} - </p>
             <p>
-                <label for="">${strings.create_associated_profile}</label>
+                <label for="newProfileClassUri">${strings.create_associated_profile}</label>
                 <select name="newProfileClassUri" id="newProfileClassUri" >
                     <option value="" selected="selected">${strings.select_one}</option>
                     <#list profileTypes?keys as key>

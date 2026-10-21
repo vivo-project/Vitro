@@ -38,7 +38,7 @@
                             <div id="search-home-field">
                                 <input type="text" name="querytext" aria-label="${i18n().search_vitro}" aria-labelledby="search-input-label" class="search-homepage" value="${querytext!}" autocapitalize="off" />
                                 <a class="filter-search filter-default" href="#" aria-expanded="false" title="${i18n().filter_search}"><span class="displace">${i18n().filter_search}</span></a>
-                                <input type="submit" value="${i18n().search_button}" class="search" />
+                                <input type="submit" value="${i18n().search_button}" aria-label="${i18n().search_button}" class="search" />
                                 <input type="hidden" name="filters_category" class="search-homepage" value="" autocapitalize="off" />
                             </div>
 

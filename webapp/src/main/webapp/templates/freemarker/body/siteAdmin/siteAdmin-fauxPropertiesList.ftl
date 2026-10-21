@@ -20,7 +20,7 @@
   <#if !displayOption?has_content>
         <#assign displayOption = "listing">
   </#if>
-  <form name="fauxListingForm" id="fauxListing" action="listFauxProperties" method="post" role="classHierarchy">
+  <form name="fauxListingForm" id="fauxListing" action="listFauxProperties" method="post">
     <label id="displayOptionLabel" class="inline">${i18n().display_options}</label>
     <select id="displayOption" name="displayOption">
       <option value="listing" <#if displayOption == "listing">selected</#if> >faux properties alphabetically</option>

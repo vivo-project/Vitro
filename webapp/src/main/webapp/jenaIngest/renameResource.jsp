@@ -30,7 +30,7 @@ they will be updated to this format.</p>
 
 <form id="takeuri" action="ingest" method="get">
 <input type="hidden" name="action" value="renameResource"/>
-<p>Old namespace: <input id="uri1" type="text" size="52" name="oldNamespace" value="${oldNamespace}" /></p>
-<p>New namespace: <input id="uri2" type="text" size="52" name="newNamespace" value="${newNamespace}" /></p>
-<p><input id="submit" type="submit" name="submit" value="Change namespace" /></p>
+<p>Old namespace: <input id="uri1" type="text" size="52" name="oldNamespace" value="${oldNamespace}"  aria-label="Old namespace"/></p>
+<p>New namespace: <input id="uri2" type="text" size="52" name="newNamespace" value="${newNamespace}"  aria-label="New namespace"/></p>
+<p><input id="submit" type="submit" name="submit" value="Change namespace"  aria-label="Change namespace"/></p>
 </form>

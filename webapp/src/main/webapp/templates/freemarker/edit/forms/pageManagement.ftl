@@ -66,8 +66,8 @@
 
 <#--class group section has associated page uri, but that depends on editing a current page or if one is selected later-->
 <section id="pageDetailsContainer">
-    <#--form method="POST" action="${formUrls}" role="${menuAction} menu item"-->
-	<form id="managePage" method="POST" action="${submitUrl}" role="add page">
+    <#--form method="POST" action="${formUrls}"-->
+	<form id="managePage" method="POST" action="${submitUrl}">
 	        <input type="hidden" name="switchToDisplayModel" id="switchToDisplayModel" value="1" />
 	        <input type="hidden" id="editKey" name="editKey" value="${editKey}" />
     <h2>${pageHeading}</h2>

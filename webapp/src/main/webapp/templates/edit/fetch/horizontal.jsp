@@ -22,7 +22,7 @@ if (request.getAttribute("title") == "Tabs") { %>
 
 <%if (request.getAttribute("horizontalJspAddButtonUrl") != null) {%>
   <td>
-    <form action="<%=request.getAttribute("horizontalJspAddButtonUrl")%>" method="get"><input type="submit" class="form-button" value="<%=request.getAttribute("horizontalJspAddButtonText")%>"/>
+    <form action="<%=request.getAttribute("horizontalJspAddButtonUrl")%>" method="get"><input type="submit" class="form-button" aria-label="<%=request.getAttribute("horizontalJspAddButtonText")%>" value="<%=request.getAttribute("horizontalJspAddButtonText")%>"/>
 <%  if (request.getAttribute("horizontalJspAddButtonControllerParam") != null) {%>
         <input type="hidden" name="controller" value="<%=request.getAttribute("horizontalJspAddButtonControllerParam")%>"/>
 <%  }

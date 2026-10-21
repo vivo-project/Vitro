@@ -29,13 +29,13 @@
     <input type="hidden" name="action" value="mergeResources"/>
     <table>
     <tr>
-        <td>Primary resource URI</td><td><input id="uri1" type="text" size="52" name="uri1"/></td>
+        <td>Primary resource URI</td><td><input id="uri1" type="text" size="52" name="uri1" aria-label="Primary resource URI"/></td>
     </tr>
     <tr>
-        <td>Duplicate resource URI</td><td><input id="uri2" type="text" size="52" name="uri2"/></td>
+        <td>Duplicate resource URI</td><td><input id="uri2" type="text" size="52" name="uri2" aria-label="Duplicate resource URI"/></td>
     </tr>
     </table>
-    <input type="checkbox" name="usePrimaryLabelOnly" value="Use Primary Label Only">Retain rdfs:labels only from Primary Resource</input>
+    <input type="checkbox" name="usePrimaryLabelOnly" value="Use Primary Label Only" aria-label="Retain rdfs:labels only from Primary Resource">Retain rdfs:labels only from Primary Resource</input>
 
-    <p><input class="submit"type="submit" name="submit" value="Merge resources" /></p>
+    <p><input class="submit"type="submit" name="submit" value="Merge resources"  aria-label="Merge resources"/></p>
 </form>

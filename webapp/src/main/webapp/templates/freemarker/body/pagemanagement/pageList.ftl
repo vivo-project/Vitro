@@ -67,7 +67,7 @@
       <input type="hidden" name="typeOfNew" value="http://vitro.mannlib.cornell.edu/ontologies/display/1.1#Page">
       <input type="hidden" name="switchToDisplayModel" value="1">
       <input type="hidden" name="editForm" value="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManagePageGenerator">
- 	<input id="submit" value="${i18n().add_page}" role="button" type="submit" >
+      <input id="submit" value="${i18n().add_page}" aria-label="${i18n().add_page}" type="submit" >
   </form>
   <br />
  <p style="margin-top:10px">${i18n().use_capitalized} <a id="menuMgmtLink" href="${urls.base}/individual?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fontologies%2Fdisplay%2F1.1%23DefaultMenu&switchToDisplayModel=true&previous=pageManagement" title="">${i18n().menu_orering}</a> ${i18n().to_order_menu_items}</p>

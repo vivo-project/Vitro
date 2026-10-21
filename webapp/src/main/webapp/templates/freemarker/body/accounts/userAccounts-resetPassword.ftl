@@ -24,7 +24,7 @@
 </#if>
 
 <section id="reset-password" role="region">
-    <form method="POST" action="${formUrls.resetPassword}" class="customForm" role="create password">
+    <form method="POST" action="${formUrls.resetPassword}" class="customForm">
         <input type="hidden" name="user" value="${userAccount.emailAddress}" />
         <input type="hidden" name="key"  value="${userAccount.emailKey}" />
 

@@ -18,7 +18,7 @@
 <h3>${menuAction} ${i18n().menu_item}</h3>
 
 <section id="${menuAction?lower_case}-menu-item" role="region">
-    <form method="POST" action="${formUrls}" class="customForm" role="${menuAction} menu item">
+    <form method="POST" action="${formUrls}" class="customForm">
         <input type="hidden" name="cmd" id="cmd" value="${menuAction}" />
         <input type="hidden" name="menuItem" id="menuItem" value="${menuItem}" />
         <input type="hidden" name="switchToDisplayModel" id="switchToDisplayModel" value="true" />

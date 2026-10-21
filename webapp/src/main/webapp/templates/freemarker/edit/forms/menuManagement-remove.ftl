@@ -5,7 +5,7 @@
 <h3>${i18n().remove_menu_item}</h3>
 
 <section id="remove-menu-item" role="region">
-    <form method="POST" action="${formUrls}" class="customForm" role="remove menu item">
+    <form method="POST" action="${formUrls}" class="customForm">
         <input type="hidden" name="menuItem" id="menuItem" value="${menuItem}" />
         <input type="hidden" name="cmd" id="cmd" value="Remove" />
         <input type="hidden" name="switchToDisplayModel" id="switchToDisplayModel" value="true" />

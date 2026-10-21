@@ -89,7 +89,7 @@
             </section>
         </fieldset>
 
-        <input class="submit pos-submit" type="submit" name="createRelationship" value="${i18n().save_button}"  role="button" />
+        <input class="submit pos-submit" type="submit" name="createRelationship" value="${i18n().save_button}" aria-label="${i18n().save_button?html}" />
     </form>
 </section>
 
@@ -98,8 +98,8 @@
 
 <section id="search-proxy" role="region">
     <form action="${formUrls.list}" method="POST">
-        <input type="text" name="searchTerm" />
-        <input class="submit" type="submit" name="searchByProxy" value="${i18n().search_button}" role="button" />
+        <input type="text" name="searchTerm" aria-label="${i18n().search_button?html}" />
+        <input class="submit" type="submit" name="searchByProxy" value="${i18n().search_button}" aria-label="${i18n().search_button}" />
             <#if page.previous??>
                | <a href="${formUrls.list}?pageIndex=${page.previous}&searchTerm=${searchTerm}" title="${i18n().previous}">${i18n().previous}</a>
             </#if>

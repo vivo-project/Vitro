@@ -39,10 +39,10 @@
 
 			<c:choose>
 				<c:when test='${_action == "insert"}'>
-					<input id="primaryAction" type="submit" class="submit" name="_insert" value="Create new record"/>
+					<input id="primaryAction" type="submit" class="submit" name="_insert" value="Create new record" aria-label="Create new record"/>
 				</c:when>
 				<c:otherwise>
-    				<input id="primaryAction" type="submit" class="submit" name="_update" value="Save changes"/>
+                    <input id="primaryAction" type="submit" class="submit" name="_update" value="Save changes" aria-label="Save changes"/>
                     <c:if test="${ ! (_cancelButtonDisabled == 'disabled') }">
 				        <!--<input type="submit" class="delete" name="_delete" onclick="return confirmDelete();" value="Delete"/>-->
                     </c:if>
@@ -53,10 +53,10 @@
 
             <c:choose>
                 <c:when test="${!empty formOnCancel}">
-                    <input type="submit" class="delete" name="_cancel" onclick="${formOnCancel}" value="Cancel"/>
+                    <input type="submit" class="delete" name="_cancel" onclick="${formOnCancel}" value="Cancel" aria-label="Cancel"/>
                 </c:when>
                 <c:otherwise>
-		            <input type="submit" class="delete" name="_cancel" value="Cancel"/>
+                    <input type="submit" class="delete" name="_cancel" value="Cancel" aria-label="Cancel"/>
                 </c:otherwise>
             </c:choose>
 

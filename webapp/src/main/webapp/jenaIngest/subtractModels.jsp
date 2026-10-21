@@ -19,7 +19,7 @@
     <form action="ingest" method="get"i>
         <input type="hidden" name="action" value="subtractModels"/>
 
-    <select name="modela">
+    <select name="modela" aria-label="model to be subtracted from">
          <option value="vitro:baseOntModel">webapp assertions</option>
          <c:forEach var="modelName" items="${modelNames}">
              <option value="${modelName}">${modelName}</option>
@@ -27,7 +27,7 @@
     </select>
     <p>model to be subtracted from</p>
 
-    <select name="modelb">
+    <select name="modelb" aria-label="model to subtract">
          <option value="vitro:baseOntModel">webapp assertions</option>
          <c:forEach var="modelName" items="${modelNames}">
              <option value="${modelName}">${modelName}</option>
@@ -35,7 +35,7 @@
 	</select>
     <p>model to subtract</p>
 
-    <select name="destinationModelName">
+    <select name="destinationModelName" aria-label="model in which difference should be saved">
          <option value="vitro:baseOntModel">webapp assertions</option>
          <c:forEach var="modelName" items="${modelNames}">
              <option value="${modelName}">${modelName}</option>
@@ -43,4 +43,4 @@
 	</select>
     <p>model in which difference should be saved</p>
 
-    <input id="submit" type="submit" value="Subtract models"/>
+    <input id="submit" type="submit" value="Subtract models" aria-label="Subtract models"/>
