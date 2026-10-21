@@ -32,7 +32,7 @@
         <form id="search-form" action="${urls.search}" autocomplete="off" name="search" role="search" accept-charset="UTF-8" method="GET">
             <div id="search-field">
                 <input type="text" name="querytext" class="search-vitro" value="${querytext!}" autocapitalize="off" />
-                <input type="submit" value="${i18n().search_button}" class="submit">
+                <input type="submit" value="${i18n().search_button}" aria-label="${i18n().search_button}" class="submit">
             </div>
         </form>
     </fieldset>

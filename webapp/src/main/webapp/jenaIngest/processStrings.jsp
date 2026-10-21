@@ -19,27 +19,27 @@
     <form action="ingest" method="get"i>
         <input type="hidden" name="action" value="processStrings"/>
 
-    <input type="text" style="width:80%;" name="className"/>
+    <input type="text" style="width:80%;" name="className" aria-label="String processor class"/>
     <p>String processor class</p>
 
-    <input type="text" name="methodName"/>
+    <input type="text" name="methodName" aria-label="String processor method"/>
     <p>String processor method</p>
 
-    <input type="text" name="propertyName"/>
+    <input type="text" name="propertyName" aria-label="Property URI"/>
     <p>Property URI</p>
 
-    <input type="text" name="newPropertyName"/>
+    <input type="text" name="newPropertyName" aria-label="New Property URI"/>
     <p>New Property URI</p>
 
-    <select name="destinationModelName">
+    <select name="destinationModelName" aria-label="model to use">
     <c:forEach var="modelName" items="${modelName}">
         <option value="${modelName}"/>${modelName}</option>
     </c:forEach>
     </select>
-    <input type="checkbox" name="processModel" value="TRUE"/> apply changes directly to this model
+    <input type="checkbox" name="processModel" value="TRUE" aria-label="apply changes directly to this model"/> apply changes directly to this model
     <p>model to use</p>
 
-    <select name="additionsModel">
+    <select name="additionsModel" aria-label="model in which to save added statements">
 		<option value="">none</option>
 		<forEach var="modelName" items="${modelNames}">
             <option value="${modelName}">${modelName}</option>
@@ -47,7 +47,7 @@
 	</select>
     <p>model in which to save added statements</p>
 
-    <select name="retractionsModel">
+    <select name="retractionsModel" aria-label="model in which to save retracted statements">
 		<option value="">none</option>
 		<c:forEach var="modelName" items="${modelNames}">
             <option value="${modelName}">${modelName}</option>
@@ -55,4 +55,4 @@
 	</select>
     <p>model in which to save retracted statements</p>
 
-    <input class="submit" type="submit" value="Process property values"/>
+    <input class="submit" type="submit" value="Process property values" aria-label="Process property values"/>

@@ -36,27 +36,27 @@
     </#if>
 
 <section id="edit-account" role="region">
-    <form method="POST" action="${formUrls.edit}" id="userAccountForm" class="customForm" role="edit account">
+    <form method="POST" action="${formUrls.edit}" id="userAccountForm" class="customForm">
         <label for="email-address">${strings.email_address}<span class="requiredHint"> *</span></label>
-        <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" role="input" />
+        <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" />
 
         <label for="first-name">${strings.first_name}<span class="requiredHint"> *</span></label>
-        <input type="text" name="firstName" value="${firstName}" id="first-name" role="input" />
+        <input type="text" name="firstName" value="${firstName}" id="first-name" />
 
         <label for="last-name">${strings.last_name}<span class="requiredHint"> *</span></label>
-        <input type="text" name="lastName" value="${lastName}" id="last-name" role="input" />
+        <input type="text" name="lastName" value="${lastName}" id="last-name" />
 
 		<#if externalAuthPermitted??>
             <#include "userAccounts-associateProfilePanel.ftl">
 
-            <p><input id="externalAuthChkBox" type="checkbox" name="externalAuthOnly"  <#if externalAuthOnly?? >checked</#if>  />${strings.external_auth_only}</p>
+            <p><input id="externalAuthChkBox" type="checkbox" name="externalAuthOnly"  <#if externalAuthOnly?? >checked</#if>  /><label class="inline" for="externalAuthChkBox">${strings.external_auth_only}</label></p>
         </#if>
 
         <#if roles?has_content>
             <p>${strings.roles}<span class="requiredHint"> *</span></p>
             <#list roles as role>
-                <input type="radio" name="role" value="${role.uri}" role="radio" ${selectedRoles?seq_contains(role.uri)?string("checked", "")} />
-                <label class="inline" for="${role.label}"> ${role.label}</label>
+                <input type="radio" id="account-role-${role_index}" name="role" value="${role.uri}" role="radio" ${selectedRoles?seq_contains(role.uri)?string("checked", "")} />
+                <label class="inline" for="account-role-${role_index}"> ${role.label}</label>
                 <br />
             </#list>
         </#if>
@@ -71,16 +71,16 @@
         <#else>
             <section id="passwordContainer" <#if externalAuthOnly?? >class="hidden"</#if> role="region">
                 <label for="new-password">${strings.new_password}</label>
-                <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />
+                <input type="password" name="newPassword" value="${newPassword}" id="new-password" />
                 <p class="note">${strings.minimum_password_length(minimumLength, maximumLength)}<br />
                 ${strings.leave_password_unchanged}</p>
 
                 <label for="confirm-password">${strings.confirm_password}</label>
-                <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
+                <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" />
             </section>
         </#if>
 
-        <p><input type="submit" id="submitMyAccount" name="submitEdit" value="${strings.save_changes}" class="submit" disabled /> ${strings.or} <a class="cancel" href="${formUrls.list}" title="${strings.cancel_title}">${strings.cancel_link}</a></p>
+        <p><input type="submit" id="submitMyAccount" name="submitEdit" value="${strings.save_changes}" aria-label="${strings.save_changes?html}" class="submit" disabled /> ${strings.or} <a class="cancel" href="${formUrls.list}" title="${strings.cancel_title}">${strings.cancel_link}</a></p>
 
         <p class="requiredHint">* ${strings.required_fields}</p>
     </form>

@@ -75,12 +75,12 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/reporting.css" 
 <section id="dataa-config" role="region">
     <form id="reportConfigForm" action="${submitUrl}" method="post" enctype="multipart/form-data">
         <div id="field_reportName" class="field">
-            <label>
+            <label for="report-name">
                 <span class="required">*</span>
                 ${i18n()["reporting_config_field_reportName"]}
             </label>
             <p>
-                <input type="text" name="reportName" size="50" value="${report.reportName!}" required <#if readOnly??>readonly</#if> />
+                <input type="text" id="report-name" name="reportName" size="50" value="${report.reportName!}" required <#if readOnly??>readonly</#if> />
             </p>
         </div>
         <div id="field_dataSources">
@@ -98,7 +98,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/reporting.css" 
                 </div>
             </#if>
             <div class="reportTemplate">
-                ${i18n().reporting_template} <input type="file" name="template" />
+                <label class="inline" for="report-template">${i18n().reporting_template}</label> <input type="file" id="report-template" name="template" />
             </div>
         </#if>
         <br>
@@ -110,7 +110,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/reporting.css" 
             <a href="${submitUrlBase}">cancel</a>
         <#else>
         <input type="hidden" name="submitted" value="submitted" />
-        <input id="save" value="${i18n().save_button}" role="button" type="submit" class="submit" />
+        <input id="save" value="${i18n().save_button}" aria-label="${i18n().save_button?html}" type="submit" class="submit" />
             <a href="${submitUrlBase}">cancel</a>
         <#if addType??>
         <#else>

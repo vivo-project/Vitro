@@ -7,7 +7,7 @@
                 <option value="${distributorType.name}">${i18n()["dd_config_" + distributorType.name]}</option>
             </#list>
         </select>
-        <input id="add" value="${i18n().dd_config_add}" role="button" type="submit" class="submit" accesskey="a">
+        <input id="add" value="${i18n().dd_config_add}" aria-label="${i18n().dd_config_add}" type="submit" class="submit" accesskey="a">
     </form>
     <table id="table-listing">
         <tr>
@@ -43,7 +43,7 @@
                 <option value="${graphbuilderType.name}">${i18n()["dd_config_" + graphbuilderType.name]}</option>
             </#list>
         </select>
-        <input id="add" value="${i18n().dd_config_add}" role="button" type="submit" class="submit" accesskey="a">
+        <input id="add" value="${i18n().dd_config_add}" aria-label="${i18n().dd_config_add}" type="submit" class="submit" accesskey="a">
     </form>
     <table id="table-listing">
         <tr>

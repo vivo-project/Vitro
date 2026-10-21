@@ -30,7 +30,7 @@
     <form action="${rebuildUrl}" method="POST">
         <p>
             <#if status.statusType == "IDLE">
-                <input class="submit" type="submit" name="rebuild" value="${i18n().rebuild_button}" role="button" />
+                <input class="submit" type="submit" name="rebuild" value="${i18n().rebuild_button}" aria-label="${i18n().rebuild_button}" role="button" />
                 ${i18n().reset_search_index}
             </#if>
         </p>

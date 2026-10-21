@@ -23,7 +23,7 @@
 
         <input type="hidden" name="workflowURI" value="${param.workflowURI}"/>
 
-		<select name="workflowStepURI">
+        <select name="workflowStepURI" aria-label="Choose a Workflow Step at Which To Start">
 
         <%
               OntModel jenaOntModel = ModelAccess.on(getServletContext()).getOntModel();
@@ -43,4 +43,4 @@
         %>
         </select>
 
-    <input id="submit" type="submit" value="Execute Workflow"/>
+    <input id="submit" type="submit" value="Execute Workflow" aria-label="Execute Workflow"/>

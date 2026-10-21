@@ -20,24 +20,24 @@
         <input type="hidden" name="action" value="smushSingleModel"/>
 
     <h3>URI of Property with which To Smush
-	<input type="text" style="width:40%;" name="propertyURI"/>
+    <input type="text" style="width:40%;" name="propertyURI" aria-label="URI of Property with which To Smush"/>
 
     <h3>Select Source Models</h3>
 
     <ul>
-        <li> <input type="checkbox" name="sourceModelName" value="vitro:baseOntModel"/>webapp assertions</li>
+        <li><label class="inline"> <input type="checkbox" name="sourceModelName" value="vitro:baseOntModel"/>webapp assertions</label></li>
 	    <c:forEach var="modelName" items="${modelNames}">
-	         <li> <input type="checkbox" name="sourceModelName" value="${modelName}"/>${modelName}</li>
+             <li><label class="inline"> <input type="checkbox" name="sourceModelName" value="${modelName}"/>${modelName}</label></li>
 	    </c:forEach>
     </ul>
 
     <h3>Select Destination Model</h3>
 
-    <select name="destinationModelName">
+    <select name="destinationModelName" aria-label="Select Destination Model">
         <option value="vitro:baseOntModel">webapp assertions</option>
         <c:forEach var="modelName" items="${modelNames}">
             <option value="${modelName}"/>${modelName}</option>
         </c:forEach>
     </select>
 
-    <input id="submit" type="submit" value="Smush Resources"/>
+    <input id="submit" type="submit" value="Smush Resources" aria-label="Smush Resources"/>

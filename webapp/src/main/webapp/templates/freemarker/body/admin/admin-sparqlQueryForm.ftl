@@ -5,9 +5,9 @@
 <div id="content" class="sparqlform">
     <h2>${i18n().sparql_query_title}</h2>
     <form action='${submitUrl}?posted' method="post">
-        <h3>${i18n().sparql_query_header}:</h3>
+        <h3 id="query-area-label">${i18n().sparql_query_header}:</h3>
 
-        <textarea name='query' rows='30' cols='100' class="span-23 maxWidth" id="query-area">${sampleQuery}</textarea>
+        <textarea name='query' rows='30' cols='100' class="span-23 maxWidth" id="query-area" aria-labelledby="query-area-label">${sampleQuery}</textarea>
 
         <div class="options">
 			 <h3>${i18n().sparql_query_select_ask_results}:</h3>
@@ -32,7 +32,7 @@
 			<label for="download"> ${i18n().sparql_query_save_results}</label><br>
 		</div>
 
-        <input class="submit" type="submit" value="${i18n().sparql_query_run_query}" />
+        <input class="submit" type="submit" value="${i18n().sparql_query_run_query}" aria-label="${i18n().sparql_query_run_query}" />
     </form>
 </div><!-- content -->
 

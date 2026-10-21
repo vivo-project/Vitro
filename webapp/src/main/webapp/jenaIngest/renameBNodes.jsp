@@ -23,9 +23,9 @@
 
     <ul>
         <c:forEach var="modelName" items="${modelNames}">
-            <li> <input type="checkbox" name="sourceModelName" value="${modelName}"/>${modelName}</li>
+            <li><label class="inline"> <input type="checkbox" name="sourceModelName" value="${modelName}"/>${modelName}</label></li>
         </c:forEach>
     </ul>
 
-    <input class="submit" type="submit" value="Next Step"/>
+    <input class="submit" type="submit" value="Next Step" aria-label="Next Step"/>
     </form>

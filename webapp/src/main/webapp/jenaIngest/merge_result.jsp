@@ -24,6 +24,6 @@ if(!result.equals("No statements merged") && !result.endsWith("statements.")){%>
 <p>Download non-mergeable statements.</p>
 <form action="ingest" method="get">
 <input type="hidden" name="action" value="mergeResult"/>
-<input class="submit"  type="submit" name="Download" value="Download" ></input>
+<input class="submit"  type="submit" name="Download" value="Download"  aria-label="Download"></input>
 </form>
 <%}} %>

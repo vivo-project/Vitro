@@ -26,13 +26,13 @@
 <#assign datatype = editConfiguration.dataPredicateProperty.rangeDatatypeURI!"none" />
 
 <form class="editForm" action = "${submitUrl}" method="post">
-    <input type="hidden" name="editKey" id="editKey" value="${editKey}" role="input" />
+    <input type="hidden" name="editKey" id="editKey" value="${editKey}" />
     <#if editConfiguration.dataPredicatePublicDescription?has_content>
        <label for="${editConfiguration.dataLiteral}"><p class="propEntryHelpText">${editConfiguration.dataPredicatePublicDescription}</p></label>
     </#if>
 
 	<#if "HTML" == editConfiguration.dataPredicateProperty.editing!>
-		<textarea rows="2" id="literal" name="literal" class="useTinyMce" role="textarea">${literalValues}</textarea>
+		<textarea rows="2" id="literal" name="literal" class="useTinyMce">${literalValues}</textarea>
 
 	<#elseif datatype = "http://www.w3.org/2001/XMLSchema#integer" || datatype = "http://www.w3.org/2001/XMLSchema#int">
     	<input type="text" id="literal" name="literal" value="${literalValues}" placeholder="123456" />
@@ -71,7 +71,7 @@
     <#--The submit label should be set within the template itself, right now
     the default label for default data/object property editing is returned from Edit Configuration Template Model,
     but that method may not return the correct result for other custom forms-->
-    <input type="submit" id="submit" value="${editConfiguration.submitLabel}" role="button"/>
+    <input type="submit" id="submit" value="${editConfiguration.submitLabel}" aria-label="${editConfiguration.submitLabel}" role="button"/>
     <span class="or"> ${i18n().or} </span>
     <a title="${i18n().cancel_title}" href="${cancelUrl}">${i18n().cancel_link}</a>
 

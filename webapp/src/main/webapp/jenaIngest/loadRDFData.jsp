@@ -11,16 +11,16 @@
 <input type="hidden" name="modelName"
 	value="<%=request.getParameter("modelName")%>" /> <input type="hidden"
 	name="action" value="loadRDFData" />
-<p>RDF document URI: <input type="text" size="32" name="docLoc" /></p>
+<p>RDF document URI: <input type="text" size="32" name="docLoc"  aria-label="RDF document URI"/></p>
 <p>Or upload a file from your computer:</p>
-<p><input type="file" name="filePath" /></p>
+<p><input type="file" name="filePath"  aria-label="Or upload a file from your computer"/></p>
 
 <ul style="list-style-type:none;">
-	<li><input type="radio" name="mode" value="directAddABox" checked="checked"/>add RDF data</li>
-	<li><input type="radio" name="mode" value="remove"/>remove RDF data</li>
+    <li><label class="inline"><input type="radio" name="mode" value="directAddABox" checked="checked"/>add RDF data</label></li>
+    <li><label class="inline"><input type="radio" name="mode" value="remove"/>remove RDF data</label></li>
 </ul>
 
-<select name="language">
+<select name="language" aria-label="RDF format">
 	<option value="RDF/XML">RDF/XML</option>
 	<option value="N3">N3</option>
 	<option value="N-TRIPLE">N-Triples</option>
@@ -28,5 +28,5 @@
 </select>
 <br></br>
 <br></br>
-<p><input class="submit" type="submit" name="submit" value="Load Data" /></p>
+<p><input class="submit" type="submit" name="submit" value="Load Data"  aria-label="Load Data"/></p>
 </form>

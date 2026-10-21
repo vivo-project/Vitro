@@ -34,18 +34,18 @@ table.choices td {
 <form action="${selectUrl}" method="get">
     <table class="choices">
         <tr>
-            <td>Select models</td>
+            <td><label class="inline" for="dump-models">Select models</label></td>
             <td>&nbsp;</td>
         </tr>
         <tr>
             <td>
-                <select name="which">
+                <select id="dump-models" name="which">
                     <option value="CONFIGURATION">Configuration models</option>
                     <option value="CONTENT">Content models</option>
                 </select>
             </td>
             <td>
-                <input type="submit" value="Dump" />
+                <input type="submit" value="Dump" aria-label="Dump" />
             </td>
         </tr>
     </table>
@@ -75,22 +75,22 @@ table.choices td {
 <form action="${restoreUrl}" enctype="multipart/form-data" method="post">
     <table class="choices">
         <tr>
-            <td>Select models</td>
-            <td>Select a file to restore from (N-Quads format)</td>
+            <td><label class="inline" for="restore-models">Select models</label></td>
+            <td><label class="inline" for="restore-source-file">Select a file to restore from (N-Quads format)</label></td>
             <td>&nbsp;</td>
         </tr>
         <tr>
             <td>
-                <select name="which">
+                <select id="restore-models" name="which">
                     <option value="CONFIGURATION">Configuration models</option>
                     <option value="CONTENT">Content models</option>
                 </select>
             </td>
             <td>
-                <input type="file" name="sourceFile" size="60"/>
+                <input type="file" id="restore-source-file" name="sourceFile" size="60"/>
             </td>
             <td>
-                <input type="submit" value="Restore" />
+                <input type="submit" value="Restore" aria-label="Restore" />
             </td>
         </tr>
         <tr>

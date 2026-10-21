@@ -41,7 +41,7 @@
 <form action="ingest" method="post"><input type="hidden"
 	name="action" value="executeSparql" />
 
-<h3>SPARQL Query <select name="savedQuery">
+<h3>SPARQL Query <select name="savedQuery" aria-label="select saved query">
 	<option value="">select saved query</option>
 	<%
               OntModel jenaOntModel = ModelAccess.on(getServletContext()).getOntModel();
@@ -62,7 +62,7 @@
         %>
 </select>
 
-<textarea rows="25" cols="40" name="sparqlQueryStr" class="maxWidth"><c:choose>
+<textarea rows="25" cols="40" name="sparqlQueryStr" class="maxWidth" aria-label="SPARQL Query"><c:choose>
     <c:when test="${param.sparqlQueryStr != null}">
         ${param.sparqlQueryStr}
     </c:when>
@@ -104,7 +104,7 @@ PREFIX <%=prefixText%>: <<%=urlText%>><%}}%>
 	}
 %>
 
-	<li><input type="checkbox" name="sourceModelName"
+    <li><label class="inline"><input type="checkbox" name="sourceModelName"
 		value="vitro:jenaOntModel"
 		<%
                         if (sourceModelNameList.contains("vitro:jenaOntModel")) {
@@ -112,8 +112,8 @@ PREFIX <%=prefixText%>: <<%=urlText%>><%}}%>
 		checked="checked" <%
                         }
                     %> />webapp
-	model</li>
-	<li><input type="checkbox" name="sourceModelName"
+    model</label></li>
+    <li><label class="inline"><input type="checkbox" name="sourceModelName"
 		value="vitro:baseOntModel"
 		<%
                         if (sourceModelNameList.contains("vitro:baseOntModel")) {
@@ -121,18 +121,18 @@ PREFIX <%=prefixText%>: <<%=urlText%>><%}}%>
 		checked="checked" <%
                         }
                     %> />webapp
-	assertions</li>
+    assertions</label></li>
 	<%
     for (String modelName : modelNames) {
         %>
-	<li><input type="checkbox" name="sourceModelName"
+    <li><label class="inline"><input type="checkbox" name="sourceModelName"
 		value="<%=modelName%>"
 		<%
                         if (sourceModelNameList.contains(modelName)) {
                         	%>
 		checked="checked" <%
                         }
-                    %> /><%=modelName%></li>
+                    %> /><%=modelName%></label></li>
 	<%
     }
 %>
@@ -140,7 +140,7 @@ PREFIX <%=prefixText%>: <<%=urlText%>><%}}%>
 
 <h3>Select Destination Model</h3>
 
-<select name="destinationModelName">
+<select name="destinationModelName" aria-label="Select Destination Model">
     <option value="vitro:baseOntModel"
 		<% if ("vitro:baseOntModel".equals(request.getParameter("destinationModelName"))) {
                   %>
@@ -169,4 +169,4 @@ PREFIX <%=prefixText%>: <<%=urlText%>><%}}%>
     }
 %>
 </select>
-<input id="submit" type="submit" value="Execute CONSTRUCT" />
+<input id="submit" type="submit" value="Execute CONSTRUCT"  aria-label="Execute CONSTRUCT"/>

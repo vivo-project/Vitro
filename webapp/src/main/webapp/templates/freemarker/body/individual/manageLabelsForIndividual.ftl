@@ -45,7 +45,7 @@
 <p id="mngLabelsText">${i18n().manage_labels_intro}</p>
 
 
-    <section id="rdfsLabels" role="container">
+    <section id="rdfsLabels">
 
      <script type="text/javascript">
         var existingLabelsData = [];

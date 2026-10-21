@@ -20,35 +20,35 @@
         <input type="hidden" name="action" value="splitPropertyValues"/>
     <h3>Select Source Models</h3>
     <ul>
-		  <li><input type="checkbox" name="sourceModelName" value="vitro:jenaOntModel"/>webapp model</li>
-		  <li><input type="checkbox" name="sourceModelName" value="vitro:baseOntModel"/>webapp assertions</li>
+          <li><label class="inline"><input type="checkbox" name="sourceModelName" value="vitro:jenaOntModel"/>webapp model</label></li>
+          <li><label class="inline"><input type="checkbox" name="sourceModelName" value="vitro:baseOntModel"/>webapp assertions</label></li>
           <c:forEach var="modelName" items="${modelNames}">
-              <li> <input type="checkbox" name="sourceModelName" value="${modelName}"/>${modelName}</li>
+              <li><label class="inline"> <input type="checkbox" name="sourceModelName" value="${modelName}"/>${modelName}</label></li>
           </c:forEach>
     </ul>
 
 
-	<input type="text" name="propertyURI"/>
+    <input type="text" name="propertyURI" aria-label="Property URI for which Values Should Be Split"/>
     <p>Property URI for which Values Should Be Split</p>
 
-	<input type="text" name="splitRegex"/>
+    <input type="text" name="splitRegex" aria-label="Regex Pattern on which To Split"/>
     <p>Regex Pattern on which To Split</p>
 
-	<input type="text" name="newPropertyURI"/>
+    <input type="text" name="newPropertyURI" aria-label="Property URI To Be Used with the Newly-Split Values"/>
     <p>Property URI To Be Used with the Newly-Split Values</p>
 
 	<h3></h3>
 
 	<p>
-	<input type="checkbox" name="trim" value="true"/> trim bordering whitespace
+    <input type="checkbox" name="trim" value="true" aria-label="trim bordering whitespace"/> trim bordering whitespace
 	</p>
 
     <h3>Select Destination Model</h3>
 
-    <select name="destinationModelName">
+    <select name="destinationModelName" aria-label="Select Destination Model">
         <c:forEach var="modelName" items="${modelNames}">
             <option value="${modelName}"/>${modelName}</option>
         </c:forEach>
     </select>
 
-    <input id="submit" type="submit" value="Split Values"/>
+    <input id="submit" type="submit" value="Split Values" aria-label="Split Values"/>
