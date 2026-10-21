@@ -482,7 +482,7 @@ ul#header-nav a.log-out {
 #search-field {
     width: 332px;
     height: 37px;
-    background: url(../images/search-interior-pages-darkened.png) 0 0 no-repeat;
+    background: url(../images/search-interior-pages.png) 0 0 no-repeat;
 }
 #search-field input.search {
     text-decoration: none;
@@ -720,7 +720,7 @@ p.password-note {
 /* SEARCH HOME------>  */
 
 #search-home-field {
-		background: url(../images/search-field-and-button-darkened.gif) 0 0 no-repeat;
+		background: url(../images/search-field-and-button.gif) 0 0 no-repeat;
 }
 #search-home-field input.search {
 	 	background-color: transparent;
@@ -1099,12 +1099,12 @@ ul#browse-classes .count-classes {
 }
 /* ALPHA BROWSE------>  */
 ul#alpha-browse-individuals a:hover {
-    background: url(../images/arrowSmall-darkened.gif) -3px 7px no-repeat;
+    background: url(../images/arrowSmall.gif) -3px 7px no-repeat;
     color: #0C5E7F;
 }
 ul#alpha-browse-individuals a.selected {
     color: #0C5E7F;
-    background: url(../images/arrowSmall-darkened.gif) -3px 7px no-repeat;
+    background: url(../images/arrowSmall.gif) -3px 7px no-repeat;
     margin-right: 3px;
     margin-left: 5px;
 }
