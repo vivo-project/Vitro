@@ -7,11 +7,12 @@ import java.util.Objects;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.searchengine.base.SearchEngineUtil;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Start up the appropriate search engine smoke test based on the configured URL property.
@@ -19,7 +20,6 @@ import org.apache.commons.logging.LogFactory;
 public class SearchEngineSmokeTest implements ServletContextListener {
 
     private static final Log log = LogFactory.getLog(SearchEngineSmokeTest.class);
-
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -44,5 +44,7 @@ public class SearchEngineSmokeTest implements ServletContextListener {
     public void contextDestroyed(ServletContextEvent sce) {
         // nothing to tear down.
     }
+
+    
 
 }
