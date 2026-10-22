@@ -25,6 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfigurationConstants;
 import edu.cornell.mannlib.vitro.webapp.freemarker.loader.FreemarkerTemplateLoader;
 import edu.cornell.mannlib.vitro.webapp.i18n.freemarker.I18nMethodModel;
+import edu.cornell.mannlib.vitro.webapp.i18n.freemarker.ReportAuthMethodModel;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings;
 import edu.cornell.mannlib.vitro.webapp.utils.developer.Key;
@@ -273,6 +274,8 @@ public abstract class FreemarkerConfiguration {
 			c.setSharedVariable("placeholderImageUrl",
 					new IndividualPlaceholderImageUrlMethod());
 			c.setSharedVariable("i18n", new I18nMethodModel());
+			c.setSharedVariable("isReportAuth", new ReportAuthMethodModel());
+			
 		}
 
 		private Map<String, Object> getRevisionInfo(ServletContext ctx) {

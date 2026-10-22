@@ -11,6 +11,7 @@ import java.util.List;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor.DataDistributorException;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContext;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.SelectFromContentDistributor;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.QueryHolder;
@@ -97,8 +98,12 @@ public class ConstructQueryGraphBuilder extends AbstractSparqlBindingGraphBuilde
     @Override
     public Model buildGraph(DataDistributorContext ddContext) throws DataDistributorException {
         log.debug("Parameters: " + formatParameters(ddContext));
-
-        RDFService rdfService = ddContext.getRequestModels().getRDFService();
+        RDFService rdfService;
+        if (GraphBuilderUtilities.isLanguageFilteringDisabledForRequest(ddContext)) {
+            rdfService = ModelAccess.getInstance().getRDFService();
+        } else {
+            rdfService = ddContext.getRequestModels().getRDFService();
+        }
         Model m = ModelFactory.createDefaultModel();
 
         for (String rawQuery : rawQueries) {
@@ -109,4 +114,5 @@ public class ConstructQueryGraphBuilder extends AbstractSparqlBindingGraphBuilde
         }
         return m;
     }
+
 }

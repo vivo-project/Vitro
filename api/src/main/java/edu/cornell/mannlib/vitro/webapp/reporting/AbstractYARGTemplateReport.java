@@ -34,7 +34,7 @@ public abstract class AbstractYARGTemplateReport extends AbstractTemplateReport 
      * Generate the report
      */
     protected void generateReport(OutputStream outputStream, String name, ReportOutputType type,
-            RequestModelAccess request, UserAccount account) {
+            RequestModelAccess request, UserAccount account, Map<String, String[]> parameters) {
         // Create a new report builder and template
         ReportBuilder reportBuilder = new ReportBuilder();
         ReportTemplateBuilder reportTemplateBuilder = new ReportTemplateBuilder();
@@ -56,7 +56,7 @@ public abstract class AbstractYARGTemplateReport extends AbstractTemplateReport 
         Map<String, Object> params = new HashMap<String, Object>();
         for (DataSource dataSource : getDataSources()) {
             // Get the output of the datasource
-            String body = dataSource.getBody(new HashMap<>(), request, account);
+            String body = dataSource.getBody(parameters, request, account);
             if (!StringUtils.isEmpty(body)) {
                 // Bind the output to the name given in the datasource configuration
                 params.put(dataSource.getOutputName(), body);

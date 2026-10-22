@@ -44,14 +44,20 @@
         </#if>
 
         <form role="form" id="login-form" action="${formAction}" method="post" name="login-form" />
-            <#if externalAuthUrl??>
+            <#if externalAuthUrl?? || (orcidAuthEnabled?? && orcidAuthEnabled)>
                 <#assign infoClassHide = 'class="vivoAccount"'/>
 
-                <p class="external-auth"><a class="blue button" href="${externalAuthUrl}" title="${i18n().external_auth_name}">${i18n().external_login_text}</a></p>
+                <#if externalAuthUrl??>
+                    <p class="external-auth"><a class="blue button" href="${externalAuthUrl}" title="${i18n().external_auth_name}">${i18n().external_login_text}</a></p>
+                </#if>
+                <#if orcidAuthEnabled>
+                    <p class="external-auth"><a class="blue button" href="${urls.orcidAuth}" title="${i18n().menu_login_orcid}">${i18n().menu_login_orcid}</a></p>
+                </#if>
                 <!--<p class="or-auth">or</p>-->
                 <h3 class="internal-auth"><!--Log in using your--> <b>${i18n().or}</b> ${siteName} ${i18n().account}</h3>
 
             </#if>
+
 
             <div ${infoClassHide} ${infoClassShow}>
 

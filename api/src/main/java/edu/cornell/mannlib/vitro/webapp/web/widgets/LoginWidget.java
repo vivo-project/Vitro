@@ -98,12 +98,37 @@ public class LoginWidget extends Widget {
             forgotPasswordEnabled = "disabled";
         }
 
+        String orcidClientId = ConfigurationProperties.getInstance()
+                .getProperty("orcid.clientId");
+        log.debug("ORCID client ID: " + orcidClientId);
+
+        String orcidClientPassword = ConfigurationProperties.getInstance()
+                .getProperty("orcid.clientPassword");
+        log.debug("ORCID client password: " + orcidClientPassword);
+
+        String orcidCallbackUrl = ConfigurationProperties.getInstance()
+                .getProperty("orcid.webappBaseUrl");
+        log.debug("ORCID callback URL: " + orcidCallbackUrl);
+
+        String orcidAuthEnabled = ConfigurationProperties.getInstance()
+                .getProperty("orcid.authEnabled");
+        log.debug("ORCID auth should be enabled: " + orcidAuthEnabled);
+
+        if (orcidAuthEnabled == null || orcidAuthEnabled.isEmpty() ||
+                orcidClientId == null || orcidClientId.isEmpty() ||
+                orcidClientPassword == null || orcidClientPassword.isEmpty() ||
+                orcidCallbackUrl == null || orcidCallbackUrl.isEmpty()) {
+            orcidAuthEnabled = "false";
+        }
+        log.debug("ORCID auth enabled: " + orcidAuthEnabled);
+
         WidgetTemplateValues values = new WidgetTemplateValues(Macro.LOGIN.toString());
         values.put(TemplateVariable.FORM_ACTION.toString(), getAuthenticateUrl(request));
         values.put(TemplateVariable.LOGIN_NAME.toString(), bean.getUsername());
         values.put(TemplateVariable.FORGOT_PASSWORD.toString(), getForgotPasswordUrl(request));
         values.put(TemplateVariable.FORGOT_PASSWORD_ENABLED.toString(),
             forgotPasswordEnabled.equalsIgnoreCase("enabled"));
+        values.put(TemplateVariable.ORCID_AUTH.toString(), orcidAuthEnabled.equalsIgnoreCase("true"));
 
         boolean showExternalAuth = StringUtils.isNotBlank(
             ConfigurationProperties.getInstance().getProperty(
@@ -244,7 +269,8 @@ public class LoginWidget extends Widget {
         CANCEL_URL("cancelUrl"),
         SITE_NAME("siteName"),
         MINIMUM_PASSWORD_LENGTH("minimumPasswordLength"),
-        MAXIMUM_PASSWORD_LENGTH("maximumPasswordLength");
+        MAXIMUM_PASSWORD_LENGTH("maximumPasswordLength"),
+        ORCID_AUTH("orcidAuthEnabled");
 
         private final String variableName;
 

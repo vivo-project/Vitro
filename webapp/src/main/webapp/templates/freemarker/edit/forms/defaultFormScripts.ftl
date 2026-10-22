@@ -78,7 +78,6 @@
 </script>
 
 <#-- Script to enable browsing individuals within a class -->
-<#--'<script type="text/javascript" src="${urls.base}/js/jquery_plugins/jquery.scrollTo-min.js"></script>',-->
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/tiny_mce/tiny_mce.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/tiny_mce/jquery.tinymce.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/edit/initTinyMce.js"></script>',

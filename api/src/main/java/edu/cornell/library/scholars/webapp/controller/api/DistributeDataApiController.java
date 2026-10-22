@@ -5,15 +5,22 @@ package edu.cornell.library.scholars.webapp.controller.api;
 import static edu.cornell.mannlib.vitro.webapp.auth.attributes.AccessOperation.EXECUTE;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
 import static edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.SparqlQueryRunner.createSelectQueryContext;
+import static edu.cornell.mannlib.vitro.webapp.web.ContentType.TEXT_PLAIN;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,6 +32,7 @@ import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistrib
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor.NoSuchActionException;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributor.NotAuthorizedException;
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContextImpl;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.objects.DataDistributorAccessObject;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.controller.api.VitroApiServlet;
@@ -41,6 +49,7 @@ import org.apache.jena.rdf.model.Model;
  */
 @WebServlet(name = "DistributeDataApi", urlPatterns = { "/api/dataRequest/*" })
 public class DistributeDataApiController extends VitroApiServlet {
+
     private static final Log log = LogFactory.getLog(DistributeDataApiController.class);
 
     private static final String DISTRIBUTOR_FOR_SPECIFIED_ACTION = ""
@@ -65,7 +74,11 @@ public class DistributeDataApiController extends VitroApiServlet {
         } catch (MissingParametersException e) {
             do400BadRequest(e.getMessage(), resp);
         } catch (NotAuthorizedException e) {
-            do403Forbidden(resp);
+            if (LoginStatusBean.getCurrentUser(req) == null) {
+                do401Unauthorized(resp, resp.getWriter());
+            } else {
+                do403Forbidden(resp, resp.getWriter());
+            }
         } catch (Exception e) {
             do500InternalServerError(e.getMessage(), e, resp);
         }
@@ -118,14 +131,26 @@ public class DistributeDataApiController extends VitroApiServlet {
     }
 
     private void runIt(HttpServletRequest req, HttpServletResponse resp, DataDistributor instance)
-            throws DataDistributorException {
+            throws DataDistributorException, IOException {
+        ServletOutputStream outputStream = resp.getOutputStream();
         try {
             instance.init(new DataDistributorContextImpl(req));
             log.debug("Distributor is " + instance);
 
             resp.setContentType(instance.getContentType());
             resp.setCharacterEncoding("UTF-8");
-            instance.writeOutput(resp.getOutputStream());
+            instance.writeOutput(outputStream);
+        } catch (NotAuthorizedException e) {
+            resp.setContentType(TEXT_PLAIN.getMediaType());
+            if (LoginStatusBean.getCurrentUser(req) == null) {
+                try (OutputStreamWriter writer = new OutputStreamWriter(outputStream, UTF_8)) {
+                    do401Unauthorized(resp, writer);
+                }
+            } else {
+                try (OutputStreamWriter writer = new OutputStreamWriter(outputStream, UTF_8)) {
+                    do403Forbidden(resp, writer);
+                }
+            }
         } catch (Exception e) {
             log.error("Failed to execute the DataDistributor", e);
             instance.close();
@@ -134,19 +159,26 @@ public class DistributeDataApiController extends VitroApiServlet {
     }
 
     private void do400BadRequest(String message, HttpServletResponse resp) throws IOException {
-        log.debug("400BadRequest: " + message);
+        log.debug("400 Bad Request: " + message);
         resp.setStatus(400);
         resp.getWriter().println(message);
     }
 
-    private void do403Forbidden(HttpServletResponse resp) throws IOException {
-        log.debug("403Forbidden");
-        resp.setStatus(403);
-        resp.getWriter().println("Not authorized for this action.");
+    private void do403Forbidden(HttpServletResponse resp, Writer writer) throws IOException {
+        log.debug("403 Forbidden");
+        resp.setStatus(SC_FORBIDDEN);
+        writer.write("Not authorized for this action.");
+    }
+
+    private void do401Unauthorized(HttpServletResponse resp, Writer writer) throws IOException {
+        log.debug("401 Unauthorized");
+        resp.setHeader("WWW-Authenticate", "Basic realm=\"Secure Servlet Realm\"");
+        resp.setStatus(SC_UNAUTHORIZED);
+        writer.write("Unauthenticated.");
     }
 
     private void do500InternalServerError(String message, Exception e, HttpServletResponse resp) throws IOException {
-        log.warn("500InternalServerError " + message, e);
+        log.warn("500 Internal Server Error: " + message, e);
         resp.setStatus(500);
         try {
             PrintWriter w = resp.getWriter();

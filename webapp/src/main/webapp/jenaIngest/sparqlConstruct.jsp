@@ -2,7 +2,6 @@
 
 <%@ page import="org.apache.jena.ontology.Individual"%>
 <%@ page import="org.apache.jena.ontology.OntModel"%>
-<%@ page import="org.apache.jena.rdf.model.ModelMaker"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService"%>
 <%@ page import="org.apache.jena.shared.Lock"%>
@@ -17,10 +16,7 @@
 <% request.setAttribute("requestedActions", SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTION); %>
 <vitro:confirmAuthorization />
 
-<%
-    ModelMaker maker = ModelAccess.on(getServletContext()).getModelMaker(WhichService.CONFIGURATION);
-%>
-
+<% List<String> modelNames = (List<String>) request.getAttribute("modelNames"); %>
 
 <%@page import="java.util.HashSet"%>
 <%@page import="java.util.Set"%>
@@ -127,8 +123,7 @@ PREFIX <%=prefixText%>: <<%=urlText%>><%}}%>
                     %> />webapp
 	assertions</li>
 	<%
-    for (Iterator it = maker.listModels(); it.hasNext(); ) {
-	String modelName = (String) it.next();
+    for (String modelName : modelNames) {
         %>
 	<li><input type="checkbox" name="sourceModelName"
 		value="<%=modelName%>"
@@ -161,8 +156,7 @@ PREFIX <%=prefixText%>: <<%=urlText%>><%}}%>
               %> />webapp
 	model</option>
 	<%
-    for (Iterator it = maker.listModels(); it.hasNext(); ) {
-    String modelName = (String) it.next();
+    for (String modelName : modelNames) {
         %>
 	<option value="<%=modelName%>"
 		<%

@@ -6,6 +6,7 @@ import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +32,7 @@ import org.apache.jena.update.UpdateRequest;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.sparql.modify.UsingList;
-
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.checks.UserOnThread;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
@@ -72,7 +73,12 @@ public class SparqlUpdateApiController extends VitroApiServlet {
 			executeUpdate(req, parsed);
 			do200response(resp);
 		} catch (AuthException e) {
-			do403response(resp, e);
+			if (LoginStatusBean.getCurrentUser(req) == null) {
+                resp.setHeader("WWW-Authenticate", "Basic realm=\"Secure Servlet Realm\"");
+                sendShortResponse(SC_UNAUTHORIZED, e.getMessage(), resp);
+            } else {
+                sendShortResponse(SC_FORBIDDEN, e.getMessage(), resp);
+            }
 		} catch (ParseException e) {
 			do400response(resp, e);
 		} catch (Exception e) {

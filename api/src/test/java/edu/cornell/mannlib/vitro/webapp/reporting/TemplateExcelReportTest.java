@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.Base64;
+import java.util.HashMap;
 
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
@@ -50,7 +51,7 @@ public class TemplateExcelReportTest {
         reportGenerator.addDatasource(getDataSource());
         reportGenerator.setTemplateBase64(string);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        reportGenerator.generateReport(baos, rma, account);
+        reportGenerator.generateReport(baos, rma, account, new HashMap<String, String[]>());
         assertFalse(baos.size() == 0);
         if (debug) {
             File file = new File(REPORTING_DIR + "/report.xlsx");

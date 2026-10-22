@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.reporting;
 
 import java.io.OutputStream;
+import java.util.Map;
 
 import com.haulmont.yarg.structure.ReportOutputType;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
@@ -19,8 +20,8 @@ public class TemplateWordReport extends AbstractYARGTemplateReport {
     }
 
     @Override
-    public void generateReport(OutputStream outputStream, RequestModelAccess request, UserAccount account)
-            throws ReportGeneratorException {
-        generateReport(outputStream, "report.docx", ReportOutputType.docx, request, account);
+    public void generateReport(OutputStream outputStream, RequestModelAccess request, UserAccount account,
+            Map<String, String[]> params) throws ReportGeneratorException {
+        generateReport(outputStream, "report.docx", ReportOutputType.docx, request, account, params);
     }
 }

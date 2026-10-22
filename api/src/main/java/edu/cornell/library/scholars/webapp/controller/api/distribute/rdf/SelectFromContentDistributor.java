@@ -7,7 +7,11 @@ import static edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.SparqlQueryRun
 import java.io.OutputStream;
 
 import edu.cornell.library.scholars.webapp.controller.api.distribute.DataDistributorContext;
+import edu.cornell.library.scholars.webapp.controller.api.distribute.rdf.graphbuilder.GraphBuilderUtilities;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.RequestModelAccess;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ResultFormat;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.QueryHolder;
 
@@ -65,6 +69,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.QueryHolder;
 public class SelectFromContentDistributor extends AbstractSparqlBindingDistributor {
     private RequestModelAccess models;
     private String rawQuery;
+    private String resultFormat = "JSON";
 
     @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#query", minOccurs = 1, maxOccurs = 1)
     public void setRawQuery(String query) {
@@ -77,16 +82,30 @@ public class SelectFromContentDistributor extends AbstractSparqlBindingDistribut
         this.models = ddc.getRequestModels();
     }
 
+    @Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#resultFormat", maxOccurs = 1)
+    public void setResultFormat(String resultFormat) {
+        this.resultFormat = resultFormat;
+    }
+
     @Override
     public String getContentType() throws DataDistributorException {
-        return "application/sparql-results+json";
+        return getContentType(resultFormat);
     }
 
     @Override
     public void writeOutput(OutputStream output) throws DataDistributorException {
+        binder.checkAuthorization(ddContext, uriBindingNames);
         QueryHolder boundQuery = binder.bindValuesToQuery(uriBindingNames, literalBindingNames,
                 new QueryHolder(rawQuery));
-        createSelectQueryContext(this.models.getRDFService(), boundQuery).execute().writeToOutput(output);
+        RDFService rdfService;
+        if (GraphBuilderUtilities.isLanguageFilteringDisabledForRequest(ddContext)) {
+            rdfService = ModelAccess.getInstance().getRDFService();
+        } else {
+            rdfService = this.models.getRDFService();
+        }
+
+        createSelectQueryContext(rdfService, boundQuery).execute().writeToOutput(output,
+                ResultFormat.valueOf(resultFormat));
     }
 
     @Override

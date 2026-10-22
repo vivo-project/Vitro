@@ -3,10 +3,10 @@
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
+import java.security.SecureRandom;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Random;
 
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.OntModel;
@@ -471,7 +471,7 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 		String namespace = DEFAULT_NAMESPACE;
 		String uri = null;
 
-		Random random = new Random(System.currentTimeMillis());
+		SecureRandom random = new SecureRandom();
 		for (int attempts = 0; attempts < 30; attempts++) {
 			int upperBound = (int) Math.pow(2, attempts + 13);
 			uri = namespace + ("u" + random.nextInt(upperBound));

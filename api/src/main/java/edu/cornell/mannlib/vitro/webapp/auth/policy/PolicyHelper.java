@@ -4,8 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
 import static edu.cornell.mannlib.vitro.webapp.auth.objects.AccessObject.SOME_URI;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,7 +32,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleAuthorization
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 /**
  * A collection of static methods to help determine whether requested actions
