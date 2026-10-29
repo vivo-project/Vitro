@@ -18,16 +18,16 @@
 <script type="text/javascript">
     var firstBrowseClass = $("ul#browse-classes li:first").find("a").attr("data-uri");
     if ( !firstBrowseClass || firstBrowseClass.length == 0 ) {
-        firstBrowseClass = '${firstNonEmptyVClass}';
+        firstBrowseClass = '${firstNonEmptyVClass?js_string}';
     }
     var menupageData = {
         baseUrl: '${urls.base}',
         <#if internalClass?has_content>
-            dataServiceUrl: '${dataServiceUrlIndividualsByVClass}${internalClass}&vclassId=',
+            dataServiceUrl: '${dataServiceUrlIndividualsByVClass?js_string}${internalClass?js_string}&vclassId=',
         <#else>
-            dataServiceUrl: '${dataServiceUrlIndividualsByVClass}',
+            dataServiceUrl: '${dataServiceUrlIndividualsByVClass?js_string}',
         </#if>
-        defaultBrowseVClassUri: firstBrowseClass //'${firstNonEmptyVClass}'
+        defaultBrowseVClassUri: firstBrowseClass //'${firstNonEmptyVClass?js_string}'
     };
     var i18nStrings = {
         pageString: '${i18n().page?js_string}',
