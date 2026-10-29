@@ -50,8 +50,8 @@
     <script type="text/javascript">
         // <#-- We need the controller to provide ${reorderUrl}. This is where ajax request will be sent on drag-n-drop events. -->
         var menuManagementData = {
-            reorderUrl: '${reorderUrl}',
-            positionPredicate: '${positionPredicate}'
+            reorderUrl: '${reorderUrl?js_string}',
+            positionPredicate: '${positionPredicate?js_string}'
         };
         var i18nStrings = {
             dragDropMenus: '${i18n().drag_drop_to_reorder_menus?js_string}',

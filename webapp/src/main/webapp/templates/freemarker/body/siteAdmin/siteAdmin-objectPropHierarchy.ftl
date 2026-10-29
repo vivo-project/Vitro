@@ -66,7 +66,7 @@
 
 <script language="javascript" type="text/javascript" >
 $(document).ready(function() {
-    objectPropHierarchyUtils.onLoad("${urls.base!}","${displayOption!}","${propType}");
+    objectPropHierarchyUtils.onLoad("${urls.base!?js_string}","${displayOption!?js_string}","${propType?js_string}");
 });
 </script>
 

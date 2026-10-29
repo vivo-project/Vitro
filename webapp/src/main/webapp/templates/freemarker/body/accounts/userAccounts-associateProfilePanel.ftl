@@ -60,7 +60,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/auto
 <script type="text/javascript">
 var associateProfileFieldsData = {
     <#if userUri??>
-        userUri: '${userUri}' ,
+        userUri: '${userUri?js_string}' ,
     <#else>
         userUri: '' ,
     </#if>
@@ -71,9 +71,9 @@ var associateProfileFieldsData = {
 
     <#if associatedProfileInfo??>
         associatedProfileInfo: {
-            label: '${associatedProfileInfo.label}',
-            uri: '${associatedProfileInfo.uri}',
-            url: '${associatedProfileInfo.url}'
+            label: '${associatedProfileInfo.label?js_string}',
+            uri: '${associatedProfileInfo.uri?js_string}',
+            url: '${associatedProfileInfo.url?js_string}'
         },
     </#if>
 
@@ -81,7 +81,7 @@ var associateProfileFieldsData = {
         associationEnabled: true ,
     </#if>
 
-    ajaxUrl: '${formUrls.accountsAjax}'
+    ajaxUrl: '${formUrls.accountsAjax?js_string}'
 };
 </script>
 
