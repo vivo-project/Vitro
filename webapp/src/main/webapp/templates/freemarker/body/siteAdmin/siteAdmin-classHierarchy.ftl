@@ -53,7 +53,7 @@
 
 <script language="javascript" type="text/javascript" >
 $(document).ready(function() {
-    classHierarchyUtils.onLoad("${urls.base!}","${displayOption!}");
+    classHierarchyUtils.onLoad("${urls.base!?js_string}","${displayOption!?js_string}");
 });
 </script>
 

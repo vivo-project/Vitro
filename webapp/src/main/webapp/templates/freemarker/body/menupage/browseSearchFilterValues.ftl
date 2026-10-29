@@ -17,8 +17,8 @@
             var queryText = window.location.toString().split("?")[1];
         }
         //If main filter is not set, then set it to default value [* TO *]
-        if (!queryText.includes('filters_${searchFilter}')) {
-            queryText += "&filters_${searchFilter}=${searchFilter}:${"[* TO *]"?url}";
+        if (!queryText.includes('filters_${searchFilter?js_string}')) {
+            queryText += "&filters_${searchFilter?js_string}=${searchFilter?js_string}:${"[* TO *]"?url?js_string}";
         }
     </script>
 
