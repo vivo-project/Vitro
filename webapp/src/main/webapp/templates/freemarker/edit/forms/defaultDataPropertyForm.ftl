@@ -82,7 +82,7 @@
 </#if>
 
 <script type="text/javascript">
-	var datatype = "${datatype!}";
+	var datatype = "${datatype!?js_string}";
 
 	var i18nStrings = {
     	four_digit_year: '${i18n().four_digit_year?js_string}',

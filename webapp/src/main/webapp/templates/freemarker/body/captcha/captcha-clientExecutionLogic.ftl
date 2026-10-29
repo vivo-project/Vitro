@@ -19,7 +19,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/templates/freemarke
                 var oldChallengeId = $('#challengeId').val();
 
                 $.ajax({
-                    url: '${contextPath}/refreshCaptcha',
+                    url: '${contextPath?js_string}/refreshCaptcha',
                     type: 'GET',
                     dataType: 'json',
                     data: { oldChallengeId: oldChallengeId },

@@ -92,19 +92,19 @@ var selectLocalesFullList = [];
 	<#list selectLocalesFullList as localeInfo>
 		<#assign code = localeInfo["code"] />
 		<#assign label= localeInfo["label"] />
-		selectLocalesFullList.push({'code':'${code}', 'label':'${label}'});
+		selectLocalesFullList.push({'code':'${code?js_string}', 'label':'${label?js_string}'});
 	</#list>
 
 </#if>
 
 var customFormData = {
     processingUrl: '${urls.base}/edit/primitiveRdfEdit',
-    individualUri: '${subjectUri!}',
-    submissionErrorsExist: '${submissionErrorsExist}',
+    individualUri: '${subjectUri!?js_string}',
+    submissionErrorsExist: '${submissionErrorsExist?js_string}',
     selectLocalesFullList: selectLocalesFullList,
-    numberAvailableLocales:${availableLocalesNumber},
+    numberAvailableLocales: ${availableLocalesNumber?c},
     localeEntryExisting : '${localeEntryExisting?c}',
-    currentSelectedLocale: '${currentSelectedLocale}'
+    currentSelectedLocale: '${currentSelectedLocale?js_string}'
 };
 var i18nStrings = {
     errorProcessingLabels: '${i18n().error_processing_labels?js_string}',
