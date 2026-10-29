@@ -27,8 +27,8 @@
   <form id="addIndividualClass" action="${urls.base}/editRequestDispatch" method="get">
       <input type="hidden" name="typeOfNew" value="http://vitro.mannlib.cornell.edu/ontologies/display/1.1#Page">
       <input type="hidden" name="switchToDisplayModel" value="1">
-      <input type="hidden" name="editForm" value="${generators.NewIndividualFormGenerator}" role="input">
-      <input type="submit" id="submit" value="${i18n().Add_page}" role="button">
+      <input type="hidden" name="editForm" value="${generators.NewIndividualFormGenerator}">
+      <input type="submit" id="submit" value="${i18n().add_page}" aria-label="${i18n().add_page}">
   </form>
 
 </div>

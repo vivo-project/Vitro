@@ -22,16 +22,16 @@
     <h3>Select Source Models for Assertions Data</h3>
 
     <ul>
-		<li><input type="checkbox" name="sourceModelName" value="vitro:jenaOntModel"/>webapp model</li>
-		<li><input type="checkbox" name="sourceModelName" value="vitro:baseOntModel"/>webapp assertions</li>
+        <li><label class="inline"><input type="checkbox" name="sourceModelName" value="vitro:jenaOntModel"/>webapp model</label></li>
+        <li><label class="inline"><input type="checkbox" name="sourceModelName" value="vitro:baseOntModel"/>webapp assertions</label></li>
         <c:forEach var="modelName" items="${modelNames}">
-            <li><input type="checkbox" name="sourceModelName" value="${modelName}"/>${modelName}</li>
+            <li><label class="inline"><input type="checkbox" name="sourceModelName" value="${modelName}"/>${modelName}</label></li>
         </c:forEach>
     </ul>
 
     <h3>Select Destination Model for Generated TBox</h3>
 
-    <select name="destinationModelName">
+    <select name="destinationModelName" aria-label="Select Destination Model for Generated TBox">
         <option value="vitro:baseOntModel"/>webapp assertions</option>
         <option value="vitro:jenaOntModel"/>webapp model</option>
         <c:forEach var="modelName" items="${modelNames}">
@@ -39,4 +39,4 @@
         </c:forEach>
     </select>
 
-    <input class="submit" type="submit" value="Generate TBox"/>
+    <input class="submit" type="submit" value="Generate TBox" aria-label="Generate TBox"/>

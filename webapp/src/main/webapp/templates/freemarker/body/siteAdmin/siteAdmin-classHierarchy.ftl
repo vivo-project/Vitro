@@ -10,17 +10,17 @@
     	<#if !displayOption?has_content>
     	    <#assign displayOption = "asserted">
     	</#if>
-    	<form name="classHierarchyForm" id="classHierarchyForm" action="showClassHierarchy" method="post" role="classHierarchy">
-    	    <label id="displayOptionLabel" class="inline">${i18n().display_options}</label>
+        <form name="classHierarchyForm" id="classHierarchyForm" action="showClassHierarchy" method="post">
+            <label id="displayOptionLabel" class="inline" for="displayOption">${i18n().display_options}</label>
     	    <select id="displayOption" name="displayOption">
     	        <option value="asserted" <#if displayOption == "asserted">selected</#if> >${i18n().asserted_class_hierarchy}</option>
     	        <option  value="inferred" <#if displayOption == "inferred">selected</#if> >${i18n().inferred_class_hierarchy}</option>
     	        <option value="all" <#if displayOption == "all">selected</#if> >${i18n().all_classes}</option>
     	        <option value="group" <#if displayOption == "group">selected</#if> >${i18n().classes_by_classgroup}</option>
     	    </select>
-    	    <input id="addClass" value="${i18n().add_new_classes}" class="form-button" type="submit" />
+            <input id="addClass" value="${i18n().add_new_classes}" aria-label="${i18n().add_new_classes}" class="form-button" type="submit" />
     	    <#if displayOption == "group">
-    	            <input type="submit" id="addGroup" class="form-button" value="${i18n().add_new_group}"/>
+                    <input type="submit" id="addGroup" class="form-button" value="${i18n().add_new_group}" aria-label="${i18n().add_new_group?html}"/>
     	    </#if>
     	</form>
 

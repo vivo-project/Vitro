@@ -20,9 +20,9 @@
 	<#if roles?has_content>
 		<#list roles as role>
 			<p>${role.label}
-				<a href="javascript:editRole('${role.uri?js_string?html}', '${role.label?js_string?html}');"><img src="${urls.images!}/individual/editIcon.gif"></a>
+				<a href="javascript:editRole('${role.uri?js_string?html}', '${role.label?js_string?html}');"><img src="${urls.images!}/individual/editIcon.gif" alt="${i18n().edit_capitalized?html}: ${role.label?html}"></a>
 				<#if role.uri != "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#PUBLIC">
-					<a href="javascript:deleteRole('${role.uri?js_string?html}', '${role.label?js_string?html}');"><img src="${urls.images!}/individual/deleteIcon.gif"></a>
+					<a href="javascript:deleteRole('${role.uri?js_string?html}', '${role.label?js_string?html}');"><img src="${urls.images!}/individual/deleteIcon.gif" alt="${i18n().delete_button?html}: ${role.label?html}"></a>
 				</#if>
 			</p>
 			<form name="edit-${role.uri}" id="$edit-${role.uri}" action="${rolesControllerUrl}" method="POST">
@@ -38,7 +38,7 @@
 	</#if>
 	<form action="${rolesControllerUrl}" method="POST">
 		<input type="hidden" name="action" value="add">
-		<input type="text" name="label">
-		<input type="submit" class="submit" role="input" value="${i18n().add_new_role?html}">
+		<input type="text" name="label" aria-label="${i18n().name_capitalized?html}">
+		<input type="submit" class="submit" aria-label="${i18n().add_new_role?html}" value="${i18n().add_new_role?html}">
 	</form>
 </section>

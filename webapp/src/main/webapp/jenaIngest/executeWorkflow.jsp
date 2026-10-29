@@ -21,7 +21,7 @@
 
     <h3>Workflow</h3>
 
-        <select name="workflowURI">
+        <select name="workflowURI" aria-label="Workflow">
 
         <%
               OntModel jenaOntModel = ModelAccess.on(getServletContext()).getOntModel();
@@ -40,4 +40,4 @@
         %>
         </select>
 
-    <input class="submit" type="submit" value="Next &gt;"/>
+    <input class="submit" type="submit" value="Next &gt;" aria-label="Next &gt;"/>

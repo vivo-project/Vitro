@@ -24,17 +24,17 @@
 </#if>
 
 <section id="reset-password" role="region">
-    <form method="POST" action="${formUrls.resetPassword}" class="customForm" role="create password">
+    <form method="POST" action="${formUrls.resetPassword}" class="customForm">
         <input type="hidden" name="user" value="${userAccount.emailAddress}" />
         <input type="hidden" name="key"  value="${userAccount.emailKey}" />
 
         <label for="new-password">${strings.new_password}<span class="requiredHint"> *</span></label>
-        <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />
+        <input type="password" name="newPassword" value="${newPassword}" id="new-password" />
 
         <p class="note">${strings.minimum_password_length(minimumLength, maximumLength)}</p>
 
         <label for="confirm-password">${strings.confirm_password}<span class="requiredHint"> *</span></label>
-        <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
+        <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" />
 
         <p><input type="submit" name="submit" value="${strings.save_changes}" class="submit"/></p>
 

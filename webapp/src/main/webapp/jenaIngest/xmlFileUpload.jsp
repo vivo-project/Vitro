@@ -14,11 +14,11 @@
 
     <form action="jenaXmlFileUpload" method="post" enctype="multipart/form-data">
 
-    <input type="file" name="xmlfile"/>
+    <input type="file" name="xmlfile" aria-label="XML file"/>
 
     <p>XML file</p>
 
-	<select name="targetModel">
+    <select name="targetModel" aria-label="Destination model">
         <option value="vitro:baseOntModel">webapp assertions</option>
         <c:forEach var="modelName" items="${modelNames}">
             <option value="${modelName}">${modelName}</option>
@@ -27,6 +27,6 @@
 
         <p>Destination model</p>
 
-        <input id="submit" type="submit" name="submit" value="upload XML and convert to RDF"/>
+        <input id="submit" type="submit" name="submit" value="upload XML and convert to RDF" aria-label="upload XML and convert to RDF"/>
     </form>
 

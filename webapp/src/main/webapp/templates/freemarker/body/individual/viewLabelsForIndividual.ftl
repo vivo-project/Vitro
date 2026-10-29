@@ -17,7 +17,7 @@
 </#if>
 
 
-    <section id="rdfsLabels" role="container">
+    <section id="rdfsLabels">
 
         <ul id="existingLabelsList" name="existingLabelsList">
         <#if labelsSortedByLanguageName?has_content>

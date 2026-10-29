@@ -28,7 +28,7 @@ URIs exactly of the form created through the GUI interface.</p>
 <input type="hidden" name="oldModel" value="${modelName}"/>
 <input type="hidden" name="action" value="permanentURI" />
 <p>Current namespace of resources
-<select name=oldNamespace>
+<select name=oldNamespace aria-label="Current namespace of resources">
 <%List namespaces = (List)request.getAttribute("namespaceList");
 if(namespaces != null) {
 	Iterator namespaceItr = namespaces.iterator();
@@ -41,15 +41,15 @@ if(namespaces != null) {
 }%>
 </select></p>
 
-<p>Model in which to save results  <select name="newModel">
+<p>Model in which to save results  <select name="newModel" aria-label="Model in which to save results">
 <c:forEach var="modelName" items="${modelNames}">
     <option value="${modelName}">${modelName}</option>
 </c:forEach>
 
 </select></p>
-<p>New namespace for resources  <input type="text" name="newNamespace" /></p>
-<p>Use default namespace ${defaultNamespace}  <input type="checkbox" name="defaultNamespace" value ="${defaultNamespace}"/>
+<p>New namespace for resources  <input type="text" name="newNamespace"  aria-label="New namespace for resources"/></p>
+<p>Use default namespace ${defaultNamespace}  <input type="checkbox" name="defaultNamespace" value ="${defaultNamespace}" aria-label="Use default namespace"/>
 </p>
 
-<p><input class="submit" type="submit" name="submit" value="Generate URIs" /></p>
+<p><input class="submit" type="submit" name="submit" value="Generate URIs"  aria-label="Generate URIs"/></p>
 </form>

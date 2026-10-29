@@ -6,8 +6,8 @@
 
 <#assign strings = i18n() />
 
-<form method="POST" action="${formUrls.add}" id="add-account" class="customForm" role="Add account">
-    <h3><span>${strings.user_accounts_link} | </span><input type="submit" class="submit add-account" value="${strings.add_new_account}" /></h3>
+<form method="POST" action="${formUrls.add}" id="add-account" class="customForm">
+    <h3><span>${strings.user_accounts_link} | </span><input type="submit" class="submit add-account" value="${strings.add_new_account}" aria-label="${strings.add_new_account?html}" /></h3>
 </form>
 
 <#if newUserAccount?? >
@@ -41,9 +41,10 @@
 </#if>
 
 <section id="filter-roles">
-    <form method="POST" action="${formUrls.list}" class="customForm" role="filter by roles">
+    <form method="POST" action="${formUrls.list}" class="customForm">
+        <label class="inline" for="roleFilterUri">${strings.filter_by_roles?html}</label>
         <select name="roleFilterUri" id="roleFilterUri">
-            <option value="" <#if roleFilterUri = "">selected</#if> >${strings.filter_by_roles}</option>
+            <option value="" <#if roleFilterUri = "">selected</#if> >${strings.all_capitalized?html}</option>
             <#list roles as role>
             <option value="${formUrls.list}?roleFilterUri=${role.uri?url}" <#if roleFilterUri = role.uri>selected</#if> >${role.label}</option>
             </#list>
@@ -61,9 +62,9 @@
 </section>
 
 <section id="search-accounts">
-    <form method="POST" action="${formUrls.list}" class="customForm" role="search accounts">
-        <input type="text" name="searchTerm" />
-        <input class="submit" type="submit" value="${strings.search_accounts_button}"/>
+    <form method="POST" action="${formUrls.list}" class="customForm">
+        <input type="text" name="searchTerm" aria-label="${strings.search_accounts_button?html}" />
+        <input class="submit" type="submit" value="${strings.search_accounts_button}" aria-label="${strings.search_accounts_button?html}"/>
         <!--
             When searchTerm changes,
             set pageIndex to 1
@@ -78,43 +79,43 @@
     <p>${strings.accounts_search_results} "<strong>${searchTerm}</strong>" | <span><a href="${formUrls.list}" title="${strings.view_all_accounts_title}">${strings.view_all_accounts}</a></span></p>
 </section>
 </#if>
-<form method="POST" action="${formUrls.list}" id="account-display" class="customForm" role="accounts display">
-    <@p.accountsNav />
+<form method="POST" action="${formUrls.list}" id="account-display" class="customForm">
+    <@p.accountsNav controlId="accounts-per-page-top" />
 
     <table id="table-listing">
         <caption>${strings.account_management}</caption>
 
         <thead>
             <tr>
-               <th scope="col"> <input  class="delete-all hidden" type="checkbox" name="delete-all">
+               <th scope="col"> <input  class="delete-all hidden" type="checkbox" name="delete-all" aria-label="${strings.select_all?html}">
                    ${strings.email_address}
                    <nav class="account-alpha-browse">
-                       <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=email&orderDirection=ASC" title="${strings.ascending_order}"></a>
-                       <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=email&orderDirection=DESC" title="${strings.descending_order}"></a>
+                       <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=email&orderDirection=ASC" title="${strings.ascending_order}" aria-label="${strings.email_address?html}: ${strings.ascending_order?html}"></a>
+                       <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=email&orderDirection=DESC" title="${strings.descending_order}" aria-label="${strings.email_address?html}: ${strings.descending_order?html}"></a>
                    </nav>
                 </th>
 
                 <th scope="col">
                     ${strings.first_name}
                     <nav class="account-alpha-browse">
-                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=firstName&orderDirection=ASC" title="${strings.ascending_order}"></a>
-                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=firstName&orderDirection=DESC" title="${strings.descending_order}"></a>
+                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=firstName&orderDirection=ASC" title="${strings.ascending_order}" aria-label="${strings.first_name?html}: ${strings.ascending_order?html}"></a>
+                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=firstName&orderDirection=DESC" title="${strings.descending_order}" aria-label="${strings.first_name?html}: ${strings.descending_order?html}"></a>
                     </nav>
                 </th>
 
                 <th scope="col">
                     ${strings.last_name}
                     <nav class="account-alpha-browse">
-                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=lastName&orderDirection=ASC" title="${strings.ascending_order}"></a>
-                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=lastName&orderDirection=DESC" title="${strings.descending_order}"></a>
+                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=lastName&orderDirection=ASC" title="${strings.ascending_order}" aria-label="${strings.last_name?html}: ${strings.ascending_order?html}"></a>
+                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=lastName&orderDirection=DESC" title="${strings.descending_order}" aria-label="${strings.last_name?html}: ${strings.descending_order?html}"></a>
                     </nav>
                 </th>
 
                 <th scope="col">
                     ${strings.status}
                     <nav class="account-alpha-browse">
-                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=status&orderDirection=ASC" title="${strings.ascending_order}"></a>
-                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=status&orderDirection=DESC" title="${strings.descending_order}"></a>
+                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=status&orderDirection=ASC" title="${strings.ascending_order}" aria-label="${strings.status?html}: ${strings.ascending_order?html}"></a>
+                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=status&orderDirection=DESC" title="${strings.descending_order}" aria-label="${strings.status?html}: ${strings.descending_order?html}"></a>
                     </nav>
                 </th>
 
@@ -123,16 +124,16 @@
                 <th scope="col">
                     ${strings.login_count}
                     <nav class="account-alpha-browse">
-                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=count&orderDirection=ASC" title="${strings.ascending_order}"></a>
-                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=count&orderDirection=DESC" title="${strings.descending_order}"></a>
+                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=count&orderDirection=ASC" title="${strings.ascending_order}" aria-label="${strings.login_count?html}: ${strings.ascending_order?html}"></a>
+                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=count&orderDirection=DESC" title="${strings.descending_order}" aria-label="${strings.login_count?html}: ${strings.descending_order?html}"></a>
                     </nav>
                 </th>
 
                 <th scope="col">
                     ${strings.last_login}
                     <nav class="account-alpha-browse">
-                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=lastLogin&orderDirection=ASC" title="${strings.ascending_order}"></a>
-                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=lastLogin&orderDirection=DESC" title="${strings.descending_order}"></a>
+                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=lastLogin&orderDirection=ASC" title="${strings.ascending_order}" aria-label="${strings.last_login?html}: ${strings.ascending_order?html}"></a>
+                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=lastLogin&orderDirection=DESC" title="${strings.descending_order}" aria-label="${strings.last_login?html}: ${strings.descending_order?html}"></a>
                     </nav>
                 </th>
             </tr>
@@ -143,7 +144,7 @@
                 <tr>
                     <td>
                         <#if account.deletable>
-                            <input type="checkbox" name="deleteAccount" value="${account.uri}" title="${strings.select_account_to_delete}"/>
+                            <input type="checkbox" name="deleteAccount" value="${account.uri}" title="${strings.select_account_to_delete}" aria-label="${strings.select_account_to_delete?html}: ${account.emailAddress?html}"/>
                             <#assign disableDeleteAccount = '' />
                             <!-- ignored unless submit action is formUrls.delete -->
                         <#else>
@@ -151,7 +152,7 @@
                         </#if>
 
                         <#if account.editUrl != "">
-                            <a ${disableDeleteAccount} href="${account.editUrl}"  title="${strings.click_to_view_account}">${account.emailAddress}</a>
+                            <a ${disableDeleteAccount} href="${account.editUrl}" title="${strings.click_to_view_account}" aria-label="${strings.click_to_view_account?html}: ${account.emailAddress?html}">${account.emailAddress?html}</a>
                             <!-- when this link is clicked, editAccount is noticed and all other fields are ignored. -->
                         <#else>
                             <span class="unlinkedAccount">${account.emailAddress}</span>
@@ -177,7 +178,7 @@
         </tbody>
     </table>
 
-    <@p.accountsNav />
+    <@p.accountsNav controlId="accounts-per-page-bottom" />
 </form>
 
 <script type="text/javascript">

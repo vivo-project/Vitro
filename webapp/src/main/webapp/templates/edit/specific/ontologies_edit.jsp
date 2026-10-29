@@ -47,7 +47,7 @@
 					</td>
 					<td valign="bottom" width="27%">
 						<form action="editForm" method="get">
-							<input type="submit" class="form-button" value="Add New Ontology"/>
+							<input type="submit" class="form-button" aria-label="Add New Ontology" value="Add New Ontology"/>
 							<input type="hidden" name="controller" value="Ontology"/>
 						</form>
 						<form action="editForm" method="get">

@@ -10,11 +10,12 @@
         <h3>${i18n().data_input}</h3>
 
         <form id="addIndividualClass" action="${dataInput.formAction}" method="get">
-            <select id="VClassURI" name="typeOfNew" class="form-item long-options" role="select">
+            <label for="VClassURI">${i18n().type_capitalized?html}</label>
+            <select id="VClassURI" name="typeOfNew" class="form-item long-options">
                 <@form.optionGroups groups=dataInput.groupedClassOptions />
             </select>
-            <input type="hidden" name="editForm" value="${generators.NewIndividualFormGenerator}" role="input" />
-            <input type="submit" id="submit" value="${i18n().add_individual_of_class}" role="button" />
+            <input type="hidden" name="editForm" value="${generators.NewIndividualFormGenerator}" />
+            <input type="submit" id="submit" value="${i18n().add_individual_of_class}" aria-label="${i18n().add_individual_of_class?html}" />
         </form>
 
         <section id="addClassBubble" role="region">

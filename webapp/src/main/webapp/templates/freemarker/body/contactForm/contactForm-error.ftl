@@ -5,7 +5,7 @@
 <h2>${title!}</h2>
 
 <#if errorMessage?has_content>
-    <section id="error-alert"><img src="${urls.images}/iconAlert.png" role="error alert"/>
+    <section id="error-alert" role="alert"><img src="${urls.images}/iconAlert.png" alt="${i18n().error_alert_icon?html}"/>
         <p>${errorMessage}</p>
     </section>
 </#if>

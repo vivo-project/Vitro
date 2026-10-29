@@ -69,6 +69,7 @@ precisionConstants.second -- URI for precision
     </#if>
 
     <fieldset class="dateTime">
+        <legend>${i18n().formatted_date_time?html}</legend>
 
         <#if precLevel gte 1>
             <#-- Only text input field in the mix. We should have some validation to ensure it's a valid year (4 digits, integer, etc) -->

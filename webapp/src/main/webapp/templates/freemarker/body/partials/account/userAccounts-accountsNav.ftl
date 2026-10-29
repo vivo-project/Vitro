@@ -8,10 +8,10 @@
 
 <#assign counts=[25, 50, 100] /> <#-- accounts per page-->
 
-<#macro accountsNav accountsCount=counts>
+<#macro accountsNav accountsCount=counts controlId="accounts-per-page">
 
   <section class="accounts">
-      <input type="submit" name="delete-account" class="delete-account delete" value="${i18n().delete_button}" onClick="changeAction(this.form, '${formUrls.delete}')" />
+      <input type="submit" name="delete-account" class="delete-account delete" value="${i18n().delete_button}" aria-label="${i18n().delete_button?html}" onClick="changeAction(this.form, '${formUrls.delete}')" />
       <!--
           When this is clicked, the checkboxes are noticed and all other fields are ignored.
           submit the form (submit action is formUrls.delete)
@@ -20,7 +20,7 @@
       <nav class="display-tools">
           <span>| ${total} ${i18n().accounts} | </span>
 
-          <select name="accountsPerPage" class="accounts-per-page">
+          <select name="accountsPerPage" id="${controlId?html}" class="accounts-per-page">
               <#list accountsCount as count>
               <option value="${count}" <#if accountsPerPage=count>selected</#if> >${count}</option>
               </#list>
@@ -32,7 +32,7 @@
               -->
           </select>
 
-          ${i18n().accounts_per_page} <input type="submit" name="accounts-per-page" value="${i18n().update_button}" /> |
+          <label class="inline" for="${controlId?html}">${i18n().accounts_per_page}</label> <input type="submit" name="accounts-per-page" value="${i18n().update_button}" aria-label="${i18n().update_button?html}" /> |
           <input id="roleTypeContainer" type="hidden" name="roleFilterUri" value="">
           <#if page.previous?has_content>
               <a id="previousPage" href="${formUrls.list}?accountsPerPage=${accountsPerPage}&pageIndex=${page.previous}" title="${i18n().previous}">${i18n().previous}</a> <!-- only present if current page is not 1.-->
