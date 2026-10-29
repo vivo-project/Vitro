@@ -28,12 +28,12 @@ form textarea {
     width: 60%;
 }
 form a:link.cancel, form a:visited.cancel {
-    color: #f70;
-    border-color: #f70;
+    color: #B50;
+    border-color: #B50;
 }
 form a:hover.cancel, form a:active.cancel {
     color: #fff;
-    background: #f70;
+    background: #B50;
 }
 form select option {
     padding-right: 5px;
