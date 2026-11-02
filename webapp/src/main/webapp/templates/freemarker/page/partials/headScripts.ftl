@@ -5,6 +5,7 @@
 var i18nStrings = {
     allCapitalized: '${i18n().all_capitalized?js_string}',
 };
+var baseUrl = '${urls.base}';
 </script>
 <script type="text/javascript" src="${urls.base}/webjars/jquery/jquery.min.js"></script>
 <script type="text/javascript" src="${urls.base}/webjars/jquery-migrate/jquery-migrate.min.js"></script>
