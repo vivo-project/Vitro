@@ -189,10 +189,6 @@ input[type=checkbox]:not(:checked) + label {
 	margin-right: 0px;
 }
 
-#search-form-footer h2 {
-    margin-top: 10px !important;
-}
-
 #search-form-footer select {
   margin-top: 10px !important;
 }
@@ -207,6 +203,14 @@ input[type=checkbox]:not(:checked) + label {
  display: flex;
  justify-content: right;
  flex-wrap: wrap;
+}
+
+#search-form-footer .results-title {
+  margin-top: 10px;
+}
+
+.searchResultsHeader {
+  width: auto;
 }
 
 label.hidden-search-option {
