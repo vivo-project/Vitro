@@ -41,21 +41,21 @@
             ${individualProductExtensionPreHeader}
         </#if>
 
-        <header>
+        <header class="individual-heading">
             <#if relatedSubject??>
-                <h2>${relatedSubject.relatingPredicateDomainPublic} for ${relatedSubject.name}</h2>
+                <h1>${relatedSubject.relatingPredicateDomainPublic} for ${relatedSubject.name}</h1>
                 <p><a href="${relatedSubject.url}" title="${i18n().return_to(relatedSubject.name)}">&larr; ${i18n().return_to(relatedSubject.name)}</a></p>
             <#else>
                 <h1 class="fn" itemprop="name">
                     <#-- Label -->
                     <@p.label individual editable labelCount localesCount languageCount/>
-                    <#if editable>
-                        <@p.deleteIndividualLink individual />
-                    </#if>
-                    <#--  Most-specific types -->
-                    <@p.mostSpecificTypes individual />
-                    <span id="iconControlsVitro"><img id="uriIcon" title="${individual.uri}" class="middle" src="${urls.images}/individual/uriIcon.gif" alt="uri icon"/></span>
                 </h1>
+                <#if editable>
+                    <@p.deleteIndividualLink individual />
+                </#if>
+                <#--  Most-specific types -->
+                <@p.mostSpecificTypes individual />
+                <span id="iconControlsVitro"><img id="uriIcon" title="${individual.uri}" class="middle" src="${urls.images}/individual/uriIcon.gif" alt="uri icon"/></span>
             </#if>
         </header>
 

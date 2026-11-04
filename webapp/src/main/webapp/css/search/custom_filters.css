@@ -268,7 +268,7 @@ ul#alphabetical-index-individuals a {
 	overflow: hidden;
 }
 
-#browse-by h2 {
+#browse-by h2:not(.selected-class) {
 	height: 44px;
 	line-height: 44px;
 	padding-left: 15px;

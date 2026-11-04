@@ -189,6 +189,7 @@ input[type=checkbox]:not(:checked) + label {
 	margin-right: 0px;
 }
 
+#search-form-footer h1,
 #search-form-footer h2 {
     margin-top: 10px !important;
 }

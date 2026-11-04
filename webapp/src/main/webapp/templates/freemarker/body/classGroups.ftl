@@ -5,6 +5,7 @@
 <#include "classgroups-checkForData.ftl">
 
 <#if (!noData)>
+    <h1>${title!}</h1>
     <section class="siteMap" role="region">
         <ul id="wookmark-container" style="position: relative;">
             <#list classGroups as classGroup>
@@ -22,7 +23,7 @@
 
                     <li class="wookmark-group" style="float: left;">
                     <h2>${classGroup.displayName}</h2>
-                        <ul id="class-group-list" role="list">
+                        <ul class="class-group-list" role="list">
                             <#list classGroup.classes as class>
                                 <#-- Only render populated classes -->
                                 <#if (class.individualCount > 0)>

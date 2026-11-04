@@ -5,7 +5,7 @@
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/admin.css" />')}
 
 <div class="tab">
-    <h2>${i18n().site_administration}</h2>
+    <h1>${i18n().site_administration}</h1>
 </div>
 
 <div id="adminDashboard">
