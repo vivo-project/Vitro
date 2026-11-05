@@ -13,6 +13,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 
 import javax.servlet.annotation.WebServlet;
 
@@ -84,7 +85,7 @@ public class SamplesController extends FreemarkerHttpServlet {
 
         body.put("xsddatetime", "1983-12-07T17:15:28Z");
 
-        body.put("title", "Freemarker Samples");
+        body.put("title", I18n.text(vreq, "freemarker_samples"));
 
         return new TemplateResponseValues(TEMPLATE_DEFAULT, body);
     }

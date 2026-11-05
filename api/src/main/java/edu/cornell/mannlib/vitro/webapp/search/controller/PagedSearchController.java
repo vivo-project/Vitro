@@ -287,8 +287,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             body.put("querytext", queryText);
             body.put("locale", vreq.getLocale().toLanguageTag());
             body.put("title",
-                    new StringBuilder().append(appBean.getApplicationName()).append(" - ")
-                            .append(I18n.text(vreq, "search_results_for")).append(" '").append(queryText).append("'")
+                    new StringBuilder().append(I18n.text(vreq, "search_results_for")).append(" '").append(queryText).append("'")
                             .toString());
 
             body.put("hitCount", hitCount);

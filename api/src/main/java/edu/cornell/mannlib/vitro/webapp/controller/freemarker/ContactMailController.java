@@ -64,7 +64,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
 
     @Override
     protected String getTitle(String siteName, VitroRequest vreq) {
-        return siteName + " Feedback Form";
+        return "Feedback Form";
     }
 
 

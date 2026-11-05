@@ -35,7 +35,7 @@ public class AboutController extends FreemarkerHttpServlet {
 
     @Override
     protected String getTitle(String siteName, VitroRequest vreq) {
-    	return "About " + siteName;
+        return "About";
     }
 
 }

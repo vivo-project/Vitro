@@ -40,7 +40,7 @@ public class RevisionInfoController extends FreemarkerHttpServlet {
 
     @Override
     protected String getTitle(String siteName, VitroRequest vreq) {
-    	return "Revision Information for " + siteName;
+        return "Revision Information";
     }
 
 }

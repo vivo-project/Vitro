@@ -93,7 +93,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
 
 	@Override
 	public String getTitle(String siteName, VitroRequest vreq) {
-        return siteName + " Site Administration";
+        return "Site Administration";
 	}
 
     @Override
