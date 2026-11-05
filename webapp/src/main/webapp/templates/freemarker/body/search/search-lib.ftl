@@ -276,14 +276,14 @@
       $( function() {
           $( "#filter_autocomplete_${filter.id?html?js_string}" ).autocomplete({
           source: function (request, response) {
-            $.getJSON("${facetOptionsUrl}&facet_filter=${filter.id?html?js_string}", {
+            $.getJSON("${facetOptionsUrl?js_string}&facet_filter=${filter.id?html?js_string}", {
                 term: request.term
             }, response);
           },
           minLength: 3,
           select: function( event, ui ) {
             $("#filter_selected_autocomplete_${filter.id?html?js_string}").val("${filter.id?html?js_string}:" + ui.item.value);
-            $('#${form}').trigger("submit");
+            $('#${form?js_string}').trigger("submit");
           }
         } );
       } );

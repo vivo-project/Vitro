@@ -186,7 +186,7 @@
 <script type="text/javascript">
 var proxyContextInfo = {
     baseUrl: '${urls.base}',
-    ajaxUrl: '${formUrls.ajax}'
+    ajaxUrl: '${formUrls.ajax?js_string}'
 };
 var i18nStrings = {
     selectEditorAndProfile: '${i18n().select_editor_and_profile?js_string}'

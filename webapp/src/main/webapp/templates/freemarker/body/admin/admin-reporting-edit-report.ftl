@@ -34,19 +34,19 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/reporting.css" 
                 '<button class="delete" onclick="return deleteDataSource(' + dataSourceIndex + ');"><img src="${urls.images!}/individual/deleteIcon.gif" /></button>' +
                 </#if>
                 '<input type="hidden" name="dataSourceIndex" value="' + dataSourceIndex + '" <#if readOnly??>readonly</#if> />' +
-                '<label>${i18n()["reporting_config_dataSource_distributor"]}</label>' +
+                '<label>${i18n()["reporting_config_dataSource_distributor"]?js_string}</label>' +
                 '<select name="dataSource' + dataSourceIndex + '_distributor" <#if readOnly??>readonly</#if> >' +
                 <#list datadistributors as datadistributor>
-                ((distibutorName == "${datadistributor.name}") ?
-                        '<option value="${datadistributor.name}" selected>${datadistributor.name}</option>'
+                ((distibutorName == "${datadistributor.name?js_string}") ?
+                        '<option value="${datadistributor.name?js_string}" selected>${datadistributor.name?js_string}</option>'
                         :
-                        '<option value="${datadistributor.name}">${datadistributor.name}</option>'
+                        '<option value="${datadistributor.name?js_string}">${datadistributor.name?js_string}</option>'
                 ) +
                 </#list>
                 '</select>' +
                 '<label>${i18n()["reporting_config_dataSource_rank"]}</label>' +
                 '<input type="number" name="dataSource' + dataSourceIndex + '_rank" value=' + rank + ' required <#if readOnly??>readonly</#if> />' +
-                '<label><span class="required">*</span> ${i18n()["reporting_config_dataSource_outputName"]}</label>' +
+                '<label><span class="required">*</span> ${i18n()["reporting_config_dataSource_outputName"]?js_string}</label>' +
                 '<input type="text" name="dataSource' + dataSourceIndex + '_outputName" size="50" value="' + outputName + '" required <#if readOnly??>readonly</#if> />' +
                 '</div>'
             ));
@@ -86,7 +86,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/reporting.css" 
         <div id="field_dataSources">
             <#list report.dataSources as dataSource>
                 <script lang="text/javascript">
-                    addDataSource("${dataSource.distributorName}", ${dataSource.rank}, "${dataSource.outputName}");
+                    addDataSource("${dataSource.distributorName?js_string}", ${dataSource.rank}, "${dataSource.outputName?js_string}");
                 </script>
             </#list>
         </div>
@@ -119,9 +119,9 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/reporting.css" 
             </button>
             <script lang="text/javascript">
                 function confirmDeleteThis() {
-                    var confirmed = confirm("${i18n().reporting_config_delete_confirm}");
+                    var confirmed = confirm("${i18n().reporting_config_delete_confirm?js_string}");
                     if (confirmed) {
-                        window.location.href = "${submitUrlBase}?deleteUri=${editUri?url}";
+                        window.location.href = "${submitUrlBase?js_string}?deleteUri=${editUri?url?js_string}";
                     }
                     return false;
                 }

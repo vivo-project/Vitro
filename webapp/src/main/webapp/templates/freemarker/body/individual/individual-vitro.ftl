@@ -84,7 +84,7 @@
 
 <#if rdfUrl??>
     <script>
-        var individualRdfUrl = '${rdfUrl}';
+        var individualRdfUrl = '${rdfUrl?js_string}';
     </script>
 </#if>
 <script>

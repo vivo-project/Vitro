@@ -67,8 +67,8 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseClassGrou
         <script type="text/javascript">
             var browseData = {
                 baseUrl: '${urls.base}',
-                dataServiceUrl: '${dataServiceUrlVClassesForVClassGroup}',
-                defaultBrowseClassGroupUri: '${firstPopulatedClassGroup.uri!}',
+                dataServiceUrl: '${dataServiceUrlVClassesForVClassGroup?js_string}',
+                defaultBrowseClassGroupUri: '${firstPopulatedClassGroup.uri!?js_string}',
                 defaultBrowseClassGroupCount: '${firstPopulatedClassGroup.individualCount!}'
             };
             var i18nStrings = {

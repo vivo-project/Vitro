@@ -14,7 +14,7 @@
 </div>
 
 <script>
-    searchIndexerStatusUrl = '${statusUrl}'
+    searchIndexerStatusUrl = '${statusUrl?js_string}'
 </script>
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/search/searchIndex.css" />')}

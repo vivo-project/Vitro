@@ -52,9 +52,9 @@
             </button>
             <script lang="text/javascript">
                 function confirmDeleteThis() {
-                    var confirmed = confirm("${i18n().dd_config_delete_confirm}");
+                    var confirmed = confirm("${i18n().dd_config_delete_confirm?js_string}");
                     if (confirmed) {
-                        window.location.href = "${submitUrlBase}?deleteUri=${editUri?url}";
+                        window.location.href = "${submitUrlBase?js_string}?deleteUri=${editUri?url?js_string}";
                     }
                     return false;
                 }

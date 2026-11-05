@@ -181,8 +181,8 @@
 </form>
 
 <script type="text/javascript">
-    confirm_delete_account_singular = "${strings.confirm_delete_account_singular}"
-    confirm_delete_account_plural = "${strings.confirm_delete_account_plural}"
+    confirm_delete_account_singular = "${strings.confirm_delete_account_singular?js_string}"
+    confirm_delete_account_plural = "${strings.confirm_delete_account_plural?js_string}"
 </script>
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/account/account.css" />')}

@@ -10,6 +10,6 @@ ${statement.linkText}
 
 <script type="text/javascript">
     menuItemData.push({
-        'menuItemUri': '${statement.menuItem}'
+        'menuItemUri': '${statement.menuItem?js_string}'
     });
 </script>
